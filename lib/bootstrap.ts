@@ -9,6 +9,24 @@ import type { BootstrapPayload, BootstrapSnapshot } from "@/lib/offline/types";
 
 let bootstrapPromise: Promise<BootstrapSnapshot> | null = null;
 
+async function fetchBootstrapFromNetwork(): Promise<void> {
+  const response = await fetch("/api/mobile/bootstrap", {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (response.status === 401) {
+    return;
+  }
+  if (!response.ok) {
+    throw new Error(`Bootstrap failed with status ${response.status}`);
+  }
+
+  const payload = (await response.json()) as BootstrapPayload;
+  await writeBootstrapPayload(payload);
+}
+
 export async function loadBootstrapSnapshot(): Promise<BootstrapSnapshot> {
   if (bootstrapPromise) {
     return bootstrapPromise;
@@ -17,24 +35,13 @@ export async function loadBootstrapSnapshot(): Promise<BootstrapSnapshot> {
   bootstrapPromise = (async () => {
     const cached = await hasBootstrapCache();
     if (cached) {
+      void fetchBootstrapFromNetwork().catch((error) => {
+        console.warn("[bootstrap] background revalidate failed:", error);
+      });
       return readBootstrapSnapshot();
     }
 
-    const response = await fetch("/api/mobile/bootstrap", {
-      method: "GET",
-      credentials: "include",
-      cache: "no-store",
-    });
-
-    if (response.status === 401) {
-      return readBootstrapSnapshot();
-    }
-    if (!response.ok) {
-      throw new Error(`Bootstrap failed with status ${response.status}`);
-    }
-
-    const payload = (await response.json()) as BootstrapPayload;
-    await writeBootstrapPayload(payload);
+    await fetchBootstrapFromNetwork();
     return readBootstrapSnapshot();
   })();
 

@@ -68,21 +68,6 @@ async function readUsersFromDatabase(): Promise<UserCountry[]> {
   const merged = new Map<string, string>();
 
   try {
-    const profileRows = await sql`
-      SELECT username, country
-      FROM user_profiles
-      WHERE country IS NOT NULL AND TRIM(country) <> ''
-    `;
-    for (const row of profileRows as Array<{ username: string; country: string | null }>) {
-      if (row.username && row.country) {
-        merged.set(row.username, row.country);
-      }
-    }
-  } catch (error) {
-    console.warn("[user-country-storage] Failed to read user_profiles countries:", error);
-  }
-
-  try {
     const authRows = await sql`
       SELECT username, country
       FROM users
@@ -90,12 +75,27 @@ async function readUsersFromDatabase(): Promise<UserCountry[]> {
       ORDER BY updated_at DESC
     `;
     for (const row of authRows as Array<{ username: string; country: string | null }>) {
-      if (row.username && row.country && !merged.has(row.username)) {
+      if (row.username && row.country) {
         merged.set(row.username, row.country);
       }
     }
   } catch (error) {
     console.error("[user-country-storage] Failed to read from users table, falling back:", error);
+  }
+
+  try {
+    const profileRows = await sql`
+      SELECT username, country
+      FROM user_profiles
+      WHERE country IS NOT NULL AND TRIM(country) <> ''
+    `;
+    for (const row of profileRows as Array<{ username: string; country: string | null }>) {
+      if (row.username && row.country && !merged.has(row.username)) {
+        merged.set(row.username, row.country);
+      }
+    }
+  } catch (error) {
+    console.warn("[user-country-storage] Failed to read user_profiles countries:", error);
   }
 
   return Array.from(merged.entries()).map(([username, country]) => ({ username, country }));
@@ -222,7 +222,7 @@ async function readRawUserCountry(username: string): Promise<string | null> {
   if (isDatabaseAvailable()) {
     try {
       const rows = await sql`
-        SELECT COALESCE(NULLIF(up.country, ''), NULLIF(u.country, '')) AS country
+        SELECT COALESCE(NULLIF(u.country, ''), NULLIF(up.country, '')) AS country
         FROM users u
         FULL OUTER JOIN user_profiles up ON up.username = u.username
         WHERE COALESCE(up.username, u.username) = ${username}

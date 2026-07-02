@@ -109,6 +109,21 @@ async function applyUserProfileRecord(record: CachedUserProfileRecord | null): P
   if (!record) return;
 
   const existing = await localDb.get("user_profile", record.id);
+  const incomingCountry = record.country?.trim() || null;
+  const existingCountry = existing?.country?.trim() || null;
+
+  // Account country is immutable server-side — never keep a stale local copy.
+  if (incomingCountry && incomingCountry !== existingCountry) {
+    await localDb.set("user_profile", {
+      ...(existing ?? record),
+      ...record,
+      country: incomingCountry,
+      version: Math.max(existing?.version ?? 0, record.version) + 1,
+      updated_at: record.updated_at,
+    });
+    return;
+  }
+
   if (!existing || record.version > existing.version) {
     await localDb.set("user_profile", record);
     return;

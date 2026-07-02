@@ -220,6 +220,12 @@ async function getProfileBundle(username: string, serverTime: string) {
   const accountLevel = getAccountLevelFromXp(accountXp);
   const seasonLevel = getSeasonLevelFromXp(seasonXp);
   const updatedAt = toIso(profileRow?.updated_at, fallbackUpdatedAt);
+  const updatedAt = toIso(profileRow?.updated_at, fallbackUpdatedAt);
+  const canonicalCountry =
+    normalizeCountryCode(storedCountry) ||
+    normalizeCountryCode(profileRow?.country as string | null) ||
+    normalizeCountryCode(profile?.country) ||
+    null;
 
   const profileRecord: CachedUserProfileRecord = {
     id: CURRENT_PROFILE_ID,
@@ -233,14 +239,16 @@ async function getProfileBundle(username: string, serverTime: string) {
       null,
     occupation: (profileRow?.occupation as string | null) ?? profile?.occupation ?? null,
     city: (profileRow?.city as string | null) ?? profile?.city ?? null,
-    country: storedCountry ?? (profileRow?.country as string | null) ?? profile?.country ?? null,
+    country: canonicalCountry,
     website: (profileRow?.website as string | null) ?? profile?.website ?? null,
     bio: (profileRow?.bio as string | null) ?? profile?.bio ?? null,
     declaredMonthlyIncomeBand: (profileRow?.declared_monthly_income_band as string | null) ?? null,
     honor: Number(profileRow?.honor ?? profile?.honor ?? 50) || 50,
     isAdmin: isAdminUser(username),
-    updated_at: updatedAt,
-    version: toVersion(updatedAt),
+    updated_at: serverTime,
+    // Key off sync moment (like wallet) so every bootstrap/sync can replace a stale
+    // IndexedDB country when users.country was updated server-side.
+    version: toVersion(serverTime),
   };
 
   const progressRecord: CachedProgressRecord = {

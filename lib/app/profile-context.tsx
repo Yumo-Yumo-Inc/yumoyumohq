@@ -12,11 +12,12 @@ import React, {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { loadBootstrapSnapshot } from "@/lib/bootstrap";
-import { readCachedProfile } from "@/lib/offline/cache";
+import { patchCachedProfileFields, readCachedProfile } from "@/lib/offline/cache";
 import { PROFILE_QUERY_KEY } from "./query-keys";
 import { syncMobileData } from "@/lib/sync";
 import { LevelUpPopup, type LevelUpEvent } from "@/components/app/level-up-popup";
 import type { MobileLevelEvent } from "@/lib/mobile/action-result-types";
+import { normalizeCountryCode } from "@/lib/shared/countries";
 
 export interface AppProfile {
   username?: string;
@@ -56,12 +57,33 @@ export interface AppProfile {
   } | null;
 }
 
+async function resolveCanonicalCountry(cachedCountry: string | null): Promise<string | null> {
+  try {
+    const response = await fetch("/api/auth/country", {
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      return normalizeCountryCode(cachedCountry);
+    }
+    const data = (await response.json()) as { country?: string | null };
+    const resolved = normalizeCountryCode(data.country);
+    if (resolved && resolved !== cachedCountry) {
+      void patchCachedProfileFields({ country: resolved }).catch(() => {});
+    }
+    return resolved ?? normalizeCountryCode(cachedCountry);
+  } catch {
+    return normalizeCountryCode(cachedCountry);
+  }
+}
+
 async function fetchProfileData(): Promise<AppProfile> {
   await loadBootstrapSnapshot().catch(() => {});
   const { profile, progress, wallet } = await readCachedProfile();
   if (!profile || !progress || !wallet) {
     throw new Error("Profile cache not ready");
   }
+  const country = await resolveCanonicalCountry(profile.country ?? null);
   return {
     username: profile.username,
     displayName: profile.displayName ?? undefined,
@@ -70,7 +92,7 @@ async function fetchProfileData(): Promise<AppProfile> {
     birthDate: profile.birthDate ?? null,
     occupation: profile.occupation ?? null,
     city: profile.city ?? null,
-    country: profile.country ?? null,
+    country,
     website: profile.website ?? null,
     bio: profile.bio ?? null,
     declaredMonthlyIncomeBand: profile.declaredMonthlyIncomeBand ?? null,

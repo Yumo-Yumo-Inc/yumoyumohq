@@ -253,7 +253,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     setOccupation(profile?.occupation ?? "");
     setIncomeBand(profile?.declaredMonthlyIncomeBand ?? "");
     setCity(profile?.city ?? "");
-    setCountry(normalizeCountryCode(profile?.country) ?? "");
     setWebsite(profile?.website ?? "");
     setBio(profile?.bio ?? "");
   }, [profile]);
@@ -277,6 +276,13 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    const resolved = normalizeCountryCode(profile?.country);
+    if (resolved) {
+      setCountry(resolved);
+    }
+  }, [profile?.country]);
 
   const accountLevel = profile?.accountLevel ?? 1;
   const accountXp = profile?.accountXp ?? 0;
@@ -459,7 +465,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     try {
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
       await clearOfflineSessionCache().catch(() => {});
-      router.replace("/app/login");
+      window.location.href = "/app/login";
     } finally {
       setIsLoggingOut(false);
     }
