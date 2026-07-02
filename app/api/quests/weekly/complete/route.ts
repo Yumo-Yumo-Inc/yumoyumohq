@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
     const questRow = await sql`
       SELECT uq.id, uq.progress, uq.target, uq.status, uq.season_number,
-             qt.type, qt.reward_ryumo, qt.reward_season_xp
+             qt.type, qt.reward_bint, qt.reward_season_xp
       FROM user_quests uq
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
       WHERE uq.id = ${questId}
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       username,
       Number(quest.id ?? 0),
       questType,
-      Number(quest.reward_ryumo ?? 0) || 0,
+      Number(quest.reward_bint ?? 0) || 0,
       Number(quest.reward_season_xp ?? 0) || 0,
       Number(quest.season_number ?? 1) || 1,
       getWeeklyQuestRewardAccountXp(questType)

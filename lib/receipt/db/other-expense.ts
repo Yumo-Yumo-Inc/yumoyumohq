@@ -190,8 +190,8 @@ const COMBINED_RECEIPTS_SUBQUERY = `
     r.hidden_cost_breakdown_import_system,
     r.hidden_cost_breakdown_retail_hidden,
     r.hidden_cost_reference_price,
-    rr.ayumo_amount,
-    rr.ryumo_bonus_amount,
+    rr.bint_amount AS ayumo_amount,
+    rr.bint_bonus_amount AS ryumo_bonus_amount,
     r.reward_final,
     COALESCE(r.expense_type, 'personal') AS expense_type
   FROM receipts r

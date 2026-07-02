@@ -1,5 +1,5 @@
 /**
- * Reward dispatcher: when quest completes, add rYUMO + season XP + account XP.
+ * Reward dispatcher: when quest completes, add bINT + season XP + account XP.
  * Every quest type grants both season XP and account XP (account XP = rewardAccountXp ?? rewardSeasonXp).
  */
 
@@ -52,10 +52,10 @@ export async function dispatchQuestReward(
     }
 
     const upsertResult = await sql`
-      INSERT INTO user_profiles (username, ryumo_balance, season_xp, account_xp, account_level, season_level, updated_at)
+      INSERT INTO user_profiles (username, bint_balance, season_xp, account_xp, account_level, season_level, updated_at)
       VALUES (${username}, ${rewardRyumo}, ${rewardSeasonXp}, ${accountXpToAdd}, 1, 1, now())
       ON CONFLICT (username) DO UPDATE SET
-        ryumo_balance = COALESCE(user_profiles.ryumo_balance, 0) + EXCLUDED.ryumo_balance,
+        bint_balance = COALESCE(user_profiles.bint_balance, 0) + EXCLUDED.bint_balance,
         season_xp = COALESCE(user_profiles.season_xp, 0) + ${rewardSeasonXp},
         account_xp = COALESCE(user_profiles.account_xp, 0) + ${accountXpToAdd},
         updated_at = EXCLUDED.updated_at

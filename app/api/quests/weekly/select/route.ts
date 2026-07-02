@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     }
 
     const templateRow = await sql`
-      SELECT id, reward_ryumo, reward_season_xp
+      SELECT id, reward_bint, reward_season_xp
       FROM quest_templates
       WHERE type = ${selectedType}
       LIMIT 1
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Quest template not found" }, { status: 404 });
     }
 
-    const rewardRyumo = Number(template.reward_ryumo ?? 220) || 220;
+    const rewardRyumo = Number(template.reward_bint ?? 220) || 220;
     const rewardSeasonXp = Number(template.reward_season_xp ?? 500) || 500;
     const rewardAccountXp = getWeeklyQuestRewardAccountXp(selectedType);
     const target = selectionState.targetsByType[selectedType];

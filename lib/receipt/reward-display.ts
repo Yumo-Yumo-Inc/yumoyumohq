@@ -30,14 +30,14 @@ export type ResolveNoRewardOptions = {
   currentUsername?: string | null;
 };
 
-export function getAyumoAmount(reward?: RewardDisplayFields | null): number {
+export function getBintAmount(reward?: RewardDisplayFields | null): number {
   return Number(reward?.final ?? reward?.amount ?? 0) || 0;
 }
 
 export function getTotalRewardAmount(reward?: RewardDisplayFields | null): number {
-  const ayumo = getAyumoAmount(reward);
-  const ryumo = reward?.ryumo != null ? Number(reward.ryumo) : 0;
-  return ayumo + ryumo;
+  const bint = getBintAmount(reward);
+  const bintBonus = reward?.ryumo != null ? Number(reward.ryumo) : 0;
+  return bint + bintBonus;
 }
 
 function resolveNoRewardCode(

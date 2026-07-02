@@ -27,7 +27,7 @@ type WeeklyQuestRow = {
   type: WeeklyQuestType;
   target: number;
   season_number: number;
-  reward_ryumo: number;
+  reward_bint: number;
   reward_season_xp: number;
 };
 
@@ -405,7 +405,7 @@ export async function autoCompleteEligibleWeeklyQuests(
         uq.progress,
         uq.season_number,
         qt.type,
-        qt.reward_ryumo,
+        qt.reward_bint,
         qt.reward_season_xp
       FROM user_quests uq
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
@@ -427,7 +427,7 @@ export async function autoCompleteEligibleWeeklyQuests(
       username,
       Number(quest.id),
       quest.type,
-      Number(quest.reward_ryumo) || 0,
+      Number(quest.reward_bint) || 0,
       Number(quest.reward_season_xp) || 0,
       Number(quest.season_number) || 1,
       getWeeklyQuestRewardAccountXp(quest.type)

@@ -29,8 +29,8 @@ async function ensureRewardLogTable() {
         id SERIAL PRIMARY KEY,
         receipt_id VARCHAR(255) NOT NULL,
         referral_relationship_id INT NOT NULL,
-        amount_ryumo_referee NUMERIC(20,6) DEFAULT 0,
-        amount_ryumo_referrer NUMERIC(20,6) DEFAULT 0,
+        amount_bint_referee NUMERIC(20,6) DEFAULT 0,
+        amount_bint_referrer NUMERIC(20,6) DEFAULT 0,
         created_at TIMESTAMP DEFAULT now()
       )
     `;
@@ -38,8 +38,8 @@ async function ensureRewardLogTable() {
 
   await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS receipt_id VARCHAR(255)`;
   await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS referral_relationship_id INT`;
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS amount_ryumo_referee NUMERIC(20,6) DEFAULT 0`;
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS amount_ryumo_referrer NUMERIC(20,6) DEFAULT 0`;
+  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS amount_bint_referee NUMERIC(20,6) DEFAULT 0`;
+  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS amount_bint_referrer NUMERIC(20,6) DEFAULT 0`;
   await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT now()`;
 
   await sql`CREATE INDEX IF NOT EXISTS idx_rrl_receipt ON referral_reward_log(receipt_id)`;
@@ -62,17 +62,17 @@ export interface ReferralBonusResult {
  *
  * @param receiptId     - The verified receipt id
  * @param refereeUsername - The receipt owner (referee)
- * @param ryumoBonusAmount - The rYUMO bonus amount from receipt_rewards
+ * @param bintBonusAmount - The bINT bonus amount from receipt_rewards
  * @returns Whether a bonus was applied and its amount
  */
 export async function applyReferralBonus(
   receiptId: string,
   refereeUsername: string,
-  ryumoBonusAmount: number,
+  bintBonusAmount: number,
 ): Promise<ReferralBonusResult> {
   const noBonus: ReferralBonusResult = { applied: false, referrerUsername: null, bonusAmount: 0 };
 
-  if (!ryumoBonusAmount || ryumoBonusAmount <= 0) return noBonus;
+  if (!bintBonusAmount || bintBonusAmount <= 0) return noBonus;
 
   const sql = getSql();
   if (!sql) return noBonus;
@@ -90,14 +90,14 @@ export async function applyReferralBonus(
   if (!relRows.length) return noBonus;
 
   const rel = relRows[0] as { id: number; referrer_username: string };
-  const bonusAmount = Math.round(ryumoBonusAmount * REFERRAL_BONUS_PCT * 100) / 100;
+  const bonusAmount = Math.round(bintBonusAmount * REFERRAL_BONUS_PCT * 100) / 100;
   if (bonusAmount <= 0) return noBonus;
 
   // Idempotency is enforced atomically by the unique index: the INSERT only
   // succeeds for the first writer; a concurrent re-run gets 0 rows back and
   // skips the credit, so the referrer can't be double-credited.
   const inserted = await sql`
-    INSERT INTO referral_reward_log (receipt_id, referral_relationship_id, amount_ryumo_referee, amount_ryumo_referrer)
+    INSERT INTO referral_reward_log (receipt_id, referral_relationship_id, amount_bint_referee, amount_bint_referrer)
     VALUES (${receiptId}, ${rel.id}, 0, ${bonusAmount})
     ON CONFLICT (receipt_id, referral_relationship_id) DO NOTHING
     RETURNING id
@@ -107,7 +107,7 @@ export async function applyReferralBonus(
   // Credit the referrer's balance
   await sql`
     UPDATE user_profiles
-    SET ryumo_balance = COALESCE(ryumo_balance, 0) + ${bonusAmount},
+    SET bint_balance = COALESCE(bint_balance, 0) + ${bonusAmount},
         updated_at = now()
     WHERE username = ${rel.referrer_username}
   `;

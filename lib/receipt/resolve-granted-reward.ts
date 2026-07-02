@@ -13,7 +13,7 @@ export type GrantedRewardResolution = {
   eligible: boolean;
   rewardFraction: number;
   fullRewardEstimate: number;
-  grantedAyumo: number;
+  grantedBint: number;
   isPaymentProof: boolean;
   proofStatus: string | null;
   pendingItemizedReceipt: boolean;
@@ -123,14 +123,14 @@ export function resolveGrantedReward(input: {
       ? Math.round(fullRewardEstimate * rewardFraction * 100) / 100
       : 0;
   const stored = Number(input.storedRewardFinal ?? 0) || 0;
-  const grantedAyumo = stored > 0 ? stored : computedGranted;
+  const grantedBint = stored > 0 ? stored : computedGranted;
 
   return {
     rules,
     eligible,
     rewardFraction,
     fullRewardEstimate,
-    grantedAyumo,
+    grantedBint,
     isPaymentProof: rules.pendingItemizedReceipt === true,
     proofStatus: rules.pendingItemizedReceipt ? "pending" : null,
     pendingItemizedReceipt: rules.pendingItemizedReceipt === true,
@@ -141,22 +141,22 @@ export function resolveGrantedReward(input: {
 export function mergeGrantedRewardIntoReceiptData(
   receiptData: unknown,
   granted: GrantedRewardResolution,
-  ryumoBonus?: number
+  bintBonus?: number
 ): Record<string, unknown> {
   const data = asRecord(receiptData);
   const reward = asRecord(data.reward);
   const nextReward = {
     ...reward,
-    raw: granted.grantedAyumo,
-    final: granted.grantedAyumo,
-    ryumo: ryumoBonus ?? reward.ryumo ?? 0,
+    raw: granted.grantedBint,
+    final: granted.grantedBint,
+    ryumo: bintBonus ?? reward.ryumo ?? 0,
     token: reward.token ?? "cPoints",
     rewardFraction: granted.rewardFraction,
     fullRewardEstimate:
       granted.fullRewardEstimate > 0 ? granted.fullRewardEstimate : reward.fullRewardEstimate,
     pendingItemizedReceipt: granted.pendingItemizedReceipt || undefined,
-    noRewardReasonCode: granted.grantedAyumo > 0 ? null : reward.noRewardReasonCode ?? "generic",
-    noRewardExplanation: granted.grantedAyumo > 0 ? null : reward.noRewardExplanation ?? null,
+    noRewardReasonCode: granted.grantedBint > 0 ? null : reward.noRewardReasonCode ?? "generic",
+    noRewardExplanation: granted.grantedBint > 0 ? null : reward.noRewardExplanation ?? null,
   };
 
   return {

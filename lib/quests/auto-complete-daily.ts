@@ -13,7 +13,7 @@ type EligibleDailyQuestRow = {
   id: number;
   season_number: number;
   type: string;
-  reward_ryumo: number;
+  reward_bint: number;
   reward_season_xp: number;
 };
 
@@ -29,7 +29,7 @@ export async function autoCompleteEligibleDailyQuests(
       uq.id,
       uq.season_number,
       qt.type,
-      qt.reward_ryumo,
+      qt.reward_bint,
       qt.reward_season_xp
     FROM user_quests uq
     JOIN quest_templates qt ON uq.quest_template_id = qt.id
@@ -49,7 +49,7 @@ export async function autoCompleteEligibleDailyQuests(
       username,
       Number(quest.id),
       String(quest.type),
-      Number(quest.reward_ryumo) || 0,
+      Number(quest.reward_bint) || 0,
       Number(quest.reward_season_xp) || 0,
       Number(quest.season_number) || 1
     );

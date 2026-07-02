@@ -113,7 +113,7 @@ async function getProfilePatch(
         account_xp,
         season_level,
         season_xp,
-        ryumo_balance,
+        bint_balance AS ryumo_balance,
         streak,
         display_name,
         avatar_url,
@@ -232,7 +232,7 @@ async function getQuestPatch(username: string, serverTime: string): Promise<Cach
       SELECT
         uq.id, uq.progress, uq.target, uq.status,
         uq.completed_at, uq.updated_at,
-        qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
+        qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
       FROM user_quests uq
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
       WHERE uq.username = ${username}
@@ -244,7 +244,7 @@ async function getQuestPatch(username: string, serverTime: string): Promise<Cach
       SELECT
         uq.id, uq.progress, uq.target, uq.status,
         uq.completed_at, uq.updated_at,
-        qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
+        qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
       FROM user_quests uq
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
       WHERE uq.username = ${username}
@@ -271,7 +271,7 @@ async function getQuestPatch(username: string, serverTime: string): Promise<Cach
       target: Number(row.target ?? 1) || 1,
       status: String(row.status ?? "active"),
       completedAt: row.completed_at ? toIso(row.completed_at, updatedAt) : null,
-      rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+      rewardRyumo: Number(row.reward_bint ?? 0) || 0,
       rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
       updated_at: updatedAt,
       version: toVersion(updatedAt),
@@ -297,7 +297,7 @@ async function getQuestPatch(username: string, serverTime: string): Promise<Cach
       target: Number(row.target ?? 1) || 1,
       status: String(row.status ?? "active"),
       completedAt: row.completed_at ? toIso(row.completed_at, updatedAt) : null,
-      rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+      rewardRyumo: Number(row.reward_bint ?? 0) || 0,
       rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
       updated_at: updatedAt,
       version: toVersion(updatedAt),
