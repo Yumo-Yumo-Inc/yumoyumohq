@@ -1,0 +1,22 @@
+{
+  "receiptId": "case-us-sales-tax",
+  "status": "analyzed",
+  "detectedCountry": "US",
+  "llmSource": "gpt-4o-vision",
+  "merchant": {
+    "name": "Walgreens LLC",
+    "category": "pharmacy",
+    "country": "US"
+  },
+  "pricing": {
+    "totalPaid": 87.63,
+    "vatAmount": 5.63,
+    "vatRate": 0.0643,
+    "currency": "USD",
+    "symbol": "$"
+  },
+  "extraction": {
+    "total": { "value": 87.63, "confidence": 0.93 },
+    "vat": { "value": 5.63, "rate": 0.0643, "confidence": 0.82 }
+  }
+}

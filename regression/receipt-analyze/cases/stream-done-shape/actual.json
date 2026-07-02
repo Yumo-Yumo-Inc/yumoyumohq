@@ -1,0 +1,45 @@
+{
+  "type": "done",
+  "receiptId": "stream-1",
+  "status": "pending",
+  "detectedCountry": "MY",
+  "llmSource": "gpt-4o-vision",
+  "merchant": {
+    "name": "Tealive Sunway",
+    "category": "cafe",
+    "country": "MY"
+  },
+  "pricing": {
+    "totalPaid": 42,
+    "vatAmount": 2.52,
+    "vatRate": 0.06,
+    "currency": "MYR",
+    "symbol": "RM",
+    "paidExTax": 39.48,
+    "serviceCharge": 0,
+    "paidPriceExTax": 39.48,
+    "stateLayerTax": 2.52,
+    "importSystemRate": 0,
+    "retailHiddenRate": 0
+  },
+  "extraction": {
+    "date": { "value": "2026-02-01", "confidence": 0.8 },
+    "total": { "value": 42, "confidence": 0.8 },
+    "vat": { "value": 2.52, "rate": 0.06, "confidence": 0.8 }
+  },
+  "reward": {
+    "conversionRate": 1,
+    "raw": 0.5,
+    "final": 0.5,
+    "ryumo": 0.5,
+    "token": "aYUMO",
+    "capsApplied": []
+  },
+  "verification": {
+    "hash": "",
+    "isDuplicate": false,
+    "confidenceScore": 0.8,
+    "merchantVerified": false,
+    "passedGating": true
+  }
+}

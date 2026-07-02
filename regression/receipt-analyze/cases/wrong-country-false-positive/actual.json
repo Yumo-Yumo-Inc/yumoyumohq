@@ -1,0 +1,22 @@
+{
+  "receiptId": "case-wrong-country-false-positive",
+  "status": "analyzed",
+  "detectedCountry": "TR",
+  "llmSource": "gpt-4o-vision",
+  "merchant": {
+    "name": "Migros Ticaret A.S.",
+    "category": "grocery",
+    "country": "TR"
+  },
+  "pricing": {
+    "totalPaid": 325.95,
+    "vatAmount": 29.63,
+    "vatRate": 0.1,
+    "currency": "TRY",
+    "symbol": "TRY"
+  },
+  "extraction": {
+    "total": { "value": 325.95, "confidence": 0.93 },
+    "vat": { "value": 29.63, "rate": 0.1, "confidence": 0.84 }
+  }
+}

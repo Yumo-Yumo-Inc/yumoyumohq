@@ -1,0 +1,39 @@
+{
+  "receiptId": "reg-minimal-1",
+  "status": "analyzed",
+  "merchant": {
+    "name": "Migros Ticaret A.S.",
+    "category": "grocery",
+    "country": "TR"
+  },
+  "detectedCountry": "TR",
+  "llmSource": "gemini-vision",
+  "total": 100.5,
+  "currency": "TRY",
+  "symbol": "TRY",
+  "vatAmount": 18.09,
+  "vatRate": 0.18,
+  "reward": {
+    "raw": 1.2,
+    "final": 1.2,
+    "ryumo": 1.55,
+    "token": "aYUMO",
+    "verifiedThankYou": false
+  },
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": {
+    "fraudScore": 12,
+    "riskLevel": "low",
+    "isValid": true,
+    "warningsCount": 1,
+    "checksKeys": ["photoOfScreen"]
+  },
+  "riskScore": 12,
+  "rejected": null,
+  "error": null
+}

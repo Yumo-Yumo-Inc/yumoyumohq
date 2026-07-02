@@ -1,0 +1,27 @@
+{
+  "receiptId": "case-us-sales-tax",
+  "status": "analyzed",
+  "merchant": {
+    "name": "Walgreens LLC",
+    "category": "pharmacy",
+    "country": "US"
+  },
+  "detectedCountry": "US",
+  "llmSource": "gpt-4o-vision",
+  "total": 87.63,
+  "currency": "USD",
+  "symbol": "$",
+  "vatAmount": 5.63,
+  "vatRate": 0.0643,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}

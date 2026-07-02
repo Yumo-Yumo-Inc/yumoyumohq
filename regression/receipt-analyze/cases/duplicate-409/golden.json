@@ -1,0 +1,23 @@
+{
+  "receiptId": null,
+  "status": null,
+  "merchant": null,
+  "detectedCountry": null,
+  "llmSource": null,
+  "total": null,
+  "currency": null,
+  "symbol": null,
+  "vatAmount": null,
+  "vatRate": null,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": true,
+    "duplicateReceiptId": "existing-receipt-uuid",
+    "duplicateType": "content",
+    "duplicateUsername": "alice"
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": "This receipt was already uploaded."
+}

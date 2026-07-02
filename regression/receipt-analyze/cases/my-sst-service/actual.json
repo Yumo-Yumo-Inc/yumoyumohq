@@ -1,0 +1,22 @@
+{
+  "receiptId": "case-my-sst-service",
+  "status": "analyzed",
+  "detectedCountry": "MY",
+  "llmSource": "gemini-vision",
+  "merchant": {
+    "name": "OldTown White Coffee Sdn Bhd",
+    "category": "restaurant",
+    "country": "MY"
+  },
+  "pricing": {
+    "totalPaid": 48.2,
+    "vatAmount": 2.73,
+    "vatRate": 0.06,
+    "currency": "MYR",
+    "symbol": "RM"
+  },
+  "extraction": {
+    "total": { "value": 48.2, "confidence": 0.92 },
+    "vat": { "value": 2.73, "rate": 0.06, "confidence": 0.86 }
+  }
+}

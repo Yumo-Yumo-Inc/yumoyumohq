@@ -1,0 +1,5 @@
+TÜFE/ÜFE veri kaynağı: TÜİK (Türkiye İstatistik Kurumu)
+
+Bu klasördeki tüm CSV dosyaları (tufe.csv, ürün bazlı tüfe.csv, üfe1.csv, üfe2.csv)
+TÜİK'ten alınmıştır. Import: scripts/import-tufe-ufe.ts
+Detay: lib/etl/data-sources.md

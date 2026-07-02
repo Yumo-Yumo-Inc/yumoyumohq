@@ -1,0 +1,54 @@
+{
+  "receiptId": "reg-minimal-1",
+  "status": "analyzed",
+  "detectedCountry": "TR",
+  "llmSource": "gemini-vision",
+  "merchant": {
+    "name": "Migros Ticaret A.S.",
+    "category": "grocery",
+    "country": "TR"
+  },
+  "pricing": {
+    "totalPaid": 100.5,
+    "vatAmount": 18.09,
+    "vatRate": 0.18,
+    "currency": "TRY",
+    "symbol": "TRY",
+    "paidExTax": 82.41,
+    "serviceCharge": 0,
+    "paidPriceExTax": 82.41,
+    "stateLayerTax": 18.09,
+    "importSystemRate": 0.01,
+    "retailHiddenRate": 0.02
+  },
+  "extraction": {
+    "date": { "value": "2026-01-15", "confidence": 0.8 },
+    "total": { "value": 100.5, "confidence": 0.8 },
+    "vat": { "value": 18.09, "rate": 0.18, "confidence": 0.8 }
+  },
+  "reward": {
+    "conversionRate": 1,
+    "raw": 1.2,
+    "final": 1.2,
+    "ryumo": 1.55,
+    "token": "aYUMO",
+    "capsApplied": [],
+    "verifiedThankYou": false
+  },
+  "verification": {
+    "hash": "abc",
+    "isDuplicate": false,
+    "confidenceScore": 0.8,
+    "merchantVerified": true,
+    "passedGating": true
+  },
+  "fraud": {
+    "fraudScore": 12,
+    "riskLevel": "low",
+    "isValid": true,
+    "rejectionReasons": [],
+    "warnings": ["note"],
+    "checks": { "photoOfScreen": false }
+  },
+  "riskScore": 12
+}

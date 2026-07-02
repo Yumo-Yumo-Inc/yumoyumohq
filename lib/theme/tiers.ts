@@ -1,0 +1,402 @@
+/**
+ * 10-tier epic theme system (reference: yumo-superapp.jsx).
+ * Seed → Immortal. Used for ThemeBg, ThemeCard, Sidebar, TopBar, BottomNav. Names are always English.
+ */
+
+export interface BlobSpec {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  c: string;
+  i: number;
+}
+
+export type ThemeMode = "dark" | "light";
+
+export interface TierTheme {
+  name: string;
+  range: string;
+  min: number;
+  max: number;
+  base: string;
+  blobs: BlobSpec[];
+  vignette: number;
+  noiseAmt: number;
+  noiseBright: number;
+  shimmer: boolean;
+  pulseRing: boolean;
+  cardBg: string;
+  cardBorder: string;
+  topLine: string;
+  accent: string;
+  accent2: string;
+  avatarBg: string;
+  orbBg: string;
+  outerGlow: string;
+  /** Light mode overrides (optional) */
+  baseLight?: string;
+  cardBgLight?: string;
+  cardBorderLight?: string;
+  topLineLight?: string;
+  avatarBgLight?: string;
+  orbBgLight?: string;
+  outerGlowLight?: string;
+  vignetteLight?: number;
+}
+
+export const TIERS: TierTheme[] = [
+  {
+    name: "Seed",
+    range: "1–9",
+    min: 1,
+    max: 9,
+    base: "#0F1117",
+    blobs: [
+      { x: 0.15, y: 0.08, rx: 0.45, ry: 0.32, c: "rgba(201,168,76,", i: 0.08 },
+      { x: 0.85, y: 0.75, rx: 0.35, ry: 0.28, c: "rgba(100,60,8,", i: 0.05 },
+    ],
+    vignette: 0.62,
+    noiseAmt: 0.38,
+    noiseBright: 14,
+    shimmer: false,
+    pulseRing: false,
+    cardBg: "#161B27",
+    cardBorder: "rgba(201,168,76,0.18)",
+    topLine: "rgba(201,168,76,.22)",
+    accent: "#C9A84C",
+    accent2: "#E8C97A",
+    avatarBg: "#1c1408,#382a10",
+    orbBg: "#1a1205,#302010",
+    outerGlow: "rgba(201,168,76,.06)",
+    baseLight: "#F5F0E6",
+    cardBgLight: "rgba(255,252,245,.85)",
+    cardBorderLight: "rgba(201,168,76,.25)",
+    topLineLight: "rgba(201,168,76,.4)",
+    avatarBgLight: "#f0e6d0,#e8dcc4",
+    orbBgLight: "#ebe0c8,#d8cca0",
+    outerGlowLight: "rgba(201,168,76,.12)",
+    vignetteLight: 0.2,
+  },
+  {
+    name: "Sapling",
+    range: "10–19",
+    min: 10,
+    max: 19,
+    base: "#050E09",
+    blobs: [
+      { x: 0.12, y: 0.06, rx: 0.55, ry: 0.38, c: "rgba(90,155,118,", i: 0.07 },
+      { x: 0.88, y: 0.7, rx: 0.42, ry: 0.32, c: "rgba(40,100,70,", i: 0.05 },
+      { x: 0.5, y: 1, rx: 0.6, ry: 0.35, c: "rgba(70,130,95,", i: 0.05 },
+    ],
+    vignette: 0.68,
+    noiseAmt: 0.48,
+    noiseBright: 16,
+    shimmer: false,
+    pulseRing: false,
+    cardBg: "rgba(5,14,9,.65)",
+    cardBorder: "rgba(90,155,118,.1)",
+    topLine: "rgba(90,155,118,.2)",
+    accent: "#5A9B76",
+    accent2: "#82C4A0",
+    avatarBg: "#08140c,#0e2014",
+    orbBg: "#061008,#0c1810",
+    outerGlow: "rgba(90,155,118,.06)",
+    baseLight: "#EBF3EF",
+    cardBgLight: "rgba(248,252,250,.9)",
+    cardBorderLight: "rgba(90,155,118,.2)",
+    topLineLight: "rgba(90,155,118,.38)",
+    avatarBgLight: "#d8ebe0,#c0e0d0",
+    orbBgLight: "#c8e8d8,#a8d8c0",
+    outerGlowLight: "rgba(90,155,118,.08)",
+    vignetteLight: 0.18,
+  },
+  {
+    name: "Archer",
+    range: "20–29",
+    min: 20,
+    max: 29,
+    base: "#0A0700",
+    blobs: [
+      { x: 0.1, y: 0.05, rx: 0.6, ry: 0.4, c: "rgba(230,130,20,", i: 0.09 },
+      { x: 0.9, y: 0.65, rx: 0.45, ry: 0.35, c: "rgba(180,70,10,", i: 0.07 },
+      { x: 0.55, y: 0.95, rx: 0.65, ry: 0.38, c: "rgba(200,100,0,", i: 0.06 },
+    ],
+    vignette: 0.65,
+    noiseAmt: 0.5,
+    noiseBright: 18,
+    shimmer: false,
+    pulseRing: false,
+    cardBg: "rgba(10,7,0,.62)",
+    cardBorder: "rgba(230,130,20,.1)",
+    topLine: "rgba(230,130,20,.25)",
+    accent: "#E68214",
+    accent2: "#F0A840",
+    avatarBg: "#1e1000,#3a1e00",
+    orbBg: "#1a0e00,#321800",
+    outerGlow: "rgba(230,130,20,.08)",
+    baseLight: "#FFF8F0",
+    cardBgLight: "rgba(255,250,240,.9)",
+    cardBorderLight: "rgba(230,130,20,.25)",
+    topLineLight: "rgba(230,130,20,.45)",
+    avatarBgLight: "#ffe4c4,#ffd8a8",
+    orbBgLight: "#ffecd4,#ffd8a0",
+    outerGlowLight: "rgba(230,130,20,.1)",
+    vignetteLight: 0.2,
+  },
+  {
+    name: "Master",
+    range: "30–39",
+    min: 30,
+    max: 39,
+    base: "#060410",
+    blobs: [
+      { x: 0.12, y: 0.06, rx: 0.6, ry: 0.42, c: "rgba(130,70,220,", i: 0.09 },
+      { x: 0.88, y: 0.68, rx: 0.48, ry: 0.36, c: "rgba(80,30,170,", i: 0.07 },
+      { x: 0.5, y: 1, rx: 0.7, ry: 0.4, c: "rgba(160,80,240,", i: 0.06 },
+    ],
+    vignette: 0.68,
+    noiseAmt: 0.5,
+    noiseBright: 16,
+    shimmer: false,
+    pulseRing: false,
+    cardBg: "rgba(6,4,14,.65)",
+    cardBorder: "rgba(130,70,220,.12)",
+    topLine: "rgba(130,70,220,.28)",
+    accent: "#8246DC",
+    accent2: "#A870F0",
+    avatarBg: "#0e0820,#1c1038",
+    orbBg: "#0c0618,#180e2e",
+    outerGlow: "rgba(130,70,220,.08)",
+    baseLight: "#F3EEFC",
+    cardBgLight: "rgba(250,246,255,.9)",
+    cardBorderLight: "rgba(130,70,220,.22)",
+    topLineLight: "rgba(130,70,220,.4)",
+    avatarBgLight: "#e6dcf8,#d4c4f0",
+    orbBgLight: "#e0d4f5,#c8b0e8",
+    outerGlowLight: "rgba(130,70,220,.1)",
+    vignetteLight: 0.2,
+  },
+  {
+    name: "Oracle",
+    range: "40–49",
+    min: 40,
+    max: 49,
+    base: "#020C0E",
+    blobs: [
+      { x: 0.1, y: 0.06, rx: 0.6, ry: 0.4, c: "rgba(20,190,210,", i: 0.09 },
+      { x: 0.9, y: 0.65, rx: 0.5, ry: 0.38, c: "rgba(10,130,150,", i: 0.07 },
+      { x: 0.5, y: 1, rx: 0.7, ry: 0.42, c: "rgba(30,170,190,", i: 0.06 },
+    ],
+    vignette: 0.65,
+    noiseAmt: 0.52,
+    noiseBright: 18,
+    shimmer: false,
+    pulseRing: false,
+    cardBg: "rgba(2,10,12,.65)",
+    cardBorder: "rgba(20,190,210,.12)",
+    topLine: "rgba(20,190,210,.28)",
+    accent: "#14BED2",
+    accent2: "#50D8E8",
+    avatarBg: "#021418,#083040",
+    orbBg: "#021018,#062830",
+    outerGlow: "rgba(20,190,210,.08)",
+    baseLight: "#E8F8FA",
+    cardBgLight: "rgba(240,252,254,.9)",
+    cardBorderLight: "rgba(20,190,210,.25)",
+    topLineLight: "rgba(20,190,210,.45)",
+    avatarBgLight: "#c8f0f5,#a8e8f0",
+    orbBgLight: "#b8ecf2,#90e0e8",
+    outerGlowLight: "rgba(20,190,210,.1)",
+    vignetteLight: 0.18,
+  },
+  {
+    name: "Phoenix",
+    range: "50–59",
+    min: 50,
+    max: 59,
+    base: "#0C0303",
+    blobs: [
+      { x: 0.1, y: 0.05, rx: 0.65, ry: 0.45, c: "rgba(220,40,40,", i: 0.11 },
+      { x: 0.9, y: 0.62, rx: 0.52, ry: 0.4, c: "rgba(160,20,20,", i: 0.08 },
+      { x: 0.5, y: 1, rx: 0.75, ry: 0.45, c: "rgba(200,30,30,", i: 0.07 },
+      { x: 0.5, y: 0.5, rx: 0.4, ry: 0.3, c: "rgba(220,40,40,", i: 0.04 },
+    ],
+    vignette: 0.62,
+    noiseAmt: 0.55,
+    noiseBright: 20,
+    shimmer: false,
+    pulseRing: false,
+    cardBg: "rgba(12,3,3,.65)",
+    cardBorder: "rgba(220,40,40,.14)",
+    topLine: "rgba(220,40,40,.32)",
+    accent: "#DC2828",
+    accent2: "#F06060",
+    avatarBg: "#200606,#381010",
+    orbBg: "#1a0404,#300808",
+    outerGlow: "rgba(220,40,40,.12)",
+    baseLight: "#FFF0F0",
+    cardBgLight: "rgba(255,248,248,.9)",
+    cardBorderLight: "rgba(220,40,40,.2)",
+    topLineLight: "rgba(220,40,40,.4)",
+    avatarBgLight: "#ffd8d8,#ffc0c0",
+    orbBgLight: "#ffe0e0,#ffb8b8",
+    outerGlowLight: "rgba(220,40,40,.08)",
+    vignetteLight: 0.2,
+  },
+  {
+    name: "Colossus",
+    range: "60–69",
+    min: 60,
+    max: 69,
+    base: "#060A02",
+    blobs: [
+      { x: 0.1, y: 0.05, rx: 0.65, ry: 0.45, c: "rgba(170,220,20,", i: 0.1 },
+      { x: 0.9, y: 0.62, rx: 0.55, ry: 0.42, c: "rgba(100,170,10,", i: 0.08 },
+      { x: 0.5, y: 1, rx: 0.75, ry: 0.45, c: "rgba(150,200,15,", i: 0.07 },
+      { x: 0.25, y: 0.5, rx: 0.35, ry: 0.28, c: "rgba(180,230,30,", i: 0.05 },
+    ],
+    vignette: 0.6,
+    noiseAmt: 0.56,
+    noiseBright: 22,
+    shimmer: true,
+    pulseRing: false,
+    cardBg: "rgba(6,10,2,.65)",
+    cardBorder: "rgba(170,220,20,.14)",
+    topLine: "rgba(170,220,20,.32)",
+    accent: "#AAD814",
+    accent2: "#C8EC40",
+    avatarBg: "#0e1802,#1c2c06",
+    orbBg: "#0a1402,#162202",
+    outerGlow: "rgba(170,220,20,.1)",
+    baseLight: "#F4FAE8",
+    cardBgLight: "rgba(248,252,240,.9)",
+    cardBorderLight: "rgba(170,220,20,.28)",
+    topLineLight: "rgba(170,220,20,.5)",
+    avatarBgLight: "#e0f0c0,#c8e890",
+    orbBgLight: "#d8ecb0,#b8e070",
+    outerGlowLight: "rgba(170,220,20,.12)",
+    vignetteLight: 0.18,
+  },
+  {
+    name: "Seraph",
+    range: "70–89",
+    min: 70,
+    max: 89,
+    base: "#0a0618",
+    blobs: [
+      { x: 0.12, y: 0.06, rx: 0.65, ry: 0.48, c: "rgba(120,60,200,", i: 0.16 },
+      { x: 0.88, y: 0.62, rx: 0.55, ry: 0.42, c: "rgba(160,80,240,", i: 0.12 },
+      { x: 0.5, y: 1, rx: 0.75, ry: 0.5, c: "rgba(100,40,180,", i: 0.1 },
+      { x: 0.25, y: 0.35, rx: 0.35, ry: 0.28, c: "rgba(201,168,76,", i: 0.06 },
+    ],
+    vignette: 0.62,
+    noiseAmt: 0.52,
+    noiseBright: 18,
+    shimmer: true,
+    pulseRing: false,
+    cardBg: "rgba(12,6,28,.68)",
+    cardBorder: "rgba(160,100,220,.22)",
+    topLine: "rgba(180,120,255,.4)",
+    accent: "#A78BFA",
+    accent2: "#C4B5FD",
+    avatarBg: "#1a0e30,#2c1850",
+    orbBg: "#140a28,#241840",
+    outerGlow: "rgba(140,80,220,.18)",
+    baseLight: "#F3EEFC",
+    cardBgLight: "rgba(248,245,255,.9)",
+    cardBorderLight: "rgba(140,80,220,.28)",
+    topLineLight: "rgba(160,100,240,.5)",
+    avatarBgLight: "#e6dcf8,#d4c4f0",
+    orbBgLight: "#e0d4f5,#c8b0e8",
+    outerGlowLight: "rgba(140,80,220,.14)",
+    vignetteLight: 0.2,
+  },
+  {
+    name: "Eden",
+    range: "90–99",
+    min: 90,
+    max: 99,
+    base: "#0c0804",
+    blobs: [
+      { x: 0.1, y: 0.05, rx: 0.7, ry: 0.5, c: "rgba(220,140,40,", i: 0.18 },
+      { x: 0.9, y: 0.6, rx: 0.6, ry: 0.45, c: "rgba(200,120,20,", i: 0.14 },
+      { x: 0.5, y: 1, rx: 0.8, ry: 0.52, c: "rgba(240,180,60,", i: 0.12 },
+      { x: 0.3, y: 0.4, rx: 0.4, ry: 0.32, c: "rgba(255,200,80,", i: 0.08 },
+    ],
+    vignette: 0.55,
+    noiseAmt: 0.58,
+    noiseBright: 22,
+    shimmer: true,
+    pulseRing: false,
+    cardBg: "rgba(18,10,4,.65)",
+    cardBorder: "rgba(230,160,50,.28)",
+    topLine: "rgba(245,190,80,.5)",
+    accent: "#E8A84C",
+    accent2: "#F5D078",
+    avatarBg: "#281808,#483018",
+    orbBg: "#201408,#382810",
+    outerGlow: "rgba(230,160,50,.2)",
+    baseLight: "#FFF8F0",
+    cardBgLight: "rgba(255,250,240,.9)",
+    cardBorderLight: "rgba(230,160,50,.32)",
+    topLineLight: "rgba(245,190,80,.55)",
+    avatarBgLight: "#fff0dc,#ffe8c8",
+    orbBgLight: "#f8ecd8,#f0dcb0",
+    outerGlowLight: "rgba(230,160,50,.18)",
+    vignetteLight: 0.18,
+  },
+  {
+    name: "Immortal",
+    range: "100+",
+    min: 100,
+    max: 999,
+    base: "#080602",
+    blobs: [
+      { x: 0.12, y: 0.03, rx: 0.85, ry: 0.62, c: "rgba(255,220,80,", i: 0.28 },
+      { x: 0.88, y: 0.52, rx: 0.7, ry: 0.55, c: "rgba(255,200,40,", i: 0.2 },
+      { x: 0.5, y: 1, rx: 0.95, ry: 0.6, c: "rgba(255,230,100,", i: 0.18 },
+      { x: 0.28, y: 0.32, rx: 0.5, ry: 0.4, c: "rgba(255,245,150,", i: 0.14 },
+    ],
+    vignette: 0.38,
+    noiseAmt: 0.68,
+    noiseBright: 32,
+    shimmer: true,
+    pulseRing: true,
+    cardBg: "rgba(12,8,2,.52)",
+    cardBorder: "rgba(255,215,80,.4)",
+    topLine: "rgba(255,230,120,.7)",
+    accent: "#FFD700",
+    accent2: "#FFEE99",
+    avatarBg: "#382808,#604818",
+    orbBg: "#302004,#503808",
+    outerGlow: "rgba(255,215,80,.35)",
+    baseLight: "#FFFEF8",
+    cardBgLight: "rgba(255,252,245,.95)",
+    cardBorderLight: "rgba(255,215,80,.45)",
+    topLineLight: "rgba(255,230,120,.75)",
+    avatarBgLight: "#fff8e8,#fff0d0",
+    orbBgLight: "#fff5e0,#ffe8c0",
+    outerGlowLight: "rgba(255,215,80,.28)",
+    vignetteLight: 0.12,
+  },
+];
+
+export function getTier(accountLevel: number, mode: ThemeMode = "dark"): TierTheme {
+  const lvl = Math.max(1, Math.min(accountLevel, 999));
+  const raw = TIERS.find((t) => lvl >= t.min && lvl <= t.max) ?? TIERS[0];
+  if (mode === "light" && (raw.baseLight ?? raw.cardBgLight)) {
+    return {
+      ...raw,
+      base: raw.baseLight ?? raw.base,
+      cardBg: raw.cardBgLight ?? raw.cardBg,
+      cardBorder: raw.cardBorderLight ?? raw.cardBorder,
+      topLine: raw.topLineLight ?? raw.topLine,
+      avatarBg: raw.avatarBgLight ?? raw.avatarBg,
+      orbBg: raw.orbBgLight ?? raw.orbBg,
+      outerGlow: raw.outerGlowLight ?? raw.outerGlow,
+      vignette: raw.vignetteLight ?? raw.vignette,
+    };
+  }
+  return raw;
+}

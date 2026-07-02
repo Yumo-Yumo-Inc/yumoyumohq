@@ -1,0 +1,27 @@
+{
+  "receiptId": "case-fuel-vs-convenience",
+  "status": "analyzed",
+  "merchant": {
+    "name": "Shell Select",
+    "category": "fuel",
+    "country": "TR"
+  },
+  "detectedCountry": "TR",
+  "llmSource": "gpt-4o-vision",
+  "total": 2150,
+  "currency": "TRY",
+  "symbol": "TRY",
+  "vatAmount": 358.33,
+  "vatRate": 0.2,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}

@@ -1,0 +1,22 @@
+{
+  "receiptId": "case-tr-topkdv-toplam",
+  "status": "analyzed",
+  "detectedCountry": "TR",
+  "llmSource": "gpt-4o-vision",
+  "merchant": {
+    "name": "FAST SPOR MALZEMELERI LIMITED SIRKETI",
+    "category": "apparel",
+    "country": "TR"
+  },
+  "pricing": {
+    "totalPaid": 3999.15,
+    "vatAmount": 363.94,
+    "vatRate": 0.1,
+    "currency": "TRY",
+    "symbol": "TRY"
+  },
+  "extraction": {
+    "total": { "value": 3999.15, "confidence": 0.95 },
+    "vat": { "value": 363.94, "rate": 0.1, "confidence": 0.9 }
+  }
+}

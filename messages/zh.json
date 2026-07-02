@@ -1,0 +1,2351 @@
+{
+  "navigation": {
+    "logo": "Yumo Yumo",
+    "home": "首页",
+    "whitepaper": "白皮书",
+    "roadmap": "路线图",
+    "tokenomics": "代币经济学",
+    "faq": "常见问题",
+    "signUp": "注册",
+    "goApp": "进入应用",
+    "app": "应用",
+    "papers": "文档",
+    "visionPaper": "Vision Paper",
+    "visionPaperDesc": "产品论述与经济叙事。",
+    "technicalPaper": "Technical Paper",
+    "technicalPaperDesc": "Pipeline、架构、公式与风险处理。"
+  },
+  "hero": {
+    "title": "解码你的收据。",
+    "subtitle": "揭示隐藏成本。",
+    "description": "你的收据隐藏着价值。Yumbie 帮你解锁它。",
+    "cta": "上传收据",
+    "joinWaitlist": "创建账户"
+  },
+  "loading": {
+    "analyzing": "正在分析收据...",
+    "extractingHiddenCosts": "正在提取隐藏成本...",
+    "revealingTruth": "正在揭示真相..."
+  },
+  "about": {
+    "title": "關於 Yumo Yumo",
+    "description": "A Web3 project that gamifies everyday spending through Proof of Expense (PoE). Upload eligible receipts, feed your Yumbie, and build in-app reward records while having fun!",
+    "description1": "Yumo Yumo turns eligible everyday receipts into app reward records by feeding your Yumbie.",
+    "description2": "Yumo Yumo 处于 Beta 阶段并已开放使用。上传符合条件的收据，探索我们的贡献型奖励系统。"
+  },
+  "footer": {
+    "description": "Turn eligible receipts into in-app rewards. Feed the Yumbie and join the cutest Web3 adventure.",
+    "resources": "资源",
+    "community": "社区",
+    "followUs": "关注我们",
+    "terms": "条款和条件",
+    "privacy": "隐私政策",
+    "support": "支持",
+    "copyright": "© 2025 Yumo Yumo。保留所有权利。用爱和 Yumbies 制作。"
+  },
+  "howItWorks": {
+    "title": "工作原理",
+    "subtitle": "简单三步即可开始 — 应用处于 Beta 阶段，现已开放使用。",
+    "betaNotice": "Beta · 现已开放",
+    "steps": [
+      {
+        "title": "创建账户",
+        "description": "免费注册，立即开始使用 Yumo Yumo。我们处于 Beta 阶段 — 你的反馈将帮助我们改进产品。"
+      },
+      {
+        "title": "了解 Yumo",
+        "description": "了解 Proof of Expense 如何將你的消費轉化為獎勵。"
+      },
+      {
+        "title": "獲得獎勵",
+        "description": "Collect eligible in-app reward records and participate in our gamified platform."
+      }
+    ]
+  },
+  "technologyStack": {
+    "eyebrow": "Technology Stack",
+    "title": "Proof of Expense 背后的基础轨道",
+    "subtitle": "AI 读取收据，Solana 锚定奖励，可信基础设施让整个循环快速、安全且可验证。",
+    "items": [
+      {
+        "name": "OpenAI"
+      },
+      {
+        "name": "Anthropic"
+      },
+      {
+        "name": "Google"
+      },
+      {
+        "name": "Solana"
+      },
+      {
+        "name": "Vercel"
+      },
+      {
+        "name": "Cursor"
+      },
+      {
+        "name": "Cloudflare"
+      },
+      {
+        "name": "Phantom"
+      }
+    ],
+    "disclaimer": "Yumo Yumo 与所展示公司无隶属关系，也不代表获得其认可。Logo 和名称均为各自所有者的商标。"
+  },
+  "tokenomics": {
+    "title": "代幣經濟學 (Tokenomics)",
+    "subtitle": "INT 價值分配：為趣味、公平與增長而生",
+    "totalSupply": "總供應量：990 億 $INT",
+    "distribution": [
+      {
+        "label": "使用者獎勵（支出證明 Proof of Expense）",
+        "description": "針對已驗證收據貢獻與參與 PoE 系統的主要配比。"
+      },
+      {
+        "label": "貢獻證明 Proof of Contribution",
+        "description": "依定期快照的可驗證貢獻品質與排行榜表現發放的獎勵池。"
+      },
+      {
+        "label": "質押與長期激勵",
+        "description": "提供給長期持有者與質押參與者的獎勵。"
+      },
+      {
+        "label": "流動性",
+        "description": "用於為鏈上交易與交易所流動性提供種子資金。"
+      },
+      {
+        "label": "社群空投與任務",
+        "description": "透過任務玩法、里程碑活動與社群發放進行分配。"
+      },
+      {
+        "label": "推薦獎勵",
+        "description": "當受邀使用者達成驗證里程碑時解鎖。"
+      }
+    ],
+    "detailedLink": "[ 點擊此處查看詳細代幣經濟學白皮書]"
+  },
+  "papers": {
+    "title": "閱讀我們的文檔",
+    "subtitle": "深入了解 Yumo Yumo 的願景和技術細節",
+    "visionPaper": {
+      "title": "願景文件",
+      "subtitle": "在你花的每一分錢上，奪回你的話語權。",
+      "description": "一份關於支出證明（Proof of Expense）的宣言。價格不是一個數字，而是一層層疊加的成本：商品本身、增值稅、零售利潤與品牌溢價。Yumo Yumo 讀取收據，逐層拆解，把隱藏成本變成屬於你的代幣。",
+      "tags": [
+        "支出證明",
+        "隱藏成本",
+        "宣言"
+      ]
+    },
+    "seriousPaper": {
+      "title": "技術文件",
+      "subtitle": "架構、信任層與代幣機制",
+      "description": "涵蓋收據處理流程、信任層、資料模型以及 Yumo Yumo 背後代幣機制的技術文件。",
+      "tags": [
+        "支出證明 (PoE)",
+        "智能合約",
+        "經濟學"
+      ]
+    }
+  },
+  "roadmap": {
+    "title": "开发路线图",
+    "subtitle": "我們革命化消費獎勵的旅程",
+    "items": [
+      {
+        "quarter": "P1",
+        "year": "P1",
+        "title": "阶段一 — 起源\n觉醒开始",
+        "items": [
+          "公平启动：社区驱动的流动性与价格发现",
+          "PoE 挖掘：收据转化为 cPoints 奖励",
+          "数字身份：领取 Foundation NFT，开启成长"
+        ]
+      },
+      {
+        "quarter": "P2",
+        "year": "P2",
+        "title": "阶段二 — 扩展\n从数据到力量",
+        "items": [
+          "智能代理：NFT 进化为 AI 经济伙伴",
+          "质押开启：早期参与者享受高 APR",
+          "商户矩阵：按类别计算奖励倍数"
+        ]
+      },
+      {
+        "quarter": "P3",
+        "year": "P3",
+        "title": "阶段三 — 智能\n系统开始思考",
+        "items": [
+          "高级洞察：AI 驱动的财务分析",
+          "HCI 指数：全球隐藏成本仪表盘",
+          "协议成熟：完全由数据支撑的经济体系"
+        ]
+      }
+    ]
+  },
+  "waitlist": {
+    "title": "加入候补名单",
+    "subtitle": "成为首批体验 Yumo Yumo 的人之一！✨",
+    "email": "电子邮件地址",
+    "country": "您的国家",
+    "referralSource": "您是如何听说我们的？",
+    "selectCountry": "选择您的国家",
+    "selectOption": "选择一个选项",
+    "submit": "加入候补名单",
+    "submitting": "正在加入...",
+    "success": "成功！您已在列表中 🎉",
+    "successTitle": "您已在列表中！🎉",
+    "successMessage": "当 Yumo Yumo 推出时，我们会通知您。",
+    "inboxMessage": "请留意您的收件箱！💌",
+    "alreadyExists": "您已在候补名单中！🎉",
+    "error": "请填写所有字段 💕",
+    "networkError": "网络错误。请检查您的连接并重试！💫",
+    "connectionError": "连接错误。请重试！💫",
+    "unexpectedError": "服务器意外响应。请重试！💫",
+    "genericError": "出错了。请重试！💫",
+    "sources": [
+      "社交媒体（X、TikTok、Discord 等）",
+      "Google 搜索",
+      "朋友或家人",
+      "YouTube / 影响者",
+      "新闻 / 博客文章",
+      "其他"
+    ]
+  },
+  "faq": {
+    "title": "Yumo Yumo 常见问题",
+    "subtitle": "有问题？我们有答案！😊",
+    "stillHaveQuestions": "还有问题？💬",
+    "contactText": "给我们发私信或推文我们 — 我们喜欢聊天！❤️",
+    "readWhitepaper": "阅读白皮书",
+    "contactUs": "联系我们",
+    "items": [
+      {
+        "question": "🧡 Yumo Yumo 是什么？",
+        "answer": "Yumo Yumo turns eligible receipts into spending insights and non-transferable in-app reward records. Upload a receipt, learn what is inside the price, and become smarter with your money."
+      },
+      {
+        "question": "🧠 它是怎么运作的？复杂吗？",
+        "answer": "Connect a wallet, upload an eligible receipt, let Proof of Expense reveal the layers, and receive insights plus app reward records if you qualify."
+      },
+      {
+        "question": "👀 那些\"隐藏成本\"到底是什么？",
+        "answer": "它们不是秘密，只是没人告诉你。\n比如税费、租金、品牌溢价、运输成本……\nYumo Yumo 只是把这些本来就存在的部分摊开给你看。"
+      },
+      {
+        "question": "💰 我能得到什么奖励？",
+        "answer": "cPoints and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
+      },
+      {
+        "question": "🪙 INT 是什么？",
+        "answer": "INT is planned as a utility token for eligible ecosystem features. Claim, transfer, staking, governance, and distribution details are not live yet and may change based on product readiness, legal review, jurisdiction, sanctions screening, and updated Token & Rewards Terms."
+      },
+      {
+        "question": "🚀 我会一夜暴富吗？",
+        "answer": "不会。\n但你会慢慢发现：\n你本来就在花的钱，开始变得有意义了。\nYumo Yumo 奖励真实行为，而不是投机。"
+      },
+      {
+        "question": "🔒 我的隐私安全吗？",
+        "answer": "非常安全。\n我们不关心你是谁，只关心收据结构。\n所有分析都是匿名处理，你的个人信息不会被展示或出售。"
+      },
+      {
+        "question": "🌍 谁可以使用？",
+        "answer": "只要你所在地区允许使用加密相关服务，并且你达到法定年龄，就可以加入。\n部分功能可能因地区规则不同而有所限制（无聊但现实 😅）。"
+      },
+      {
+        "question": "🧩 为什么没有营销预算？",
+        "answer": "因为我们不想把价值花在广告上。\n我们更愿意把系统奖励给真正使用、分享和建设的人。\n用户就是最好的传播者 💕"
+      },
+      {
+        "question": "👥 团队会偷偷拿走代币吗？",
+        "answer": "不会。\n没有团队特权，没有隐藏分配。\n团队和用户站在同一边，通过系统长期运作获得回报。"
+      },
+      {
+        "question": "🛠️ 那团队怎么活？",
+        "answer": "靠把产品做好。\n如果系统没人用，没人获益。\n如果系统被真实使用，大家一起受益。"
+      },
+      {
+        "question": "⏳ 什么时候可以用？",
+        "answer": "白皮书已上线 📄\n产品正在逐步推出中。\n关注 X 获取第一时间更新！"
+      },
+      {
+        "question": "💬 我还有问题怎么办？",
+        "answer": "来找我们聊！\n白皮书、X、官网都可以。\n没有\"傻问题\"，只有好奇 ❤️"
+      }
+    ]
+  },
+  "alerts": {
+    "auth": {
+      "termsRequired": "请接受条款和条件和隐私政策。"
+    },
+    "dashboard": {
+      "fileSizeError": "文件大小必须小于 10MB",
+      "fileRequired": "请先选择一个文件"
+    },
+    "wallet": {
+      "signatureRequired": "需要签名才能连接。请重试并批准签名请求。",
+      "connectionFailed": "连接失败",
+      "pleaseTryAgain": "请重试。"
+    },
+    "waitlist": {
+      "privacyNote": "我们尊重您的隐私。永远不会发送垃圾邮件！💕"
+    }
+  },
+  "funPaper": {
+    "sections": [
+      {
+        "title": "1. 所以……Yumo Yumo 是什么？",
+        "content": [
+          "Yumo Yumo 是一个 Web3 项目，\n让符合条件的日常收据变成应用内贡献记录。",
+          "那件事就是——花钱。",
+          "每一个价格，\n其实都有很多层。",
+          "税费、利润、运营成本……",
+          "你每天都在支付这些，\n只是从来没有仔细想过。",
+          "Yumo Yumo 看着这些层级，说了一句：",
+          "\"太好了，我们把它变成一种参与方式吧。\""
+        ]
+      },
+      {
+        "title": "2. 那为什么要在意？",
+        "content": [
+          "因为几乎所有理财工具，\n都会问一个很无聊的问题：",
+          "\"你花了多少钱？\"",
+          "Yumo Yumo 问的是另一个问题：",
+          "\"这个价格里面，到底装了什么？\"",
+          "一旦你开始这样看待消费，\n花钱就不再只是一个被动动作。",
+          "它会变成数据。",
+          "而数据，是有价值的。"
+        ]
+      },
+      {
+        "title": "3. 什么是支出证明（PoE）？",
+        "content": [
+          "PoE（Proof of Expense）很简单，也很诚实。",
+          "• 你上传一张真实的收据",
+          "• 系统解析价格结构",
+          "• 原本看不见的部分被摊开",
+          "• 因为你提供了真实世界的数据，你获得奖励",
+          "没有假操作。",
+          "没有机器人点按钮。",
+          "没有\"感觉对了就发奖励\"。",
+          "只要你在现实生活中消费，\n就可以在 Yumo Yumo 中参与。"
+        ]
+      },
+      {
+        "title": "4. 挖矿，但它就是日常生活",
+        "content": [
+          "忘掉显卡吧。",
+          "忘掉机器仓库吧。",
+          "在 Yumo Yumo 里，\n你的收据就是你的\"设备\"。",
+          "每一张有效收据，\n都会为系统提供一个信号。",
+          "每一个信号，\n都会产生奖励。",
+          "流程非常干净：",
+          "花钱 → 上传 → 参与 → 获得",
+          "而第一步，\n你本来就每天在做。"
+        ]
+      },
+      {
+        "title": "5. 关于代币（社区优先）",
+        "content": [
+          "我们说清楚一件事：",
+          "没有团队专属分配。",
+          "没有隐藏储备。",
+          "没有巨额营销预算。",
+          "没有给内部人员预留的代币。",
+          "Yumo Yumo 的设计目标只有一个：",
+          "让价值流向参与者，\n而不是某个中心结构。",
+          "你参与，你获得。",
+          "你不参与，就不会获得。",
+          "就这么简单。"
+        ]
+      },
+      {
+        "title": "6. \"那这个系统靠什么运转？\"",
+        "content": [
+          "它不是用传统方式运转的。",
+          "没有大规模广告。",
+          "没有烧钱买流量。",
+          "没有人为制造需求。",
+          "Yumo Yumo 以 Web3 的方式成长：",
+          "靠参与、靠贡献、靠共同激励。",
+          "价值来自人们做了什么，\n而不是团队说了什么。"
+        ]
+      },
+      {
+        "title": "7. 为什么一定要用 Web3？",
+        "content": [
+          "因为规则，\n比人更重要。",
+          "Web3 确保：",
+          "• 奖励遵循预先设定的逻辑",
+          "• 分配无法被手动更改",
+          "• 没有人可以在幕后决定\"谁拿多少\"",
+          "消费行为变成一种共享信号。",
+          "代币，\n会回到创造这个信号的人手中。",
+          "简单的系统，\n才能长期存在。",
+          "不透明的系统，\n最终会被淘汰。"
+        ]
+      },
+      {
+        "title": "8. 这到底适合谁？",
+        "content": [
+          "• 会花钱的人",
+          "• 喜欢参与，但也想好好睡觉的人",
+          "• 更相信规则，而不是故事的人",
+          "你不需要交易。",
+          "不需要加杠杆。",
+          "不需要预测走势图。",
+          "只需要上传收据。"
+        ]
+      },
+      {
+        "title": "9. 更大的图景",
+        "content": [
+          "Yumo Yumo 从\"看懂消费\"开始。",
+          "随着时间推移，\n这种认知会变成：",
+          "• 更深入的洞察",
+          "• 更聪明的工具",
+          "• 一个建立在真实消费数据之上的生态系统",
+          "而支撑这一切的，\n正是那些每天在花钱的人。"
+        ]
+      },
+      {
+        "title": "10. 最后的话",
+        "content": [
+          "钱每天都会离开你的钱包。",
+          "Yumo Yumo 并不会阻止它。",
+          "它只是让你在这个过程中，\n顺便获得一些东西。",
+          "这个循环很简单：",
+          "花钱\n上传\n参与\n获得",
+          "这就是循环。",
+          "准备好进厨房看看里面是怎么运作的吗？"
+        ]
+      }
+    ],
+    "cta": {
+      "title": "想了解更多技术细节吗？",
+      "description": "如果你对系统原理、代币经济模型以及实现方式感兴趣，\n可以在这里深入探索。",
+      "button": "👉 阅读 Serious Paper"
+    },
+    "loop": {
+      "title": "循环",
+      "steps": {
+        "spend": "花钱",
+        "upload": "上传",
+        "mine": "参与",
+        "earn": "获得"
+      }
+    }
+  },
+  "terms": {
+    "title": "Yumo Yumo 使用条款",
+    "lastUpdated": "最后更新：2026 年 4 月 20 日",
+    "intro": "嗨！欢迎来到 Yumo Yumo —— 很高兴你在这里 🧡",
+    "introDescription": "这些条款就像我们小小俱乐部里的友好规则。\n当你使用我们的应用、网站或相关服务（以下统称为\"服务\"），\n就表示你同意这些规则。如果你觉得不太合适，也完全没关系，\n只需停止使用服务即可。",
+    "sections": [
+      {
+        "title": "1. 谁可以加入？",
+        "content": "你需要年满 18 岁（或你所在地区规定的法定成年年龄）。\n我们希望每位用户都能在充分理解和自愿的情况下参与。"
+      },
+      {
+        "title": "2. 账户与钱包安全",
+        "content": "当你连接 Web3 钱包时，请像保管家门钥匙一样保护好它 🔑\n如果他人在未经你允许的情况下使用了你的钱包，我们无法承担责任。\n如果发现异常，请第一时间联系我们。"
+      },
+      {
+        "title": "3. 在这里可以做什么？",
+        "content": "You can upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see spending insights, and collect non-transferable cPoints/bINT app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
+      },
+      {
+        "title": "4. 收据与内容归属",
+        "content": "当你上传收据或其他内容时，\n你允许我们以**匿名、安全的方式**使用这些数据，\n为你提供洞察，并持续优化产品体验。\n\n请确认你有权分享这些内容，\n并且它们不会违反任何法律或伤害他人。"
+      },
+      {
+        "title": "5. 奖励与 INT 代币",
+        "content": [
+          "cPoints and bINT are non-transferable in-app records tied to eligible activity.",
+          "They do not guarantee any token claim, airdrop, transfer, listing, cash value, profit, or exchangeability.",
+          "INT is planned as a utility token for eligible app functionality, not investment advice, a security offering, or a get rich quick ticket.",
+          "Eligibility rules may change. We may withhold, reverse, or suspend rewards for fraud, duplicate activity, sanctions risk, legal restrictions, or policy violations. Taxes are your responsibility."
+        ]
+      },
+      {
+        "title": "6. 我们不喜欢的事情",
+        "content": [
+          "请不要：",
+          "• 上传虚假收据",
+          "• 试图操纵系统",
+          "• 进行任何违法行为",
+          "• 骚扰、攻击他人",
+          "• 破坏系统安全",
+          "如果发现异常行为，我们可能会暂停或终止相关账户。\n当然，我们更希望大家都能友好参与 💕"
+        ]
+      },
+      {
+        "title": "7. 知识产权",
+        "content": "应用的设计、代码与创意属于我们\n（或帮助我们一起建设的合作伙伴）。\n你可以个人使用，但请不要复制、出售或用于其他用途。"
+      },
+      {
+        "title": "8. 隐私保护",
+        "content": "你的隐私对我们来说很重要（而且是认真对待的那种）。\n详细内容请查看我们的《隐私政策》，\n找个喜欢的饮料，慢慢读一读 ☕️"
+      },
+      {
+        "title": "9. 第三方服务（钱包、区块链）",
+        "content": "我们会与一些第三方工具合作，\n例如钱包或区块链网络。\n它们很棒，但我们无法保证始终完美运行。\n\n链上操作是公开且不可撤销的，\n这是区块链本身的特性。"
+      },
+      {
+        "title": "10. 温馨提醒（无保证 & 非建议）",
+        "content": [
+          "我们会尽力让服务稳定、准确，但请注意：",
+          {
+            "type": "list",
+            "items": [
+              {
+                "label": "友好估算：",
+                "text": "隐藏成本与消费洞察仅用于帮助理解，\n不构成任何财务、投资或法律建议。"
+              },
+              {
+                "label": "服务现状提供：",
+                "text": "服务按\"现状\"提供，我们无法保证始终 100% 无误。"
+              },
+              {
+                "label": "加密世界的起伏：",
+                "text": "加密资产存在波动，所有操作需自行承担责任 🎢"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "11. 如果出现问题",
+        "content": "我们当然希望一切顺利。\n如发生问题，我们的责任将限制在法律允许的最大范围内，\n不对间接损失承担责任。\n让我们尽量保持轻松与善意 ✨"
+      },
+      {
+        "title": "12. 关于加密世界的现实",
+        "content": "Tokens can lose value, transactions cannot be undone, and rules can change by country. INT is planned as a utility token, not an investment ticket. No claim, airdrop, transfer, exchange listing, or profit is promised."
+      },
+      {
+        "title": "13. 暂停或终止服务",
+        "content": "在必要情况下，我们可能暂停或关闭账户，\n并会尽量公平处理。\n若账户终止，未领取的奖励可能无法继续获取。"
+      },
+      {
+        "title": "14. 法律适用",
+        "content": "本条款受美国特拉华州法律管辖，强制性当地法律另有规定的除外。如发生争议，我们会优先沟通解决；如有需要，将由适用法律下有管辖权的法院或机构处理。"
+      },
+      {
+        "title": "15. 条款更新",
+        "content": "我们可能会不时更新这些条款。\n继续使用服务，表示你接受更新后的版本。"
+      },
+      {
+        "title": "16. 联系我们",
+        "content": "如对 Yumo Yumo Inc. 有任何问题，请通过 info@yumoyumo.com 联系我们，电话 +1 302-719-1468，或邮寄至 8 The Green Suite B, Dover, DE 19901, United States。"
+      }
+    ],
+    "footer": "感谢你成为 Yumo Yumo 的一部分，\n让我们一起发现隐藏的价值，并享受这个过程 🫶✨"
+  },
+  "privacy": {
+    "title": "Yumo Yumo 隐私政策",
+    "lastUpdated": "最后更新：2026 年 4 月 20 日",
+    "intro": "你好，朋友！🧡\n你的隐私对我们来说非常重要。\n这份隐私政策将向你说明，我们如何以温和、克制且负责任的方式\n处理你的信息。",
+    "sections": [
+      {
+        "title": "1. 我们收集哪些信息（只收必要的）",
+        "content": [
+          "我们只会收集为服务正常运行所必需的信息，包括：",
+          "- 你的钱包地址（当你连接钱包时 —— 这是区块链上本就公开的信息）",
+          "- 你上传的收据（用于提供消费洞察）",
+          "- 基本设备信息（例如你使用的浏览器或设备类型，用于优化体验）",
+          "- 当你联系我们时的沟通记录",
+          "除非这些信息出现在收据中，\n我们不会主动收集任何敏感数据\n（也请尽量避免在收据中包含健康等敏感信息）。"
+        ]
+      },
+      {
+        "title": "2. 我们如何使用这些信息",
+        "content": [
+          "我们使用这些信息来：",
+          "- 展示价格结构与隐藏成本",
+          "- 计算并发放你应得的奖励",
+          "- 在匿名处理的前提下改进产品体验",
+          "- 保障系统安全与稳定运行"
+        ]
+      },
+      {
+        "title": "3. 匿名化处理（我们很擅长这个 ✨）",
+        "content": "当我们用于产品改进或生成整体统计数据时\n（例如\"曼谷餐饮成本趋势\"），\n所有可识别个人的信息都会被移除。\n\n你的收据可以帮助整个系统变得更聪明，\n但它们不会暴露你是谁。"
+      },
+      {
+        "title": "4. 谁能看到你的信息？",
+        "content": [
+          "几乎没有人。",
+          "- 值得信赖的服务提供方（如云服务、分析工具），且仅在必要范围内",
+          "- 区块链网络（用于奖励发放，这部分是公开的）",
+          "- 仅在法律要求的情况下",
+          "我们不会出售你的数据。\n这一点，我们是认真的。"
+        ]
+      },
+      {
+        "title": "5. 关于区块链的透明性",
+        "content": "当奖励记录写入区块链后，\n相关交易信息（钱包地址与数量）将公开可见。\n\n这是 Web3 的基本特性，\n透明但不可篡改。"
+      },
+      {
+        "title": "6. 数据安全",
+        "content": "我们采用合理的技术与管理措施\n来保护你的信息安全。\n\n没有任何系统是 100% 无风险的，\n但我们始终尽最大努力降低风险。"
+      },
+      {
+        "title": "7. 数据保存时间",
+        "content": "我们只会在必要的时间内保留你的信息，\n用于提供服务或满足合规要求。\n\n如果你希望删除相关数据，\n欢迎随时联系我们。"
+      },
+      {
+        "title": "8. 你的权利（你始终拥有控制权）",
+        "content": [
+          "根据你所在地区的法律，\n你可能有权：",
+          "- 查看你的数据",
+          "- 更正或删除数据",
+          "- 拒绝某些使用方式",
+          "只需联系我们，\n我们会认真处理你的请求。"
+        ]
+      },
+      {
+        "title": "9. 数据的跨境存储",
+        "content": "你的数据可能会被存储在其他国家或地区的服务器上，\n但我们始终确保这些服务遵守严格的隐私与安全标准。"
+      },
+      {
+        "title": "10. 未成年人说明",
+        "content": "Yumo Yumo 仅面向 18 岁及以上用户。\n我们不会主动收集未成年人的信息。"
+      },
+      {
+        "title": "11. 政策更新",
+        "content": "如果本隐私政策发生重要变化，\n我们会以合适的方式通知你。\n\n继续使用服务，\n即表示你接受更新后的版本。"
+      },
+      {
+        "title": "12. 有问题？想聊聊？",
+        "content": "如有隐私或数据保护问题，请通过 info@yumoyumo.com 联系我们，电话 +1 302-719-1468，或邮寄至 8 The Green Suite B, Dover, DE 19901, United States。"
+      }
+    ],
+    "footer": "感谢你对我们的信任。\n我们希望让与金钱相关的事情变得更清晰、更有价值，\n同时也会认真守护你的隐私与安全。"
+  },
+  "support": {
+    "title": "支持中心",
+    "subtitle": "有问题或需要帮助？提交支持工单，我们会尽快回复您。",
+    "form": {
+      "username": "用户名",
+      "usernamePlaceholder": "您的用户名",
+      "email": "电子邮件地址",
+      "emailPlaceholder": "your@email.com",
+      "subject": "主题",
+      "subjectPlaceholder": "问题的简要描述",
+      "description": "描述",
+      "descriptionPlaceholder": "请提供有关您问题的详细信息...",
+      "captcha": "验证码验证",
+      "captchaPlaceholder": "输入验证码",
+      "captchaHint": "输入上面显示的 4 位数字验证码",
+      "verify": "验证",
+      "submit": "提交支持工单",
+      "submitting": "正在提交..."
+    },
+    "success": {
+      "title": "工单提交成功！",
+      "message": "我们已经收到您的支持请求。我们的团队会尽快回复您。"
+    },
+    "errors": {
+      "captchaRequired": "请先验证验证码。",
+      "fillAll": "请填写所有字段。",
+      "captchaIncorrect": "验证码不正确。请重试。"
+    }
+  },
+  "app": {
+    "scanReveal": {
+      "itemsRead": "已读取 {count} 项",
+      "receiptRead": "已读取小票",
+      "processing": "正在揭示隐藏成本",
+      "valueLabel": "商品价值",
+      "paidLabel": "你支付了",
+      "splitCap": "差额：价格看不见的旅程",
+      "layersTitle": "价格在每一次转手中变大。",
+      "shareLabel": "你看不见的那部分",
+      "unit": "估算",
+      "opening": "完整明细马上展开…",
+      "eyebrow": "正在分析小票",
+      "itemCount": "{count} 项",
+      "readHeadline": "我们已读取 {merchant} 的小票",
+      "valueSentence": "你所购商品的真实价值为 {value}，你支付了 {paid}。",
+      "doneEyebrow": "分析完成",
+      "doneHeadline": "→ 正在打开结果",
+      "uploading": "正在上传文件",
+      "reading": "正在读取小票"
+    },
+    "resultHero": {
+      "ratioCap": "{paid} 中有 {pct}% 在小票未印出的层级里。"
+    },
+    "xrayCard": {
+      "title": "小票透视",
+      "estimateBadge": "估算解读",
+      "persona": {
+        "workspaceHunter": "工位猎人",
+        "eveningRewarder": "夜间犒赏者",
+        "routineRestocker": "日常补给者",
+        "socialConnector": "社交联结者",
+        "inflationVictim": "被价格挤压",
+        "impulseNomad": "冲动漫游者",
+        "balancedShopper": "均衡消费者"
+      },
+      "read": {
+        "workspaceHunter": "这张 {merchant} 小票不只是一杯咖啡，更像在为工位付租金。",
+        "eveningRewarder": "来自 {merchant} 的小小夜间犒赏仪式。",
+        "routineRestocker": "{merchant} 是每周节奏的一部分——补货、维持家用。",
+        "socialConnector": "这张 {merchant} 小票是一次在外相聚时刻的痕迹。",
+        "inflationVictim": "在 {merchant} 买的是必需品，但价格层层盖过了产品本身。",
+        "impulseNomad": "{merchant} 是一次临时停留——不在清单上，却抓住了那一刻。",
+        "balancedShopper": "这张 {merchant} 小票读起来是一种均衡的消费习惯。"
+      }
+    },
+    "sectorCompare": {
+      "title": "行业对比",
+      "thisReceipt": "本张小票",
+      "sectorAvg": "行业平均",
+      "sourcePrefix": "来源"
+    },
+    "resultSources": {
+      "label": "来源",
+      "seeAll": "查看全部"
+    },
+    "nav": {
+      "home": "首页",
+      "homeMenu": "主页",
+      "dashboard": "仪表盘",
+      "mine": "挖矿",
+      "receipts": "收据",
+      "insights": "洞察",
+      "leaderboard": "排行榜",
+      "tasks": "任务",
+      "rewards": "奖励",
+      "settings": "设置",
+      "profile": "个人资料",
+      "menu": "菜单",
+      "close": "关闭",
+      "closeMenu": "关闭菜单",
+      "sidebar": {
+        "insights": "洞察",
+        "insightsSub": "消费，Hidden Cost，趋势",
+        "games": "小游戏",
+        "gamesSub": "预算竞赛，问答游戏",
+        "guild": "公会",
+        "guildSub": "团体储蓄，竞赛",
+        "basket": "购物篮对比",
+        "basketSub": "对比替代产品",
+        "ai": "AI My Life",
+        "aiSub": "个人理财助手",
+        "market": "市场追踪",
+        "marketSub": "价格走势，通货膨胀",
+        "social": "社交动态",
+        "socialSub": "好友活动"
+      },
+      "admin": {
+        "_": "管理员",
+        "fileUpload": "文件上传",
+        "bulkUpload": "批量上传收据",
+        "analyzeFile": "从文件分析",
+        "downloadReceipt": "下载收据",
+        "downloadLog": "下载日志",
+        "downloadRawOcr": "下载RAW OCR"
+      },
+      "approvals": "审批",
+      "rejected": "已拒绝",
+      "section": {
+        "dashboard": "仪表盘",
+        "explore": "探索",
+        "account": "账户"
+      },
+      "feedback": "反馈",
+      "merchants": "商家"
+    },
+    "comingSoon": {
+      "short": "即将推出",
+      "title": "即将推出",
+      "description": "此功能正在开发中，请稍后再来查看！"
+    },
+    "sidebar": {
+      "defaultUser": "用户",
+      "defaultTitle": "经济侦探",
+      "season": "季",
+      "days": "天"
+    },
+    "home": {
+      "recentReceipts": "最近的收据",
+      "addWithScan": "扫码添加",
+      "quickAction": {
+        "scan": "扫描小票",
+        "insights": "洞察",
+        "leaderboard": "排行榜",
+        "convert": "兑换",
+        "referral": "邀请"
+      },
+      "quickActionsTitle": "快速操作",
+      "receiptsEmpty": "还没有小票哦",
+      "viewAll": "查看全部",
+      "treasure": "宝藏",
+      "treasureDays": "{count} 天",
+      "checkIn": "签到",
+      "checkedIn": "已签到"
+    },
+    "profile": {
+      "tokenSummary": "代币概览",
+      "fromReceipts": "来自小票",
+      "questRewards": "Quest奖励",
+      "free": "免费"
+    },
+    "topbar": {
+      "search": {
+        "placeholder": "搜索商家或小票ID..."
+      },
+      "notifications": {
+        "title": "通知",
+        "empty": "还没有通知哦",
+        "emptyDesc": "小票和奖励更新会显示在这里",
+        "willAppear": "通知会显示在这里",
+        "markAllRead": "标记全部已读"
+      },
+      "upload": "上传",
+      "logout": "退出登录",
+      "testnet": "Testnet",
+      "mainnet": "Mainnet",
+      "language": {
+        "tr": "土耳其语",
+        "en": "英语",
+        "aria": "更改语言"
+      }
+    },
+    "dashboard": {
+      "welcome": "欢迎来到 Yumo Yumo",
+      "hiddenCosts": "你发现了 {amount} {currency} 的隐藏费用。你的收据里还藏着什么？",
+      "noReceipts": "每张收据都有一个故事。上传一张，发现你支付的隐藏费用。",
+      "uploadReceipt": "上传收据",
+      "spent": "已花费",
+      "honor": "荣誉",
+      "hidden": "隐藏",
+      "value": "价值",
+      "rewards": "奖励",
+      "hiddenCostByCategory": "按类别查看隐藏费用 (Hidden Cost)",
+      "activeQuests": "活跃的 Quests",
+      "hiddenCostInsight": "隐藏费用洞察 (Hidden Cost)",
+      "hiddenCostPercent": "本月，你的支出中有 {percent}% 是隐藏费用。",
+      "retailBrandPercent": "大部分来自零售和品牌利润（隐藏费用的 {percent}%）。",
+      "error": {
+        "load": "无法加载仪表板数据",
+        "network": "没有网络连接。请检查你的网络并重试。",
+        "login": "请登录以查看收据",
+        "receipts": "无法加载收据数据"
+      },
+      "quests": {
+        "notActive": "⚠️ 未激活"
+      },
+      "totalReceipts": "你总共上传了 {count} 张收据。"
+    },
+    "receipts": {
+      "title": "小票",
+      "description": "查看和管理你所有的挖矿小票",
+      "export": "导出 CSV",
+      "exportShort": "导出",
+      "loading": "加载中...",
+      "empty": "未找到小票",
+      "emptyDesc": "试试调整你的筛选条件或上传新的小票。",
+      "upload": "上传小票",
+      "merchant": "商家",
+      "category": "类别",
+      "date": "日期",
+      "time": "时间",
+      "total": "总计",
+      "status": "状态",
+      "hiddenCost": "Hidden Cost",
+      "reward": "奖励",
+      "actions": "操作",
+      "view": "查看",
+      "delete": "删除",
+      "deleteConfirm": "你确定要删除这张小票吗？此操作无法撤销。",
+      "deleted": "小票已成功删除",
+      "error": {
+        "load": "加载小票失败",
+        "network": "没有网络连接。请检查你的网络后重试。",
+        "login": "请登录以查看小票",
+        "parse": "解析小票数据失败",
+        "delete": "删除收据失败",
+        "title": "无法加载收据"
+      },
+      "user": "用户",
+      "na": "N/A"
+    },
+    "errors": {
+      "login": {
+        "noInternet": "没有网络连接。请检查你的网络然后重试。",
+        "invalidServerResponse": "服务器响应无效。请重试。",
+        "invalidCredentials": "用户名或密码错误",
+        "errorOccurred": "发生错误。请重试。",
+        "selectCountryFirst": "请先选择你的国家。前往个人资料设置选择国家。"
+      },
+      "receiptDetail": {
+        "notFound": "未找到收据",
+        "backToList": "返回收据列表",
+        "goToRewards": "前往奖励",
+        "loadFailed": "加载收据失败",
+        "deleteFailed": "删除收据失败",
+        "deleteConfirm": "你确定要删除这张收据吗？此操作无法撤销。"
+      },
+      "upload": {
+        "pdfFailed": "PDF转换失败。请将PDF转换为图片（PNG/JPG）后重试。",
+        "uploadFailed": "上传失败",
+        "saveFailed": "保存收据失败",
+        "walletRequired": "连接你的钱包以保存收据。",
+        "unknownError": "未知错误"
+      },
+      "admin": {
+        "logsLoadFailed": "日志无法加载",
+        "noLogsToDownload": "没有可下载的日志",
+        "zipCreateFailed": "无法创建ZIP",
+        "filesLoadFailed": "文件无法加载",
+        "noFilesToDownload": "没有可下载的文件",
+        "zipFileCreateFailed": "无法创建ZIP文件"
+      },
+      "api": {
+        "noFile": "未提供文件",
+        "screenshotDetected": "检测到截图。请上传真实收据的照片，而不是截图。",
+        "fileMustBeImageOrPdf": "文件必须是图片或PDF格式",
+        "fileSizeExceeded": "文件大小超过4.5 MB限制",
+        "invalidFileData": "文件数据无效",
+        "marginGeneral": "请将收据放在平面上，四周留出一些空间。",
+        "marginVertical": "请在收据的上下方留出一些空间。",
+        "marginHorizontal": "请在收据的左右两侧留出一些空间。",
+        "marginTooMany": "今天有太多照片边距不足。请遵循照片指南。",
+        "uploadFailed": "收据上传失败",
+        "unauthorized": "未授权",
+        "usernamePasswordRequired": "需要用户名和密码",
+        "internalServerError": "内部服务器错误",
+        "selectCountryFirst": "请先选择你的国家",
+        "duplicateSameUser": "你已经上传了这张收据",
+        "duplicateVisual": "这张收据看起来是重复的（检测到相似的图片）",
+        "duplicateOtherUser": "这张收据已被其他用户上传",
+        "analyzeFailed": "收据分析失败",
+        "serviceBusy": "服务当前繁忙，请在一两分钟后重试。",
+        "receiptNotFound": "未找到收据",
+        "notValidReceipt": "这份文件似乎不是有效的收据。",
+        "totalNotReliable": "无法可靠地从收据中提取总金额。",
+        "unknown": "发生错误",
+        "allFieldsRequired": "所有字段都是必填的",
+        "invalidEmail": "无效的电子邮件地址",
+        "invalidBirthDate": "出生日期无效",
+        "futureBirthDate": "出生日期不能是未来的日期",
+        "usernameInvalid": "用户名必须是3-32个字符，只能使用字母、数字、点、破折号或下划线",
+        "passwordTooShort": "密码至少需要8个字符",
+        "registrationFailed": "注册账户失败",
+        "emailAlreadyExists": "电子邮件已存在",
+        "usernameAlreadyExists": "用户名已存在",
+        "captchaRequired": "需要Captcha令牌",
+        "captchaFailed": "Captcha验证失败",
+        "captchaNotConfigured": "Captcha服务未配置",
+        "emailAlreadyVerified": "电子邮件已验证",
+        "noEmailOnAccount": "此账户没有关联的电子邮件",
+        "resendVerificationFailed": "重新发送验证邮件失败",
+        "verificationCooldown": "请稍等再请求另一封邮件",
+        "userNotFound": "用户未找到",
+        "identifierRequired": "需要电子邮件或用户名",
+        "resetEmailFailed": "发送密码重置邮件失败",
+        "resetTokenPasswordRequired": "需要Token和密码",
+        "resetInvalid": "密码重置链接无效",
+        "resetExpired": "密码重置链接已过期",
+        "resetConsumed": "密码重置链接已被使用",
+        "resetFailed": "重置密码失败",
+        "legalAcceptanceRequired": "需要接受条款和隐私政策"
+      },
+      "rejection": {
+        "noBackground": "确保收据周围的区域（开始和结束处）清晰可见。将收据放在深色表面上，并在所有边缘留出空间。",
+        "missingDocId": "收据缺少必需的文件标识符（发票号，POS/终端）。"
+      },
+      "quality": {
+        "insufficient": "照片质量不足",
+        "improve": "照片质量可以提升"
+      },
+      "memory": "内存错误",
+      "duplicateWarning": "警告：重复收据",
+      "duplicateReceipt": "重复收据",
+      "sessionEnded": "会话已结束。请重新登录。"
+    },
+    "auth": {
+      "login": {
+        "badge": "可信登录",
+        "headline": "回到你的Yumo Yumo个人资料，继续未完成的任务吧。",
+        "subheadline": "使用你已验证的账户登录，继续你的收据流程、奖励和个人资料历史。",
+        "title": "欢迎回来",
+        "description": "使用你的用户名和密码进入应用。",
+        "username": "用户名",
+        "usernamePlaceholder": "输入你的用户名",
+        "password": "密码",
+        "passwordPlaceholder": "输入你的密码",
+        "submit": "登录",
+        "submitting": "正在登录...",
+        "helper": "如果你的电子邮件尚未验证，我们会自动将你引导到验证页面。",
+        "featureAccessTitle": "直接访问",
+        "featureAccessBody": "同一个已验证的账户可以在整个Yumo Yumo应用中使用。",
+        "featureTrustTitle": "受保护的身份",
+        "featureTrustBody": "已验证的电子邮件状态会保持与你的会话连接，因此访问保持干净和可控。",
+        "flowHint": "需要重新开始吗？你可以在不离开此流程的情况下重置密码。",
+        "forgotPassword": "忘记密码？",
+        "resetSuccess": "你的密码已更新。使用新密码登录。",
+        "noAccount": "还没有账号？",
+        "registerLink": "立即创建"
+      },
+      "register": {
+        "badge": "安全引导",
+        "headline": "创建你的Yumo Yumo账号，从可信的资料开始。",
+        "subheadline": "你的账号将从安全验证、国家默认设置和清晰的应用路径开始。",
+        "featureSecureTitle": "防止机器人攻击",
+        "featureSecureBody": "Turnstile在新用户接触认证层之前进行筛选。",
+        "featureRewardsTitle": "准备好使用应用",
+        "featureRewardsBody": "一旦你的邮箱验证通过，同一账号可以直接进入奖励和收据挖矿。",
+        "featureProfileTitle": "为你的资料量身打造",
+        "featureProfileBody": "国家和出生日期会提前获取，应用会以正确的默认设置开始。",
+        "title": "创建账号",
+        "description": "使用你的邮箱、用户名和国家打开一个新账号。",
+        "email": "邮箱",
+        "username": "用户名",
+        "birthDate": "出生日期",
+        "password": "密码",
+        "confirmPassword": "确认密码",
+        "country": "国家",
+        "countryPlaceholder": "选择你的国家",
+        "locale": "对话语言",
+        "localeHint": "Yumbie会用这个语言与你交流。你可以在设置中更改。",
+        "captchaLabel": "验证码验证",
+        "submit": "创建账号",
+        "submitting": "正在创建账号...",
+        "verifyHint": "注册后，我们会立即发送验证链接。你需要确认邮箱才能进入应用。",
+        "haveAccount": "已经有账号了？",
+        "signIn": "登录",
+        "passwordMismatch": "密码不匹配",
+        "captchaRequired": "请完成验证码挑战",
+        "legalRequired": "你需要接受条款和隐私声明才能继续。",
+        "legalNotice": "你上传和使用过程中产生的数据可能会被匿名化或汇总，用于洞察、分析和报告产品。",
+        "acceptTermsPrefix": "我已阅读并接受",
+        "acceptTermsLink": "条款和条件",
+        "acceptTermsSuffix": "。",
+        "acceptPrivacyPrefix": "我已阅读",
+        "acceptPrivacyLink": "隐私声明 / KVKK 披露",
+        "acceptPrivacySuffix": "。",
+        "passwordHint": "至少8个字符，包括大写字母、小写字母、数字和特殊字符"
+      },
+      "verify": {
+        "pendingTitle": "验证你的邮箱",
+        "pendingBody": "我们已将验证链接发送到你的收件箱。确认后即可解锁应用。",
+        "pendingEmailFailedBody": "你的账号已创建，但我们无法自动发送验证邮件。请使用下面的重发按钮。",
+        "verifiedTitle": "邮箱已验证",
+        "verifiedBody": "你的账号已验证。你可以直接进入应用。",
+        "expiredTitle": "验证链接已过期",
+        "expiredBody": "此验证链接已过期。请求新的邮件并重试。",
+        "consumedTitle": "验证链接已使用",
+        "consumedBody": "此链接已被使用。如果你仍无法访问应用，请请求另一封验证邮件。",
+        "invalidTitle": "验证链接无效",
+        "invalidBody": "验证链接缺失或无效。请从此屏幕请求一个新的。",
+        "resend": "重新发送验证邮件",
+        "resending": "正在发送邮件...",
+        "resendSuccess": "验证邮件已发送",
+        "resendError": "无法重新发送验证邮件",
+        "continueToApp": "继续使用应用",
+        "logout": "退出",
+        "signingOut": "正在退出...",
+        "needAnotherAccount": "需要其他账户吗？",
+        "registerAgain": "重新注册"
+      },
+      "forgot": {
+        "badge": "恢复流程",
+        "headline": "无需重置账户即可恢复访问。",
+        "subheadline": "输入你的用户名或邮箱，我们将发送一个安全的重置链接到与你账户关联的邮箱。",
+        "title": "忘记密码了吗？",
+        "description": "请求一个密码重置链接，并从你的邮箱中选择一个新密码。",
+        "identifier": "邮箱或用户名",
+        "identifierPlaceholder": "name@example.com 或 yumouser",
+        "submit": "发送重置链接",
+        "submitting": "正在发送重置链接...",
+        "success": "如果该账户存在，密码重置邮件正在路上。",
+        "hint": "为了隐私，即使找不到账户，此页面也会显示相同的成功状态。",
+        "backToLogin": "返回登录",
+        "featureInboxTitle": "优先邮箱恢复",
+        "featureInboxBody": "重置链接将发送到已关联账户的邮箱。",
+        "featureSafeTitle": "一次性访问",
+        "featureSafeBody": "每个重置链接会快速过期并使之前的链接失效。"
+      },
+      "reset": {
+        "badge": "安全重置",
+        "headline": "设置新密码，重返Yumo Yumo。",
+        "subheadline": "使用收件箱中的安全链接，为你的账户选择一个新密码。",
+        "title": "创建新密码",
+        "description": "你的新密码应至少包含8个字符。",
+        "password": "新密码",
+        "confirmPassword": "确认新密码",
+        "submit": "更新密码",
+        "submitting": "正在更新密码...",
+        "passwordMismatch": "密码不匹配",
+        "successTitle": "密码已更新",
+        "successBody": "你的密码已成功更改。现在可以重新登录了。",
+        "invalidTitle": "重置链接不可用",
+        "invalidBody": "此重置链接缺失或已失效。请求一个新的链接以继续。",
+        "signIn": "前往登录",
+        "requestAnother": "请求另一封重置邮件",
+        "featureFastTitle": "快速恢复",
+        "featureFastBody": "密码更新后，你可以立即重新登录应用。",
+        "featureSecureTitle": "基于Token的重置",
+        "featureSecureBody": "重置链接为一次性使用，并且有时间限制以确保账户安全。"
+      }
+    },
+    "filter": {
+      "search": {
+        "placeholder": "搜索商家或收据ID..."
+      },
+      "status": {
+        "all": "所有状态",
+        "verified": "已验证",
+        "needsReview": "需要审核",
+        "rejected": "已拒绝"
+      },
+      "country": {
+        "all": "所有国家",
+        "th": "泰国",
+        "tw": "台湾",
+        "tr": "土耳其",
+        "us": "美国"
+      },
+      "verifiedOnly": "仅限已验证",
+      "clear": "清除",
+      "expense": {
+        "all": "全部支出类型"
+      }
+    },
+    "status": {
+      "verified": "已验证",
+      "pending": "待处理",
+      "rejected": "已拒绝",
+      "analyzed": "已分析",
+      "scanned": "已扫描"
+    },
+    "mine": {
+      "upload": "上传",
+      "scan": "扫描",
+      "review": "审核",
+      "mining": "数据贡献",
+      "breakdown": "明细",
+      "verify": "验证",
+      "uploadReceipt": "上传收据",
+      "processing": "正在处理收据...",
+      "privacy": {
+        "title": "隐私说明：",
+        "description": "你的收据图像会被安全处理。我们只提取必要信息，不会存储你的图像。"
+      },
+      "back": "返回",
+      "continue": "继续",
+      "receipt": "收据",
+      "blockchainNote": "此收据将记录在区块链上",
+      "verifyReceipt": "验证收据",
+      "merchant": "商家",
+      "total": "总计",
+      "hiddenCost": "Hidden Cost",
+      "reward": "奖励",
+      "saving": "保存中...",
+      "receiptMined": "收据已挖掘！",
+      "successDescription": "你已成功从此收据中挖掘出隐藏费用",
+      "earned": "已赚取",
+      "pending": "待处理",
+      "rewardNote": "注意：奖励暂时无法领取。该功能即将上线。",
+      "uploadNext": "上传下一张收据",
+      "deleteAndUploadNew": "删除并上传新收据",
+      "goToReceipts": "查看收据",
+      "error": {
+        "upload": "上传失败",
+        "analyze": "收据分析失败",
+        "rejected": "收据被拒绝",
+        "underReview": "收据审核中",
+        "underReviewDesc": "由于发现具有相同总额和日期的其他收据，此收据需要人工审核。请等待批准。",
+        "pdfConversion": "PDF转换失败",
+        "noReceiptId": "上传后未返回收据ID",
+        "analysisFailed": "收据分析失败。请重试。",
+        "processImage": "无法处理收据图像"
+      },
+      "step": {
+        "sendingFile": "正在将文件发送到服务器"
+      },
+      "toast": {
+        "timeSaved": "节省时间",
+        "timeSkipped": "时间已跳过"
+      },
+      "duplicateToastDesc": "这张收据可能之前已上传过。({id}…)",
+      "duplicateNotSavedDesc": "这张收据之前已上传。重复的收据不会保存。",
+      "photoTooLargeDesc": "照片太大了。请重试；大照片将在服务器上压缩。",
+      "desktopOnlyTitle": "移动设备上传收据",
+      "desktopOnlyDescription": "要扫描和上传收据，请在手机上打开应用。",
+      "desktopOnlyAppStore": "App Store",
+      "desktopOnlyPlayStore": "Google Play"
+    },
+    "breakdown": {
+      "title": "Hidden Cost 解析",
+      "totalHiddenCost": "总 Hidden Cost",
+      "costItemsIdentified": "已识别 {count} 个成本项目",
+      "storeOperations": "商店 & 运营",
+      "supplyChain": "供应链 & 旅程",
+      "retailBrand": "零售 & 品牌层",
+      "stateLayer": "国家层（在收据上）",
+      "estimated": "估算",
+      "otaCommission": "OTA 佣金",
+      "storeOperationsDesc": "商店运营、员工、水电费和支付处理",
+      "supplyChainDesc": "供应链、物流和分销成本",
+      "retailBrandDesc": "零售利润、品牌和营销成本",
+      "distributionTitle": "成本分布",
+      "distributionSubtitle": "查看你的付款去向",
+      "productValue": "产品价值",
+      "productValueDesc": "你所收到的实际价值",
+      "importSystem": "进口 & 系统",
+      "importSystemDesc": "物流、仓储和基础设施成本",
+      "stateLayerDesc": "增值税和政府费用",
+      "total": "总计",
+      "bucket": {
+        "store": "商店",
+        "supply": "供应",
+        "retail": "零售",
+        "excise": "消费税 (ÖTV)",
+        "government": "政府",
+        "other": "其他"
+      }
+    },
+    "mining": {
+      "title": "数据贡献",
+      "step": {
+        "extracting": "数据提取中",
+        "extractingDesc": "正在分析收据结构",
+        "calculating": "计算Hidden Costs",
+        "calculatingDesc": "正在计算成本细分",
+        "categorizing": "分类支出",
+        "categorizingDesc": "映射到支出类别",
+        "generating": "生成收据",
+        "generatingDesc": "创建区块链准备好的收据",
+        "finalizing": "正在完成",
+        "finalizingDesc": "完成数据贡献过程"
+      },
+      "modal": {
+        "title": "数据贡献",
+        "description": "正在服务器上处理你的收据...",
+        "progress": "进度",
+        "uploading": "上传收据",
+        "uploadingDesc": "正在发送收据图像到服务器...",
+        "ocr": "OCR处理",
+        "ocrDesc": "正在从收据图像中提取文本...",
+        "extraction": "数据提取",
+        "extractionDesc": "识别日期、总额和增值税...",
+        "merchant": "商家验证",
+        "merchantDesc": "正在验证商家和类别...",
+        "calculation": "计算Hidden Costs",
+        "calculationDesc": "计算价格明细和奖励...",
+        "verification": "防作弊验证",
+        "verificationDesc": "检查重复项并验证数据...",
+        "complete": "完成！",
+        "completeDesc": "收据分析成功完成。"
+      }
+    },
+    "pipeline": {
+      "errorTitle": "出错了",
+      "retry": "再试一次",
+      "analyzing": "正在分析收据",
+      "hiddenCostFound": "发现Hidden Cost",
+      "paid": "已支付",
+      "realValue": "实际价值",
+      "viewDetails": "查看详情",
+      "breakdownTitle": "成本明细",
+      "viewNext": "继续",
+      "saveReceipt": "保存收据",
+      "saving": "正在保存...",
+      "doneTitle": "完成",
+      "doneSub": "收据已保存。",
+      "scanAgain": "扫描新收据",
+      "viewReceipts": "查看小票",
+      "potentialReward": "潜在奖励",
+      "stage": {
+        "upload": "正在上传小票…",
+        "ocr": "正在读取文本（OCR）…",
+        "extract": "提取日期和总额…",
+        "merchant": "识别商家…",
+        "hidden": "计算Hidden Cost…",
+        "verify": "正在验证…"
+      },
+      "story": {
+        "upload": {
+          "short": "封印",
+          "title": "正在封印你的小票",
+          "sub": "我们会安全地发送你的文件并准备分析。"
+        },
+        "ocr": {
+          "short": "读取",
+          "title": "正在读取文本",
+          "sub": "OCR提取行文本，以便我们了解你的消费内容。"
+        },
+        "extract": {
+          "short": "提取",
+          "title": "寻找日期和总额",
+          "sub": "我们定位关键数字，构建整个故事。"
+        },
+        "enrich": {
+          "short": "商家",
+          "title": "识别商家",
+          "sub": "我们匹配商家和类别以丰富分析。"
+        },
+        "verify": {
+          "short": "信任",
+          "title": "信任与防重复",
+          "sub": "我们验证信号并保护奖励不被重复。"
+        },
+        "reward": {
+          "short": "奖励",
+          "title": "计算你的奖励",
+          "sub": "我们将隐藏成本转换为cPoints，完成你的结果。"
+        }
+      }
+    },
+    "upload": {
+      "dropzone": {
+        "dropHere": "将收据图片或PDF拖到这里",
+        "clickToBrowse": "或点击浏览"
+      },
+      "card": {
+        "title": "上传收据",
+        "description": "拖放图片或PDF，或点击浏览",
+        "dropHere": "把你的收据放这里",
+        "clickToSelect": "或点击选择文件",
+        "browseFiles": "浏览文件",
+        "uploaded": "收据已上传",
+        "readyToAnalyze": "准备分析"
+      }
+    },
+    "insights": {
+      "title": "洞察",
+      "description": "了解你的钱花在哪里，如何省更多",
+      "empty": "暂无洞察",
+      "emptyDesc": "先挖掘几个收据，看看你的消费模式和隐藏成本。",
+      "noMatch": "没有符合过滤条件的收据",
+      "noMatchDesc": "尝试更改时间范围或过滤条件以查看洞察。",
+      "error": "加载洞察失败",
+      "timeRange": {
+        "all": "所有时间",
+        "7d": "最近7天",
+        "30d": "最近30天",
+        "90d": "最近90天"
+      },
+      "filters": {
+        "timeRange": "时间范围",
+        "allTime": "所有时间",
+        "last7Days": "最近7天",
+        "last30Days": "最近30天",
+        "last90Days": "最近90天",
+        "country": "国家",
+        "allCountries": "所有国家",
+        "category": "类别",
+        "allCategories": "所有类别",
+        "searchMerchant": "搜索商家...",
+        "currency": "货币",
+        "clear": "清除"
+      },
+      "truthMetric": {
+        "title": "你支付的金额超过了产品价值。",
+        "subtitle": "超出实际产品价值的隐藏成本",
+        "percentOfSpending": "支出的{percent}%",
+        "totalSpend": "总支出",
+        "paidExTax": "税前支付",
+        "productValue": "产品价值",
+        "hiddenIndex": "隐藏指数",
+        "disclaimer": "税费/增值税单独显示。隐藏成本不包括国家层面。",
+        "confidence": "信心覆盖率：{percent}%已验证"
+      },
+      "moneyFlow": {
+        "title": "你的钱花到哪里了",
+        "insightText": "在{total}中，你支付了：{product}产品 / {retail}零售 / {system}系统 / {tax}税。",
+        "productValue": "产品价值",
+        "retailHidden": "零售隐藏",
+        "importSystem": "进口/系统",
+        "taxVat": "税费/增值税"
+      },
+      "timePatterns": {
+        "title": "支出与隐藏成本趋势 (Hidden Cost)",
+        "subtitle": "随时间跟踪你的支出和隐藏成本。",
+        "notEnoughData": "数据还不够哦，快上传更多小票吧！",
+        "trendingUp": "Hidden cost 比率正在上升哦。",
+        "trendingDown": "Hidden cost 比率正在下降哦。",
+        "categoryAboveBaseline": "{category} 类别一直高于基准线（{categoryPercent}% 对比 {avgPercent}% 平均值）。",
+        "noPatterns": "还没有发现明显的模式哦。",
+        "notEnoughForTrend": "数据不足，无法进行趋势分析",
+        "weekOf": "{date} 的那一周",
+        "patternInsights": "模式洞察",
+        "spend": "花费",
+        "hiddenCost": "Hidden Cost"
+      },
+      "behaviorTrap": {
+        "title": "行为陷阱探测器",
+        "subtitle": "按天和时间的 Hidden cost 比率",
+        "notEnoughData": "数据还不够哦，快上传更多小票吧！",
+        "needReceipts": "需要至少 {count} 张小票来检测模式哦。",
+        "avgHiddenRate": "平均 Hidden rate：",
+        "totalSpend": "总花费：",
+        "totalHidden": "总 Hidden：",
+        "rateRange": "Hidden cost 比率：{min}% - {max}%",
+        "low": "低",
+        "high": "高"
+      },
+      "merchantTables": {
+        "title": "Hidden Cost 最高的商家",
+        "merchant": "商家",
+        "hiddenCost": "Hidden Cost",
+        "avgPercent": "平均 %",
+        "count": "数量",
+        "noData": "暂无商家数据"
+      },
+      "whatIf": {
+        "title": "假设模拟器",
+        "subtitle": "小幅减少隐藏成本，积少成多。",
+        "reduction": "减少",
+        "youWouldHaveSaved": "你本可以节省",
+        "reduceBy": "减少 {percent}%",
+        "custom": "自定义"
+      },
+      "spendingPulse": {
+        "title": "消费脉搏",
+        "subtitle": "追踪你的消费速度和月末预测",
+        "dailyBurnRate": "每日消耗率",
+        "receiptFrequency": "收据频率",
+        "projectedMonthEnd": "预计月末",
+        "notEnoughData": "数据不足 — 上传更多收据。",
+        "cumulativeSpend": "累计消费 vs 时间",
+        "topSpendingDay": "消费最多的一天",
+        "mostFrequentCategory": "最常用类别",
+        "perDay": "每天",
+        "receiptsPerDay": "收据/天",
+        "forecast": "预测",
+        "cumulative": "累计",
+        "daySpend": "每日消费",
+        "actual": "实际",
+        "projected": "预计"
+      },
+      "trustLayer": {
+        "title": "信任层",
+        "onlyVerified": "只有已验证的收据才能生成奖励。{count} 张低可信度收据{plural}被标记。",
+        "allVerified": "所有小票均已验证。",
+        "noReceipts": "没有可用的小票。",
+        "noData": "没有小票数据。",
+        "verified": "已验证",
+        "lowConfidence": "信心不足"
+      },
+      "categories": {
+        "grocery": "杂货",
+        "restaurant": "餐厅",
+        "cafe": "咖啡馆",
+        "fuel": "燃油",
+        "marketplace": "网购",
+        "pharmacy": "药店",
+        "electronics": "电子产品",
+        "apparel": "服装",
+        "fashion": "时尚",
+        "beauty": "美妆",
+        "personal_care": "个人护理",
+        "home": "家居",
+        "alcohol": "酒类",
+        "tobacco": "烟草",
+        "utilities": "水电费",
+        "travel": "旅行",
+        "hospitality_lodging": "住宿",
+        "healthcare": "医疗",
+        "services": "服务",
+        "convenience": "便利店",
+        "other": "其他"
+      },
+      "products": {
+        "genericItem": "通用项目"
+      }
+    },
+    "tasks": {
+      "title": "任务",
+      "description": "完成社交媒体任务、挑战和内容创作，赚取奖励",
+      "notActive": "⚠️ 未激活",
+      "completed": "已完成",
+      "earned": "已赚取 {amount} 分",
+      "all": "所有任务",
+      "socialMedia": "社交媒体",
+      "challenge": "挑战",
+      "contentCreation": "内容创作",
+      "community": "社区",
+      "empty": "所选过滤器下没有找到任务",
+      "progress": "进度",
+      "steps": "步骤",
+      "moreSteps": "还有 +{count} 步",
+      "start": "开始任务",
+      "error": "加载任务失败"
+    },
+    "rewards": {
+      "title": "奖励",
+      "description": "账户余额和交易历史",
+      "cPointsTotal": "总 cPoints",
+      "cPointsBreakdown": "cPoints 细分",
+      "totalEarned": "总收入",
+      "activity": "活动日志",
+      "receiptVerified": "收据已验证",
+      "taskCompleted": "任务已完成",
+      "adjustment": "调整",
+      "claim": "领取",
+      "completed": "已完成",
+      "pending": "待处理",
+      "noActivity": "没有记录活动",
+      "awarenessToken": "贡献分数",
+      "awarenessDesc": "总积分由你验证的收据和任务贡献计算而来。",
+      "rewardToken": "贡献明细",
+      "rewardDesc": "收据积分来自分析/验证的收据，任务积分来自已完成的任务。",
+      "receiptFrom": "来自{merchant}的收据"
+    },
+    "leaderboard": {
+      "title": "排行榜",
+      "description": "顶级矿工和隐藏成本发现者",
+      "subtitle": "隐藏成本猎人",
+      "season": "赛季",
+      "global": "全球",
+      "weekly": "每周",
+      "daily": "每日",
+      "receiptsAndStreak": "{receipts} 张收据 · 连续 {days} 天",
+      "receiptsAndDays": "{receipts} 张收据 · {days} 天",
+      "hiddenCostLabel": "隐藏成本",
+      "uploadToRank": "上传收据以进入排行榜。",
+      "yourRank": "你的排名",
+      "you": "你",
+      "rank": "排名",
+      "user": "用户",
+      "receipts": "收据",
+      "hiddenCost": "Hidden Cost",
+      "streak": "连续天数",
+      "days": "天",
+      "badges": "徽章",
+      "honor": "荣誉",
+      "totalAyumo": "总收据cPoints",
+      "totalRyumo": "总任务cPoints",
+      "totalAyumoAdminHint": "历史总收据cPoints（仅限管理员）",
+      "totalRyumoAdminHint": "历史总任务cPoints（仅限管理员）",
+      "error": "排行榜加载失败",
+      "empty": "暂无排行榜数据",
+      "seasonLabel": "赛季"
+    },
+    "honor": {
+      "tipsTitle": "提升你的荣誉：",
+      "tipPhoto": "清晰完整地拍摄收据；保持相机对焦。",
+      "tipCondition": "保持收据清晰完整；湿的或皱的收据可能无法读取。",
+      "tipBackground": "将收据放在深色、平坦的表面上；边缘留有空间。"
+    },
+    "settings": {
+      "title": "设置",
+      "account": "账户",
+      "accountDesc": "管理你的账户信息",
+      "email": "电子邮件",
+      "emailPlaceholder": "ni@example.com",
+      "emailNone": "没有记录的邮箱",
+      "emailVerified": "已验证",
+      "emailUnverified": "未验证",
+      "updateEmail": "更新邮箱",
+      "emailDialogTitle": "更新邮箱",
+      "emailDialogDesc": "输入你的新邮箱和当前密码。更改邮箱后需要确认新地址才能完成验证。",
+      "emailDialogPasswordOnly": "输入当前密码以保存上面的邮箱地址。",
+      "emailSaveHint": "输入你的邮箱并点击保存邮箱。我们会发送验证链接到该地址。",
+      "emailUnsaved": "尚未保存",
+      "saveEmail": "保存邮箱",
+      "emailSaved": "邮箱已更新",
+      "emailVerifyReminder": "检查你的收件箱以验证新邮箱地址。",
+      "error": {
+        "emailInvalid": "无效的邮箱地址",
+        "emailInUse": "该邮箱已被使用",
+        "emailLoad": "无法加载邮箱",
+        "emailSave": "无法更新邮箱",
+        "login": "请登录以保存设置",
+        "displayNameRequired": "显示名称是必需的",
+        "allFieldsRequired": "所有字段都是必需的",
+        "passwordsNotMatch": "新密码不匹配",
+        "passwordLength": "密码至少需要8个字符",
+        "saveProfile": "无法保存个人资料",
+        "saveAccount": "无法保存账户设置",
+        "changePassword": "无法更改密码",
+        "savePreferences": "保存偏好设置失败"
+      },
+      "displayName": "显示名称",
+      "displayNamePlaceholder": "输入你的显示名称",
+      "gender": {
+        "_": "性别",
+        "male": "男",
+        "female": "女",
+        "nonBinary": "非二元性别",
+        "other": "其他",
+        "preferNotToSay": "不愿透露"
+      },
+      "genderPlaceholder": "选择性别（可选）",
+      "birthDate": "出生日期",
+      "birthDatePlaceholder": "选择日期（可选）",
+      "password": "密码",
+      "changePassword": "更改密码",
+      "currentPassword": "当前密码",
+      "currentPasswordPlaceholder": "输入当前密码",
+      "newPassword": "新密码",
+      "newPasswordPlaceholder": "输入新密码",
+      "confirmPassword": "确认新密码",
+      "confirmPasswordPlaceholder": "确认新密码",
+      "passwordDesc": "输入当前密码并选择一个新密码。",
+      "wallet": {
+        "_": "钱包",
+        "connect": "连接钱包",
+        "connecting": "正在连接...",
+        "signing": "正在签名...",
+        "disconnect": "断开连接"
+      },
+      "walletDesc": "管理你的连接钱包",
+      "connectedAddress": "已连接地址",
+      "appearance": "外观",
+      "appearanceDesc": "切换明亮和暗黑主题",
+      "sound": {
+        "_": "音效",
+        "volume": "音量",
+        "mute": "静音",
+        "unmute": "取消静音"
+      },
+      "soundDesc": "默认启用（首次点击后播放）",
+      "appLanguage": "应用语言",
+      "appLanguageHint": "菜单、按钮和应用界面的显示语言。",
+      "appLanguageSaved": "应用语言已更新",
+      "cookiePreferences": "Cookie 偏好设置",
+      "cookiePreferencesDesc": "管理 Yumo Yumo 的分析与同意类 Cookie。",
+      "openCookiePreferences": "打开 Cookie 偏好设置",
+      "themeLight": "明亮主题",
+      "themeDark": "暗黑主题",
+      "preferences": "个人资料和收入",
+      "preferencesDesc": "职业和月收入（可选）",
+      "occupation": "职业",
+      "occupationPlaceholder": "例如：工程师、教师",
+      "monthlyIncome": "月平均收入",
+      "monthlyIncomePlaceholder": "选择美元区间（可选）",
+      "incomeBand": {
+        "under_30": "低于 30,000 ₺",
+        "30_35": "30,000 – 35,000 ₺",
+        "35_45": "35,000 – 45,000 ₺",
+        "45_60": "45,000 – 60,000 ₺",
+        "60_70": "60,000 – 70,000 ₺",
+        "70_85": "70,000 – 85,000 ₺",
+        "85_100": "85,000 – 100,000 ₺",
+        "100_120": "100,000 â€“ 120,000 â‚º",
+        "120_150": "120,000 â€“ 150,000 â‚º",
+        "150_plus": "150,000 â‚º及以上"
+      },
+      "save": "保存账户设置",
+      "saving": "保存中...",
+      "saved": "账户设置已成功保存",
+      "savePreferences": "保存偏好设置",
+      "preferencesSaved": "偏好设置已成功保存",
+      "changing": "更改中...",
+      "passwordChanged": "密码已成功更改",
+      "cancel": "取消"
+    },
+    "admin": {
+      "approvals": {
+        "title": "待审批",
+        "description": "审批超过20,000 TL的收据",
+        "noPending": "没有待审批的收据",
+        "noPendingDesc": "目前没有待审批的收据。",
+        "approve": "批准",
+        "reject": "拒绝",
+        "view": "查看",
+        "merchant": "商家",
+        "user": "用户",
+        "date": "日期",
+        "total": "总计",
+        "status": "状态",
+        "actions": "操作",
+        "refresh": "刷新",
+        "loading": "加载中...",
+        "approveConfirm": "你确定要批准这张收据吗？",
+        "rejectConfirm": "你确定要拒绝这张收据吗？",
+        "rejectReason": "拒绝原因（可选）：",
+        "error": {
+          "unauthorized": "未授权 - 需要管理员权限",
+          "forbidden": "禁止访问 - 需要管理员权限",
+          "load": "无法加载待处理的收据",
+          "approve": "批准收据失败",
+          "reject": "拒绝收据失败",
+          "notPending": "收据不在待批准状态"
+        }
+      },
+      "rejected": {
+        "title": "被拒收据",
+        "description": "被管理员拒绝的收据",
+        "noRejected": "没有被拒收据",
+        "noRejectedDesc": "没有被拒绝的收据。",
+        "view": "查看",
+        "merchant": "商家",
+        "user": "用户",
+        "date": "日期",
+        "total": "总计",
+        "status": "状态",
+        "actions": "操作",
+        "refresh": "刷新",
+        "loading": "加载中...",
+        "error": {
+          "unauthorized": "未授权 - 需要管理员权限",
+          "forbidden": "禁止访问 - 需要管理员权限",
+          "load": "无法加载被拒收据"
+        }
+      },
+      "feedback": {
+        "title": "反馈",
+        "description": "用户报告的收据问题",
+        "empty": "还没有反馈哦",
+        "emptyDesc": "用户报告会显示在这里。",
+        "reporter": "报告人",
+        "bugTypes": "问题类型",
+        "viewReceipt": "查看收据",
+        "receiptNotSaved": "收据尚未保存",
+        "refresh": "刷新",
+        "loading": "加载中...",
+        "error": {
+          "unauthorized": "未授权 - 需要管理员权限",
+          "forbidden": "禁止访问 - 需要管理员权限",
+          "load": "无法加载反馈"
+        }
+      },
+      "stats": {
+        "totalReceipts": "系统中总收据数：{count}"
+      },
+      "merchants": {
+        "title": "商家",
+        "description": "批准新商家（设置为候选或已验证）。",
+        "filterAll": "全部",
+        "filterUnverified": "待审批",
+        "filterCandidate": "候选",
+        "filterVerified": "已验证",
+        "displayName": "显示名称",
+        "canonicalName": "正式名称",
+        "category": "类别",
+        "tierLabel": "等级",
+        "tier": {
+          "unverified": "未验证",
+          "candidate": "候选",
+          "verified": "已验证"
+        },
+        "patternCount": "模式",
+        "actions": "操作",
+        "refresh": "刷新",
+        "loading": "加载中...",
+        "noMerchants": "没有商家",
+        "noMerchantsDesc": "没有符合所选筛选条件的商家。",
+        "approveCandidate": "批准（候选）",
+        "approveVerified": "批准（已验证）",
+        "approveConfirm": "批准“{name}”为{tier}？",
+        "error": {
+          "unauthorized": "未授权 - 需要管理员权限",
+          "forbidden": "禁止 - 需要管理员权限",
+          "load": "加载商家失败",
+          "approve": "批准商家失败",
+          "reject": "拒绝商家失败"
+        },
+        "acceptCandidate": "接受（候选）",
+        "acceptVerified": "接受（已验证）",
+        "reject": "拒绝",
+        "rejectConfirm": "拒绝“{name}”？这将从列表中移除。",
+        "tooltip": {
+          "candidate": "接受为候选：用于匹配，标准奖励",
+          "verified": "接受为已验证：用于匹配，奖励倍数更高",
+          "reject": "拒绝：从列表中移除（可能再次出现在收据中）"
+        }
+      }
+    },
+    "reportBug": {
+      "button": "报告问题",
+      "title": "报告问题",
+      "submit": "提交",
+      "selectAtLeastOne": "请至少选择一个选项",
+      "types": {
+        "category_wrong": "类别错误",
+        "date_wrong": "日期错误",
+        "merchant_name_wrong": "商家名称错误",
+        "time_wrong": "时间错误",
+        "total_wrong": "总金额错误"
+      }
+    },
+    "common": {
+      "loading": "加载中...",
+      "error": "错误",
+      "retry": "重试",
+      "cancel": "取消",
+      "confirm": "确认",
+      "save": "保存",
+      "delete": "删除",
+      "edit": "编辑",
+      "close": "关闭",
+      "back": "返回",
+      "next": "下一步",
+      "previous": "上一步",
+      "tryAgain": "再试一次",
+      "somethingWentWrong": "出了点问题",
+      "user": "用户",
+      "na": "N/A",
+      "share": "分享",
+      "linkCopied": "链接已复制",
+      "claimable": "可领取",
+      "shareReceipt": "分享小票",
+      "dismissBanner": "关闭横幅",
+      "account": "账户"
+    },
+    "receiptDetail": {
+      "total": "总计",
+      "hiddenCost": "Hidden Cost",
+      "reward": "奖励",
+      "status": "状态"
+    },
+    "empty": {
+      "noData": "暂无数据"
+    },
+    "quests": {
+      "active": "活跃的Quests",
+      "notActive": "⚠️ 未激活",
+      "dailyTitle": "每日Quests",
+      "today": "今天",
+      "xpToday": "今天+ {x} XP",
+      "weeklyGoal": "每周目标",
+      "selectGoalThisWeek": "选择本周目标（你还没有选）。",
+      "noWeeklyGoal": "没有每周目标。",
+      "noDailyQuests": "还没有每日quests。",
+      "loadError": "任务加载失败",
+      "completedBadge": "已完成",
+      "completeQuest": "完成quest",
+      "conditionsNotMet": "条件未满足",
+      "viewAll": "查看所有quests",
+      "streak": "连续记录"
+    },
+    "receiptViewer": {
+      "noImage": "没有可用图片",
+      "title": "收据图片",
+      "previewWillAppear": "收据预览将在这里显示",
+      "rotate": "旋转",
+      "zoom": "缩放"
+    },
+    "evidence": {
+      "value": "价值",
+      "score": "得分",
+      "downloadImage": "下载图片",
+      "selectedTotal": "已选总计",
+      "fromLine": "来自行",
+      "reasons": "原因",
+      "ocrLines": "OCR 行",
+      "rawOcrText": "原始 OCR 文本",
+      "verificationReasons": "验证原因",
+      "title": "证据与信心",
+      "visionJsonIntro": "Vision JSON 下载按钮在下方的第一个部分。",
+      "visionJsonSectionTitle": "Google Vision JSON（管理员）",
+      "visionJsonSectionDesc": "原始 Vision API 响应（responses[0]）；与 receipt_vision_raw 内容相同。",
+      "visionJsonDownloadBtn": "下载 Vision JSON",
+      "receiptImageTitle": "收据图片（Blob）"
+    },
+    "potentialReward": {
+      "honorEffect": "奖励率",
+      "title": "你的潜在奖励",
+      "potential": "（潜在）",
+      "description": "你的潜在奖励已根据此分析计算。",
+      "rewardNote": "奖励估算已准备好。",
+      "rewardDesc": "保存分析，将此收据添加到你的历史记录中。",
+      "check1": "数据已在本地处理",
+      "check2": "隐藏费用已揭示",
+      "check3": "潜在奖励已计算",
+      "back": "返回",
+      "save": "保存分析",
+      "saving": "正在保存...",
+      "honorFromReceipt": "来自此收据的荣誉",
+      "honorBonus": "荣誉奖励 1.2x 已应用",
+      "honorAdminNote": "管理员：你的荣誉分数未更新；此收据会这样影响普通用户的荣誉。"
+    },
+    "receiptScanner": {
+      "cameraNotSupported": "不支持相机",
+      "pickFile": "选择文件",
+      "scan": "扫描",
+      "takePhoto": "拍照",
+      "desktopCameraHint": "实时相机捕捉在手机和平板电脑上有效。要用相机扫描，请在移动设备上打开应用。",
+      "desktopPickFileHint": "你仍然可以通过下面的选择文件，从这台电脑上传收据照片或PDF。",
+      "uploadTitle": "上传收据",
+      "uploadSubtitle": "用相机拍照或从图库中选择图片。",
+      "cameraNotAvailable": "无法访问相机",
+      "placeReceipt": "将收据放入框内",
+      "holdVertical": "请垂直握住手机，以便收据适合。",
+      "cameraPermissionHint": "在浏览器设置中启用相机权限。",
+      "openingCamera": "正在打开相机...",
+      "expenseTypeTitle": "选择收据类型",
+      "expenseTypeSubtitle": "这会影响收据的分类和奖励方式。",
+      "expensePersonal": "个人消费",
+      "expensePersonalDesc": "你的购物清单 — 超市、咖啡馆、加油等。",
+      "expenseOther": "其他支出",
+      "expenseOtherDesc": "为企业或他人收集的批量收据。",
+      "expenseTypeBack": "更改类型",
+      "expenseOtherBadge": "奖励减少",
+      "expenseTypeHint": "你可以在下一步随时更改类型。"
+    },
+    "scanIntro": {
+      "title": "扫描前须知",
+      "subtitle": "快速了解 Yumo Yumo 如何将你的收据转化为更清晰的消费全貌。",
+      "purposeTitle": "为你的日常消费而打造",
+      "purposeDesc": "Yumo Yumo 帮助你管理日常消费习惯。你添加的每张收据都会丰富你的消费记录，并让价格对比更精准。",
+      "expenseTypeTitle": "个人支出与其他支出",
+      "expenseTypeDesc": "个人支出是你自己的购物，可获得全额奖励。其他支出是你为企业或他人收集的收据：会以较低奖励保存，并不计入你的个人价格基准。",
+      "dateRuleTitle": "当月收据可获得奖励",
+      "dateRuleDesc": "在购买当月添加收据即可获得奖励。更早月份的收据仍会被保存并计入你的消费记录，让你的记录保持完整。",
+      "dontShowAgain": "不再显示",
+      "cta": "知道了，开始扫描"
+    },
+    "vectorReceipt": {
+      "seeYouAgain": "期待再次见到你",
+      "timeNa": "时间不可用",
+      "thankYou": "感谢选择YumoYumo"
+    },
+    "photoGuidelines": {
+      "title": "拍照指南",
+      "receiptUpright": "收据需竖直",
+      "receiptUprightDesc": "将收据放在平坦的表面上，并保持相机与收据垂直。",
+      "entireReceipt": "收据全貌可见",
+      "entireReceiptDesc": "确保整个收据在画面中，边缘不被切掉。如果太近，请将相机远离收据。",
+      "cleanBackground": "背景干净",
+      "cleanBackgroundDesc": "收据周围或上面不应有其他物品。请放在干净、平坦的表面上。",
+      "sufficientLight": "光线充足",
+      "sufficientLightDesc": "请确保光线充足，避免直接光源。",
+      "sharpFocused": "清晰对焦",
+      "sharpFocusedDesc": "保持相机稳定并对准收据，照片不应模糊。",
+      "margins": "收据周围留白",
+      "marginsDesc": "在收据的上下左右留一些空间，收据不应接触照片边缘。"
+    },
+    "compactPieChart": {
+      "weekly": "每周",
+      "monthly": "每月",
+      "yearly": "每年",
+      "hoverDetails": "悬停在图表部分查看详情",
+      "hidden": "隐藏"
+    },
+    "deepScan": {
+      "generatingReport": "正在生成报告"
+    },
+    "miningComplete": {
+      "congrats": "恭喜！",
+      "success": "分析完成",
+      "receiptAnalyzed": "你的收据已成功分析！",
+      "foundHidden": "发现Hidden Cost",
+      "potentialReward": "潜在奖励",
+      "stats": "总统计",
+      "totalReceipts": "已分析收据",
+      "totalHidden": "总Hidden Cost",
+      "mineAnother": "分析新收据",
+      "viewHistory": "查看历史",
+      "totalPotential": "潜在奖励"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome! ğŸ‘‹",
+      "subtitle": "Sign in to your account",
+      "emailLabel": "Email / Username",
+      "emailPlaceholder": "Email or username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "toggle": "Don't have an account?",
+      "toggleAction": "Sign Up",
+      "error": "Invalid credentials",
+      "googleError": "Failed to sign in with Google",
+      "twitterError": "Failed to sign in with X (Twitter)",
+      "unknownError": "Unknown error"
+    },
+    "register": {
+      "title": "Join the Yumo World! ğŸ€",
+      "subtitle": "Create your account and start collecting eligible app rewards",
+      "walletLabel": "Wallet Address",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Your username",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "email@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create your password",
+      "passwordConfirmLabel": "Password Confirm",
+      "passwordConfirmPlaceholder": "Confirm your password",
+      "dateOfBirthLabel": "Date of Birth",
+      "genderLabel": "Gender",
+      "genderOptional": "Optional",
+      "genderSelect": "Select",
+      "countryLabel": "Country",
+      "countrySelect": "Select Country",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "+1 555 123 4567",
+      "termsText": "Terms and Conditions and Privacy Policy",
+      "termsAgree": "and I agree",
+      "submit": "Sign Up",
+      "toggle": "Already a member?",
+      "toggleAction": "Sign In",
+      "error": "Registration failed"
+    },
+    "social": {
+      "or": "or"
+    }
+  },
+  "dashboard": {
+    "financialOs": "",
+    "notifications": "通知",
+    "unread": "未读",
+    "markAllRead": "全部标为已读",
+    "noNotificationsTitle": "没有新通知。",
+    "noNotificationsBody": "每日笔记和账户动态会在这里出现。",
+    "notificationCenter": "打开通知中心",
+    "newNotification": "新通知",
+    "rhythmEyebrow": "本周",
+    "thisWeek": "本周",
+    "todayEyebrow": "今日笔记",
+    "todaysEvents": "今天",
+    "noEventsTitle": "今天没什么新内容。",
+    "noEventsBody": "日历、账单、行程和活动笔记会在这里出现。",
+    "platformEyebrow": "Yumo 学习中",
+    "platform": "",
+    "live": "",
+    "profileEyebrow": "你好",
+    "level": "等级",
+    "xpThreshold": "阈值",
+    "shoppingEyebrow": "购物",
+    "shoppingTitle": "购物清单",
+    "shoppingEmptyTitle": "购物清单还空着",
+    "shoppingEmptyBody": "开始扫描收据后，Yumo 会自动帮你补上",
+    "shoppingHint": "看起来挺适合加进清单。",
+    "listCandidate": "候选项",
+    "todayNote": "今天",
+    "contributionScore": "贡献积分",
+    "total": "总计",
+    "items": "项",
+    "notes": "条",
+    "addProfilePhoto": "添加头像",
+    "home": "今天",
+    "scan": "扫描",
+    "myWorld": "我的世界",
+    "social": "好友",
+    "web3": "Web3",
+    "verifyEyebrow": "Workhub",
+    "verifyTitle": "为去中心化愿景出力，赢取奖励",
+    "verifyBody": "帮助构建 Yumo 的去中心化价格网络。每一次核对都让网络更精准，也带来奖励。",
+    "verifyPending": "待处理",
+    "verifyMore": "更多",
+    "verifyEmptyTitle": "暂时没有要核对的",
+    "verifyEmptyBody": "新收据上来后，Yumo 会自动补上。",
+    "verifyQuotaUsed": "今天",
+    "verifyQuotaRemaining": "次核对剩余",
+    "verifyConfirm": "对，没错",
+    "verifyReject": "不，不一样",
+    "verifySkip": "不确定，跳过",
+    "verifyCorrectTitle": "正确的是哪个？",
+    "verifyCorrectHint": "按收据上的样子，输入完整店名",
+    "verifyCorrectSave": "保存并继续",
+    "verifySimilar": "相似商家 — 点一下自动填充",
+    "servicesEyebrow": "我的服务",
+    "servicesTitle": "订阅与账单",
+    "servicesAdd": "+ 添加",
+    "servicesEmptyTitle": "还没有服务",
+    "servicesEmptyBody": "把电费、网费、订阅这种定期服务加进来，Yumo 会到期前提醒你。",
+    "servicesReminderHint": "到期前 3 天和 1 天会提醒你",
+    "servicesDayCounter": "天",
+    "servicesUpcomingTitle": "即将到期",
+    "servicesAddTitle": "添加服务",
+    "servicesStepCategory": "1 · 类别",
+    "servicesStepName": "2 · 名称",
+    "servicesStepNameHint": "品牌你来选 — Yumo 不收集 logo，只保存你写的名字",
+    "servicesStepDay": "3 · 缴费日",
+    "servicesStepReminder": "4 · 提醒",
+    "servicesPaymentDayLabel": "每月",
+    "servicesReminder3": "提前 3 天",
+    "servicesReminder1": "提前 1 天",
+    "servicesReminderSameDay": "当天早上",
+    "servicesSubmit": "添加并提醒",
+    "shoppingListAdd": "+ 添加",
+    "shoppingItemPlaceholder": "新项目...",
+    "shoppingItemSave": "添加",
+    "shoppingHintMatch": "上传收据后，Yumo 会自动比对清单，告诉你哪家更便宜",
+    "todayMicroEyebrow": "今天的一步",
+    "todayMicroAddReceipt": "添加第一张收据",
+    "todayMicroSeconds": "秒",
+    "todayMicroContribution": "贡献"
+  },
+  "goals": {
+    "title": "目标",
+    "streak": "连续 {count} 天",
+    "addFinancialGoal": "添加财务目标",
+    "todaysPlan": "今日计划",
+    "actions": "{count} 个行动",
+    "noActions": "当前没有开放任务，请从任务界面继续。",
+    "daily": "每日",
+    "weekly": "每周",
+    "receiptTrust": "收据信任度",
+    "quests": "任务",
+    "complete": "完成",
+    "questsAll": "全部",
+    "questsDaily": "每日",
+    "questsWeekly": "每周",
+    "dailyQuest": "每日任务",
+    "weeklyQuest": "每周任务",
+    "questDone": "完成",
+    "questOngoing": "进行中",
+    "questProgress": "进度 {current} / {target}",
+    "noQuests": "没有未完成的任务。新收据或每周轮换将显示在此处。",
+    "patterns": "生活",
+    "financialGoals": "财务目标",
+    "add": "添加",
+    "noFinancialGoals": "没有已保存的活跃目标。添加一个或点击上方的+。",
+    "deleteGoal": "删除目标",
+    "goalTarget": "目标 {amount}",
+    "addGoalButton": "添加财务目标",
+    "trustCard": {
+      "title": "收据质量",
+      "desc": "清晰的收据可提高信任分数并解锁更好的奖励。",
+      "improve": "如何改进"
+    },
+    "trustSheet": {
+      "title": "如何提高收据质量",
+      "tip1": "确保收据所有边缘都可见。裁剪的角会阻止OCR读取总金额。",
+      "tip2": "上传真实照片，而非截图。截图缺少必要的元数据。",
+      "tip3": "日期、总额和商家名称必须清晰可见。三者齐全才能触发奖励计算。",
+      "tip4": "避免模糊或黑暗的照片。光线不足是降低OCR置信度的最大因素。",
+      "understood": "明白了"
+    },
+    "financialSheet": {
+      "title": "添加财务目标",
+      "desc": "目标通过 /api/goals 保存（与 Insights 相同的数据）。",
+      "titleLabel": "标题",
+      "titlePlaceholder": "例：暑假基金",
+      "amountLabel": "目标金额（{currency}）",
+      "deadlineLabel": "截止日期（可选 · YYYY-MM-DD）",
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中…",
+      "saveError": "无法保存。请检查您的会话和网络连接。"
+    }
+  },
+  "rewardsPage": {
+    "title": "赛季奖励",
+    "daysLeft": "{count} 天剩余",
+    "yourRewards": "你的奖励",
+    "contributionBalance": "贡献余额",
+    "totalProof": "你的已验证总贡献",
+    "fromReceipts": "来自收据",
+    "fromQuests": "来自任务",
+    "receiptCPoints": "收据 cPoints",
+    "bonusCPoints": "奖励 cPoints",
+    "earnedFromReceipts": "来自已验证收据",
+    "earnedFromQuests": "来自已完成任务",
+    "nextUnlocks": "下一个解锁",
+    "milestoneChallenge": "里程碑挑战",
+    "reached": "✓ 已达成",
+    "howYouEarn": "你的获得方式",
+    "earnReceiptLabel": "上传收据",
+    "earnReceiptDesc": "Season XP · 账户 XP · 贡献值 · cPoints",
+    "earnVerifyLabel": "验证并赚取",
+    "earnVerifyDesc": "验证他人收据 → 获得 cPoints + Season XP",
+    "earnDailyLabel": "每日任务",
+    "earnDailyDesc": "cPoints · Season XP",
+    "earnWeeklyLabel": "每周任务",
+    "earnWeeklyDesc": "更多 cPoints · Season XP",
+    "earnQualityLabel": "高质量收据",
+    "earnQualityDesc": "更好的奖励结果",
+    "activity": "活动",
+    "all": "全部",
+    "receipts": "收据",
+    "quests": "任务",
+    "noActivity": "暂无活动",
+    "invitesTitle": "你的邀请",
+    "invitesSubtitle": "你邀请的人的活动和收益",
+    "seasonRecap": "本赛季目前",
+    "receiptsVerified": "已验证收据",
+    "questsCompleted": "已完成任务",
+    "cPointsEarned": "已获得 cPoints",
+    "seasonXp": "Season XP",
+    "currentLevel": "当前等级",
+    "rewardBoost": "奖励加成",
+    "bestMove": "今日最佳动作",
+    "go": "前往",
+    "receipt": "收据",
+    "receiptVerified": "收据已验证",
+    "dailyQuest": "每日任务",
+    "weeklyQuest": "每周任务",
+    "rewardBoostArrow": "奖励加成 → {multiplier}x"
+  },
+  "notificationsPage": {
+    "eyebrow": "收件箱",
+    "title": "通知",
+    "unread": "{count} 条未读",
+    "markAllRead": "全部标为已读",
+    "empty": "没有通知。",
+    "emptyDesc": "新更新将在此处显示。",
+    "defaultTitle": "通知",
+    "defaultBody": "详情可用"
+  },
+  "bills": {
+    "title": "我的账单",
+    "providerCount": "{count} 个服务商",
+    "headerSubtitle": "已追踪 {count} 项 · 账单与订阅",
+    "tabBills": "账单",
+    "tabSubscriptions": "订阅",
+    "summary": {
+      "monthly": "每月",
+      "upcoming": "即将到期",
+      "tracked": "追踪中",
+      "subs": "订阅"
+    },
+    "heroTitle": "本月",
+    "heroSubsTitle": "订阅",
+    "heroEmpty": "添加第一项,这里会显示支付状态。",
+    "heroProgress": "已付 {paid} / {total}",
+    "heroAllPaid": "本月全部已付",
+    "heroPendingLabel": "待付 · {count} 笔",
+    "heroPendingNoAmount": "{count} 项待付",
+    "heroPaidLabel": "本月已付",
+    "heroNextLabel": "下次付款",
+    "dayLetter": "天",
+    "everyDay": "每月 {day} 日",
+    "menu": "菜单",
+    "editName": "编辑名称",
+    "markPaid": "标记为已付",
+    "markPaidShort": "已付",
+    "undoPaid": "取消已付标记",
+    "delete": "删除",
+    "deleteConfirm": "删除 {name}?",
+    "deleteConfirmDesc": "提醒也会一并取消。",
+    "deleteConfirmYes": "删除",
+    "cancel": "取消",
+    "deleted": "{name} 已删除",
+    "deleteFailed": "删除失败",
+    "uploadFailed": "上传失败",
+    "renamePrompt": "新的服务商名称",
+    "providerRenamed": "已重命名:{name}",
+    "renamedBadge": "已更新",
+    "paidThisPeriod": "本期已付",
+    "paidJustNow": "已付 · {date}",
+    "stepCategory": "选择类别",
+    "stepName": "服务商名称",
+    "stepDay": "付款日",
+    "stepAmountTime": "金额与时间",
+    "stepReminders": "提醒",
+    "stepSample": "示例文档",
+    "choosePlaceholder": "类别",
+    "namePreview": "服务商名称",
+    "noAmountPreview": "无金额",
+    "noAmount": "无金额",
+    "estimated": "预估",
+    "reminder3Short": "3 天",
+    "reminder1Short": "1 天",
+    "sameDay": "当天",
+    "before": "之前",
+    "morning": "早上",
+    "reminderHintOff": "未设置提醒",
+    "reminderHintOn": "已启用 {n} 个提醒",
+    "optional": "可选",
+    "clear": "清除",
+    "undoPaidShort": "撤销",
+    "reminderActive": "提醒已开启",
+    "today": "今天",
+    "daysLeft": "还剩 {days} 天",
+    "nextOn": "下次",
+    "itemBill": "账单",
+    "itemSubscription": "订阅",
+    "addSubscription": "添加",
+    "allSubscriptions": "所有订阅",
+    "emptySubscriptions": "暂无订阅",
+    "emptySubscriptionsDesc": "添加 Netflix、Spotify 或任何数字订阅,集中管理。",
+    "emptyAddSubscription": "添加第一个订阅",
+    "newSubscription": "新订阅",
+    "back": "返回",
+    "add": "添加",
+    "upcomingTitle": "即将到期 — 7 天",
+    "daysShort": "{days} days",
+    "allProviders": "All providers",
+    "loading": "Loading…",
+    "empty": "No providers yet",
+    "emptyDesc": "Add your bills and I'll remind you when they're due.",
+    "emptyAdd": "Add your first provider",
+    "categoryLabel": {
+      "electricity": "Electricity",
+      "water": "Water",
+      "gas": "Gas",
+      "phone": "Phone",
+      "internet": "Internet",
+      "streaming": "Streaming",
+      "entertainment": "Entertainment",
+      "digital_subscription": "Subscription",
+      "other": "Other"
+    },
+    "paymentDay": "every {day}th",
+    "uploadBill": "Upload bill",
+    "newProvider": "New Provider",
+    "categorySection": "Category — choose from list",
+    "nameSection": "Provider name — type it",
+    "namePlaceholder": "Provider name",
+    "sampleSection": "Sample document — optional",
+    "sampleChange": "Change document",
+    "sampleUpload": "Upload PDF / image",
+    "sampleHint": "If uploaded, the system will extract amount and date for the first record.",
+    "sampleRemove": "Remove",
+    "paymentDaySection": "Payment day — every month",
+    "reminderSection": "Reminder",
+    "reminder3": "3 days before",
+    "reminder1": "1 day before",
+    "reminderSameDay": "Same day",
+    "timeSection": "Time",
+    "amountSection": "Estimated amount",
+    "amountPlaceholder": "optional",
+    "saveFailed": "Could not save: {error}",
+    "saving": "Saving…",
+    "savingWithDoc": "Saving and analyzing…",
+    "submit": "Save Provider",
+    "closeSheet": "Close",
+    "shortDays": "{days}d",
+    "paymentDayHint": "If the month is shorter, shifts to the last day (e.g. Feb 28/29)",
+    "savedWithDoc": "Provider saved, sample document archived"
+  },
+  "breakdownCard": {
+    "title": "成本明细",
+    "estimated": "预估",
+    "totalPaid": "已付总额",
+    "vat": "增值税",
+    "hiddenTitle": "隐藏成本明细",
+    "supplyChain": "供应链",
+    "storeBrand": "门店与品牌",
+    "totalHidden": "隐藏成本总计",
+    "referencePrice": "参考价格"
+  },
+  "rewardCard": {
+    "title": "潜在奖励",
+    "earnedFromHidden": "来自隐藏成本的收益",
+    "totalPoints": "总积分",
+    "quality": "质量",
+    "rawReward": "基础奖励",
+    "conversionRate": "转换率",
+    "appliedLimits": "已应用限制：",
+    "honorBonus": "荣誉加成 1.2x 已应用",
+    "noReward": {
+      "pos_slip": "银行卡签单可证明付款；当前月以外的签单无法获得完整奖励路径。",
+      "payment_receipt": "此签单已确认付款，但缺少明细消费凭证 — 请上传商店小票或电子发票。",
+      "order_list": "订单和未付账单会记录，但不具备奖励资格。",
+      "no_payment_proof": "此文件未确认付款，因此不适用奖励。",
+      "out_of_current_month": "仅接受日期在当前自然月内的小票以获得奖励。",
+      "missing_receipt_date": "无法验证小票日期以应用当月规则。",
+      "document_rejected": "此文件类型不被接受为消费凭证。",
+      "vision_failed": "无法分析图像。请重新拍照后再试。",
+      "reward_pending_verification": "奖励尚未计算。行项目验证后可能会更新。",
+      "duplicate_same_user": "你已经上传过这张小票。重复小票不会获得奖励。",
+      "duplicate_other_user": "这张小票之前已上传。重复小票不会获得奖励。",
+      "generic": "此文件已保存，但未获得奖励。"
+    }
+  },
+  "extractionCard": {
+    "title": "提取的信息",
+    "subtitle": "服务器端提取结果（只读）",
+    "date": "日期",
+    "totalAmount": "总金额",
+    "vatAmount": "增值税金额",
+    "confidence": "置信度：{pct}%",
+    "rate": "税率：{pct}%",
+    "sourceLine": "从第 {line} 行提取"
+  }
+}

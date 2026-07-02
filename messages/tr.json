@@ -1,0 +1,2808 @@
+{
+  "navigation": {
+    "logo": "Yumo Yumo",
+    "home": "Ana Sayfa",
+    "whitepaper": "Ciddi Belge",
+    "roadmap": "Yol Haritası",
+    "tokenomics": "Tokenomik",
+    "faq": "SSS",
+    "signUp": "Kayıt Ol",
+    "goApp": "Uygulamaya Git",
+    "app": "Uygulama",
+    "papers": "Belgeler",
+    "visionPaper": "Vision Paper",
+    "visionPaperDesc": "Ürün tezi ve ekonomik anlatı.",
+    "technicalPaper": "Technical Paper",
+    "technicalPaperDesc": "Pipeline, şemalar, formüller, risk yaklaşımı."
+  },
+  "hero": {
+    "title": "Harcamanı anlayan finansal OS.",
+    "subtitle": "Fiş destekli finansal zeka.",
+    "description": "",
+    "cta": "Fiş Yükle",
+    "joinWaitlist": "Hesap Oluştur"
+  },
+  "loading": {
+    "analyzing": "Fiş analiz ediliyor...",
+    "extractingHiddenCosts": "Gizli masraflar çıkartılıyor...",
+    "revealingTruth": "Gerçekler gün yüzüne çıkarılıyor..."
+  },
+  "about": {
+    "title": "Yumo Yumo Hakkında",
+    "description": "Proof of Expense üzerine kurulu kişisel bir finansal işletim sistemi. Uygun fişlerini yükle, fiyat hafızanı oluştur ve ileride açılabilecek token raylarını destekleyebilecek katkı kayıtları biriktir.",
+    "description1": "Yumo Yumo, fişleri, rutinleri ve fiyat değişimlerini Yumbie rehberliğinde yaşayan finansal hafızaya dönüştürür.",
+    "description2": "Yumo Yumo beta aşamasında. Uygun fişlerini yükle, fiyat hafızanı güçlendir ve ürün içinde katkı geçmişi oluştur."
+  },
+  "footer": {
+    "description": "Fiyat hafızanı oluştur, harcama ritmini daha iyi anla ve Yumbie'yi daha iyi verilerle besle.",
+    "resources": "Kaynaklar",
+    "community": "Topluluk",
+    "followUs": "Bizi Takip Edin",
+    "terms": "Şartlar ve Koşullar",
+    "privacy": "Gizlilik Politikası",
+    "support": "Destek",
+    "copyright": "© 2025 Yumo Yumo. Tüm hakları saklıdır. Sevgi ve Yumbie'lerle yapıldı."
+  },
+  "howItWorks": {
+    "title": "Nasıl Çalışır",
+    "subtitle": "Finansal işletim sistemini kurmaya başlamak için üç basit adım.",
+    "betaNotice": "Beta · Kullanıma açık",
+    "steps": [
+      {
+        "title": "Hesabını Oluştur",
+        "description": "Ücretsiz kaydol ve Yumo Yumo'yu hemen kullanmaya başla. Beta sürümdeyiz — geri bildirimin bir sonraki sürümü şekillendirir."
+      },
+      {
+        "title": "İlk Kanıtını Yükle",
+        "description": "Yumo'nun ürünleri, mağazayı, zamanı ve gizli maliyet sinyallerini okuyabilmesi için uygun bir fiş ekle."
+      },
+      {
+        "title": "Hafıza ve Katkı Oluştur",
+        "description": "Uygulamada fiyat hafızanı ve rehberliği gör; uygun aktiviteler ayrıca devredilemeyen katkı kayıtları oluşturabilir."
+      }
+    ]
+  },
+  "technologyStack": {
+    "eyebrow": "Technology Stack",
+    "title": "Proof of Expense'in arkasındaki raylar",
+    "subtitle": "AI fişi okur. Solana ödülü zincire bağlar. Güvenilir altyapı döngüyü hızlı, güvenli ve doğrulanabilir tutar.",
+    "items": [
+      {
+        "name": "OpenAI"
+      },
+      {
+        "name": "Anthropic"
+      },
+      {
+        "name": "Google"
+      },
+      {
+        "name": "Solana"
+      },
+      {
+        "name": "Vercel"
+      },
+      {
+        "name": "Cursor"
+      },
+      {
+        "name": "Cloudflare"
+      },
+      {
+        "name": "Phantom"
+      }
+    ],
+    "disclaimer": "Yumo Yumo, burada gösterilen şirketlerle bağlı değildir ve bu şirketler tarafından onaylandığı anlamına gelmez. Logo ve isimler ilgili sahiplerinin ticari markalarıdır."
+  },
+  "tokenomics": {
+    "title": "Token Dağılımı",
+    "subtitle": "INT nasıl paylaşılıyor",
+    "totalSupply": "Toplam arz: 99 milyar $INT — Proof of Expense, stake ve uzun vadeli katkı üzerine kurulu",
+    "distribution": [
+      {
+        "label": "Kullanıcı ödülleri (Proof of Expense)",
+        "description": "Doğrulanmış fiş katkısı ve PoE sistemine katılım için ana ödül havuzu."
+      },
+      {
+        "label": "Proof of Contribution",
+        "description": "Katkı kalitesi ve dönemsel sıralamalara göre dağıtılan bonus havuzu — çekirdek ekip ve dış katkıcılar tarafından iş etkisiyle kazanılır."
+      },
+      {
+        "label": "Stake ve uzun vadeli teşvikler",
+        "description": "Uzun vadeli sahiplere ve stake edenlere 5 yıllık ufukta dağıtılır."
+      },
+      {
+        "label": "Likidite",
+        "description": "TGE'de sağlıklı zincir-üstü piyasa ve borsa likiditesi için tohum; piyasa derinliği için yönetişimli rezerv ile birlikte."
+      },
+      {
+        "label": "Airdrop ve topluluk görevleri",
+        "description": "Oyunlaştırılmış görevler, dönüm noktası kampanyaları ve topluluk dağıtımları."
+      },
+      {
+        "label": "Davet ödülleri",
+        "description": "Davet ettiklerin doğrulama eşiğini geçtiğinde (ör. başarılı PoE yüklemesi) açılan etkinlik bazlı ödüller."
+      }
+    ],
+    "detailedLink": "Detaylı tokenomik için tıkla"
+  },
+  "papers": {
+    "title": "Belgelerimizi Oku",
+    "subtitle": "Vizyon belgesi ile teknik belgeyi yan yana keşfet",
+    "visionPaper": {
+      "title": "Vizyon Belgesi",
+      "subtitle": "Cebinden çıkan parada söz sahibi ol.",
+      "description": "Harcama Kanıtı üzerine bir manifesto. Fiyat bir sayı değil, bir yığın: ürün, KDV, perakende marjı, marka primi. Yumo Yumo fişi okur, yığını söker ve gizli maliyeti sahip olduğun bir token'a çevirir.",
+      "tags": [
+        "Harcama Kanıtı",
+        "Gizli Maliyet",
+        "Manifesto"
+      ]
+    },
+    "seriousPaper": {
+      "title": "Teknik Belge",
+      "subtitle": "Mimari, Güven Katmanı ve Token Mekanikleri",
+      "description": "Fiş işleme hattını, güven katmanını, veri modelini ve Yumo Yumo'nun arkasındaki token mekaniklerini açan teknik dokümantasyon.",
+      "tags": [
+        "Harcama-Kanıtı",
+        "Akıllı Sözleşmeler",
+        "Ekonomi"
+      ]
+    }
+  },
+  "funPaper": {
+    "sections": [
+      {
+        "title": "1. Peki... Yumo Yumo Nedir?",
+        "content": [
+          "Yumo Yumo, uygun günlük fişleri uygulama içi katkı kayıtlarına dönüştüren bir Web3 projesidir:",
+          "Para harcamak.",
+          "Her fiyatın katmanları vardır.",
+          "Vergiler, kâr marjları, operasyonel maliyetler...",
+          "Hepsini her gün, hiç düşünmeden ödersin.",
+          "Yumo Yumo bu katmanlara bakar ve der ki:",
+          "\"Harika! Gel bunu faydalı veri katkısına dönüştürelim.\""
+        ]
+      },
+      {
+        "title": "2. Neden İnsanların Umurunda Olsun?",
+        "content": [
+          "Çünkü neredeyse tüm finans araçları şu sıkıcı soruyu sorar:",
+          "\"Ne kadar harcadın?\"",
+          "Yumo Yumo daha iyisini sorar:",
+          "\"O fiyatın içinde aslında neler vardı?\"",
+          "Fiyatlara bu gözle bakmaya başladığında, harcama yapmak pasif bir eylem olmaktan çıkar.",
+          "Veriye dönüşür.",
+          "Ve uygun veri uygulama içi ödül oluşturabilir."
+        ]
+      },
+      {
+        "title": "3. Harcama Kanıtı (Proof of Expense - PoE)",
+        "content": [
+          "PoE (Harcama Kanıtı) basit ve dürüsttür.",
+          "Gerçek bir fiş yüklersin.",
+          "Sistem fiyatın içindekileri analiz eder.",
+          "Gizli maliyetler gün yüzüne çıkar.",
+          "Uygun gerçek dünya verisi sağladığın için uygulama içi ödül kaydı alabilirsin.",
+          "Sahte aksiyon yok.",
+          "Botlarla buton tıklamak yok.",
+          "\"Sadece hislerle\" gelen ödüller yok.",
+          "Eğer gerçek hayatta harcıyorsan, Yumo Yumo'da uygun veri katkısı yapabilirsin."
+        ]
+      },
+      {
+        "title": "4. Veri Katkısı, Ama Günlük Hayatın İçinde",
+        "content": [
+          "GPU'ları (ekran kartlarını) unut.",
+          "Makine dolu depoları unut.",
+          "Yumo Yumo'da fişlerin, senin veri katkısıdır.",
+          "Her geçerli fiş, sisteme bir sinyal ekler.",
+          "Her uygun sinyal, uygulama içi ödül kaydı oluşturabilir.",
+          "Döngü tertemizdir:",
+          "Harca → Yükle → Doğrula → Ödül",
+          "Zaten birinci adımı her halükarda yapıyordun."
+        ]
+      },
+      {
+        "title": "5. Tokenlar Hakkında (Önce Topluluk)",
+        "content": [
+          "Net olalım:",
+          "Ekip tahsisi (allocation) yok.",
+          "Gizli zula yok.",
+          "Pazarlama için ayrılmış dev bütçeler yok.",
+          "İçeriden birilerinin önceden token basması yok.",
+          "Yumo Yumo, uygun uygulama içi ödüllerin şeffaf ürün kurallarını takip etmesi için inşa edildi.",
+          "Uygun katkı sağlarsan uygulama içi ödül için hak kazanabilirsin.",
+          "Faaliyet uygun değilse ödül için hak kazanmaz.",
+          "Bu kadar."
+        ]
+      },
+      {
+        "title": "6. \"Peki Bu İş Nasıl Fonlanıyor?\"",
+        "content": [
+          "Alışılagelmiş yollarla fonlanmıyor.",
+          "Devasa pazarlama bütçeleri yok.",
+          "Parayla tutulmuş reklam makineleri yok.",
+          "Yapay bir talep yok.",
+          "Yumo Yumo, Web3 yoluyla büyür:",
+          "Katılım, katkı ve paylaşılan teşviklerle.",
+          "Değer, ekibin vaatlerinden değil, insanların yaptıklarından gelir."
+        ]
+      },
+      {
+        "title": "7. Neden Web3?",
+        "content": [
+          "Çünkü kurallar insanlardan daha önemlidir.",
+          "Web3 şunları garanti eder:",
+          "Ödüller önceden tanımlanmış bir mantığı takip eder.",
+          "Dağıtım manuel olarak değiştirilemez.",
+          "Perde arkasında kimse \"kimin ne alacağına\" karar veremez.",
+          "Harcamalar ortak bir sinyale dönüşür.",
+          "Gelecekte token işlevleri açılırsa uygunluk ve güncel şartlarla sınırlı olur.",
+          "Basit sistemler hayatta kalır.",
+          "Şeffaf olmayanlar ise elenir."
+        ]
+      },
+      {
+        "title": "8. Bu Aslında Kimin İçin?",
+        "content": [
+          "Para harcayan insanlar.",
+          "Veri katkısı yapmayı seven ama uykusunu da almak isteyenler.",
+          "Hikayeler yerine kuralları tercih edenler.",
+          "Trade yapmana gerek yok.",
+          "Kaldıraç kullanmana gerek yok.",
+          "Grafik tahmin etmene gerek yok.",
+          "Sadece fişleri yüklersin."
+        ]
+      },
+      {
+        "title": "9. Büyük Resim",
+        "content": [
+          "Yumo Yumo bir farkındalıkla başlar.",
+          "Zamanla bu farkındalık şuna dönüşür:",
+          "Daha derin içgörüler.",
+          "Daha akıllı finansal araçlar.",
+          "Gerçek harcama verileri üzerine kurulu, büyüyen bir ekosistem.",
+          "Hepsi, parayı asıl harcayan insanlar tarafından desteklenir."
+        ]
+      },
+      {
+        "title": "10. Son Düşünce",
+        "content": [
+          "Cüzdanından her gün zaten para çıkıyor.",
+          "Yumo Yumo bunu durdurmaya çalışmaz.",
+          "Sadece bu olurken uygun fişlerin katkı sinyaline dönüşmesini sağlar.",
+          "Döngü: Harca ➔ Yükle ➔ Doğrula ➔ Ödül",
+          "İşte döngü bu."
+        ]
+      }
+    ],
+    "cta": {
+      "title": "İşin mutfağına girmeye hazır mısın?",
+      "description": "Teknik özellikler, token ekonomisinin (tokenomics) matematiksel detayları ve uygulama süreçleri hakkında çok daha derin bir dalış yap.",
+      "button": "Teknik Dökümanları İncele ➔"
+    },
+    "loop": {
+      "title": "Döngü",
+      "steps": {
+        "spend": "Harca",
+        "upload": "Yükle",
+        "mine": "Kaz",
+        "earn": "Kazan"
+      }
+    }
+  },
+  "roadmap": {
+    "title": "Geliştirme Yol Haritası",
+    "subtitle": "Harcama ödüllerini devrimleştirme yolculuğumuz",
+    "items": [
+      {
+        "quarter": "P1",
+        "year": "P1",
+        "title": "Faz 1 — Erken Veri Sağlayıcıları\nFarkındalık Başlıyor",
+        "items": [
+          "Adil Lansman: Topluluk odaklı likidite ve fiyat keşfi",
+          "PoE Katkısı: Fişleri uygulama içi katkı kayıtlarına dönüştür",
+          "Dijital Kimlik: Foundation NFT'ni al, seviyeni yükselt"
+        ]
+      },
+      {
+        "quarter": "P2",
+        "year": "P2",
+        "title": "Faz 2 — Genişleme\nVeriden Güce",
+        "items": [
+          "Akıllı Ajanlar: NFT'ler AI destekli yol arkadaşlarına dönüşür",
+          "Staking Açılışı: Erken katılanlar için yüksek APR",
+          "Merchant Matrix: Kategori bazlı ödül çarpanları"
+        ]
+      },
+      {
+        "quarter": "P3",
+        "year": "P3",
+        "title": "Faz 3 — Zeka\nSistem Öğreniyor",
+        "items": [
+          "Gelişmiş İçgörüler: AI destekli finansal raporlar",
+          "HCI Endeksi: Global hidden cost panosu",
+          "Olgun Protokol: Tamamen veri destekli ekonomi"
+        ]
+      }
+    ]
+  },
+  "waitlist": {
+    "title": "Bekleme Listesine Katılın",
+    "subtitle": "Yumo Yumo'yu ilk deneyenler arasında ol! ✨",
+    "email": "E-posta Adresi",
+    "country": "Ülken",
+    "referralSource": "Bizim hakkımızda nasıl duydun?",
+    "selectCountry": "Ülkeni seç",
+    "selectOption": "Bir seçenek seçin",
+    "submit": "Bekleme Listesine Katıl",
+    "submitting": "Katılıyor...",
+    "success": "Başarılı! Listedesin 🎉",
+    "successTitle": "Listedesin! 🎉",
+    "successMessage": "Yumo Yumo başladığında sana bildireceğiz.",
+    "inboxMessage": "Gelen kutunu kontrol et! 💌",
+    "alreadyExists": "Zaten bekleme listesindesin! 🎉",
+    "marketingConsent": "Yumo Yumo Inc.'ten lansman haberleri, ürün güncellemeleri ve bekleme listesi e-postaları almayı kabul ediyorum. Pazarlama e-postalarından istediğim zaman çıkabilirim.",
+    "error": "Lütfen tüm alanları doldur ve onay kutusunu işaretle 💕",
+    "networkError": "Ağ hatası. Lütfen bağlantını kontrol et ve tekrar dene! 💫",
+    "connectionError": "Bağlantı hatası. Lütfen tekrar dene! 💫",
+    "unexpectedError": "Sunucudan beklenmeyen yanıt. Lütfen tekrar dene! 💫",
+    "genericError": "Bir şeyler ters gitti. Lütfen tekrar dene! 💫",
+    "sources": [
+      "Sosyal medya (X, TikTok, Discord, vb.)",
+      "Google Arama",
+      "Arkadaşlar veya Aile",
+      "YouTube / Etkileyici",
+      "Haberler / Blog Makalesi",
+      "Diğer"
+    ]
+  },
+  "faq": {
+    "title": "Yumo Yumo SSS",
+    "subtitle": "Soruların mı var? Cevaplarımız var! 😊",
+    "stillHaveQuestions": "Hala soruların mı var? 💬",
+    "contactText": "DM'ye gelin veya bir tweet atın — sohbet etmeyi seviyoruz! ❤️",
+    "readWhitepaper": "Whitepaper'ı Oku",
+    "contactUs": "Bize Ulaşın",
+    "items": [
+      {
+        "question": "Yumo Yumo neyle ilgili?",
+        "answer": "Alışveriş fişlerinde gerçekte neyin gizlendiğini nihayet gösteren arkadaşız biz! 🧾✨ Yumo Yumo günlük harcamaları eğlenceli içgörülere ve uygun uygulama içi ödül kayıtlarına dönüştürür. Bir fiş yükle, gizli maliyetleri ortaya çıkar ve paranla daha akıllı ol."
+      },
+      {
+        "question": "Bu gerçekten nasıl çalışıyor? Çok iyi geliyor!",
+        "answer": "Şöyle: 🚀\n\nBağlan: Cüzdanınla giriş yap.\n\nOkut: Uygun fişin fotoğrafını gönder.\n\nDoğrula: PoE teknolojimiz veriyi işlesin.\n\nSonuç: Harcama dökümünü gör ve uygunsan uygulama içi ödül kaydı al. Bitti bile!"
+      },
+      {
+        "question": "Tamam, ama herkesin bahsettiği bu \"gizli maliyetler\" nedir?",
+        "answer": "Fiyat etiketinin arkasındaki gerçekleri gün yüzüne çıkarıyoruz: Devletin payı 🏛️, yol maliyeti 🚚, bitmek bilmeyen enflasyon 📈 ve marka kârları 💸. Yumo Yumo ile toplam tutarın hangi katmanlara bölündüğünü gör; \"Aynı burger neden orada daha ucuz?\" sorusuna kesin cevabı al!"
+      },
+      {
+        "question": "Bu finansal tavsiye mi? Hayatımı şimdi değiştirmeli miyim? 😅",
+        "answer": "Hayır! Burada sana ne yapacağını söylemek için değil, daha net görmene yardımcı olmak için bulunuyoruz. İçgörüler sadece merak ve farkındalık uyandırmak için eğitimli tahminlerdir — kesinlikle resmi finansal tavsiye değildir. Hala cüzdanının patronu sensin! 👑"
+      },
+      {
+        "question": "Ödülleri nasıl kazanırım? Eğlenceli kısmı anlat!",
+        "answer": "İki yol var: ✨\n\ncPoints 🍪: Uygun gerçek hayat fişlerinden oluşan uygulama içi kayıtlar.\n\ncPoints 🎈: Uygun topluluk katkılarından (görevler) oluşan uygulama içi kayıtlar.\n\nBu kayıtlar transfer edilemez; gelecekte token programı açılırsa her claim uygunluk, güncel şartlar ve yasal kontrollerden geçer."
+      },
+      {
+        "question": "YUMO token nedir? Aya mı gidiyor? 🚀",
+        "answer": "YUMO, uygun ekosistem özellikleri için planlanan bir utility token'dır. Claim, transfer, staking, governance ve dağıtım detayları henüz canlı değildir; ürün hazırlığı, hukuki inceleme, ülke kuralları, yaptırım taraması ve güncel Token & Rewards Terms'e göre değişebilir."
+      },
+      {
+        "question": "Hızlıca zengin olur muyum?",
+        "answer": "Spekülasyon rüzgarlarıyla değil, gerçek hayatın ritmiyle büyüyoruz. Yumo Yumo'da ödüller \"belki\"lerden değil, yüklediğin o gerçek fişlerden doğar. Her kahve alışında, her market turunda kendine bir ödül fırlat! Bu sadece bir \"teşekkür\" değil; harcama alışkanlıklarını bir varlığa dönüştüren yeni nesil bir ekonomik hareket. Oyunun kuralları değişti, sen hala sadece harcıyor musun? 🔥🛒"
+      },
+      {
+        "question": "Her şeyi nasıl adil ve sürdürülebilir tutuyorsunuz?",
+        "answer": "Projemizin bu kısmıyla gurur duyuyoruz çünkü burada her şey net. Gizli basım riskini sıfırladık, emisyonu topluluk büyümesine göre dengeledik. Kötüye kullanıma karşı geliştirdiğimiz zırhımız sayesinde ödüller botlara değil, gerçek kullanıcılara gider. Biz saman alevi gibi yanıp sönmeye değil, sürdürülebilir bir ekonomiyle kalıcı olmaya geldik! ♻️🚀"
+      },
+      {
+        "question": "Peki gizliliğim? Sen fişlerimi görüyorsun! 😳",
+        "answer": "Sana en iyi ödülleri ve analizleri sunmak için sadece gerekli olanı işliyoruz. Sistemimizi geliştirmek için kullandığımız her veri, kimliğini asla ele vermeyecek şekilde tamamen anonimleştirilmiştir. Cüzdan adresin blockchain üzerinde (doğal olarak) halka açıktır ama kişisel detayların bizimle özel kalır. Şeffaflık konusunda takıntılıyız; Gizlilik Politikamızı yanına en sevdiğin atıştırmalığı alıp keyifle okuyabilirsin! 🍿✨"
+      },
+      {
+        "question": "Kelimenin tam anlamıyla herkes katılabilir mi?",
+        "answer": "Ülkende yasal yaşta olduğun ve yaşadığın yerde kriptonun uygun olduğu sürece — evet! 🌍 (Yerel kurallar nedeniyle bazı özellikler belirli bölgelerde sınırlı olabilir — sıkıcı ama gerekli.)"
+      },
+      {
+        "question": "Airdrop? Ücretsiz token'lar? 🤑",
+        "answer": "Airdrop, ücretsiz token, claim, transfer veya nakit değer garantisi yoktur. Gelecekte bir token veya ödül etkinliği olursa uygunluk, cüzdan ve ülke kontrolleri, kötüye kullanım incelemesi ve ayrı Token & Rewards Terms gerekir."
+      },
+      {
+        "question": "Ne zaman kullanmaya başlayabilirim?",
+        "answer": "Uygulama fırında pişiyor! 🔥 Whitepaper şimdi çıktı, erken erişim yakında. En taze güncellemeler için bizi X'te takip et — hazır olduğunda bağıracağız!"
+      },
+      {
+        "question": "Neden bir pazarlama bütçesi yok?",
+        "answer": "Biz dev reklam ajanslarına servet ödemek yerine, enerjimizi ve ödüllerimizi seninle paylaşmayı seçiyoruz. Yumo Yumo, büyük şirketlerin yapay desteğiyle değil; senin gibi tutkulu kullanıcıların sevgisi ve paylaşımıyla büyüyor. Bize en başından inananları ve içerik üretenleri ödüllendirmek bizim için çok daha değerli. Daha sağlıklı, insan odaklı ve kesinlikle çok daha eğlenceli! 💖✨"
+      },
+      {
+        "question": "Ekip bir \"ekip tahsisi\" tutuyor mu?",
+        "answer": "Yumo Yumo'da gizli cepler, kapalı kapılar ardında ayrılmış \"zula\"lar göremezsin. Ekip olarak biz de tam olarak senin gibi kazanıyoruz: Sistemi inşa ederek, büyüterek ve gerçek değer üreterek. Eğer Yumo Yumo sana gerçek bir fayda sunmazsa, biz de kazanamayız. Ya birlikte büyüyoruz ya da hiç büyümüyoruz! Şeffaflık bizim kırmızı çizgimiz. 🤝✨"
+      },
+      {
+        "question": "Bekle—ekip ücretsiz mi çalışıyor?",
+        "answer": "Bizim başarı kriterimiz borsadaki grafikler değil, senin bu sistemi gerçekten benimsemendir. Geliştirdiğimiz her yeni özellik, ağı daha güçlü ve topluluğu daha mutlu etmek için. İnsanlar Yumo Yumo'yu kullanmayı seviyorsa, ekosistem zaten kendi kendine büyür. Hep beraber, severek kazanmanın tadını çıkarıyoruz! 💎🎈"
+      },
+      {
+        "question": "Daha fazla öğrenmek ve kafamdaki soru işaretleri ile vedalaşmak için ne yapmalıyım?",
+        "answer": "Daha Fazlasını Merak mı Ediyorsun? Gel Konuşalım! 💬✨\n\nWhitepaper: Detaylarda kaybolmak isteyenler için \"derin dalış\" burada.\n\nX (@yumohq): En taze haberler ve bolca sohbet için oradayız, mutlaka takıl!\n\nWeb Sitemiz: yumoyumo.com her zaman güncel.\n\nDiscord/Telegram: Çok yakında kapıları açıyoruz, beklemede kal!\n\nAklına takılan başka bir şey mi var? Hiç çekinme, DM kutumuza dal veya bize bir tweet fırlat. Sohbet etmeye bayılıyoruz! 🔥🙌"
+      }
+    ]
+  },
+  "terms": {
+    "title": "Yumo Yumo Kullanım Koşulları",
+    "lastUpdated": "Son Güncelleme: 20 Nisan 2026",
+    "intro": "Selam! Yumo Yumo'ya hoş geldin — burada olduğun için çok mutluyuz. ✨",
+    "introDescription": "Bu Koşullar, bizim küçük kulübümüzün arkadaşça kuralları gibidir. Uygulamamızı, web sitemizi veya hizmetlerimizi (hepsine birden \"Hizmetler\" diyoruz) kullanarak bu kurallara \"tamam!\" demiş oluyorsun. Eğer bir şeyler içine sinmiyorsa sorun değil; sadece Hizmetleri kullanmaman yeterli.",
+    "sections": [
+      {
+        "title": "1. Eğlenceye kimler katılabilir?",
+        "content": "En az 18 yaşında (veya yaşadığın yerdeki reşitlik yaşında) olman gerekiyor. Herkesin kendi kararlarını sorumlulukla alabilmesini istiyoruz. 🔞"
+      },
+      {
+        "title": "2. Hesabın ve Cüzdanın",
+        "content": "Web3 cüzdanını bağladığında onu güvenli tut; o senin evin anahtarı gibi! 🔑 İznin olmadan başkası tarafından kullanılması durumunda sorumluluk kabul edemiyoruz. Eğer bir gariplik sezerden bize hemen haber ver."
+      },
+      {
+        "title": "3. Burada neler yapabilirsin?",
+        "content": "Uygun fişlerini yükleyebilir, \"Harcama Kanıtı\" (PoE) ile gizli maliyetleri keşfedebilir, harcama içgörülerini görebilir ve uygunsan transfer edilemeyen cPoints uygulama içi kayıtları toplayabilirsin. Gelecekteki token özellikleri ayrı uygunluk ve şartlara tabidir."
+      },
+      {
+        "title": "4. Fişler ve Senin Paylaştıkların",
+        "content": "Fişlerini veya içeriklerini yüklediğinde, sana içgörü sağlamak ve uygulamayı herkes için daha iyi hale getirmek adına bunları (güvenli ve anonim bir şekilde) kullanmamıza izin vermiş olursun. Paylaştığın şeylerin sana ait olduğuna ve kimsenin kalbini kırmayacağına dair bize söz ver, olur mu? 🤗"
+      },
+      {
+        "title": "5. Ödüller ve YUMO Token'lar",
+        "content": [
+          "cPoints uygun faaliyete bağlı, transfer edilemeyen uygulama içi kayıtlardır.",
+          "Bunlar token claim, airdrop, transfer, listeleme, nakit değer, kâr veya takas edilebilirlik garantisi vermez.",
+          "YUMO, uygun uygulama işlevleri için planlanan bir utility token'dır; yatırım tavsiyesi, menkul kıymet teklifi veya \"köşeyi dönme bileti\" değildir.",
+          "Uygunluk kuralları değişebilir. Dolandırıcılık, mükerrer faaliyet, yaptırım riski, yasal kısıt veya politika ihlalinde ödülleri durdurabilir, geri alabilir veya askıya alabiliriz. Vergi sorumluluğu sana aittir."
+        ]
+      },
+      {
+        "title": "6. Lütfen Nazik Ol (Sevmediğimiz Şeyler)",
+        "content": [
+          "Sahte fiş yok, sistemi kandırmaya çalışmak yok, yasa dışı işler yok, zorbalık yok, hacklemek yok.",
+          "Eğer bir şeyler yanlış hissettirirse hesabını durdurabilir veya sana veda edebiliriz — ama biz herkesin nazikçe oynamasını tercih ederiz! 😇"
+        ]
+      },
+      {
+        "title": "7. Bizimkiler Bizde Kalır",
+        "content": "Uygulama tasarımı, kodlar ve fikirler bize (veya bize yardım eden dostlarımıza) aittir. Bunları kişisel eğlencen için kullanabilirsin ama kopyalamak veya satmak yok, lütfen. 🎨"
+      },
+      {
+        "title": "8. Gizlilik — Arkandayız!",
+        "content": "Gizliliğini ciddiye (ve tatlılıkla) alıyoruz. Her şey Gizlilik Politikamızda açıklandı — en sevdiğin içeceği yanına alıp bir göz at. 🥤📖"
+      },
+      {
+        "title": "9. Üçüncü Taraf Dostlar (Cüzdanlar, Blockchainler)",
+        "content": "Cüzdanlar ve blockchain gibi diğer araçlarla ekip çalışması yapıyoruz. Onlar harikalar ama her zaman kusursuz çalışacaklarının sözünü veremeyiz. Zincir üstündeki (on-chain) her şey kalıcı ve halka açıktır — blockchain dünyası böyle yürür! ⛓️"
+      },
+      {
+        "title": "10. Dikkat — Garanti Yok & Yatırım Tavsiyesi Değildir (NFA!) 🙈",
+        "content": [
+          "Her şeyi pürüzsüz ve doğru yapmak için elimizden geleni yapıyoruz ama:",
+          {
+            "type": "list",
+            "items": [
+              {
+                "label": "Sadece Arkadaşça Tahminler:",
+                "text": "Gizli maliyet tahminleri ve harcama içgörüleri, öğrenmene yardımcı olacak arkadaşça tahminlerdir. Finansal, yatırım veya hukuk tavsiyesi değildir (NFA!). Her zaman kendi araştırmanı yap. 🔍"
+              },
+              {
+                "label": "Hizmetler \"Olduğu Gibi\":",
+                "text": "Kusursuz olmaya çalışıyoruz ama her şeyin %100 her zaman çalışacağına dair \"kusursuz sözler\" veremeyiz. 💫"
+              },
+              {
+                "label": "Kripto Maceraları:",
+                "text": "Kriptonun iniş çıkışları vardır, bilirsin. Attığın her adım senin sorumluluğundadır. 🎢"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "11. Eğer Bir Şeyler Ters Giderse 🤗",
+        "content": "Umarız hiç olmaz ama bir sorun çıkarsa, sorumluluğumuz yasaların izin verdiği ölçüde sınırlıdır. Dolaylı durumlardan sorumlu değiliz — gelin ortamı pozitif tutalım! ✨"
+      },
+      {
+        "title": "12. Kripto Gerçekleri (Ciddi Ama Dürüst Kısım) 🪙",
+        "content": "Tokenlar değer kaybedebilir, işlemler geri alınamaz ve ülkelerdeki kurallar değişebilir. YUMO planlanan bir utility token'dır, yatırım bileti değildir. Claim, airdrop, transfer, borsa listelemesi veya kâr vaadi yoktur. Sadece blockchain işleyişi ve uygulanabilecek uygunluk kuralları seni rahat hissettiriyorsa katıl! 🌊"
+      },
+      {
+        "title": "13. Duraklatma veya Veda Etme",
+        "content": "Gerekirse hesapları durdurabilir veya kapatabiliriz (adil olmaya çalışacağız). Talep edilmemiş, uygun olmayan, hileli veya hukuken kısıtlı ödüller durdurulabilir, geri alınabilir veya sona erebilir."
+      },
+      {
+        "title": "14. Yetişkinlerin Hukuk Bölümü",
+        "content": "Bu Koşullar, zorunlu yerel hukuk farklı bir düzenleme gerektirmediği sürece Amerika Birleşik Devletleri Delaware Eyaleti yasalarına tabidir. Bir anlaşmazlık çıkarsa önce çözüm için iletişime geçmeyi deneriz; gerekirse uyuşmazlıklar yürürlükteki hukuka göre yetkili mahkeme veya mercilerde ele alınır."
+      },
+      {
+        "title": "15. Bu Kuralları Güncelleyebiliriz",
+        "content": "Eğer değişiklik yaparsak sana haber veririz. Uygulamayı kullanmaya devam etmen, yeni versiyonla \"aran iyi\" demektir. ✅"
+      },
+      {
+        "title": "16. Sohbet Etmek İster misin?",
+        "content": "Yumo Yumo Inc. ile ilgili sorular için bize info@yumoyumo.com adresinden, +1 302-719-1468 telefonundan veya 8 The Green Suite B, Dover, DE 19901, United States posta adresinden ulaşabilirsin."
+      }
+    ],
+    "footer": "Yumo Yumo'nun bir parçası olduğun için teşekkürler — hadi gizli olanı açığa çıkaralım ve ortalığı karıştırarak biraz eğlenelim! 🫶✨"
+  },
+  "privacy": {
+    "title": "Yumo Yumo Gizlilik Politikası",
+    "lastUpdated": "Son Güncelleme: 20 Nisan 2026",
+    "intro": "Selam dostum! Gizliliğine gerçekten çok ama çok değer veriyoruz. Bu politika, bilgilerini olabilecek en nazik şekilde nasıl işlediğimizi açıklıyor. 🛡️✨",
+    "sections": [
+      {
+        "title": "1. Neler topluyoruz? (Sadece en gerekli olanları)",
+        "content": [
+          "Cüzdan Adresin: Bağlandığın zaman (Zaten blockchain üzerinde halka açıktır).",
+          "Yüklediğin Fişler: Sana o havalı içgörüleri sunabilmek için.",
+          "Temel Cihaz Bilgileri: Uygulamanın sorunsuz çalışması için hangi telefonu veya tarayıcıyı kullandığın.",
+          "Sohbetler: Bize ulaştığında kurduğumuz iletişimler.",
+          {
+            "type": "note",
+            "text": "Özel Not: Fişin üzerinde yanlışlıkla kalmadığı sürece hassas bilgilerini (sağlık bilgileri gibi) asla toplamayız. Lütfen bu tip detayları paylaşmamaya dikkat et, olur mu? 🤫"
+          }
+        ]
+      },
+      {
+        "title": "2. Bilgilerini nasıl kullanıyoruz?",
+        "content": [
+          "Gizli maliyetleri ve o tatlı harcama dökümlerini sana göstermek için.",
+          "Hak ettiğin ödülleri hesaplamak için.",
+          "Uygulamayı daha iyi hale getirmek için (Sadece anonim verilerle — kimse onun sen olduğunu bilmez).",
+          "Her şeyin güvenli ve tıkır tıkır işlemesini sağlamak için."
+        ]
+      },
+      {
+        "title": "3. Anonimleştirme — En sevdiğimiz sihirli numaramız! ✨",
+        "content": "Uygulamayı geliştirirken veya genel istatistikler oluştururken (örneğin: \"İstanbul'da yemek maliyetleri\"), seninle bağ kurulabilecek her şeyi silip atıyoruz. Fişlerin herkese yardımcı olur ama kimliğin hep gizli kalır."
+      },
+      {
+        "title": "4. Bilgilerini kimler görüyor?",
+        "content": [
+          "Neredeyse hiç kimse!",
+          "Güvenilir Yardımcılar: İyi davranacağına söz veren bulut servisleri ve analiz araçları.",
+          "Blockchain: Ödüller için — bu kısım tasarım gereği halka açıktır.",
+          "Sadece Yasalar İsterse: Çok nadir ve sıkıcı bir durum. Verilerini asla satmıyoruz. Serçe parmağımızla söz veriyoruz! 🤙💖"
+        ]
+      },
+      {
+        "title": "5. Blockchain sonsuzdur",
+        "content": "Ödüller zincire ulaştığında cüzdan adresin ve miktarlar halka açık hale gelir. Web3 dünyası böyle çalışır; süper şeffaf! ⛓️🔍"
+      },
+      {
+        "title": "6. Güvenliği sağlıyoruz",
+        "content": "Bilgilerini korumak için güçlü kilitler ve dikkatli alışkanlıklar kullanıyoruz. Hiçbir şey %100 kırılamaz değildir ama biz elimizden gelenin en iyisini yapıyoruz. 🔒"
+      },
+      {
+        "title": "7. Bilgileri ne kadar tutuyoruz?",
+        "content": "Sadece sana yardımcı olmak veya kurallara uymak için ihtiyacımız olduğu sürece. Bir şeylerin silinmesini mi istiyorsun? Sorman yeterli!"
+      },
+      {
+        "title": "8. Hakların (Kontrol sende!)",
+        "content": [
+          "Yaşadığın yere bağlı olarak şunları yapabilirsin:",
+          "Verilerini görebilirsin.",
+          "Düzeltilmesini veya silinmesini isteyebilirsin.",
+          "Belirli kullanımlara \"hayır, teşekkürler\" diyebilirsin. Bize bir mesaj atman yeterli — yüzümüzde bir gülümsemeyle hemen çözeriz. 😊"
+        ]
+      },
+      {
+        "title": "9. Bazen seyahat ediyoruz",
+        "content": "Verilerin başka ülkelerdeki sunucuları ziyaret edebilir ama her zaman sıkı gizlilik kurallarına uyduklarından emin oluruz. 🌍✈️"
+      },
+      {
+        "title": "10. Çocuklar için değil",
+        "content": "Uygulamamız sadece yetişkinler (18+) içindir. Çocuklardan bilgi toplamıyoruz."
+      },
+      {
+        "title": "11. Bu politikadaki güncellemeler",
+        "content": "Önemli bir şeyi değiştirirsek sana haber veririz. Uygulamayı kullanmaya devam etmen, yeni versiyonla \"okey\" olduğun anlamına gelir. ✅"
+      },
+      {
+        "title": "12. Sorular veya tatlı bir sohbet?",
+        "content": "Gizlilik soruları için bize info@yumoyumo.com adresinden, +1 302-719-1468 telefonundan veya 8 The Green Suite B, Dover, DE 19901, United States posta adresinden ulaşabilirsin."
+      }
+    ],
+    "footer": "Bize güvendiğin için teşekkürler. Para meselelerini daha az kafa karıştırıcı, daha çok ödüllendirici hale getirmek için buradayız — hem de gizliliğini sevgiyle koruyarak. Haydi gel sarılalım. 🤗✨"
+  },
+  "alerts": {
+    "auth": {
+      "termsRequired": "Lütfen Kullanım Koşulları ve Gizlilik Politikasını kabul et."
+    },
+    "dashboard": {
+      "fileSizeError": "Dosya boyutu 10MB'dan küçük olmalı",
+      "fileRequired": "Lütfen önce bir dosya seç"
+    },
+    "wallet": {
+      "signatureRequired": "Bağlanmak için imza gereklidir. Lütfen tekrar dene ve imza isteğini onayla.",
+      "connectionFailed": "Bağlantı başarısız oldu",
+      "pleaseTryAgain": "Lütfen tekrar dene."
+    },
+    "waitlist": {
+      "privacyNote": "Yumo Yumo Inc., 8 The Green Suite B, Dover, DE 19901. Bekleme listesi bilgilerini lansman ve güncelleme e-postaları için kullanırız. Her pazarlama e-postasında abonelikten çıkma talimatı bulunur."
+    }
+  },
+  "support": {
+    "title": "Destek Merkezi",
+    "subtitle": "Bir sorunuz mu var veya yardıma mı ihtiyacınız var? Bir destek talebi gönderin, en kısa sürede size geri dönelim.",
+    "form": {
+      "username": "Kullanıcı Adı",
+      "usernamePlaceholder": "Kullanıcı adınız",
+      "email": "E-posta Adresi",
+      "emailPlaceholder": "eposta@adres.com",
+      "subject": "Konu",
+      "subjectPlaceholder": "Sorununuzun kısa açıklaması",
+      "description": "Açıklama",
+      "descriptionPlaceholder": "Lütfen sorununuz hakkında detaylı bilgi verin...",
+      "captcha": "Captcha Doğrulama",
+      "captchaPlaceholder": "Kodu girin",
+      "captchaHint": "Yukarıda gösterilen 4 haneli kodu girin",
+      "verify": "Doğrula",
+      "submit": "Destek Talebi Gönder",
+      "submitting": "Gönderiliyor..."
+    },
+    "success": {
+      "title": "Talep Başarıyla Gönderildi!",
+      "message": "Destek talebinizi aldık. Ekibimiz en kısa sürede size geri dönecektir."
+    },
+    "errors": {
+      "captchaRequired": "Lütfen önce captcha'yı doğrulayın.",
+      "fillAll": "Lütfen tüm alanları doldurun.",
+      "captchaIncorrect": "Captcha kodu yanlış. Lütfen tekrar deneyin."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Hoş geldin! 👋",
+      "subtitle": "Hesabına giriş yap",
+      "emailLabel": "E-posta / Kullanıcı Adı",
+      "emailPlaceholder": "E-posta veya kullanıcı adı",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Şifreni gir",
+      "submit": "Giriş Yap",
+      "toggle": "Hesabın yok mu?",
+      "toggleAction": "Kayıt Ol",
+      "error": "E-posta veya şifre hatalı",
+      "googleError": "Google ile giriş başarısız oldu",
+      "twitterError": "X (Twitter) ile giriş başarısız oldu",
+      "unknownError": "Bilinmeyen hata"
+    },
+    "register": {
+      "title": "Yumo Dünyasına Katıl! 🎀",
+      "subtitle": "Hesabını oluştur ve ödül kazanmaya başla",
+      "walletLabel": "Cüzdan Adresi",
+      "usernameLabel": "Kullanıcı Adı",
+      "usernamePlaceholder": "Kullanıcı adın",
+      "emailLabel": "E-posta Adresi",
+      "emailPlaceholder": "email@ornek.com",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Şifreni oluştur",
+      "passwordConfirmLabel": "Şifre Onayı",
+      "passwordConfirmPlaceholder": "Şifreni onayla",
+      "dateOfBirthLabel": "Doğum Tarihi",
+      "genderLabel": "Cinsiyet",
+      "genderOptional": "(Opsiyonel)",
+      "genderSelect": "Seç",
+      "countryLabel": "Ülke",
+      "countrySelect": "Ülke Seç",
+      "phoneLabel": "Telefon Numarası",
+      "phonePlaceholder": "+90 555 123 4567",
+      "termsText": "Kullanım Koşulları ve Gizlilik Politikası",
+      "termsAgree": "okudum ve kabul ediyorum",
+      "submit": "Kayıt Ol",
+      "toggle": "Zaten üye misin?",
+      "toggleAction": "Giriş Yap",
+      "error": "Kayıt başarısız oldu"
+    },
+    "social": {
+      "or": "veya"
+    }
+  },
+  "app": {
+    "scanReveal": {
+      "itemsRead": "{count} kalem okundu",
+      "receiptRead": "Fiş okundu",
+      "processing": "Gizli maliyeti çıkarıyoruz",
+      "valueLabel": "Ürünün değeri",
+      "paidLabel": "Ödediğin",
+      "splitCap": "aradaki fark: fiyatın görünmeyen yolculuğu",
+      "layersTitle": "Fiyat, her elden geçişte büyüdü.",
+      "shareLabel": "senin görünmeyen payın",
+      "unit": "tahmini",
+      "opening": "tüm kalemler birazdan açılıyor…",
+      "eyebrow": "Fiş analiz ediliyor",
+      "itemCount": "{count} kalem",
+      "readHeadline": "{merchant} fişini okuduk",
+      "valueSentence": "Aldığın ürünün gerçek değeri {value}. Sen {paid} ödedin.",
+      "doneEyebrow": "analiz tamamlandı",
+      "doneHeadline": "→ sonuç ekranı açılıyor",
+      "uploading": "Dosya yükleniyor",
+      "reading": "Fiş okunuyor"
+    },
+    "pushOptIn": {
+      "title": "Fatura hatırlatmaları",
+      "body": "Son ödeme günü yaklaşınca haber vermemi ister misin? Bildirimleri aç.",
+      "enable": "Bildirimleri aç",
+      "dismiss": "Şimdilik değil"
+    },
+    "resultHero": {
+      "ratioCap": "{paid} tutarın %{pct}'i fişte yazmayan katmanlarda."
+    },
+    "xrayCard": {
+      "title": "Fiş röntgeni",
+      "estimateBadge": "tahmini okuma",
+      "persona": {
+        "workspaceHunter": "çalışma alanı avcısı",
+        "eveningRewarder": "akşam ödülcüsü",
+        "routineRestocker": "rutin stokçu",
+        "socialConnector": "sosyal bağ kuran",
+        "inflationVictim": "fiyatla sıkışan",
+        "impulseNomad": "anlık gezgin",
+        "balancedShopper": "dengeli alışverişçi"
+      },
+      "read": {
+        "workspaceHunter": "Bu {merchant} fişi bir kahveden çok, çalışma alanı kirası gibi davranıyor.",
+        "eveningRewarder": "{merchant}'dan küçük bir akşam ödülü molası.",
+        "routineRestocker": "{merchant} haftalık ritmin parçası — evi çekip çevirmek.",
+        "socialConnector": "Bu {merchant} fişi, dışarıda paylaşılan bir anın izi.",
+        "inflationVictim": "{merchant}'da temel ihtiyaç alınmış ama fiyat katmanları ürünün önüne geçmiş.",
+        "impulseNomad": "{merchant} anlık bir duraktı — listede yoktu ama ânına denk geldi.",
+        "balancedShopper": "Bu {merchant} fişi dengeli bir harcama alışkanlığının izini taşıyor."
+      }
+    },
+    "sectorCompare": {
+      "title": "Sektör kıyası",
+      "thisReceipt": "Bu fiş",
+      "sectorAvg": "Sektör ort.",
+      "sourcePrefix": "kaynak"
+    },
+    "resultSources": {
+      "label": "Kaynaklar",
+      "seeAll": "tümünü gör"
+    },
+    "yumbie": {
+      "chat": {
+        "greeting": "Selam! Harcamalarınla ilgili istediğini sor.",
+        "placeholder": "Yumbie'ye yaz…",
+        "send": "Gönder",
+        "close": "Kapat",
+        "thinking": "Yumbie düşünüyor…",
+        "fallback": "Şu an yanıt veremedim, birazdan tekrar dener misin?",
+        "chips": {
+          "todayEarned": "Bugün ne kazandım?",
+          "giveTip": "Bana ipucu ver",
+          "showLastReceipt": "Son fişimi göster",
+          "monthSpend": "Bu ay ne harcadım?",
+          "myCpoints": "Kaç cPoint'im var?",
+          "whatsHere": "Bu sayfada ne var?",
+          "help": "Bana yardım et"
+        }
+      },
+      "daily": {
+        "yesterdayReceiptsPoints": "Dün {receipts} fiş ekledin, +{points} cPoint kazandın.",
+        "yesterdayReceipts": "Dün {receipts} fiş ekledin, eline sağlık.",
+        "streak": "{days} gündür buradasın — birlikte iyi gidiyoruz.",
+        "topCategory": "Bu ara en çok {label} rafını dolduruyorsun.",
+        "newMonth": "Yeni ay, taze başlangıç. Geçen ay en çok {label} rafını doldurdun.",
+        "newMonthNoCat": "Yeni ay, taze başlangıç. Hadi yeniden başlayalım.",
+        "streakMilestone": "{days} günlük seri! Birlikte sağlam gidiyoruz.",
+        "newMonthCapWin": "Yeni ay! Geçen ay {label}'i sınırının altında tuttun — harika.",
+        "streakLapsed": "İlerlemen duruyor — kaldığın yerden devam edelim."
+      },
+      "insight": {
+        "pill": "Yumbie bir şey fark etti",
+        "up": {
+          "slight": "{label} bu hafta hafifçe arttı.",
+          "notable": "{label} son haftalarda biraz arttı. İstersen birlikte bakarız."
+        },
+        "down": "{label} geçen aya göre daha sakin — güzel gidiyor.",
+        "flat": "{label} dengede görünüyor.",
+        "setCap": "Yumuşak sınır koy",
+        "dismiss": "Anladım",
+        "capPrompt": "{label} için aylık yumuşak sınır:",
+        "capSave": "Kaydet",
+        "capSaved": "Tamam, {label} için {amount} sınırını not ettim. Zorlamam, sadece hatırlatırım.",
+        "close": "Kapat"
+      },
+      "notify": {
+        "title": "Yumbie",
+        "monthFresh": "Yeni ay, taze başlangıç. Bugün küçük bir adım atalım mı?",
+        "monthFreshCapWin": "Geçen ay {label}'i sınırının altında tuttun. Yeni ay, devam edelim.",
+        "streakLapse": "İlerlemen duruyor — kaldığın yerden devam edelim.",
+        "insight": "Harcamanda küçük bir şey fark ettim. Birlikte bakalım mı?",
+        "weeklyReview": "Haftanı birlikte gözden geçirelim mi?",
+        "dailyRecap": "Dün {receipts} fiş eklemiştin. Bugünün özeti hazır.",
+        "gentleReturn": "{label} rafın seni bekliyor — bir uğra istersen.",
+        "billReminderDays": "{name} faturanın son ödeme gününe {days} gün kaldı.",
+        "billReminderDaysAmount": "{name} faturan (~{amount}) için son ödemeye {days} gün kaldı.",
+        "billReminderToday": "{name} faturanın son ödeme günü bugün — küçük bir hatırlatma.",
+        "billReminderTodayAmount": "{name} faturan (~{amount}) bugün ödenmeli — hatırlatmak istedim.",
+        "toggle": "Bildirimler"
+      },
+      "review": {
+        "pill": "Haftalık özet",
+        "intro": "Haftanı birlikte gözden geçirelim.",
+        "topCategory": "En çok {label}: %{pct}.",
+        "weekPoints": "Bu hafta +{points} cPoint kazandın.",
+        "streak": "{days} gündür buradasın — bu emek değerli.",
+        "closing": "Güzel bir haftaydı. Yarın görüşürüz."
+      },
+      "workspace": {
+        "onDuty": "Yumbie nöbette…",
+        "here": "Yumbie burada",
+        "ambient": {
+          "sleeping": "Kestiriyor…",
+          "reading": "Kitap okuyor",
+          "daydreaming": "Dalıp gitti",
+          "lookingAround": "Etrafı süzüyor"
+        },
+        "rooms": {
+          "preening": "Toparlanıyor",
+          "admiring": "Sıralamaya bakıyor",
+          "aiming": "Hedefi süzüyor",
+          "checking": "Bildirimlere bakıyor",
+          "pottering": "Oyalanıyor",
+          "tasking": "Görev panosuna bakıyor",
+          "studying": "Grafikleri inceliyor",
+          "filing": "Faturaları ayıklıyor"
+        },
+        "today": {
+          "newReceipt": "Senin taramanı tekrarlıyor",
+          "picking": "Fiş alınıyor",
+          "toScanner": "Taramaya götürüyor",
+          "toDoor": "Fişini yeniden işliyor",
+          "handoff": "İşlendi ✓",
+          "scanning": "Taranıyor…",
+          "streakCheck": "Seri kontrolü",
+          "watering": "Bitki sulanıyor",
+          "tidying": "Rafı düzenliyor",
+          "shiftContinues": "Mesai devam ediyor"
+        },
+        "receipts": {
+          "archiveShift": "Arşiv vardiyası",
+          "inboxHasReceipt": "Gelen kutusunda fiş var",
+          "picking": "Fiş alınıyor",
+          "toFiling": "Dosyalamaya götürüyor",
+          "archiving": "Arşivleniyor…",
+          "next": "Sıradaki…",
+          "searching": "Arşivde fiş arıyor"
+        },
+        "wallet": {
+          "counting": "Kasa sayımı",
+          "collecting": "cPoints toplanıyor",
+          "picked": "cPoint alındı",
+          "toVault": "Kasaya taşıyor",
+          "stacking": "İstifleniyor…",
+          "polishing": "Parayı parlatıyor"
+        },
+        "patterns": {
+          "reviewing": "Alışkanlıklar inceleniyor",
+          "approaching": "Panoya yürüyor",
+          "measuring": "Çubuklar ölçülüyor",
+          "inspecting": "Yakından bakıyor",
+          "trendUp": "Bir eğilim yakaladı",
+          "shiftContinues": "Mesai devam ediyor"
+        },
+        "scan": {
+          "ready": "Taramaya hazır",
+          "receiving": "Belge alınıyor",
+          "processing": "Taranıyor…",
+          "filed": "Dosyalandı",
+          "standby": "Tarayıcı başında bekliyor"
+        },
+        "bills": {
+          "billsShift": "Fatura vardiyası",
+          "duePile": "Ödenecek fatura var",
+          "picking": "Faturayı alıyor",
+          "toTerminal": "Ödemeye götürüyor",
+          "paying": "Ödüyor…",
+          "paid": "Ödendi",
+          "checking": "Son ödeme tarihlerine bakıyor",
+          "shiftContinues": "Vardiya sürüyor"
+        },
+        "door": {
+          "passing": "Kapıdan geçiyor…",
+          "toDoor": "Kapıya yöneliyor"
+        },
+        "sky": {
+          "dayShift": "Gündüz vardiyası",
+          "nightShift": "Gece vardiyası"
+        },
+        "fx": {
+          "plusReceipt": "+1 fiş",
+          "plusCPoint": "+1 cPoint",
+          "archived": "arşivlendi",
+          "plusTrend": "+eğilim",
+          "scanFailed": "okunamadı"
+        }
+      }
+    },
+    "nav": {
+      "home": "Ana Sayfa",
+      "homeMenu": "Panel",
+      "dashboard": "Kontrol Paneli",
+      "mine": "Kazı",
+      "receipts": "Fişler",
+      "insights": "İçgörüler",
+      "leaderboard": "Lider Tablosu",
+      "tasks": "Görevler",
+      "rewards": "Ödüller",
+      "settings": "Ayarlar",
+      "profile": "Profil",
+      "menu": "Menü",
+      "close": "Kapat",
+      "closeMenu": "Menüyü kapat",
+      "sidebar": {
+        "insights": "İçgörüler",
+        "insightsSub": "Harcama, gizli maliyet, trend",
+        "games": "Mini Oyunlar",
+        "gamesSub": "Bütçe yarışması, bilgi yarışması",
+        "guild": "Guild",
+        "guildSub": "Grup tasarruf, rekabet",
+        "basket": "Sepet Karşılaştırma",
+        "basketSub": "Alternatif ürün karşılaştır",
+        "ai": "AI My Life",
+        "aiSub": "Kişisel finans asistanı",
+        "market": "Piyasa Takibi",
+        "marketSub": "Fiyat geçmişi, enflasyon",
+        "social": "Sosyal Feed",
+        "socialSub": "Arkadaş etkinlikleri"
+      },
+      "admin": {
+        "_": "Yönetici",
+        "fileUpload": "Dosya Yükleme",
+        "bulkUpload": "Toplu Fiş Yükle",
+        "analyzeFile": "Dosyadan analiz",
+        "downloadReceipt": "Fiş İndir",
+        "downloadLog": "Log İndir",
+        "downloadRawOcr": "RAW OCR İndir"
+      },
+      "approvals": "Onaylar",
+      "rejected": "Reddedilenler",
+      "section": {
+        "dashboard": "Kontrol Paneli",
+        "explore": "Keşfet",
+        "account": "Hesap"
+      },
+      "feedback": "Geri Bildirim",
+      "merchants": "İşletmeler"
+    },
+    "comingSoon": {
+      "short": "Yakında",
+      "title": "Yakında",
+      "description": "Bu özellik geliştirilme aşamasında. Birazdan tekrar kontrol edin!"
+    },
+    "sidebar": {
+      "defaultUser": "Kullanıcı",
+      "defaultTitle": "Ekonomi Dedektifi",
+      "season": "Sezon",
+      "days": "gün"
+    },
+    "home": {
+      "recentReceipts": "Son Fişler",
+      "addWithScan": "Tara ile ekle",
+      "quickAction": {
+        "scan": "Fiş Tara",
+        "insights": "Analiz",
+        "leaderboard": "Sıralama",
+        "convert": "Çevir",
+        "referral": "Davet"
+      },
+      "quickActionsTitle": "Hızlı İşlem",
+      "receiptsEmpty": "Henüz fiş yok",
+      "viewAll": "Tümü",
+      "treasure": "Hazine",
+      "treasureDays": "{count} gün",
+      "checkIn": "Giriş yap",
+      "checkedIn": "Giriş yapıldı"
+    },
+    "profile": {
+      "tokenSummary": "Token Özeti",
+      "fromReceipts": "Fişlerden",
+      "questRewards": "Quest ödülleri",
+      "free": "Ücretsiz"
+    },
+    "topbar": {
+      "search": {
+        "placeholder": "İşletme veya fiş ID'si ara..."
+      },
+      "notifications": {
+        "title": "Bildirimler",
+        "empty": "Henüz bildirim yok",
+        "emptyDesc": "Fiş ve ödül güncellemeleri burada görünecek",
+        "willAppear": "Bildirimler burada görünecek",
+        "markAllRead": "Tümünü okundu işaretle"
+      },
+      "upload": "Yükle",
+      "logout": "Çıkış Yap",
+      "testnet": "Testnet",
+      "mainnet": "Mainnet",
+      "language": {
+        "tr": "Türkçe",
+        "en": "English",
+        "aria": "Dil değiştir"
+      }
+    },
+    "dashboard": {
+      "welcome": "Yumo Yumo'ya Hoş Geldiniz",
+      "hiddenCosts": "Fişlerinizde {amount} {currency} gizli maliyet keşfettiniz. Başka neler gizli?",
+      "noReceipts": "Her fiş bir hikaye anlatır. Gizli maliyetleri keşfetmek için bir tane yükleyin.",
+      "uploadReceipt": "Fiş yükle",
+      "spent": "Harcanan",
+      "honor": "Onur",
+      "hidden": "Gizli",
+      "value": "Değer",
+      "rewards": "Ödüller",
+      "hiddenCostByCategory": "Kategoriye Göre Gizli Maliyet",
+      "activeQuests": "Aktif Görevler",
+      "hiddenCostInsight": "Gizli Maliyet İçgörüsü",
+      "hiddenCostPercent": "Bu ay, harcamalarınızın {percent}%'i gizli maliyetlere gitti.",
+      "retailBrandPercent": "Çoğu perakende ve marka marjlarından geldi (gizli maliyetlerin {percent}%).",
+      "error": {
+        "load": "Kontrol paneli verileri yüklenemedi",
+        "network": "İnternet bağlantısı yok. Lütfen ağınızı kontrol edip tekrar deneyin.",
+        "login": "Fişleri görmek için lütfen giriş yapın",
+        "receipts": "Fiş verileri yüklenemedi"
+      },
+      "quests": {
+        "notActive": "⚠️ Aktif değil"
+      },
+      "totalReceipts": "Toplam {count} fiş yüklediniz."
+    },
+    "receipts": {
+      "title": "Fişler",
+      "description": "Tüm kazılan fişlerinizi görüntüleyin ve yönetin",
+      "export": "CSV Dışa Aktar",
+      "exportShort": "Dışa Aktar",
+      "loading": "Yükleniyor...",
+      "empty": "Fiş bulunamadı",
+      "emptyDesc": "Filtreleri ayarlamayı deneyin veya yeni bir fiş yükleyin.",
+      "upload": "Fiş Yükle",
+      "merchant": "İşletme",
+      "category": "Kategori",
+      "date": "Tarih",
+      "time": "Saat",
+      "total": "Toplam",
+      "status": "Durum",
+      "hiddenCost": "Gizli Maliyet",
+      "reward": "Ödül",
+      "actions": "İşlemler",
+      "view": "Görüntüle",
+      "delete": "Sil",
+      "deleteConfirm": "Bu fişi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+      "deleted": "Fiş başarıyla silindi",
+      "error": {
+        "load": "Fişler yüklenemedi",
+        "network": "İnternet bağlantısı yok. Lütfen ağınızı kontrol edip tekrar deneyin.",
+        "login": "Fişleri görmek için lütfen giriş yapın",
+        "parse": "Fiş verileri ayrıştırılamadı",
+        "delete": "Fiş silinemedi",
+        "title": "Fişler yüklenemedi"
+      },
+      "user": "Kullanıcı",
+      "na": "N/A"
+    },
+    "errors": {
+      "login": {
+        "noInternet": "İnternet bağlantısı yok. Lütfen ağınızı kontrol edip tekrar deneyin.",
+        "invalidServerResponse": "Sunucudan geçersiz yanıt. Lütfen tekrar deneyin.",
+        "invalidCredentials": "Kullanıcı adı veya şifre hatalı",
+        "errorOccurred": "Bir hata oluştu. Lütfen tekrar deneyin.",
+        "selectCountryFirst": "Lütfen önce ülkenizi seçin. Profil ayarlarınızdan ülke seçebilirsiniz."
+      },
+      "receiptDetail": {
+        "notFound": "Fiş bulunamadı",
+        "backToList": "Fiş listesine dön",
+        "goToRewards": "Ödüllere git",
+        "loadFailed": "Fiş yüklenemedi",
+        "deleteFailed": "Fiş silinemedi",
+        "deleteConfirm": "Bu fişi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+      },
+      "upload": {
+        "pdfFailed": "PDF dönüştürme başarısız. Lütfen PDF'i görüntü formatına (PNG/JPG) dönüştürüp tekrar deneyin.",
+        "uploadFailed": "Yükleme başarısız",
+        "saveFailed": "Fiş kaydedilemedi",
+        "walletRequired": "Fişi kaydetmek için cüzdan bağlamanız gerekiyor.",
+        "unknownError": "Bilinmeyen hata"
+      },
+      "admin": {
+        "logsLoadFailed": "Loglar yüklenemedi",
+        "noLogsToDownload": "İndirilecek log yok",
+        "zipCreateFailed": "ZIP oluşturulamadı",
+        "filesLoadFailed": "Dosyalar yüklenemedi",
+        "noFilesToDownload": "İndirilecek dosya yok",
+        "zipFileCreateFailed": "ZIP dosyası oluşturulamadı"
+      },
+      "api": {
+        "noFile": "Dosya gönderilmedi",
+        "screenshotDetected": "Ekran görüntüsü tespit edildi. Lütfen gerçek fiş fotoğrafı yükleyin, ekran görüntüsü kabul edilmez.",
+        "fileMustBeImageOrPdf": "Dosya görüntü veya PDF olmalıdır",
+        "fileSizeExceeded": "Dosya boyutu 4,5 MB sınırını aşıyor",
+        "invalidFileData": "Geçersiz dosya verisi",
+        "marginGeneral": "Lütfen fişi bir zemin üzerinde çekin. Fotoğrafın üst ve altından, sağ ve solundan biraz boşluk bırakın.",
+        "marginVertical": "Fotoğrafın üst ve altından biraz boşluk bırakın.",
+        "marginHorizontal": "Fotoğrafın sağ ve solundan biraz boşluk bırakın.",
+        "marginTooMany": "Bugün yetersiz kenar boşluklu çok fazla fotoğraf. Lütfen fotoğraf kurallarına uyun.",
+        "uploadFailed": "Fiş yüklenemedi",
+        "unauthorized": "Yetkisiz",
+        "usernamePasswordRequired": "Kullanıcı adı ve şifre gereklidir",
+        "internalServerError": "Sunucu hatası",
+        "selectCountryFirst": "Lütfen önce ülkenizi seçin",
+        "duplicateSameUser": "Bu fişi zaten yüklediniz",
+        "duplicateVisual": "Bu fiş benzeri daha önce yüklendi (benzer görüntü tespit edildi)",
+        "duplicateOtherUser": "Bu fiş başka bir kullanıcı tarafından yüklendi",
+        "analyzeFailed": "Fiş analiz edilemedi",
+        "serviceBusy": "Şu anda geçici bir yoğunluk yaşanmakta, lütfen 1-2 dakika sonra tekrar deneyiniz.",
+        "receiptNotFound": "Fiş bulunamadı",
+        "notValidReceipt": "Bu belge geçerli bir fiş gibi görünmüyor.",
+        "receiptCountryMismatch": "Bu fiş hesap ülkenizden farklı bir ülkeden görünüyor. Kayıtlı olduğunuz ülkeden fiş yükleyin ya da Ayarlar'dan ülkenizi güncelleyin.",
+        "totalNotReliable": "Fişin değeri tespit edilemedi.",
+        "unknown": "Bir hata oluştu",
+        "allFieldsRequired": "Tüm alanlar zorunludur",
+        "invalidEmail": "Geçersiz e-posta adresi",
+        "invalidBirthDate": "Geçersiz doğum tarihi",
+        "futureBirthDate": "Doğum tarihi gelecekte olamaz",
+        "usernameInvalid": "Kullanıcı adı 3-32 karakter olmalı ve sadece harf, rakam, nokta, tire veya alt çizgi içermelidir",
+        "passwordTooShort": "Şifre en az 8 karakter olmalıdır",
+        "passwordRequirements": "Şifre en az 8 karakter olmalı; büyük harf, küçük harf, rakam ve özel karakter içermelidir",
+        "accountAlreadyExists": "Bu e-posta veya kullanıcı adı zaten kayıtlı",
+        "tooManyRegistrationAttempts": "Çok fazla kayıt denemesi. Lütfen bir süre sonra tekrar deneyin",
+        "tooManyRequests": "Çok fazla istek. Lütfen bir süre sonra tekrar deneyin",
+        "invalidRequestOrigin": "Kayıt isteği güvenlik kontrolünden geçemedi. Sayfayı yenileyip tekrar deneyin",
+        "ageRestriction": "Yumo Yumo yalnızca 18 yaş ve üzeri kullanıcılar içindir",
+        "registrationFailed": "Hesap oluşturulamadı",
+        "emailAlreadyExists": "Bu e-posta zaten kullanılıyor",
+        "usernameAlreadyExists": "Bu kullanıcı adı zaten kullanılıyor",
+        "captchaRequired": "Captcha doğrulaması gereklidir",
+        "captchaFailed": "Captcha doğrulaması başarısız oldu",
+        "captchaNotConfigured": "Captcha servisi yapılandırılmamış",
+        "emailAlreadyVerified": "E-posta zaten doğrulanmış",
+        "noEmailOnAccount": "Bu hesaba bağlı bir e-posta bulunmuyor",
+        "resendVerificationFailed": "Doğrulama e-postası yeniden gönderilemedi",
+        "verificationCooldown": "Yeni bir e-posta istemeden önce biraz bekleyin",
+        "userNotFound": "Kullanıcı bulunamadı",
+        "identifierRequired": "E-posta veya kullanıcı adı zorunludur",
+        "resetEmailFailed": "Şifre sıfırlama e-postası gönderilemedi",
+        "resetTokenPasswordRequired": "Token ve şifre zorunludur",
+        "resetInvalid": "Şifre sıfırlama linki geçersiz",
+        "resetExpired": "Şifre sıfırlama linkinin süresi dolmuş",
+        "resetConsumed": "Şifre sıfırlama linki zaten kullanılmış",
+        "resetFailed": "Şifre sıfırlanamadı",
+        "legalAcceptanceRequired": "Kullanım koşulları ve aydınlatma metni kabulü zorunludur"
+      },
+      "rejection": {
+        "noBackground": "Fişin etrafında başladığı ve bittiği alanın net göründüğünden emin olun. Fişi koyu bir yüzeye yerleştirip tüm kenarlardan boşluk bırakarak çekin.",
+        "missingDocId": "Fiş üzerinde zorunlu belge kimliği (fatura no, POS/terminal) eksik."
+      },
+      "quality": {
+        "insufficient": "Fotoğraf kalitesi yetersiz",
+        "improve": "Fotoğraf kalitesi iyileştirilebilir"
+      },
+      "memory": "Bellek hatası",
+      "duplicateWarning": "Dikkat: Tekrarlayan Fiş",
+      "duplicateReceipt": "Tekrarlayan Fiş",
+      "sessionEnded": "Oturum sonlandı. Lütfen tekrar giriş yapın."
+    },
+    "auth": {
+      "login": {
+        "badge": "Güvenli giriş",
+        "headline": "Yumo Yumo profiline geri dön ve kaldığın yerden devam et.",
+        "subheadline": "Doğruladığın hesapla giriş yap; fiş akışı, ödüller ve profil geçmişin seni bekliyor olacak.",
+        "title": "Tekrar hoş geldin",
+        "description": "Uygulamaya girmek için kullanıcı adın ve şifrenle giriş yap.",
+        "username": "Kullanıcı adı",
+        "usernamePlaceholder": "Kullanıcı adını gir",
+        "password": "Şifre",
+        "passwordPlaceholder": "Şifreni gir",
+        "submit": "Giriş yap",
+        "submitting": "Giriş yapılıyor...",
+        "helper": "E-postan henüz doğrulanmadıysa seni otomatik olarak doğrulama ekranına yönlendireceğiz.",
+        "featureAccessTitle": "Doğrudan erişim",
+        "featureAccessBody": "Aynı doğrulanmış hesap tüm Yumo Yumo deneyiminde çalışır.",
+        "featureTrustTitle": "Korunan kimlik",
+        "featureTrustBody": "Doğrulanmış e-posta durumu oturumuna bağlı kalır ve erişim daha temiz yönetilir.",
+        "flowHint": "Yeni bir başlangıca mı ihtiyacın var? Akıştan çıkmadan şifreni sıfırlayabilirsin.",
+        "forgotPassword": "Şifremi unuttum",
+        "resetSuccess": "Şifren güncellendi. Yeni şifrenle giriş yapabilirsin.",
+        "noAccount": "Hesabın yok mu?",
+        "registerLink": "Kayıt ol"
+      },
+      "register": {
+        "badge": "Korunan onboarding",
+        "headline": "Yumo Yumo hesabını oluştur ve doğrulanmış bir profille başla.",
+        "subheadline": "Hesabın, güvenli doğrulama, ülkeye duyarlı varsayılanlar ve uygulamaya temiz bir geçiş ile açılır.",
+        "featureSecureTitle": "Botlara karşı koruma",
+        "featureSecureBody": "Turnstile, signup trafiğini auth katmanına gelmeden filtreler.",
+        "featureRewardsTitle": "Uygulama için hazır",
+        "featureRewardsBody": "E-postanı doğruladıktan sonra aynı hesapla ödüller ve fiş madenciliğine geçebilirsin.",
+        "featureProfileTitle": "Profil için hazır",
+        "featureProfileBody": "Ülke ve doğum tarihi baştan alınır; uygulama sana doğru varsayılanlarla açılır.",
+        "title": "Hesap oluştur",
+        "description": "E-posta, kullanıcı adı ve ülken ile yeni bir hesap aç.",
+        "email": "E-posta",
+        "username": "Kullanıcı adı",
+        "birthDate": "Doğum tarihi",
+        "password": "Şifre",
+        "confirmPassword": "Şifreyi doğrula",
+        "country": "Ülke",
+        "countryPlaceholder": "Ülkeni seç",
+        "countryOther": "Diğer",
+        "countryOtherStarTitle": "Henüz entegre değil",
+        "countryOtherNotice": "Diğer ülkelerin entegrasyonu henüz tamamlanmadığından uygulama on-chain kullanılamaz ve ödül üretmez. Ülken fişlerinden otomatik tespit edilir, ancak yüklemeler ödül kazandırmaz.",
+        "countryLockNotice": "Önemli: şimdi seçtiğin ülke daha sonra ayarlardan değiştirilemez.",
+        "locale": "Yumbie ile konuşma dili",
+        "localeHint": "Yumbie seninle bu dilde konuşacak. Sonradan ayarlardan değiştirebilirsin.",
+        "captchaLabel": "Captcha doğrulaması",
+        "submit": "Hesap oluştur",
+        "submitting": "Hesap oluşturuluyor...",
+        "verifyHint": "Kayıttan hemen sonra sana bir doğrulama linki göndereceğiz. Uygulamaya girmeden önce e-postanı onaylaman gerekir.",
+        "haveAccount": "Zaten hesabın var mı?",
+        "signIn": "Giriş yap",
+        "passwordMismatch": "Şifreler eşleşmiyor",
+        "captchaRequired": "Lütfen captcha doğrulamasını tamamla",
+        "legalRequired": "Devam etmek için kullanım koşulları ve aydınlatma metnini kabul etmelisin.",
+        "legalNotice": "Yüklediğin ve kullanım sırasında oluşan veri setleri, anonimleştirilerek veya toplulaştırılarak içgörü, analiz ve raporlama ürünlerinde kullanılabilir.",
+        "acceptTermsPrefix": "",
+        "acceptTermsLink": "Kullanım Koşulları",
+        "acceptTermsSuffix": "'nı okudum ve kabul ediyorum.",
+        "acceptPrivacyPrefix": "",
+        "acceptPrivacyLink": "KVKK Aydınlatma Metni",
+        "acceptPrivacySuffix": "'ni okudum."
+      },
+      "verify": {
+        "pendingTitle": "E-postanı doğrula",
+        "pendingBody": "Doğrulama linkini gelen kutuna gönderdik. Uygulamayı açmak için onayla.",
+        "pendingEmailFailedBody": "Hesabın oluştu fakat doğrulama e-postası otomatik gönderilemedi. Aşağıdaki butonla tekrar iste.",
+        "verifiedTitle": "E-posta doğrulandı",
+        "verifiedBody": "Hesabın artık doğrulandı. Doğrudan uygulamaya devam edebilirsin.",
+        "expiredTitle": "Doğrulama linkinin süresi doldu",
+        "expiredBody": "Bu doğrulama linkinin süresi dolmuş. Yeni bir e-posta isteyip tekrar dene.",
+        "consumedTitle": "Doğrulama linki zaten kullanıldı",
+        "consumedBody": "Bu link daha önce kullanıldı. Hâlâ erişemiyorsan yeni bir doğrulama e-postası iste.",
+        "invalidTitle": "Doğrulama linki geçersiz",
+        "invalidBody": "Doğrulama linki eksik veya geçersiz. Bu ekrandan yeni bir tane isteyebilirsin.",
+        "resend": "Doğrulama e-postasını yeniden gönder",
+        "resending": "E-posta gönderiliyor...",
+        "resendSuccess": "Doğrulama e-postası gönderildi",
+        "resendError": "Doğrulama e-postası yeniden gönderilemedi",
+        "continueToApp": "Uygulamaya devam et",
+        "logout": "Çıkış yap",
+        "signingOut": "Çıkış yapılıyor...",
+        "needAnotherAccount": "Farklı bir hesaba mı ihtiyacın var?",
+        "registerAgain": "Tekrar kayıt ol"
+      },
+      "forgot": {
+        "badge": "Kurtarma akışı",
+        "headline": "Hesabını sıfırlamadan erişimini geri al.",
+        "subheadline": "Kullanıcı adını veya e-postanı gir; hesabına bağlı gelen kutusuna güvenli bir sıfırlama linki gönderelim.",
+        "title": "Şifreni mi unuttun?",
+        "description": "Şifre sıfırlama linki iste ve gelen kutundan yeni bir şifre belirle.",
+        "identifier": "E-posta veya kullanıcı adı",
+        "identifierPlaceholder": "name@example.com veya yumouser",
+        "submit": "Sıfırlama linki gönder",
+        "submitting": "Sıfırlama linki gönderiliyor...",
+        "success": "Bu hesap varsa, şifre sıfırlama e-postası yolda.",
+        "hint": "Gizlilik için bu ekran, hesap bulunmasa bile aynı başarı durumunu gösterir.",
+        "backToLogin": "Girişe dön",
+        "featureInboxTitle": "Gelen kutusu odaklı kurtarma",
+        "featureInboxBody": "Sıfırlama linki hesabına bağlı mevcut e-postaya gider.",
+        "featureSafeTitle": "Tek kullanımlık erişim",
+        "featureSafeBody": "Her sıfırlama linki kısa süre içinde sona erer ve öncekini geçersiz kılar."
+      },
+      "reset": {
+        "badge": "Güvenli sıfırlama",
+        "headline": "Yeni bir şifre belirle ve Yumo Yumo’ya geri dön.",
+        "subheadline": "Hesabın için yeni bir şifre seçmek üzere gelen kutundaki güvenli linki kullan.",
+        "title": "Yeni şifre oluştur",
+        "description": "Yeni şifren en az 8 karakter uzunluğunda olmalıdır.",
+        "password": "Yeni şifre",
+        "confirmPassword": "Yeni şifreyi doğrula",
+        "submit": "Şifreyi güncelle",
+        "submitting": "Şifre güncelleniyor...",
+        "passwordMismatch": "Şifreler eşleşmiyor",
+        "successTitle": "Şifre güncellendi",
+        "successBody": "Şifren başarıyla değiştirildi. Artık yeniden giriş yapabilirsin.",
+        "invalidTitle": "Sıfırlama linki kullanılamıyor",
+        "invalidBody": "Bu sıfırlama linki eksik veya artık kullanılamaz durumda. Devam etmek için yenisini iste.",
+        "signIn": "Giriş ekranına git",
+        "requestAnother": "Yeni sıfırlama e-postası iste",
+        "featureFastTitle": "Hızlı geri dönüş",
+        "featureFastBody": "Şifre güncellenir güncellenmez uygulamaya tekrar giriş yapabilirsin.",
+        "featureSecureTitle": "Token tabanlı sıfırlama",
+        "featureSecureBody": "Sıfırlama linkleri tek kullanımlıktır ve hesap güvenliği için zaman sınırlıdır."
+      }
+    },
+    "filter": {
+      "search": {
+        "placeholder": "İşletme veya fiş ID'si ara..."
+      },
+      "status": {
+        "all": "Tüm Durumlar",
+        "verified": "Doğrulanmış",
+        "needsReview": "İnceleme Gerekli",
+        "rejected": "Reddedilmiş"
+      },
+      "country": {
+        "all": "Tüm Ülkeler",
+        "th": "Tayland",
+        "tw": "Tayvan",
+        "tr": "Türkiye",
+        "us": "Amerika Birleşik Devletleri"
+      },
+      "verifiedOnly": "Sadece doğrulanmış",
+      "clear": "Temizle",
+      "expense": {
+        "all": "Tüm harcama tipleri"
+      }
+    },
+    "status": {
+      "verified": "Doğrulanmış",
+      "pending": "Beklemede",
+      "rejected": "Reddedilmiş",
+      "analyzed": "Analiz Edildi",
+      "scanned": "Tarandı"
+    },
+    "mine": {
+      "upload": "Yükle",
+      "scan": "Tara",
+      "review": "İncele",
+      "mining": "Veri Katkısı",
+      "breakdown": "Dağılım",
+      "verify": "Doğrula",
+      "uploadReceipt": "Fiş Yükle",
+      "processing": "Fiş işleniyor...",
+      "privacy": {
+        "title": "Gizlilik Notu:",
+        "description": "Fiş görüntüleriniz güvenli bir şekilde işlenir. Sadece gerekli bilgileri çıkarırız ve görüntülerinizi saklamayız."
+      },
+      "back": "Geri",
+      "continue": "Devam Et",
+      "receipt": "Fiş",
+      "blockchainNote": "Bu fiş blockchain'e kaydedilecek",
+      "verifyReceipt": "Fişi Doğrula",
+      "merchant": "İşletme",
+      "total": "Toplam",
+      "hiddenCost": "Gizli Maliyet",
+      "reward": "Ödül",
+      "saving": "Kaydediliyor...",
+      "receiptMined": "Fiş Kazıldı!",
+      "successDescription": "Bu fişten gizli maliyetleri başarıyla kazdınız",
+      "earned": "Kazanıldı",
+      "pending": "Beklemede",
+      "rewardNote": "Not: Ödüller henüz talep edilebilir değil. Bu özellik yakında kullanılabilir olacak.",
+      "uploadNext": "Sonraki Fişi Yükle",
+      "deleteAndUploadNew": "Sil ve Başka Fiş Yükle",
+      "goToReceipts": "Fişlere Git",
+      "error": {
+        "upload": "Yükleme Başarısız",
+        "analyze": "Fiş Analizi Başarısız",
+        "rejected": "Fiş Reddedildi",
+        "underReview": "Fiş İncelemede",
+        "underReviewDesc": "Bu fiş, aynı tutar ve tarihe sahip başka bir fiş bulunduğu için manuel inceleme gerektiriyor. Lütfen onay bekleyin.",
+        "pdfConversion": "PDF dönüştürme başarısız",
+        "noReceiptId": "Yüklemeden fiş ID'si döndürülmedi",
+        "analysisFailed": "Fiş analiz edilemedi. Lütfen tekrar deneyin.",
+        "processImage": "Fiş görüntüsü işlenemedi"
+      },
+      "step": {
+        "sendingFile": "Dosya sunucuya gönderiliyor"
+      },
+      "toast": {
+        "timeSaved": "Saat kaydedildi",
+        "timeSkipped": "Saat atlandı"
+      },
+      "duplicateToastDesc": "Bu fiş daha önce yüklenmiş olabilir. ({id}…)",
+      "duplicateNotSavedDesc": "Bu fiş daha önce yüklenmiş. Yinelenen fişler kaydedilmez.",
+      "photoTooLargeDesc": "Fotoğraf çok büyük. Tekrar deneyin; büyük fotoğraflar sunucuda sıkıştırılacak.",
+      "desktopOnlyTitle": "Fiş yükleme yalnızca mobilde",
+      "desktopOnlyDescription": "Fiş taramak ve yüklemek için lütfen uygulamayı telefonunuzda açın.",
+      "desktopOnlyAppStore": "App Store",
+      "desktopOnlyPlayStore": "Google Play"
+    },
+    "breakdown": {
+      "title": "Gizli Maliyet Dağılımı",
+      "totalHiddenCost": "Toplam Gizli Maliyet",
+      "costItemsIdentified": "{count} maliyet kalemi tespit edildi",
+      "storeOperations": "Mağaza & Operasyonlar",
+      "supplyChain": "Tedarik Zinciri & Yolculuk",
+      "retailBrand": "Perakende & Marka Katmanı",
+      "stateLayer": "Devlet Katmanı (Fişte)",
+      "estimated": "Tahmini",
+      "otaCommission": "OTA Komisyonu",
+      "storeOperationsDesc": "Mağaza operasyonları, personel, faturalar ve ödeme işleme",
+      "supplyChainDesc": "Tedarik zinciri, lojistik ve dağıtım maliyetleri",
+      "retailBrandDesc": "Perakende marjı, marka ve pazarlama maliyetleri",
+      "distributionTitle": "Maliyet Dağılımı",
+      "distributionSubtitle": "Ödediğiniz tutarın nereye gittiğini görün",
+      "productValue": "Ürün Değeri",
+      "productValueDesc": "Aldığınız ürün/hizmetin gerçek değeri",
+      "importSystem": "İthalat & Sistem",
+      "importSystemDesc": "Lojistik, depo, altyapı maliyetleri",
+      "stateLayerDesc": "Katma değer vergisi ve devlet harçları",
+      "exciseTax": "Özel Tüketim Vergisi (ÖTV)",
+      "exciseTaxDesc": "Tütün, alkol veya yakıtın raf fiyatına gömülü özel tüketim vergisi. Ödersiniz ama fişte ayrı bir kalem olarak görünmez.",
+      "total": "Toplam",
+      "bucket": {
+        "store": "Mağaza",
+        "supply": "Tedarik",
+        "retail": "Perakende",
+        "excise": "ÖTV",
+        "government": "Devlet",
+        "other": "Diğer"
+      },
+      "itemsTitle": "Fişteki Kalemler",
+      "itemsSubtitle": "Fişinizden okunan satır kalemleri",
+      "itemsCount": "{count} kalem",
+      "itemQty": "Adet",
+      "itemUnitPrice": "Birim",
+      "itemEmpty": "Bu fişten satır kalemi okunamadı."
+    },
+    "mining": {
+      "title": "Veri Katkısı",
+      "step": {
+        "extracting": "Veri Çıkarma",
+        "extractingDesc": "Fişin yapısı analiz ediliyor",
+        "calculating": "Gizli Maliyetleri Hesaplama",
+        "calculatingDesc": "Maliyet dağılımı hesaplanıyor",
+        "categorizing": "Giderleri Kategorize Etme",
+        "categorizingDesc": "Gider kategorilerine eşleniyor",
+        "generating": "Fiş Oluşturma",
+        "generatingDesc": "Blockchain'e hazır fiş oluşturuluyor",
+        "finalizing": "Sonlandırma",
+        "finalizingDesc": "Veri katkısı işlemi tamamlanıyor"
+      },
+      "modal": {
+        "title": "Veri Katkısı",
+        "description": "Fişiniz sunucuda işleniyor...",
+        "progress": "İlerleme",
+        "uploading": "Fiş Yükleniyor",
+        "uploadingDesc": "Fiş görüntüsü sunucuya gönderiliyor...",
+        "ocr": "OCR İşleme",
+        "ocrDesc": "Fiş görüntüsünden metin çıkarılıyor...",
+        "extraction": "Veri Çıkarma",
+        "extractionDesc": "Tarih, toplam ve KDV belirleniyor...",
+        "merchant": "İşletme Doğrulama",
+        "merchantDesc": "İşletme ve kategori doğrulanıyor...",
+        "calculation": "Gizli Maliyetleri Hesaplama",
+        "calculationDesc": "Fiyatlandırma dağılımı ve ödüller hesaplanıyor...",
+        "verification": "Hile Önleme Doğrulama",
+        "verificationDesc": "Tekrarlar kontrol ediliyor ve veriler doğrulanıyor...",
+        "complete": "Tamamlandı!",
+        "completeDesc": "Fiş analizi başarıyla tamamlandı."
+      }
+    },
+    "pipeline": {
+      "errorTitle": "İşlem başarısız",
+      "retry": "Tekrar dene",
+      "analyzing": "Fiş analiz ediliyor",
+      "hiddenCostFound": "Gizli maliyet bulundu",
+      "paid": "Ödenen",
+      "realValue": "Gerçek değer",
+      "viewDetails": "Detaylı analiz",
+      "breakdownTitle": "Maliyet dağılımı",
+      "viewNext": "Devam",
+      "saveReceipt": "Fişi kaydet",
+      "saving": "Kaydediliyor…",
+      "doneTitle": "Tamamlandı",
+      "doneSub": "Fiş kaydedildi.",
+      "scanAgain": "Yeni fiş tara",
+      "viewReceipts": "Fişlere git",
+      "potentialReward": "Potansiyel ödül",
+      "stage": {
+        "upload": "Fiş yükleniyor…",
+        "ocr": "Metin okunuyor (OCR)…",
+        "extract": "Tarih ve tutar çıkarılıyor…",
+        "merchant": "İşletme tespit ediliyor…",
+        "hidden": "Gizli maliyet hesaplanıyor…",
+        "verify": "Doğrulama yapılıyor…"
+      },
+      "story": {
+        "upload": {
+          "short": "Mühür",
+          "title": "Fişi mühürlüyoruz",
+          "sub": "Dosyanı güvenle gönderip analize hazırlıyoruz."
+        },
+        "ocr": {
+          "short": "Oku",
+          "title": "Metni okuyoruz",
+          "sub": "OCR ile satırları çözüp fişi anlamlandırıyoruz."
+        },
+        "extract": {
+          "short": "Çıkar",
+          "title": "Tarih ve tutarı buluyoruz",
+          "sub": "Hikâyeyi sabitleyen kilit verileri yakalıyoruz."
+        },
+        "enrich": {
+          "short": "İşletme",
+          "title": "İşletmeyi tespit ediyoruz",
+          "sub": "Kategori ve işletme eşlemesiyle analizi zenginleştiriyoruz."
+        },
+        "verify": {
+          "short": "Güven",
+          "title": "Güven ve tekrar kontrolü",
+          "sub": "Sinyalleri doğrulayıp yinelenen kayıtlara karşı ödülleri koruyoruz."
+        },
+        "reward": {
+          "short": "Ödül",
+          "title": "Ödülü hesaplıyoruz",
+          "sub": "Gizli maliyetleri cPoints’e cevirip sonucu tamamlıyoruz."
+        }
+      }
+    },
+    "upload": {
+      "dropzone": {
+        "dropHere": "Fiş görüntüsü veya PDF'i buraya bırakın",
+        "clickToBrowse": "veya gözatmak için tıklayın"
+      },
+      "card": {
+        "title": "Fiş Yükle",
+        "description": "Bir görüntü veya PDF'i sürükleyip bırakın veya gözatmak için tıklayın",
+        "dropHere": "Fişinizi buraya bırakın",
+        "clickToSelect": "veya dosya seçmek için tıklayın",
+        "browseFiles": "Dosyalara Gözat",
+        "uploaded": "Fiş Yüklendi",
+        "readyToAnalyze": "Analiz için hazır"
+      }
+    },
+    "insights": {
+      "title": "İçgörüler",
+      "description": "Paranızın nereye gittiğini anlayın ve daha fazla tasarruf edin",
+      "empty": "Henüz içgörü yok",
+      "emptyDesc": "Harcama kalıplarınızı ve gizli maliyetleri görmek için önce birkaç fiş kazın.",
+      "noMatch": "Filtrelere uyan fiş yok",
+      "noMatchDesc": "İçgörüleri görmek için zaman aralığını veya filtreleri değiştirmeyi deneyin.",
+      "error": "İçgörüler yüklenemedi",
+      "timeRange": {
+        "all": "tüm zaman",
+        "7d": "son 7 gün",
+        "30d": "son 30 gün",
+        "90d": "son 90 gün"
+      },
+      "filters": {
+        "timeRange": "Zaman aralığı",
+        "allTime": "Tüm zaman",
+        "last7Days": "Son 7 gün",
+        "last30Days": "Son 30 gün",
+        "last90Days": "Son 90 gün",
+        "country": "Ülke",
+        "allCountries": "Tüm ülkeler",
+        "category": "Kategori",
+        "allCategories": "Tüm kategoriler",
+        "searchMerchant": "İşletme ara...",
+        "currency": "Para Birimi",
+        "clear": "Temizle"
+      },
+      "truthMetric": {
+        "title": "Ürün değerinden fazla ödediniz.",
+        "subtitle": "Gerçek ürün değerinin ötesindeki gizli maliyetler",
+        "percentOfSpending": "Harcamaların {percent}%",
+        "totalSpend": "Toplam Harcama",
+        "paidExTax": "Vergi Hariç Ödenen",
+        "productValue": "Ürün Değeri",
+        "hiddenIndex": "Gizli Endeks",
+        "disclaimer": "KDV/Vergi ayrı gösterilir. Gizli maliyet devlet katmanını hariç tutar.",
+        "confidence": "Güven kapsamı: {percent}% doğrulandı"
+      },
+      "moneyFlow": {
+        "title": "Paranız nereye gitti",
+        "insightText": "{total} tutarından: {product} ürün / {retail} perakende / {system} sistem / {tax} vergi ödediniz.",
+        "productValue": "Ürün Değeri",
+        "retailHidden": "Perakende Gizli",
+        "importSystem": "İthalat/Sistem",
+        "taxVat": "KDV/Vergi"
+      },
+      "timePatterns": {
+        "title": "Harcama vs Gizli Maliyet Trendi",
+        "subtitle": "Harcamalarınızı ve gizli maliyetleri zaman içinde takip edin.",
+        "notEnoughData": "Henüz yeterli veri yok — daha fazla fiş yükleyin.",
+        "trendingUp": "Gizli maliyet oranı yükselişte.",
+        "trendingDown": "Gizli maliyet oranı düşüşte.",
+        "categoryAboveBaseline": "{category} kategorisi sürekli olarak baz çizgisinin üzerinde ({categoryPercent}% vs {avgPercent}% ortalama).",
+        "noPatterns": "Henüz önemli bir kalıp tespit edilmedi.",
+        "notEnoughForTrend": "Trend analizi için yeterli veri yok",
+        "weekOf": "{date} haftası",
+        "patternInsights": "Kalıp İçgörüleri",
+        "spend": "Harcama",
+        "hiddenCost": "Gizli Maliyet"
+      },
+      "behaviorTrap": {
+        "title": "Davranış Tuzağı Dedektörü",
+        "subtitle": "Gün ve saate göre gizli maliyet oranı",
+        "notEnoughData": "Henüz yeterli veri yok — daha fazla fiş yükleyin.",
+        "needReceipts": "Kalıpları tespit etmek için en az {count} fiş gerekiyor.",
+        "avgHiddenRate": "Ort. gizli oran:",
+        "totalSpend": "Toplam harcama:",
+        "totalHidden": "Toplam gizli:",
+        "rateRange": "Gizli maliyet oranı: {min}% - {max}%",
+        "low": "Düşük",
+        "high": "Yüksek"
+      },
+      "merchantTables": {
+        "title": "En Yüksek Gizli Maliyetli İşletmeler",
+        "merchant": "İşletme",
+        "hiddenCost": "Gizli Maliyet",
+        "avgPercent": "Ort. %",
+        "count": "Adet",
+        "noData": "İşletme verisi mevcut değil"
+      },
+      "whatIf": {
+        "title": "Ne-Olur-Simülatörü",
+        "subtitle": "Gizli maliyetlerdeki küçük azalmalar hızla birikir.",
+        "reduction": "Azaltma",
+        "youWouldHaveSaved": "Tasarruf etmiş olurdunuz",
+        "reduceBy": "%{percent} azalt",
+        "custom": "Özel"
+      },
+      "spendingPulse": {
+        "title": "Harcama Nabzı",
+        "subtitle": "Harcama hızınızı ve ay sonu tahminini takip edin",
+        "dailyBurnRate": "Günlük harcama hızı",
+        "receiptFrequency": "Fiş sıklığı",
+        "projectedMonthEnd": "Tahmini ay sonu",
+        "notEnoughData": "Henüz yeterli veri yok — daha fazla fiş yükleyin.",
+        "cumulativeSpend": "Birikimli Harcama vs Zaman",
+        "topSpendingDay": "En çok harcama yapılan gün",
+        "mostFrequentCategory": "En sık kullanılan kategori",
+        "perDay": "günlük",
+        "receiptsPerDay": "fiş/gün",
+        "forecast": "tahmin",
+        "cumulative": "Birikimli",
+        "daySpend": "Günlük harcama",
+        "actual": "Gerçek",
+        "projected": "Tahmini"
+      },
+      "trustLayer": {
+        "title": "Güven Katmanı",
+        "onlyVerified": "Sadece doğrulanmış fişler ödül üretir. {count} düşük güvenilirlikli fiş işaretlendi.",
+        "allVerified": "Tüm fişler doğrulandı.",
+        "noReceipts": "Fiş mevcut değil.",
+        "noData": "Fiş verisi mevcut değil",
+        "verified": "Doğrulanmış",
+        "lowConfidence": "Düşük Güven"
+      },
+      "categories": {
+        "grocery": "Market",
+        "restaurant": "Restoran",
+        "cafe": "Kafe",
+        "fuel": "Yakıt",
+        "marketplace": "Online",
+        "pharmacy": "Eczane",
+        "electronics": "Elektronik",
+        "apparel": "Giyim",
+        "fashion": "Giyim",
+        "beauty": "Kozmetik",
+        "personal_care": "Kişisel Bakım",
+        "home": "Ev",
+        "alcohol": "Alkol",
+        "tobacco": "Tütün",
+        "utilities": "Faturalar",
+        "travel": "Seyahat",
+        "hospitality_lodging": "Konaklama",
+        "healthcare": "Sağlık",
+        "services": "Hizmet",
+        "convenience": "Bakkal",
+        "other": "Diğer"
+      },
+      "products": {
+        "genericItem": "genel kalem"
+      }
+    },
+    "tasks": {
+      "title": "Görevler",
+      "description": "Ödül kazanmak için sosyal medya görevlerini, meydan okumaları ve içerik oluşturmayı tamamlayın",
+      "notActive": "⚠️ Aktif değil",
+      "completed": "Tamamlandı",
+      "earned": "{amount} puan kazanıldı",
+      "all": "Tüm Görevler",
+      "socialMedia": "Sosyal Medya",
+      "challenge": "Meydan Okuma",
+      "contentCreation": "İçerik Oluşturma",
+      "community": "Topluluk",
+      "empty": "Seçilen filtre için görev bulunamadı",
+      "progress": "İlerleme",
+      "steps": "Adımlar",
+      "moreSteps": "+{count} adım daha",
+      "start": "Görevi Başlat",
+      "error": "Görevler yüklenemedi"
+    },
+    "rewards": {
+      "title": "Ödüller",
+      "description": "Hesap bakiyeleri ve işlem geçmişi",
+      "cPointsTotal": "Toplam cPoints",
+      "cPointsBreakdown": "cPoints Kirilimi",
+      "totalEarned": "Toplam Kazanç",
+      "activity": "Aktivite Günlüğü",
+      "receiptVerified": "Fiş doğrulandı",
+      "taskCompleted": "Görev tamamlandı",
+      "adjustment": "Düzeltme",
+      "claim": "Talep Et",
+      "completed": "TAMAMLANDI",
+      "pending": "BEKLİYOR",
+      "noActivity": "Kaydedilmiş aktivite yok",
+      "awarenessToken": "Katkı skoru",
+      "awarenessDesc": "Toplam puan, doğrulanan fiş ve görev katkılarından hesaplanır.",
+      "rewardToken": "Katkı kırılımı",
+      "rewardDesc": "Fiş puanı analiz/doğrulama sonrası, görev puanı ise tamamlanan görevlerden gelir.",
+      "receiptFrom": "{merchant} fişi"
+    },
+    "leaderboard": {
+      "title": "Lider Tablosu",
+      "description": "En iyi kazıcılar ve gizli maliyet keşfedenler",
+      "subtitle": "Gizli maliyet avcıları",
+      "season": "Sezon",
+      "global": "Küresel",
+      "weekly": "Haftalık",
+      "daily": "Günlük",
+      "receiptsAndStreak": "{receipts} fiş · {days} gün üst üste",
+      "receiptsAndDays": "{receipts} fiş · {days} gün",
+      "hiddenCostLabel": "gizli maliyet",
+      "uploadToRank": "Fiş yükleyerek sıralamaya gir.",
+      "yourRank": "Senin sıran",
+      "you": "Sen",
+      "rank": "Sıra",
+      "user": "Kullanıcı",
+      "receipts": "Fişler",
+      "hiddenCost": "Gizli Maliyet",
+      "streak": "Seri",
+      "days": "gün",
+      "badges": "Rozetler",
+      "honor": "Onur",
+      "totalAyumo": "Toplam fis cPoints",
+      "totalRyumo": "Toplam gorev cPoints",
+      "totalAyumoAdminHint": "Bugune kadar kazanilan fis cPoints (sadece admin)",
+      "totalRyumoAdminHint": "Bugune kadar kazanilan gorev cPoints (sadece admin)",
+      "error": "Lider tablosu yüklenemedi",
+      "empty": "Lider tablosu verisi mevcut değil",
+      "seasonLabel": "Sezon"
+    },
+    "honor": {
+      "tipsTitle": "Onurunuzu yükseltmek için:",
+      "tipPhoto": "Fişi net ve tam çerçeveleyin; kamera odaklı olsun.",
+      "tipCondition": "Fiş okunaklı ve yırtıksız olsun; ıslak veya çok buruşuk fişler okunmayabilir.",
+      "tipBackground": "Fişi koyu/düz bir zemin üzerine koyun; kenarlardan boşluk bırakın."
+    },
+    "settings": {
+      "title": "Ayarlar",
+      "account": "Hesap",
+      "accountDesc": "Hesap bilgilerinizi yönetin",
+      "email": "E-posta",
+      "emailPlaceholder": "siz@ornek.com",
+      "emailNone": "Kayıtlı e-posta yok",
+      "emailVerified": "Doğrulandı",
+      "emailUnverified": "Doğrulanmadı",
+      "updateEmail": "E-postayı güncelle",
+      "emailDialogTitle": "E-postayı güncelle",
+      "emailDialogDesc": "Yeni e-postanızı ve mevcut şifrenizi girin. E-postayı değiştirmek, yeni adresi onaylayana kadar doğrulamayı sıfırlar.",
+      "emailDialogPasswordOnly": "Yukarıdaki e-postayı kaydetmek için mevcut şifrenizi girin.",
+      "emailSaveHint": "E-postanızı yazıp E-postayı kaydet’e dokunun. Bu adrese doğrulama bağlantısı göndereceğiz.",
+      "emailUnsaved": "Henüz kaydedilmedi",
+      "saveEmail": "E-postayı kaydet",
+      "emailSaved": "E-posta güncellendi",
+      "emailVerifyReminder": "Yeni adresinizi doğrulamak için gelen kutunuzu kontrol edin.",
+      "error": {
+        "emailInvalid": "Geçersiz e-posta adresi",
+        "emailInUse": "Bu e-posta zaten kullanılıyor",
+        "emailLoad": "E-posta yüklenemedi",
+        "emailSave": "E-posta güncellenemedi",
+        "login": "Ayarları kaydetmek için lütfen giriş yapın",
+        "displayNameRequired": "Görünen ad gereklidir",
+        "allFieldsRequired": "Tüm alanlar gereklidir",
+        "passwordsNotMatch": "Yeni şifreler eşleşmiyor",
+        "passwordLength": "Şifre en az 8 karakter olmalıdır",
+        "saveProfile": "Profil kaydedilemedi",
+        "saveAccount": "Hesap ayarları kaydedilemedi",
+        "changePassword": "Şifre değiştirilemedi",
+        "savePreferences": "Tercihler kaydedilemedi"
+      },
+      "displayName": "Görünen Ad",
+      "displayNamePlaceholder": "Görünen adınızı girin",
+      "gender": {
+        "_": "Cinsiyet",
+        "male": "Erkek",
+        "female": "Kadın",
+        "nonBinary": "İkili olmayan",
+        "other": "Diğer",
+        "preferNotToSay": "Belirtmek istemiyorum"
+      },
+      "genderPlaceholder": "Cinsiyet seçin (isteğe bağlı)",
+      "birthDate": "Doğum Tarihi",
+      "birthDatePlaceholder": "Tarih seçin (isteğe bağlı)",
+      "password": "Şifre",
+      "changePassword": "Şifre Değiştir",
+      "currentPassword": "Mevcut Şifre",
+      "currentPasswordPlaceholder": "Mevcut şifrenizi girin",
+      "newPassword": "Yeni Şifre",
+      "newPasswordPlaceholder": "Yeni şifrenizi girin",
+      "confirmPassword": "Şifreyi Onayla",
+      "confirmPasswordPlaceholder": "Yeni şifreyi onaylayın",
+      "passwordDesc": "Mevcut şifrenizi girin ve yeni bir şifre seçin.",
+      "wallet": {
+        "_": "Cüzdan",
+        "connect": "Cüzdanı Bağla",
+        "connecting": "Bağlanıyor...",
+        "signing": "İmzalanıyor...",
+        "disconnect": "Bağlantıyı Kes"
+      },
+      "walletDesc": "Bağlı cüzdanınızı yönetin",
+      "connectedAddress": "Bağlı Adres",
+      "appearance": "Görünüm",
+      "appearanceDesc": "Açık ve koyu tema arasında geçiş yap",
+      "themeLight": "Açık tema",
+      "themeDark": "Karanlık tema",
+      "themeSwitch": "Temayı değiştir",
+      "sound": {
+        "_": "Ses efektleri",
+        "volume": "Ses seviyesi",
+        "mute": "Sessize al",
+        "unmute": "Sesi aç"
+      },
+      "soundDesc": "Varsayılan açık (ilk dokunuştan sonra çalar)",
+      "appLanguage": "Uygulama dili",
+      "appLanguageHint": "Menüler, düğmeler ve uygulama ekranlarının dili.",
+      "appLanguageSaved": "Uygulama dili güncellendi",
+      "cookiePreferences": "Çerez tercihleri",
+      "cookiePreferencesDesc": "Yumo Yumo için analitik ve rıza çerezlerini yönet.",
+      "openCookiePreferences": "Çerez tercihlerini aç",
+      "preferences": "Profil ve gelir",
+      "preferencesDesc": "Meslek ve aylık ortalama gelir (isteğe bağlı)",
+      "occupation": "Meslek",
+      "occupationPlaceholder": "Örn. Mühendis, Öğretmen",
+      "monthlyIncome": "Aylik ortalama gelir",
+      "monthlyIncomePlaceholder": "USD araligi secin (istege bagli)",
+      "incomeBand": {
+        "under_30": "30.000 ₺ altı",
+        "30_35": "30.000 – 35.000 ₺",
+        "35_45": "35.000 – 45.000 ₺",
+        "45_60": "45.000 – 60.000 ₺",
+        "60_70": "60.000 – 70.000 ₺",
+        "70_85": "70.000 – 85.000 ₺",
+        "85_100": "85.000 – 100.000 ₺",
+        "100_120": "100.000 – 120.000 ₺",
+        "120_150": "120.000 – 150.000 ₺",
+        "150_plus": "150.000 ₺ ve üzeri"
+      },
+      "save": "Hesap Ayarlarını Kaydet",
+      "saving": "Kaydediliyor...",
+      "saved": "Hesap ayarları başarıyla kaydedildi",
+      "savePreferences": "Tercihleri Kaydet",
+      "preferencesSaved": "Tercihler başarıyla kaydedildi",
+      "changing": "Değiştiriliyor...",
+      "passwordChanged": "Şifre başarıyla değiştirildi",
+      "cancel": "İptal"
+    },
+    "admin": {
+      "approvals": {
+        "title": "Onay Bekleyen Fişler",
+        "description": "20,000 TL üzeri fişlerin onayı",
+        "noPending": "Onay bekleyen fiş yok",
+        "noPendingDesc": "Şu anda onay bekleyen fiş bulunmamaktadır.",
+        "approve": "Onayla",
+        "reject": "Reddet",
+        "view": "Görüntüle",
+        "merchant": "İşletme",
+        "user": "Kullanıcı",
+        "date": "Tarih",
+        "total": "Toplam",
+        "status": "Durum",
+        "actions": "İşlemler",
+        "refresh": "Yenile",
+        "loading": "Yükleniyor...",
+        "approveConfirm": "Bu fişi onaylamak istediğinizden emin misiniz?",
+        "rejectConfirm": "Bu fişi reddetmek istediğinizden emin misiniz?",
+        "rejectReason": "Red nedeni (isteğe bağlı):",
+        "error": {
+          "unauthorized": "Yetkisiz - Yönetici erişimi gerekli",
+          "forbidden": "Yasak - Yönetici erişimi gerekli",
+          "load": "Onay bekleyen fişler yüklenemedi",
+          "approve": "Fiş onaylanamadı",
+          "reject": "Fiş reddedilemedi",
+          "notPending": "Fiş onay bekliyor durumunda değil"
+        }
+      },
+      "rejected": {
+        "title": "Reddedilen Fişler",
+        "description": "Yönetici tarafından reddedilen fişler",
+        "noRejected": "Reddedilen fiş yok",
+        "noRejectedDesc": "Reddedilen fiş bulunmamaktadır.",
+        "view": "Görüntüle",
+        "merchant": "İşletme",
+        "user": "Kullanıcı",
+        "date": "Tarih",
+        "total": "Toplam",
+        "status": "Durum",
+        "actions": "İşlemler",
+        "refresh": "Yenile",
+        "loading": "Yükleniyor...",
+        "error": {
+          "unauthorized": "Yetkisiz - Yönetici erişimi gerekli",
+          "forbidden": "Yasak - Yönetici erişimi gerekli",
+          "load": "Reddedilen fişler yüklenemedi"
+        }
+      },
+      "allReceipts": {
+        "title": "Tüm Fişler",
+        "description": "Sistemdeki tüm fişler, her durumdan",
+        "approvalQueue": "Onay kuyruğu",
+        "searchPlaceholder": "İşletme veya fiş ID ara",
+        "refresh": "Yenile",
+        "loading": "Yükleniyor...",
+        "empty": "Fiş yok",
+        "emptyDesc": "Bu filtreye uyan fiş yok.",
+        "view": "Görüntüle",
+        "merchant": "İşletme",
+        "user": "Kullanıcı",
+        "date": "Tarih",
+        "total": "Toplam",
+        "status": "Durum",
+        "actions": "İşlemler",
+        "userView": "Kullanıcı görünümü",
+        "adminTools": "Yönetici araçları (OCR & pipeline)",
+        "prev": "Önceki",
+        "next": "Sonraki",
+        "pageLabel": "{from}–{to} gösteriliyor",
+        "filters": {
+          "all": "Tümü",
+          "pending": "Bekleyen",
+          "verified": "Onaylı",
+          "rejected": "Reddedilen"
+        },
+        "error": {
+          "unauthorized": "Yetkisiz - Yönetici erişimi gerekli",
+          "forbidden": "Yasak - Yönetici erişimi gerekli",
+          "load": "Fişler yüklenemedi"
+        }
+      },
+      "feedback": {
+        "title": "Geri Bildirim",
+        "description": "Kullanıcıların bildirdiği fiş hataları",
+        "empty": "Henüz geri bildirim yok",
+        "emptyDesc": "Kullanıcı raporları burada görünecek.",
+        "reporter": "Raporlayan",
+        "bugTypes": "Hata türleri",
+        "viewReceipt": "Fişi görüntüle",
+        "receiptNotSaved": "Fiş henüz kaydedilmedi",
+        "refresh": "Yenile",
+        "loading": "Yükleniyor...",
+        "error": {
+          "unauthorized": "Yetkisiz - Yönetici erişimi gerekli",
+          "forbidden": "Yasak - Yönetici erişimi gerekli",
+          "load": "Geri bildirimler yüklenemedi"
+        }
+      },
+      "stats": {
+        "totalReceipts": "Sistemdeki toplam fiş: {count}"
+      },
+      "merchants": {
+        "title": "İşletmeler",
+        "description": "Yeni işletmeleri onaylayın (aday veya doğrulanmış yapın).",
+        "filterAll": "Tümü",
+        "filterUnverified": "Onay bekleyen",
+        "filterCandidate": "Aday",
+        "filterVerified": "Doğrulanmış",
+        "displayName": "Görünen ad",
+        "canonicalName": "Kurumsal ad",
+        "category": "Kategori",
+        "tierLabel": "Seviye",
+        "tier": {
+          "unverified": "Doğrulanmamış",
+          "candidate": "Aday",
+          "verified": "Doğrulanmış"
+        },
+        "patternCount": "Kalıp",
+        "actions": "İşlemler",
+        "refresh": "Yenile",
+        "loading": "Yükleniyor...",
+        "noMerchants": "İşletme yok",
+        "noMerchantsDesc": "Seçilen filtreye uyan işletme yok.",
+        "approveCandidate": "Aday yap",
+        "approveVerified": "Doğrulanmış yap",
+        "approveConfirm": "\"{name}\" işletmesini {tier} olarak onaylıyor musunuz?",
+        "error": {
+          "unauthorized": "Yetkisiz - Yönetici erişimi gerekli",
+          "forbidden": "Yasak - Yönetici erişimi gerekli",
+          "load": "İşletmeler yüklenemedi",
+          "approve": "İşletme onaylanamadı",
+          "reject": "İşletme reddedilemedi"
+        },
+        "acceptCandidate": "Kabul (aday)",
+        "acceptVerified": "Kabul (doğrulanmış)",
+        "reject": "Reddet",
+        "rejectConfirm": "\"{name}\" reddedilsin mi? Listeden kaldırılacak.",
+        "tooltip": {
+          "candidate": "Aday: eşleşmede kullanılır, normal ödül",
+          "verified": "Doğrulanmış: eşleşmede kullanılır, daha yüksek ödül çarpanı",
+          "reject": "Reddet: listeden kaldır (fiş yüklenince tekrar görünebilir)"
+        }
+      }
+    },
+    "reportBug": {
+      "button": "Hata bildir",
+      "title": "Hata bildir",
+      "submit": "Gönder",
+      "selectAtLeastOne": "Lütfen en az bir seçenek işaretleyin",
+      "types": {
+        "category_wrong": "Kategori yanlış",
+        "date_wrong": "Tarih yanlış",
+        "merchant_name_wrong": "İşletme adı yanlış",
+        "time_wrong": "Saat yanlış",
+        "total_wrong": "Toplam tutar yanlış"
+      }
+    },
+    "correctionModal": {
+      "button": "Yanlış gördüğün bir alan mı var?",
+      "title": "Yanlış gördüğün bir alan mı var?",
+      "subtitle": "Düzelt ve ekstra ödül kazan (doğru olması durumunda).",
+      "fieldLabel": "Hangi alan?",
+      "selectField": "Bir alan seç",
+      "valueLabel": "Doğru değer",
+      "enterValue": "Doğru değeri gir",
+      "submit": "Düzeltmeyi gönder",
+      "successPending": "Teşekkürler — düzeltmen incelemeye gönderildi.",
+      "successApplied": "Teşekkürler — düzeltmen uygulandı ve incelemeye gönderildi.",
+      "pendingBadge": "incelemede",
+      "detailsTitle": "Fiş bilgileri",
+      "awaitingApproval": "onay bekliyor",
+      "underReview": "fiş inceleniyor",
+      "noChanges": "En az bir alanı değiştir",
+      "multiSubtitle": "İstediğin alanları düzenle, sonra gönder. Birden fazlasını aynı anda düzeltebilirsin.",
+      "error": "Düzeltme gönderilemedi",
+      "dateConfirm": {
+        "title": "Bu fişin tarihi doğru mu?",
+        "body": "Tarihi {date} olarak okuduk; bu mevcut ayın dışında kaldığı için ödül verilmedi. Yanlışsa tarihi düzelt, yeniden değerlendirelim.",
+        "futureTitle": "Bu tarih gelecekte olamaz",
+        "futureBody": "Tarihi {date} olarak okuduk; bu ileri bir tarih ve bir fiş gelecekte tarihli olamaz, bu yüzden ödül verilmedi. Lütfen doğru tarihi gir.",
+        "cta": "Tarihi düzelt"
+      },
+      "fields": {
+        "merchant_name": "İşletme adı",
+        "date": "Tarih",
+        "time": "Saat",
+        "total": "Toplam tutar",
+        "vat": "KDV tutarı"
+      }
+    },
+    "common": {
+      "loading": "Yükleniyor...",
+      "error": "Hata",
+      "retry": "Tekrar Dene",
+      "cancel": "İptal",
+      "confirm": "Onayla",
+      "save": "Kaydet",
+      "delete": "Sil",
+      "edit": "Düzenle",
+      "close": "Kapat",
+      "back": "Geri",
+      "next": "İleri",
+      "previous": "Önceki",
+      "tryAgain": "Tekrar Dene",
+      "somethingWentWrong": "Bir şeyler yanlış gitti",
+      "user": "Kullanıcı",
+      "na": "N/A",
+      "share": "Paylaş",
+      "linkCopied": "Link kopyalandı",
+      "claimable": "Talep edilebilir",
+      "shareReceipt": "Fişi Paylaş",
+      "dismissBanner": "Banner'ı kapat",
+      "account": "Hesap"
+    },
+    "receiptDetail": {
+      "total": "Toplam",
+      "hiddenCost": "Gizli Maliyet",
+      "reward": "Ödül",
+      "status": "Durum",
+      "proofEyebrow": "Harcama kanıtı",
+      "youPaid": "Ödediğin",
+      "realValue": "Gerçek değer",
+      "rewardReady": "Ödül hazır",
+      "rewardVerifying": "Doğrulanıyor",
+      "bonus": "Bonus",
+      "hiddenTitle": "Paran nereye gitti",
+      "ofTotal": "toplamın",
+      "tapForDetail": "Detay için dokun",
+      "estimatedBadge": "Tahmini",
+      "readFromReceipt": "Fişten okundu",
+      "embeddedTax": "Gömülü vergi",
+      "itemsTitle": "Kalemler",
+      "itemsEmpty": "Bu fişten kalem okunamadı.",
+      "brandQuestion": "Markası nedir?",
+      "brandHint": "Bu ürünün markasını okuyamadık — favori markalarını takip edebilmemiz için ekle.",
+      "brandPlaceholder": "Marka ara veya yaz",
+      "brandUnbranded": "Markasız",
+      "brandSave": "Kaydet",
+      "brandSaved": "Teşekkürler!",
+      "showMore": "{count} kalem daha",
+      "showLess": "Daha az göster",
+      "detailsTitle": "Fiş bilgileri",
+      "uploaded": "Yüklendi",
+      "readConfidence": "Okuma güveni",
+      "category": "Kategori",
+      "merchant": "Satıcı",
+      "duplicateTitle": "Daha önce yüklendi",
+      "duplicateBody": "Bu fiş daha önce yüklenmiş bir kayıtla eşleşiyor.",
+      "viewOriginal": "Orijinali gör",
+      "photoTipTitle": "Fotoğraf ipucu",
+      "adminSection": "Yönetici araçları",
+      "adminEvidence": "Kanıt",
+      "adminWarnings": "Uyarılar",
+      "adminRejections": "Ret nedenleri",
+      "downloadImage": "Görseli indir",
+      "downloadCard": "Kartı indir",
+      "downloading": "İndiriliyor…",
+      "deleteReceipt": "Fişi sil",
+      "deleting": "Siliniyor…",
+      "deleteConfirmTitle": "Fişi sil",
+      "deleteConfirmBody": "Bu fiş kalıcı olarak silinecek. Bu işlem geri alınamaz."
+    },
+    "empty": {
+      "noData": "Veri mevcut değil"
+    },
+    "quests": {
+      "active": "Aktif Görevler",
+      "notActive": "⚠️ Aktif değil",
+      "dailyTitle": "Günlük Görevler",
+      "today": "Bugün",
+      "xpToday": "+ {x} XP bugün",
+      "weeklyGoal": "Haftalık Hedef",
+      "selectGoalThisWeek": "Bu hafta için bir hedef seç (henüz seçmedin).",
+      "noWeeklyGoal": "Haftalık hedef yok.",
+      "noDailyQuests": "Henüz günlük görev yok.",
+      "loadError": "Görevler yüklenemedi",
+      "completedBadge": "Tamamlandı",
+      "completeQuest": "Görevi tamamla",
+      "conditionsNotMet": "Şartlar karşılanmadı",
+      "viewAll": "Tum gorevlere git",
+      "streak": "Seri"
+    },
+    "receiptViewer": {
+      "noImage": "Görsel mevcut değil",
+      "title": "Fiş Görüntüsü",
+      "previewWillAppear": "Fiş önizlemesi burada görünecek",
+      "rotate": "Döndür",
+      "zoom": "Yakınlaştır"
+    },
+    "evidence": {
+      "value": "Değer",
+      "score": "Skor",
+      "downloadImage": "Görseli indir",
+      "selectedTotal": "Seçilen Toplam",
+      "fromLine": "Satırdan",
+      "reasons": "Nedenler",
+      "ocrLines": "OCR Satırları",
+      "rawOcrText": "Ham OCR Metni",
+      "verificationReasons": "Doğrulama Nedenleri",
+      "title": "Kanıt ve Güven",
+      "visionJsonIntro": "Vision JSON indir butonu aşağıda, ilk bölümde.",
+      "visionJsonSectionTitle": "Google Vision JSON (Admin)",
+      "visionJsonSectionDesc": "Ham Vision API cevabı (responses[0]); receipt_vision_raw ile aynı içerik.",
+      "visionJsonDownloadBtn": "Vision JSON İndir",
+      "receiptImageTitle": "Fiş Görseli (Blob)"
+    },
+    "potentialReward": {
+      "honorEffect": "Ödül oranı",
+      "title": "Potansiyel Ödülünüz",
+      "potential": "(potansiyel)",
+      "description": "Bu analiz sonucunda potansiyel ödülünüz hesaplandı.",
+      "rewardNote": "Ödül tahmini hazır.",
+      "rewardDesc": "Bu fişi geçmişinize eklemek için analizi kaydedin.",
+      "check1": "Veriler yerel olarak işlendi",
+      "check2": "Gizli maliyetler ortaya çıkarıldı",
+      "check3": "Potansiyel ödül hesaplandı",
+      "back": "Geri",
+      "save": "Analizi Kaydet",
+      "saving": "Kaydediliyor...",
+      "honorFromReceipt": "Bu fişten gelen onur",
+      "honorBonus": "Onur bonusu 1,2x uygulandı",
+      "honorAdminNote": "Admin: Onur puanınız güncellenmez; bu fiş, normal bir kullanıcının onurunu bu şekilde etkilerdi."
+    },
+    "receiptScanner": {
+      "cameraNotSupported": "Kamera desteklenmiyor",
+      "pickFile": "Dosyadan seç",
+      "scan": "Tara",
+      "takePhoto": "Fotoğraf Çek",
+      "desktopCameraHint": "Canlı kamera ile çekim telefon ve tabletlerde çalışır. Fişi kamerayla taramak için lütfen uygulamaya mobil cihazınızdan girin.",
+      "desktopPickFileHint": "Bu bilgisayardan yine de aşağıdaki Dosyadan seç ile fiş fotoğrafı veya PDF yükleyebilirsiniz.",
+      "uploadTitle": "Fiş Yükle",
+      "uploadSubtitle": "Kameranızla fotoğraf çekin veya galerinizden bir görsel seçin.",
+      "cameraNotAvailable": "Kameraya erişilemedi",
+      "placeReceipt": "Fişi çerçeveye yerleştirin",
+      "holdVertical": "Telefonu dikey tutun, fiş çerçeveye sığsın.",
+      "cameraPermissionHint": "Tarayıcı ayarlarından kamera iznini açın.",
+      "openingCamera": "Kamera açılıyor…",
+      "expenseTypeTitle": "Fiş tipini seçin",
+      "expenseTypeSubtitle": "Bu seçim fişin nasıl sınıflandırılacağını ve ödülünü belirler.",
+      "expensePersonal": "Kişisel Harcama",
+      "expensePersonalDesc": "Kendi alışverişiniz — market, kafe, akaryakıt vb.",
+      "expenseOther": "Diğer Harcamalar",
+      "expenseOtherDesc": "İşletme ya da başkası adına toplu alınmış fişler.",
+      "expenseTypeBack": "Tipi değiştir",
+      "expenseOtherBadge": "Düşük ödül",
+      "expenseTypeHint": "Türü bir sonraki adımda istediğin zaman değiştirebilirsin."
+    },
+    "scanIntro": {
+      "title": "Taramaya başlamadan",
+      "subtitle": "Yumo Yumo'nun fişlerinizi nasıl daha net bir harcama görünümüne dönüştürdüğüne hızlı bir bakış.",
+      "purposeTitle": "Günlük harcamanız için tasarlandı",
+      "purposeDesc": "Yumo Yumo, günlük harcama alışkanlıklarınızı yönetmenize yardımcı olur. Eklediğiniz her fiş harcama geçmişinizi oluşturur ve fiyat karşılaştırmalarınızı keskinleştirir.",
+      "expenseTypeTitle": "Kişisel harcama ile diğer harcamalar",
+      "expenseTypeDesc": "Kişisel harcama kendi alışverişinizdir ve tam ödül kazandırır. Diğer harcamalar bir işletme ya da başkası adına topladığınız fişlerdir — düşük ödülle kaydedilir ve kişisel fiyat referanslarınızın dışında tutulur.",
+      "dateRuleTitle": "İçinde bulunulan ayın fişleri ödül kazandırır",
+      "dateRuleDesc": "Fişi satın aldığınız ay içinde ekleyin, ödül kazanın. Önceki bir aya ait fişler yine kaydedilir ve harcama geçmişinize işlenir; kayıtlarınızı eksiksiz tutar.",
+      "dontShowAgain": "Bunu bir daha gösterme",
+      "cta": "Anladım, taramaya başla"
+    },
+    "vectorReceipt": {
+      "seeYouAgain": "Yine bekleriz",
+      "timeNa": "Saat yok",
+      "thankYou": "YumoYumo'yu tercih ettiğiniz için teşekkür ederiz"
+    },
+    "photoGuidelines": {
+      "title": "Fotoğraf Çekme Kuralları",
+      "receiptUpright": "Fiş dik olarak durmalıdır",
+      "receiptUprightDesc": "Fişi düz bir yüzeye koyunuz ve kameranızı fişe dik açıyla tutunuz.",
+      "entireReceipt": "Fişin tamamı görünmeli",
+      "entireReceiptDesc": "Fişin tamamı kadrajda olmalı; kenarlar kesilmemeli. Fiş çok yakınsa kamerayı fişten uzaklaştırınız.",
+      "cleanBackground": "Temiz arka plan",
+      "cleanBackgroundDesc": "Fişin etrafında ve/veya üzerinde başka cisimler bulunmamalıdır. Temiz, düz bir yüzeye koyunuz.",
+      "sufficientLight": "Yeterli ışık",
+      "sufficientLightDesc": "Lütfen ışığın yeterli olduğuna emin olunuz. Doğrudan ışık kaynağından kaçınınız.",
+      "sharpFocused": "Net ve odaklı",
+      "sharpFocusedDesc": "Kameranızı sabit tutunuz ve fişe odaklanınız. Fotoğraf bulanık olmamalıdır.",
+      "margins": "Kenar boşlukları",
+      "marginsDesc": "Fişin üst, alt, sağ ve solunda biraz boşluk bırakınız. Fiş fotoğrafın kenarlarına yapışmamalıdır."
+    },
+    "compactPieChart": {
+      "weekly": "Haftalık",
+      "monthly": "Aylık",
+      "yearly": "Yıllık",
+      "hoverDetails": "Detaylar için grafik dilimlerinin üzerine gelin",
+      "hidden": "gizli"
+    },
+    "deepScan": {
+      "generatingReport": "Rapor oluşturuluyor"
+    },
+    "miningComplete": {
+      "congrats": "TEBRİKLER!",
+      "success": "ANALİZ TAMAMLANDI",
+      "receiptAnalyzed": "Fişiniz başarıyla analiz edildi!",
+      "foundHidden": "Bulunan Gizli Maliyet",
+      "potentialReward": "Potansiyel Ödül",
+      "stats": "Toplam İstatistikler",
+      "totalReceipts": "Analiz Edilen Fiş",
+      "totalHidden": "Toplam Gizli Maliyet",
+      "mineAnother": "Yeni Fiş Analiz Et",
+      "viewHistory": "Geçmişe Git",
+      "totalPotential": "Potansiyel Ödül"
+    }
+  },
+  "dashboard": {
+    "financialOs": "",
+    "notifications": "BİLDİRİMLER",
+    "unread": "okunmamış",
+    "markAllRead": "Tümünü okundu yap",
+    "noNotificationsTitle": "Yeni bildirim yok.",
+    "noNotificationsBody": "Günün notları ve hesap hareketleri geldiğinde burada görünecek.",
+    "notificationCenter": "Bildirim merkezine git",
+    "newNotification": "Yeni bildirim",
+    "rhythmEyebrow": "Bu hafta",
+    "thisWeek": "Bu Hafta",
+    "todayEyebrow": "Günün notları",
+    "todaysEvents": "Günün olayları",
+    "noEventsTitle": "Bugün için yeni kayıt yok.",
+    "noEventsBody": "Takvim, fatura, yolculuk ve etkinlik notları geldikçe burada görünür.",
+    "platformEyebrow": "Yumo öğreniyor",
+    "platform": "",
+    "live": "",
+    "profileEyebrow": "Merhaba",
+    "level": "LEVEL",
+    "xpThreshold": "eşik",
+    "shoppingEyebrow": "Alışveriş",
+    "shoppingTitle": "Alışveriş listesi",
+    "shoppingEmptyTitle": "Alışveriş listen şimdilik boş",
+    "shoppingEmptyBody": "Fiş taramaya başladığında Yumo burayı senin için dolduracak",
+    "shoppingHint": "Listeye eklemeye uygun görünüyor.",
+    "listCandidate": "Liste adayı",
+    "todayNote": "Bugün",
+    "contributionScore": "Katkı puanı",
+    "total": "toplam",
+    "items": "ürün",
+    "notes": "not",
+    "addProfilePhoto": "Profil fotoğrafı ekle",
+    "home": "Bugün",
+    "scan": "Fiş Tara",
+    "myWorld": "Dünyam",
+    "social": "Arkadaşlar",
+    "web3": "Web3",
+    "verifyEyebrow": "Workhub",
+    "verifyTitle": "Vizyona katkıda bulun, ödüller kazan",
+    "verifyBody": "Yumo'nun merkeziyetsiz fiyat verisi vizyonuna katkı sağla. Her kontrol ağı keskinleştirir, her keskinleşme ödüller getirir.",
+    "verifyPending": "bekliyor",
+    "verifyMore": "Daha gör",
+    "verifyEmptyTitle": "Şu an doğrulanacak görev yok",
+    "verifyEmptyBody": "Yumo yeni fişler eklendikçe burayı dolduracak.",
+    "verifyQuotaUsed": "Bugün",
+    "verifyQuotaRemaining": "doğrulama hakkı",
+    "verifyConfirm": "Evet, doğru",
+    "verifyReject": "Hayır, farklı",
+    "verifySkip": "Bilmiyorum, atla",
+    "verifyCorrectTitle": "Doğrusu nedir?",
+    "verifyCorrectHint": "Fişteki işletmenin tam adını yaz",
+    "verifyCorrectSave": "Kaydet ve devam et",
+    "verifySimilar": "Benzer işletmeler — dokun, otomatik doldur",
+    "servicesEyebrow": "Hizmet sağlayıcılarım",
+    "servicesTitle": "Aboneliklerim & faturalarım",
+    "servicesAdd": "+ Ekle",
+    "servicesEmptyTitle": "Henüz sağlayıcı eklemedin",
+    "servicesEmptyBody": "Elektrik, internet, dijital üyelik gibi tekrar eden hizmetlerini ekle, Yumo seni vadelere göre uyarsın.",
+    "servicesReminderHint": "Vade tarihinden 3 ve 1 gün önce hatırlatma gelir",
+    "servicesDayCounter": "gün",
+    "servicesUpcomingTitle": "Yaklaşan ödemeler",
+    "servicesAddTitle": "Hizmet sağlayıcı ekle",
+    "servicesStepCategory": "1 · Kategori",
+    "servicesStepName": "2 · Sağlayıcı adı",
+    "servicesStepNameHint": "Markayı sen seçersin — Yumo logoları toplamaz, sadece adını saklar",
+    "servicesStepDay": "3 · Ödeme günü",
+    "servicesStepReminder": "4 · Hatırlatma",
+    "servicesPaymentDayLabel": "Her ayın",
+    "servicesReminder3": "3 gün önce",
+    "servicesReminder1": "1 gün önce",
+    "servicesReminderSameDay": "Aynı gün sabah",
+    "servicesSubmit": "Ekle ve hatırlat",
+    "shoppingListAdd": "+ Ekle",
+    "shoppingItemPlaceholder": "Yeni ürün ekle...",
+    "shoppingItemSave": "Ekle",
+    "shoppingHintMatch": "Listene fiş yüklediğinde Yumo otomatik eşler ve marketler arası fark gösterir",
+    "todayMicroEyebrow": "Bugünün hamlesi",
+    "todayMicroAddReceipt": "İlk fişini ekle",
+    "todayMicroSeconds": "sn",
+    "todayMicroContribution": "katkı"
+  },
+  "xray": {
+    "title": "Fiş X-Ray",
+    "dominantLabel": "Baskın",
+    "personaLabel": "Kişilik",
+    "detectedSignals": "Tespit edilen sinyaller",
+    "layer": {
+      "need": {
+        "title": "İhtiyaç Katmanı",
+        "sub": "Gerçekten gerekli olanlar"
+      },
+      "mood": {
+        "title": "Mood Katmanı",
+        "sub": "Ödül, rahatlama, kaçış"
+      },
+      "inflation": {
+        "title": "Enflasyon Katmanı",
+        "sub": "Ürün değerine göre fiyat sapması"
+      },
+      "social": {
+        "title": "Sosyal Katman",
+        "sub": "Dışarı yaşamı ve bağlam"
+      },
+      "hiddenCost": {
+        "title": "Gizli Maliyet",
+        "sub": "Yumo core modeli"
+      }
+    },
+    "signals": {
+      "basicNeedCategory": "Temel ihtiyaç kategorisi",
+      "mandatoryService": "Zorunlu hizmet harcaması",
+      "luxuryWantCategory": "Lüks / istek kategorisi",
+      "entertainmentExpense": "Eğlence harcaması",
+      "lowAmountSmallPurchase": "Düşük tutar — küçük alışveriş",
+      "highAmountStockPurchase": "Yüksek tutar — stok/büyük alışveriş",
+      "rewardRelaxationCategory": "Ödül / rahatlama kategorisi",
+      "eveningEndOfDayReward": "Akşam — gün sonu ödül eğilimi",
+      "afternoonBreakTime": "Öğleden sonra mola saati",
+      "weekendHigherMood": "Hafta sonu — daha yüksek mood potansiyeli",
+      "smallAmountLowRiskReward": "Küçük tutar — düşük riskli ödül",
+      "socialMealReward": "Dışarıda yemek — sosyal ödül",
+      "highHiddenCostRatio": "Hidden cost toplamın %{pct}'inden fazla",
+      "brandMarkupExceedsImport": "Marka katma değeri ithalat maliyetinden yüksek",
+      "retailMarkupExceedsProduct": "Perakende katma değeri ürün değerinden yüksek",
+      "importLogisticsSignificant": "İthalat & lojistik katmanı belirgin",
+      "intermediaryInflation": "Fiyat aracı katmanlarca oldukça şişirilmiş",
+      "moderateInflation": "Orta düzeyde aracı şişirmesi",
+      "socialVenueCategory": "Sosyal / dışarı mekan kategorisi",
+      "restaurantSocialContext": "Restoran — sosyal yemek ortamı",
+      "nightlifeSocialContext": "Gece hayatı — sosyal bağlam",
+      "groceryHome": "Market alışverişi — ev içi",
+      "utilityBillHome": "Fatura — tamamen ev içi",
+      "onlineNoPhysicalSocial": "Online alışveriş — fiziksel sosyallik yok",
+      "brandAmount": "Perakende & Marka: {amount} {currency}",
+      "importAmount": "İthalat & Sistem: {amount} {currency}",
+      "stateAmount": "Devlet payı (KDV): {amount} {currency}"
+    },
+    "labels": {
+      "needHigh": "Temel İhtiyaç",
+      "needMid": "Karma",
+      "needLow": "İstek / Lüks",
+      "moodHigh": "Ödül / Rahatlama",
+      "moodMid": "Mood Etkisi Var",
+      "moodLow": "Fonksiyonel",
+      "inflationHigh": "Yüksek Fiyat Sapması",
+      "inflationMid": "Orta Sapma",
+      "inflationLow": "Düşük Sapma",
+      "socialHigh": "Dışarı Yaşamı",
+      "socialMid": "Karma",
+      "socialLow": "Ev / Dijital",
+      "hiddenCostHigh": "Yüksek Gizli Maliyet",
+      "hiddenCostMid": "Orta Gizli Maliyet",
+      "hiddenCostLow": "Düşük Gizli Maliyet"
+    },
+    "descriptions": {
+      "need": {
+        "high": "Bu fişteki ürünler yaşam sürdürmek için gerekli temel kalemler.",
+        "mid": "Hem ihtiyaç hem istek içeren bir karışım.",
+        "low": "Bu fiş daha çok keyif, lüks veya istek yönünde bir harcama."
+      },
+      "mood": {
+        "high": "Bu fiş bir ödül, kaçış veya rahatlama ritüeli gibi davranıyor.",
+        "mid": "Hafif bir mood etkisi var ama tamamen ödül sayılmaz.",
+        "low": "Bu fiş daha çok fonksiyonel bir ihtiyaç karşılığı."
+      },
+      "inflation": {
+        "high": "Fiyat, ürünün gerçek değerinden oldukça sapmış. Aracı katmanları belirgin.",
+        "mid": "Fiyat sapması var ama kontrol sınırları içinde.",
+        "low": "Fiyat ve değer arasındaki fark görece küçük."
+      },
+      "social": {
+        "high": "Bu fiş dışarıda, başkalarıyla bir arada geçirilen bir anın parçası.",
+        "mid": "Sosyallik ve pratiklik arasında bir denge.",
+        "low": "Bu fiş daha çok ev düzeni veya kişisel dijital alışverişe işaret ediyor."
+      },
+      "hiddenCost": {
+        "high": "Ödediğin tutarın büyük bölümü ürünün kendisine gitmiyor; aracılar, marka ve vergi katmanları belirgin.",
+        "mid": "Gizli maliyet var ama ürün değeri hâlâ önemli bir pay.",
+        "low": "Ödediğin tutarın çoğu ürünün kendisine gidiyor."
+      }
+    },
+    "oneLine": {
+      "workspaceHunter": "Bu {merchant} fişi bir kahve değil; çalışma alanı kiralama, serin ortam ve mola maliyeti gibi davranıyor.",
+      "eveningRewarder": "Günün ikinci yarısında {merchant}'den küçük bir ödül ritüeli.",
+      "routineRestocker": "{merchant} ziyareti haftalık rutinin bir parçası; stok tamamlama ve ev düzeni.",
+      "socialConnector": "Bu {merchant} fişi sadece bir harcama değil; dışarıda başkalarıyla geçirilen bir an.",
+      "inflationVictim": "{merchant}'de temel ihtiyaç alınıyor ama fiyat katmanları ürünün kendisini gölgede bırakıyor.",
+      "impulseNomad": "{merchant} anlık bir kararın ürünü; ihtiyaç listesinde yoktu ama mood'u yakaladı.",
+      "needDominant": "Bu {merchant} fişi temel ihtiyaçların pratik bir karşılığı.",
+      "moodDominant": "Bu {merchant} fişi bir ödül veya rahatlama anının izi.",
+      "inflationDominant": "{merchant}'de fiyat ve değer arasındaki mesafe dikkat çekici.",
+      "socialDominant": "Bu {merchant} fişi dışarı yaşamının ve sosyal bağlamın bir parçası.",
+      "hiddenCostDominant": "Bu {merchant} fişinde ödenen tutarın önemli bölümü ürünün dışındaki katmanlara gidiyor.",
+      "fallback": "Bu {merchant} fişi harcamanın davranışsal katmanlarını taşıyor."
+    },
+    "narrative": {
+      "workspaceHunter": "Bu {merchant} ziyareti aslında bir içecek alımı değil; masanı kapatıp oraya taşınmak istemenin bir sinyali. Kahve ana ürün değil, çalışma izninin bedeli.",
+      "eveningRewarder": "Akşamın yorgunluğuyla {merchant}'den alınan bu küçük şey, kendine izin verme anı gibi duruyor. Bir ödül değil, bir nefes.",
+      "routineRestocker": "{merchant} alışverişi düzenin devamı; ama listenin dışına çıkan ürünler varsa bu rutinin de küçük kaçamakları olabilir.",
+      "socialConnector": "Bu {merchant} fişi sadece yemek veya içecek değil; başkalarıyla aynı masada olmanın, sohbetin ve dışarıda hissetmenin bir izi.",
+      "inflationVictim": "{merchant}'de alınan temel şeyler raflardan iniyor ama ödediğin tutarın önemli bölümü ürünün kendisine gitmiyor; raflar, lojistik ve marka araya giriyor.",
+      "impulseNomad": "Bu {merchant} fişi planlanmamış bir durak. Gerekli değildi, ama o an seni yakalayan bir şey vardı. Mood bazen listenin önüne geçer.",
+      "fallback": "Bu {merchant} fişinin satırlar arasında ne söylediğine bakalım.",
+      "needAndInflation": "Temel ihtiyaç olmasına rağmen fiyat katmanları oldukça kalın.",
+      "moodAndSocial": "Bu ödül aynı zamanda sosyal bir bağlam taşıyor; yalnız değil, dışarıda yaşanıyor.",
+      "hiddenCostAndNeed": "Gizli maliyet yüksek ama bu bir zorunluluk harcaması; kaçınılması zor.",
+      "socialAndMood": "Sosyal ortam aynı zamanda bir rahatlama ve ödül kaynağı.",
+      "highRatio": "Ödediğin tutarın %{pct}'i ürünün kendisine gitmiyor.",
+      "eveningMood": "Akşam saati bu harcamanın ödül karakteri kazanıyor."
+    }
+  },
+  "goals": {
+    "title": "Goals",
+    "streak": "{count} günlük seri",
+    "addFinancialGoal": "Finansal hedef ekle",
+    "todaysPlan": "Bugünkü planın",
+    "actions": "{count} aksiyon",
+    "noActions": "Şu an açık görev yok veya veri yüklenemedi. Görevler ekranından devam edebilirsin.",
+    "daily": "Günlük",
+    "weekly": "Haftalık",
+    "receiptTrust": "Fiş güveni",
+    "quests": "Görevler",
+    "complete": "Tamamla",
+    "questsAll": "Hepsi",
+    "questsDaily": "Günlük",
+    "questsWeekly": "Haftalık",
+    "dailyQuest": "Günlük görev",
+    "weeklyQuest": "Haftalık görev",
+    "questDone": "Bitti",
+    "questOngoing": "Devam",
+    "questProgress": "İlerleme {current} / {target}",
+    "noQuests": "Tamamlanmamış görev yok. Yeni fişler veya haftalık rotasyonla burada görünür.",
+    "patterns": "Yaşam",
+    "financialGoals": "Finansal hedefler",
+    "add": "Ekle",
+    "noFinancialGoals": "Kayıtlı aktif hedef yok. Ekle veya üstteki + ile dene.",
+    "deleteGoal": "Hedefi sil",
+    "goalTarget": "Hedef {amount}",
+    "addGoalButton": "Finansal hedef ekle",
+    "trustCard": {
+      "title": "Fiş kalitesi",
+      "desc": "Net fişler güven skorunu artırır ve daha iyi ödüller açar.",
+      "improve": "Nasıl iyileştiririm"
+    },
+    "trustSheet": {
+      "title": "Fiş kaliteni nasıl artırırsın",
+      "tip1": "Fişin tüm kenarlarını görünür bırak. Kesik köşeler OCR'nin toplam tutarı okumasını engelliyor.",
+      "tip2": "Screenshot yerine gerçek fiş fotoğrafı yükle. Ekran görüntüleri meta verisiz geliyor.",
+      "tip3": "Tarih, toplam ve işletme adı görünür olsun. Bu üçü eşleşince ödül hesaplaması devreye giriyor.",
+      "tip4": "Bulanık veya karanlık fotoğraf yükleme. Işık yetersizliği OCR güvenini en çok etkileyen faktör.",
+      "understood": "Anladım"
+    },
+    "financialSheet": {
+      "title": "Finansal hedef ekle",
+      "desc": "Hedef /api/goals üzerinden kaydedilir (Insights ile aynı veri).",
+      "titleLabel": "Başlık",
+      "titlePlaceholder": "Örn. Yaz tatili fonu",
+      "amountLabel": "Hedef tutar ({currency})",
+      "deadlineLabel": "Son tarih (opsiyonel · YYYY-MM-DD)",
+      "cancel": "Vazgeç",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor…",
+      "saveError": "Kaydedilemedi. Oturumu ve bağlantını kontrol et."
+    }
+  },
+  "rewardsPage": {
+    "title": "Sezon Ödülleri",
+    "daysLeft": "{count} gün kaldı",
+    "yourRewards": "Ödülleriniz",
+    "contributionBalance": "Katkı Bakiyesi",
+    "totalProof": "Toplam kanıtlanmış katkın",
+    "fromReceipts": "Fişlerden",
+    "fromQuests": "Görevlerden",
+    "receiptCPoints": "Fiş cPoints",
+    "bonusCPoints": "Bonus cPoints",
+    "earnedFromReceipts": "Doğrulanan fişlerden kazanılır",
+    "earnedFromQuests": "Tamamlanan görevlerden kazanılır",
+    "nextUnlocks": "Sıradaki açılımlar",
+    "milestoneChallenge": "Milestone görevi",
+    "reached": "✓ Ulaşıldı",
+    "howYouEarn": "Nasıl kazanırsınız?",
+    "earnReceiptLabel": "Fiş yükleme",
+    "earnReceiptDesc": "Season XP · Hesap XP · Katkı puanı · cPoints",
+    "earnVerifyLabel": "Doğrula ve kazan",
+    "earnVerifyDesc": "Başkalarının fişlerini doğrula → cPoints + Season XP kazan",
+    "earnDailyLabel": "Günlük görevler",
+    "earnDailyDesc": "cPoints · Season XP",
+    "earnWeeklyLabel": "Haftalık görevler",
+    "earnWeeklyDesc": "Daha fazla cPoints · Season XP",
+    "earnQualityLabel": "Yüksek kaliteli fişler",
+    "earnQualityDesc": "Daha iyi ödül sonucu",
+    "activity": "Aktivite",
+    "all": "Tümü",
+    "receipts": "Fişler",
+    "quests": "Görevler",
+    "noActivity": "Henüz aktivite yok",
+    "invitesTitle": "Davet ettiklerin",
+    "invitesSubtitle": "Davet ettiğin kişilerin aktivitesi ve kazançları",
+    "seasonRecap": "Bu sezon",
+    "receiptsVerified": "Doğrulanan fiş",
+    "questsCompleted": "Tamamlanan görev",
+    "cPointsEarned": "Kazanılan cPoints",
+    "seasonXp": "Season XP",
+    "currentLevel": "Mevcut seviye",
+    "rewardBoost": "Ödül çarpanı",
+    "bestMove": "Bugünün en iyi hamlesi",
+    "go": "Git",
+    "receipt": "Fiş",
+    "receiptVerified": "Fiş doğrulandı",
+    "dailyQuest": "Günlük görev",
+    "weeklyQuest": "Haftalık görev",
+    "rewardBoostArrow": "Ödül çarpanı → {multiplier}x"
+  },
+  "notificationsPage": {
+    "eyebrow": "GELEN KUTUSU",
+    "title": "Bildirimler",
+    "unread": "{count} okunmamış",
+    "markAllRead": "Tümünü okundu yap",
+    "empty": "Bildirim bulunmuyor.",
+    "emptyDesc": "Yeni güncellemeler geldiğinde burada göreceksin.",
+    "defaultTitle": "Bildirim",
+    "defaultBody": "Detay mevcut"
+  },
+  "bills": {
+    "title": "Faturalarım",
+    "providerCount": "{count} sağlayıcı",
+    "headerSubtitle": "{count} takipte · fatura ve üyelik",
+    "tabBills": "Faturalar",
+    "tabSubscriptions": "Üyelikler",
+    "summary": {
+      "monthly": "Aylık",
+      "upcoming": "Yaklaşan",
+      "tracked": "Takipte",
+      "subs": "Üyelik"
+    },
+    "heroTitle": "Bu ayki durum",
+    "heroSubsTitle": "Üyelik durumu",
+    "heroEmpty": "İlk kaydını ekleyince burada ödeme durumunu göstereyim.",
+    "heroProgress": "{paid} / {total} ödendi",
+    "heroAllPaid": "bu ay her şey ödendi",
+    "heroPendingLabel": "bekleyen · {count} fatura",
+    "heroPendingNoAmount": "{count} fatura bekliyor",
+    "heroPaidLabel": "Bu ay ödendi",
+    "heroNextLabel": "Sonraki ödeme",
+    "dayLetter": "g",
+    "everyDay": "her ayın {day}'i",
+    "menu": "Menü",
+    "editName": "Adı düzenle",
+    "markPaid": "Ödendi olarak işaretle",
+    "markPaidShort": "Ödendi",
+    "undoPaid": "Ödendi işaretini kaldır",
+    "delete": "Sil",
+    "deleteConfirm": "{name} silinsin mi?",
+    "deleteConfirmDesc": "Hatırlatıcılar da iptal olur.",
+    "deleteConfirmYes": "Sil",
+    "cancel": "Vazgeç",
+    "deleted": "{name} silindi",
+    "deleteFailed": "Silinemedi",
+    "uploadFailed": "Yükleme başarısız",
+    "renamePrompt": "Yeni sağlayıcı adı",
+    "providerRenamed": "Sağlayıcı güncellendi: {name}",
+    "renamedBadge": "güncellendi",
+    "paidThisPeriod": "Bu dönem ödendi",
+    "paidJustNow": "Ödendi · {date}",
+    "stepCategory": "Kategori seç",
+    "stepName": "Sağlayıcı adı",
+    "stepDay": "Ödeme günü",
+    "stepAmountTime": "Tutar ve saat",
+    "stepReminders": "Hatırlatma",
+    "stepSample": "Örnek döküman",
+    "choosePlaceholder": "kategori seç",
+    "namePreview": "Sağlayıcı adı",
+    "noAmountPreview": "tutar yok",
+    "noAmount": "tutar yok",
+    "estimated": "tahmini",
+    "reminder3Short": "3 gün",
+    "reminder1Short": "1 gün",
+    "sameDay": "Aynı gün",
+    "before": "önce",
+    "morning": "sabah",
+    "reminderHintOff": "Hatırlatıcı seçilmedi",
+    "reminderHintOn": "{n} hatırlatıcı aktif",
+    "optional": "opsiyonel",
+    "clear": "Temizle",
+    "undoPaidShort": "Geri al",
+    "reminderActive": "Hatırlatıcı aktif",
+    "today": "Bugün",
+    "daysLeft": "{days} gün kaldı",
+    "nextOn": "Sonraki",
+    "itemBill": "fatura",
+    "itemSubscription": "üyelik",
+    "addSubscription": "Ekle",
+    "allSubscriptions": "Tüm üyelikler",
+    "emptySubscriptions": "Henüz üyelik yok",
+    "emptySubscriptionsDesc": "Netflix, Spotify ya da herhangi bir dijital üyeliğini ekle, hepsini tek yerde tut.",
+    "emptyAddSubscription": "İlk üyeliğini ekle",
+    "newSubscription": "Yeni Üyelik",
+    "back": "Geri",
+    "add": "Ekle",
+    "upcomingTitle": "Yaklaşan — 7 gün",
+    "daysShort": "{days} gün",
+    "allProviders": "Tüm sağlayıcılar",
+    "loading": "Yükleniyor…",
+    "empty": "Henüz sağlayıcı yok",
+    "emptyDesc": "Faturalarını ekle, vakti gelince hatırlatırım.",
+    "emptyAdd": "İlk sağlayıcını ekle",
+    "categoryLabel": {
+      "electricity": "Elektrik",
+      "water": "Su",
+      "gas": "Doğalgaz",
+      "phone": "Telefon",
+      "internet": "İnternet",
+      "streaming": "Yayın",
+      "entertainment": "Eğlence",
+      "digital_subscription": "Üyelik",
+      "other": "Diğer"
+    },
+    "paymentDay": "her ayın {day}'i",
+    "uploadBill": "Faturayı yükle",
+    "newProvider": "Yeni Sağlayıcı",
+    "categorySection": "Kategori — listeden seç",
+    "nameSection": "Sağlayıcı adı — kendin yaz",
+    "namePlaceholder": "Sağlayıcının adını yaz",
+    "sampleSection": "Örnek döküman — opsiyonel",
+    "sampleChange": "Dökümanı değiştir",
+    "sampleUpload": "PDF / görsel yükle",
+    "sampleHint": "Yüklersen sistem dökümanı pipeline'a sokup tutar ve tarih gibi alanları ilk kayıt için kullanır.",
+    "sampleRemove": "Kaldır",
+    "paymentDaySection": "Ödeme günü — her ayın",
+    "reminderSection": "Hatırlatma",
+    "reminder3": "3 gün önce",
+    "reminder1": "1 gün önce",
+    "reminderSameDay": "Aynı gün",
+    "timeSection": "Saat",
+    "amountSection": "Tahmini tutar",
+    "amountPlaceholder": "opsiyonel ₺",
+    "saveFailed": "Kaydedilemedi: {error}",
+    "saving": "Kaydediliyor…",
+    "savingWithDoc": "Kaydediliyor ve analiz ediliyor…",
+    "submit": "Sağlayıcıyı Kaydet",
+    "closeSheet": "Kapat",
+    "shortDays": "{days}g",
+    "paymentDayHint": "Ay 31 günden kısaysa son güne kayar (örn. Şubat'ta 28 / 29)",
+    "savedWithDoc": "Sağlayıcı kaydedildi, örnek döküman arşivlendi"
+  },
+  "breakdownCard": {
+    "title": "Maliyet Dökümü",
+    "estimated": "Tahmini",
+    "totalPaid": "Ödenen Toplam",
+    "vat": "KDV",
+    "hiddenCostBreakdown": "Gizli Maliyet Dökümü",
+    "supplyChain": "Tedarik Zinciri",
+    "storeAndBrand": "Mağaza & Marka",
+    "totalHiddenCost": "Toplam Gizli Maliyet",
+    "referencePrice": "Referans Fiyat"
+  },
+  "rewardCard": {
+    "title": "Potansiyel Ödül",
+    "subtitle": "Bu fişten kazanılan cPoints",
+    "totalPoints": "Kazanılan cPoints",
+    "calculating": "cPoints hesaplanıyor…",
+    "receipt": "Fiş",
+    "quest": "Görev",
+    "honorBonus": "Onur Bonusu 1,2x uygulandı",
+    "firstMerchantBonus": "Bu işletmeyi ilk yükleyen sendin; doğrulandığı için teşekkür bonusu (1,2x) uygulandı.",
+    "quality": "Kalite",
+    "rawReward": "Ham ödül",
+    "conversionRate": "Dönüşüm oranı",
+    "appliedLimits": "Uygulanan limitler:",
+    "partial": {
+      "title": "Ödeme doğrulandı — şimdilik ödülün {pct}% kadarı",
+      "fullEstimate": "Kalemli fiş yüklendiğinde tahmini tam ödül: {amount} cPoints",
+      "followUp": "Ödülün geri kalanını almak için ürün kalemlerinin listelendiği kasa fişini yükleyin.",
+      "uploadCta": "Kasa fişi yükle"
+    },
+    "itemizedDialog": {
+      "title": "Kalemli kasa fişi",
+      "description": "Slip ile aynı tarih, tutar ve işletmeye ait kalemli fişi yükleyin. Kalan ödül slip kaydınıza eklenir.",
+      "merchant": "İşletme",
+      "date": "Tarih",
+      "total": "Tutar",
+      "upload": "Fiş seç",
+      "uploading": "Yükleniyor…",
+      "later": "Sonra",
+      "mismatch": "Fiş slip ile eşleşmedi. Tarih, tutar ve işletme adının aynı olduğundan emin olun."
+    },
+    "noReward": {
+      "pos_slip": "Kart slipi ödeme kanıtıdır; tam ödül için kalemli mağaza fişi veya e-fatura yükleyin.",
+      "payment_receipt": "Bu belgede ödeme doğrulanır; kalemli harcama kanıtı olmadığı için mağaza fişi veya e-fatura yükleyin.",
+      "order_list": "Adisyon ve ödenmemiş hesaplar kaydedilir; ödül kapsamına girmez.",
+      "no_payment_proof": "Bu belgede ödeme kanıtı doğrulanamadığı için ödül uygulanmaz.",
+      "out_of_current_month": "Ödül için yalnızca içinde bulunduğumuz aya ait fişler kabul edilir.",
+      "missing_receipt_date": "Fiş tarihi okunamadığı için ay kuralı doğrulanamadı.",
+      "document_rejected": "Bu belge türü harcama kanıtı olarak kabul edilmez.",
+      "vision_failed": "Görsel analiz edilemedi. Lütfen fotoğrafı yeniden çekip tekrar deneyin.",
+      "reward_pending_verification": "Ödül henüz hesaplanamadı. Satır doğrulaması sonrası güncellenebilir.",
+      "amount_inconsistent": "Toplam tutar, listelenen kalemlerle uyuşmuyor; bu yüzden ödül beklemede. Tutarı kontrol edip yanlışsa düzeltin.",
+      "duplicate_same_user": "Bu fişi daha önce yüklediniz. Yinelenen fişler ödül kazandırmaz.",
+      "duplicate_other_user": "Bu fiş daha önce yüklenmiş. Yinelenen fişler ödül kazandırmaz.",
+      "generic": "Bu belge ödülsüz olarak kaydedildi."
+    }
+  },
+  "extractionCard": {
+    "title": "Çıkarılan Bilgiler",
+    "subtitle": "Sunucu taraflı çıkarım sonuçları (salt okunur)",
+    "date": "Tarih",
+    "totalAmount": "Toplam Tutar",
+    "vatAmount": "KDV Tutarı",
+    "confidence": "Güven: %{pct}",
+    "rate": "Oran: %{pct}",
+    "sourceLine": "{line}. satırdan çıkarıldı"
+  },
+  "categoryPicker": {
+    "title": "Bu fiş hangi kategoride?",
+    "subtitle": "Kategoriyi otomatik belirleyemedik. Doğru değerlendirebilmemiz için en yakın olanı seçin.",
+    "placeholder": "Bir kategori seçin",
+    "submit": "Gönder",
+    "skip": "Şimdilik geç",
+    "submitting": "Gönderiliyor…",
+    "successToast": "Teşekkürler — seçiminiz incelenecek.",
+    "errorToast": "Gönderilemedi. Lütfen tekrar deneyin.",
+    "reviewNote": "Seçiminiz incelemeye gider ve onaylandıktan sonra uygulanır."
+  }
+}

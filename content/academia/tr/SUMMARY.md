@@ -1,0 +1,16 @@
+# Summary
+
+* [Özet](README.md)
+* [01 Gizli Maliyet](01-hidden-cost/README.md)
+  * [Soru](01-hidden-cost/01-the-question.md)
+  * [Model ailesi](01-hidden-cost/02-model-family.md)
+  * [Veri temelleri](01-hidden-cost/03-data-foundations.md)
+  * [Kaynak kütüğü](01-hidden-cost/04-source-registry.md)
+  * [Sınırlar & dürüstlük](01-hidden-cost/05-limitations.md)
+* [02 Harcama Kimliği](02-spending-identity/README.md)
+  * [Altı sinyal](02-spending-identity/01-six-signals.md)
+  * [Davranışsal dayanak](02-spending-identity/02-behavioural-basis.md)
+  * [Sınıf & tribü](02-spending-identity/03-class-and-tribe.md)
+  * [Geniş literatür](02-spending-identity/04-wider-literature.md)
+  * [Etik](02-spending-identity/05-ethics.md)
+* [03 Kaynakça](03-references.md)

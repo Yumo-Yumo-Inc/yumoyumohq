@@ -1,0 +1,16 @@
+# Summary
+
+* [Abstract](README.md)
+* [01 Hidden Cost](01-hidden-cost/README.md)
+  * [The question](01-hidden-cost/01-the-question.md)
+  * [The model family](01-hidden-cost/02-model-family.md)
+  * [Data foundations](01-hidden-cost/03-data-foundations.md)
+  * [Source registry](01-hidden-cost/04-source-registry.md)
+  * [Limits & honesty](01-hidden-cost/05-limitations.md)
+* [02 Spending Identity](02-spending-identity/README.md)
+  * [Six signals](02-spending-identity/01-six-signals.md)
+  * [The behavioural basis](02-spending-identity/02-behavioural-basis.md)
+  * [Class & tribe](02-spending-identity/03-class-and-tribe.md)
+  * [Wider literature](02-spending-identity/04-wider-literature.md)
+  * [Ethics](02-spending-identity/05-ethics.md)
+* [03 References](03-references.md)

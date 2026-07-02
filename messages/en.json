@@ -1,0 +1,2808 @@
+{
+  "navigation": {
+    "logo": "Yumo Yumo",
+    "home": "Home",
+    "whitepaper": "Whitepaper",
+    "roadmap": "Roadmap",
+    "tokenomics": "Tokenomics",
+    "faq": "FAQ",
+    "signUp": "Sign up",
+    "goApp": "Go App",
+    "app": "App",
+    "papers": "Papers",
+    "visionPaper": "Vision Paper",
+    "visionPaperDesc": "Product thesis, economic narrative.",
+    "technicalPaper": "Technical Paper",
+    "technicalPaperDesc": "Pipeline, schemas, formulas, risk treatment."
+  },
+  "hero": {
+    "title": "The financial OS for everyday life.",
+    "subtitle": "Receipt-powered financial intelligence.",
+    "description": "",
+    "cta": "Upload Receipt",
+    "joinWaitlist": "Create Account"
+  },
+  "loading": {
+    "analyzing": "Analyzing receipt...",
+    "extractingHiddenCosts": "Extracting hidden costs...",
+    "revealingTruth": "Revealing the truth..."
+  },
+  "about": {
+    "title": "About Yumo Yumo",
+    "description": "A personal financial operating system built on Proof of Expense. Upload eligible receipts, build price memory, and create contribution records that can support future token rails when enabled.",
+    "description1": "Yumo Yumo turns receipts, routines, and price changes into living financial memory with Yumbie as your guide.",
+    "description2": "Yumo Yumo is in beta. Upload eligible receipts, improve your price memory, and build contribution history inside the product."
+  },
+  "footer": {
+    "description": "Build price memory, understand the rhythm of your spending, and feed Yumbie with better data.",
+    "resources": "Resources",
+    "community": "Community",
+    "followUs": "Follow Us",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "support": "Support",
+    "copyright": "© 2025 Yumo Yumo. All rights reserved. Built with love and Yumbies."
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Three simple steps to start building your financial operating system.",
+    "betaNotice": "Beta · Open now",
+    "steps": [
+      {
+        "title": "Create Your Account",
+        "description": "Sign up for free and start using Yumo Yumo today. We're in beta — your feedback helps shape what we ship next."
+      },
+      {
+        "title": "Upload Your First Proof",
+        "description": "Add an eligible receipt so Yumo can read products, merchants, timing, and hidden-cost signals."
+      },
+      {
+        "title": "Build Memory & Contribution",
+        "description": "See price memory and guidance in the app; eligible activity can also create non-transferable contribution records."
+      }
+    ]
+  },
+  "technologyStack": {
+    "eyebrow": "Technology Stack",
+    "title": "The rails behind Proof of Expense",
+    "subtitle": "AI reads the receipt. Solana anchors the reward. Trusted infrastructure keeps the loop fast, secure, and verifiable.",
+    "items": [
+      {
+        "name": "OpenAI"
+      },
+      {
+        "name": "Anthropic"
+      },
+      {
+        "name": "Google"
+      },
+      {
+        "name": "Solana"
+      },
+      {
+        "name": "Vercel"
+      },
+      {
+        "name": "Cursor"
+      },
+      {
+        "name": "Cloudflare"
+      },
+      {
+        "name": "Phantom"
+      }
+    ],
+    "disclaimer": "Yumo Yumo is not affiliated with or endorsed by the companies shown. Logos and names are trademarks of their respective owners."
+  },
+  "tokenomics": {
+    "title": "Token Distribution",
+    "subtitle": "How INT is shared",
+    "totalSupply": "Total supply: 99B $INT — engineered for Proof of Expense, staking, and long-term contribution",
+    "distribution": [
+      {
+        "label": "User Rewards (Proof of Expense)",
+        "description": "Primary pool for verified receipt contribution and PoE system participation."
+      },
+      {
+        "label": "Proof of Contribution",
+        "description": "Bonus pool tied to contribution quality and leaderboard snapshots — earned by the core team and outside contributors through work impact."
+      },
+      {
+        "label": "Staking & long-term incentives",
+        "description": "Rewards for long-term holders and stakers, released over a 5-year horizon."
+      },
+      {
+        "label": "Liquidity",
+        "description": "Seeds healthy on-chain markets and exchange liquidity at TGE, with a governed reserve for market depth."
+      },
+      {
+        "label": "Airdrops & community quests",
+        "description": "Gamified missions, milestone campaigns, and community distributions."
+      },
+      {
+        "label": "Referral rewards",
+        "description": "Event-based unlocks when invitees complete verification milestones (e.g. a successful PoE upload)."
+      }
+    ],
+    "detailedLink": "Click here for detailed tokenomics"
+  },
+  "papers": {
+    "title": "Read Our Papers",
+    "subtitle": "Explore the vision paper and technical paper side by side",
+    "visionPaper": {
+      "title": "Vision Paper",
+      "subtitle": "Take back the say in what you spend.",
+      "description": "A manifesto on Proof of Expense. A price isn't a number — it's a stack: product, VAT, retail margin, brand premium. Yumo Yumo reads the receipt, peels the stack apart, and turns the hidden cost into a token you own.",
+      "tags": [
+        "Proof of Expense",
+        "Hidden Cost",
+        "Manifesto"
+      ]
+    },
+    "seriousPaper": {
+      "title": "Technical Paper",
+      "subtitle": "Architecture, Trust Layer & Token Mechanics",
+      "description": "Technical documentation covering the receipt pipeline, trust layer, data model, and token mechanics behind Yumo Yumo.",
+      "tags": [
+        "Proof-of-Expense",
+        "Smart Contracts",
+        "Economics"
+      ]
+    }
+  },
+  "roadmap": {
+    "title": "Development Roadmap",
+    "subtitle": "Our journey to revolutionize spending rewards",
+    "items": [
+      {
+        "quarter": "P1",
+        "year": "P1",
+        "title": "Phase 1 — Early Data Contributors\nAwareness Begins",
+        "items": [
+          "Fair Launch: Community-led liquidity & price discovery",
+          "PoE Data Contribution: Turn receipts into in-app contribution records",
+          "Digital Identity: Claim your Foundation NFT & start leveling"
+        ]
+      },
+      {
+        "quarter": "P2",
+        "year": "P2",
+        "title": "Phase 2 — Expansion\nFrom Data to Power",
+        "items": [
+          "Smart Agents: NFTs evolve into AI-powered companions",
+          "Staking Unlocks: High-APR pools for early believers",
+          "Merchant Matrix: Category-based reward multipliers"
+        ]
+      },
+      {
+        "quarter": "P3",
+        "year": "P3",
+        "title": "Phase 3 — Intelligence\nThe System Thinks",
+        "items": [
+          "Advanced Insights: AI-driven financial reports",
+          "HCI Index: Global hidden cost dashboard",
+          "Protocol Maturity: Fully data-backed economy"
+        ]
+      }
+    ]
+  },
+  "waitlist": {
+    "title": "Join the Waitlist",
+    "subtitle": "Be among the first to experience Yumo Yumo! ✨",
+    "email": "Email Address",
+    "country": "Your Country",
+    "referralSource": "How did you hear about us?",
+    "selectCountry": "Select your country",
+    "selectOption": "Select an option",
+    "submit": "Join the Waitlist",
+    "submitting": "Joining...",
+    "success": "Success! You're on the list 🎉",
+    "successTitle": "You're on the list! 🎉",
+    "successMessage": "We'll notify you when Yumo Yumo launches.",
+    "inboxMessage": "Keep an eye on your inbox! 💌",
+    "alreadyExists": "You're already on the waitlist! 🎉",
+    "marketingConsent": "I agree to receive Yumo Yumo launch news, product updates, and waitlist emails from Yumo Yumo Inc. I can unsubscribe from marketing emails at any time.",
+    "error": "Please fill in all fields and consent checkbox 💕",
+    "networkError": "Network error. Please check your connection and try again! 💫",
+    "connectionError": "Connection error. Please try again! 💫",
+    "unexpectedError": "Unexpected response from server. Please try again! 💫",
+    "genericError": "Something went wrong. Please try again! 💫",
+    "sources": [
+      "Social media (X, TikTok, Discord, etc)",
+      "Google Search",
+      "Friends or Family",
+      "YouTube / Influencer",
+      "News / Blog Article",
+      "Other"
+    ]
+  },
+  "faq": {
+    "title": "Yumo Yumo FAQ",
+    "subtitle": "Got questions? We've got answers! 😊",
+    "stillHaveQuestions": "Still have questions? 💬",
+    "contactText": "Slide into our DMs or tweet us — we love chatting! ❤️",
+    "readWhitepaper": "Read Whitepaper",
+    "contactUs": "Contact Us",
+    "items": [
+      {
+        "question": "What's Yumo Yumo all about?",
+        "answer": "We're the friend who finally shows you what's really hiding in your shopping receipts! 🧾✨ Yumo Yumo turns everyday spending into fun insights and eligible in-app rewards. Upload a receipt, uncover hidden costs (taxes, markups, all that sneaky stuff), and become smarter with your money."
+      },
+      {
+        "question": "How does it actually work? Sounds too good!",
+        "answer": "Super simple — promise! 1. Connect your wallet (no complicated sign-up). 2. Snap a photo of any eligible receipt (coffee, groceries, online shopping…). 3. Our Proof of Expense (PoE) magic reveals the hidden layers. 4. You get a cute breakdown and app reward records when you qualify. That's it! 🎉"
+      },
+      {
+        "question": "Okay, but what are these \"hidden costs\" everyone keeps talking about?",
+        "answer": "Think of them as the invisible extras baked into every price: Taxes & duties 🏛️, Logistics and shipping 🚚, Inflation vibes 📈, Brand & market markups 💸. We show you roughly how much of your total goes to these — so you finally understand why that burger costs more here than there!"
+      },
+      {
+        "question": "Is this financial advice? Should I change my life now? 😅",
+        "answer": "Nope! We're here to help you see clearer, not tell you what to do. The insights are just educated estimates to spark curiosity and awareness — definitely not official financial advice. You're still the boss of your wallet! 👑"
+      },
+      {
+        "question": "How do I earn rewards? Tell me the fun part!",
+        "answer": "Two super sweet ways: cPoints 🍪 → app records from eligible real-life receipts, and cPoints 🎈 → app records from eligible community activity (quests). They are non-transferable unless and until a future token program is enabled, and any claim will be subject to eligibility, updated terms, and legal checks."
+      },
+      {
+        "question": "What's YUMO token? Is it going to the moon? 🚀",
+        "answer": "YUMO is planned as a utility token for eligible ecosystem features. Claim, transfer, staking, governance, and distribution details are not live yet and may change based on product readiness, legal review, jurisdiction, sanctions screening, and updated Token & Rewards Terms."
+      },
+      {
+        "question": "Will I get rich quick?",
+        "answer": "Let's be real — no promises of moonshots here. 😌 Rewards come from real activity, not speculation. Think of it as getting a little thank-you every time you spend money you were already spending."
+      },
+      {
+        "question": "How do you keep everything fair and sustainable?",
+        "answer": "We're kinda proud of this part! Everything is rule-based (no secret minting). Emissions slow down as more people join. Anti-abuse safeguards everywhere. It grows with real use, not farming bots. Sustainable vibes only ♻️"
+      },
+      {
+        "question": "What about my privacy? You're seeing my receipts! 😳",
+        "answer": "We care a lot about this! We only process what's needed to give you insights and rewards. Anything used to improve the system is fully anonymized. Your wallet address is public on-chain (normal for Web3), but personal details stay private. Full transparency in our Privacy Policy — feel free to read it with your favorite snack."
+      },
+      {
+        "question": "Can literally anyone join?",
+        "answer": "As long as you're of legal age in your country and crypto is okay where you live — yes! 🌍 (Some features might be limited in certain regions because of local rules — boring but necessary.)"
+      },
+      {
+        "question": "Airdrop? Free tokens? 🤑",
+        "answer": "No guaranteed airdrop, free token, claim, transfer, or cash value. Any future token or reward event will require eligibility, wallet and jurisdiction checks, anti-fraud review, and separate Token & Rewards Terms."
+      },
+      {
+        "question": "When can I start using it?",
+        "answer": "App is cooking in the oven! 🔥 Whitepaper is out now, early access coming soon. Follow us on X for the freshest updates — we'll shout when it's ready!"
+      },
+      {
+        "question": "Why isn't there a marketing budget?",
+        "answer": "Yumo Yumo doesn't grow by dumping money into boring ads! 🙅‍♂️ It grows because friends like you use it and share the love. We'd rather reward our early helpers and creators than pay big corporations. It's healthier, human-driven, and way more fun! 💖"
+      },
+      {
+        "question": "Does the team keep a \"team allocation\"?",
+        "answer": "Nope! There are no secret pockets or hidden stashes here. 🙅‍♀️ The team earns exactly like you do—by building, running, and improving the system. If Yumo Yumo doesn't deliver real value, nobody earns. We grow together or not at all! 🤝✨"
+      },
+      {
+        "question": "Wait—is the team working for free?",
+        "answer": "Not exactly! 😸 We work for the real-world adoption of tools people actually want to use. Our rewards are tied to shipping useful features and keeping the network happy. If people love using it, we all win! 🍎✨"
+      },
+      {
+        "question": "Where can I learn more or ask silly questions?",
+        "answer": "Whitepaper (deep dive), X (@yumohq) — we're super chatty there, Website: yumoyumo.com, Discord/Telegram coming soon! Got a question that's not here? Slide into our DMs or tweet us — we love chatting! 💬❤️"
+      }
+    ]
+  },
+  "funPaper": {
+    "sections": [
+      {
+        "title": "1. So… what is Yumo Yumo?",
+        "content": [
+          "Yumo Yumo is a Web3 project that turns eligible everyday receipts into in-app contribution records:",
+          "Spending money.",
+          "Every price has layers.",
+          "Taxes, profit margins, operational costs...",
+          "You pay all of them every day, without thinking.",
+          "Yumo Yumo looks at these layers and says:",
+          "\"Great! Let's turn this into useful contribution data.\""
+        ]
+      },
+      {
+        "title": "2. Why should anyone care?",
+        "content": [
+          "Because almost all financial tools ask this boring question:",
+          "\"How much did you spend?\"",
+          "Yumo Yumo asks something better:",
+          "\"What was actually inside that price?\"",
+          "Once you start looking at prices this way, spending stops being a passive action.",
+          "It becomes data.",
+          "And eligible data can create in-app rewards."
+        ]
+      },
+      {
+        "title": "3. Proof of Expense (PoE)",
+        "content": [
+          "PoE (Proof of Expense) is simple and honest.",
+          "You upload a real receipt.",
+          "The system analyzes what's inside the price.",
+          "Hidden costs come to light.",
+          "You can receive in-app reward records because you provided eligible real-world data.",
+          "No fake actions.",
+          "No button clicking with bots.",
+          "No rewards that come \"just from feelings\".",
+          "If you spend in real life, you may be able to contribute eligible data on Yumo Yumo."
+        ]
+      },
+      {
+        "title": "4. Data Contribution, but make it normal life",
+        "content": [
+          "Forget GPUs.",
+          "Forget warehouses full of machines.",
+          "In Yumo Yumo, your receipts are your data contribution.",
+          "Every valid receipt adds a signal to the system.",
+          "Every eligible signal can create in-app reward records.",
+          "The cycle is clean:",
+          "Spend → Upload → Validate → Reward",
+          "You were already doing step one anyway."
+        ]
+      },
+      {
+        "title": "5. About tokens (community first)",
+        "content": [
+          "Let's be clear:",
+          "No separate passive team allocation.",
+          "No hidden stash.",
+          "No massive budgets set aside for marketing.",
+          "No pre-minting tokens for insiders.",
+          "If token rails are enabled, the published allocation map and contribution rules determine the flow.",
+          "Yumo Yumo was built so contribution stays inspectable and product rules stay transparent.",
+          "If you contribute eligible activity, you may qualify for in-app contribution records.",
+          "If activity is not eligible, it does not qualify.",
+          "That's it."
+        ]
+      },
+      {
+        "title": "6. \"But how is this funded?\"",
+        "content": [
+          "It's not funded the usual way.",
+          "No massive marketing budgets.",
+          "No paid advertising machines.",
+          "No artificial demand.",
+          "Yumo Yumo grows through the Web3 way:",
+          "Through participation, contribution, and shared incentives.",
+          "Value comes from what people do, not from team promises."
+        ]
+      },
+      {
+        "title": "7. Why Web3 at all?",
+        "content": [
+          "Because rules matter more than people.",
+          "Web3 guarantees:",
+          "Rewards follow predefined logic.",
+          "Distribution cannot be changed manually.",
+          "No one behind the curtain can decide \"who gets what\".",
+          "Spending becomes a shared signal.",
+          "Future token functionality, if enabled, will be gated by eligibility and updated terms.",
+          "Simple systems survive.",
+          "Non-transparent ones get eliminated."
+        ]
+      },
+      {
+        "title": "8. Who is this actually for?",
+        "content": [
+          "People who spend money.",
+          "Those who love contributing data but also want to sleep.",
+          "Those who prefer rules over stories.",
+          "You don't need to trade.",
+          "You don't need to use leverage.",
+          "You don't need to predict charts.",
+          "Just upload receipts."
+        ]
+      },
+      {
+        "title": "9. The bigger picture",
+        "content": [
+          "Yumo Yumo starts with awareness.",
+          "Over time, this awareness becomes:",
+          "Deeper insights.",
+          "Smarter financial tools.",
+          "A growing ecosystem built on real spending data.",
+          "All supported by the people who actually spend the money."
+        ]
+      },
+      {
+        "title": "10. Final thought",
+        "content": [
+          "Money already leaves your wallet every day.",
+          "Yumo Yumo doesn't try to stop that.",
+          "It lets eligible receipts become contribution signals while it happens.",
+          "The cycle: Spend ➔ Upload ➔ Validate ➔ Reward",
+          "That's the cycle."
+        ]
+      }
+    ],
+    "cta": {
+      "title": "Ready to get into the kitchen?",
+      "description": "Take a much deeper dive into technical specifications, mathematical details of tokenomics, and implementation processes.",
+      "button": "Read the Technical Documents ➔"
+    },
+    "loop": {
+      "title": "The Cycle",
+      "steps": {
+        "spend": "Spend",
+        "upload": "Upload",
+        "mine": "Mine",
+        "earn": "Earn"
+      }
+    }
+  },
+  "terms": {
+    "title": "Yumo Yumo Terms and Conditions",
+    "lastUpdated": "Last Updated: April 20, 2026",
+    "intro": "Hey there! Welcome to Yumo Yumo — we're super happy you're here.",
+    "introDescription": "These Terms are like the friendly rules of our little clubhouse. By using our app, website, or services (we call them all \"Services\"), you're saying \"okay!\" to these rules. If something doesn't feel right, no worries — just don't use the Services.",
+    "sections": [
+      {
+        "title": "1. Who can join the fun?",
+        "content": "You need to be at least 18 (or the grown-up age where you live). We want everyone to be able to make their own choices responsibly."
+      },
+      {
+        "title": "2. Your account & wallet",
+        "content": "When you connect your Web3 wallet, keep it safe — it's like your house key! 🔑\n\nWe're not responsible if someone else uses it without your permission. If something seems off, tell us right away."
+      },
+      {
+        "title": "3. What can you do here?",
+        "content": "Upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see cute spending insights, and collect non-transferable cPoints app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
+      },
+      {
+        "title": "4. Receipts & your stuff",
+        "content": "When you upload receipts or other content, you're letting us use it (in a safe, anonymized way) to give you insights and make the app better for everyone.\n\nPromise us they're yours to share and don't break any rules or hurt anyone's feelings, okay?"
+      },
+      {
+        "title": "5. Rewards & YUMO tokens",
+        "content": [
+          "cPoints are non-transferable in-app records tied to eligible activity.",
+          "They do not guarantee any token claim, airdrop, transfer, listing, cash value, profit, or exchangeability.",
+          "YUMO is planned as a utility token for eligible app functionality — not investment advice, a security offering, or a \"get rich quick\" ticket.",
+          "Eligibility rules may change. We may withhold, reverse, or suspend rewards for fraud, duplicate activity, sanctions risk, legal restrictions, or policy violations. Any taxes on rewards are your responsibility."
+        ]
+      },
+      {
+        "title": "6. Please be kind (things we don't like)",
+        "content": [
+          "No fake receipts, no trying to game the system, no illegal stuff, no bullying, no hacking.",
+          "If something feels wrong, we might pause or say goodbye to your account — but we'd rather everyone plays nicely!"
+        ]
+      },
+      {
+        "title": "7. Our stuff stays ours",
+        "content": "The app design, code, and ideas belong to us (or our friends who helped). You get to use them for personal fun, but no copying or selling, pretty please."
+      },
+      {
+        "title": "8. Privacy — we've got your back",
+        "content": "We take your privacy seriously (and cutely). Everything is explained in our Privacy Policy — give it a read with your favorite drink."
+      },
+      {
+        "title": "9. Third-party friends (wallets, blockchains)",
+        "content": "We team up with other tools (like wallets and blockchains). They're awesome, but we can't promise they'll always work perfectly. On-chain stuff is forever and public — that's just how blockchain rolls."
+      },
+      {
+        "title": "10. Heads up — no guarantees & NFA 🙈",
+        "content": [
+          "We do our best to make everything smooth and accurate, but:",
+          {
+            "type": "list",
+            "items": [
+              {
+                "label": "Friendly Guesses Only:",
+                "text": "Hidden cost estimates and spending insights are friendly guesses to help you learn. They are not financial, investment, or legal advice (NFA!). Always do your own research. 🔍"
+              },
+              {
+                "label": "Services are \"as is\":",
+                "text": "We try to be perfect, but we can't make \"perfect promises\" about everything working 100% of the time. 💫"
+              },
+              {
+                "label": "Crypto Adventures:",
+                "text": "Crypto has ups and downs — you know the drill. Any moves you make are your own responsibility. 🎢"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "11. If something goes wrong 🤗",
+        "content": "We really hope nothing does, but if there's an issue, our responsibility is limited (to the max the law allows). We're not liable for indirect stuff — let's keep things positive! ✨"
+      },
+      {
+        "title": "12. Crypto realities (the serious but honest part) 🪙",
+        "content": "Tokens can lose value, transactions can't be undone, and rules can change in different countries. YUMO is planned as a utility token, not an investment ticket. No claim, airdrop, transfer, exchange listing, or profit is promised. Join only if you're comfortable with how blockchain works and the eligibility rules that may apply! 🌊"
+      },
+      {
+        "title": "13. Pausing or saying goodbye",
+        "content": "We might pause or close accounts if needed (we'll try to be fair). If that happens, unclaimed, ineligible, fraudulent, or legally restricted rewards may be withheld, reversed, or expire."
+      },
+      {
+        "title": "14. The grown-up legal bit",
+        "content": "These Terms are governed by the laws of the State of Delaware, United States, unless mandatory local law provides otherwise. If a disagreement comes up, we will try to resolve it first; if needed, disputes will be handled by the competent courts or forums available under applicable law."
+      },
+      {
+        "title": "15. We might update these rules",
+        "content": "If we make changes, we'll let you know. Keep using the app = you're cool with the new version."
+      },
+      {
+        "title": "16. Want to chat?",
+        "content": "Questions about Yumo Yumo Inc.? Reach us at info@yumoyumo.com, call +1 302-719-1468, or write to 8 The Green Suite B, Dover, DE 19901, United States."
+      }
+    ],
+    "footer": "Thanks for being part of Yumo Yumo — let's uncover the hidden and have fun doing it! 🫶✨"
+  },
+  "privacy": {
+    "title": "Yumo Yumo Privacy Policy",
+    "lastUpdated": "Last Updated: April 20, 2026",
+    "intro": "Hi friend! We really care about your privacy — like, a lot. This policy explains how we handle your info in the gentlest way possible.",
+    "sections": [
+      {
+        "title": "1. What we collect (only the necessities)",
+        "content": [
+          "Your wallet address (when you connect — it's public on blockchain anyway).",
+          "Receipts you upload (to give you those cool insights).",
+          "Basic device stuff (like which phone or browser you're using) so the app works smoothly.",
+          "Chats if you reach out to us.",
+          "We don't grab sensitive stuff unless it accidentally sneaks onto a receipt (please don't share things like health info!)."
+        ]
+      },
+      {
+        "title": "2. How we use your info",
+        "content": [
+          "To show you hidden costs and cute spending breakdowns.",
+          "To calculate your well-deserved rewards.",
+          "To make the app better (using anonymized data only — no one knows it's you).",
+          "To keep everything safe and running."
+        ]
+      },
+      {
+        "title": "3. Anonymization — our favorite magic trick",
+        "content": "When we improve the app or create general stats (like \"dining costs in Bangkok\"), we strip away anything that could point to you. Your receipts help everyone, but stay private."
+      },
+      {
+        "title": "4. Who sees your info?",
+        "content": [
+          "Almost nobody!",
+          "Trusted helpers (cloud services, analytics) who promise to be good.",
+          "Blockchain (for rewards — that part is public by design).",
+          "Only if the law asks (very rare and boring).",
+          "We never sell your data. Pinky promise."
+        ]
+      },
+      {
+        "title": "5. Blockchain is forever",
+        "content": "Once rewards hit the chain, they're public (wallet address + amounts). That's just how Web3 works — super transparent!"
+      },
+      {
+        "title": "6. Keeping things safe",
+        "content": "We use strong locks and careful habits to protect your info. Nothing is 100% unbreakable, but we try our very best."
+      },
+      {
+        "title": "7. How long we keep stuff",
+        "content": "Only as long as we need it to help you or follow rules. Want something deleted? Just ask!"
+      },
+      {
+        "title": "8. Your rights (you're in control)",
+        "content": [
+          "Depending on where you live, you can:",
+          "See your data",
+          "Correct or delete it",
+          "Say \"no thanks\" to certain uses",
+          "Just ping us — we'll sort it with a smile."
+        ]
+      },
+      {
+        "title": "9. We travel sometimes",
+        "content": "Your data might visit servers in other countries, but we always make sure they follow strict privacy rules."
+      },
+      {
+        "title": "10. No kids allowed",
+        "content": "Our app is for grown-ups only (18+). We don't collect info from kids."
+      },
+      {
+        "title": "11. Updates to this policy",
+        "content": "If we change anything important, we'll give you a heads-up. Keep using the app = you're okay with the new version."
+      },
+      {
+        "title": "12. Questions or cozy chats?",
+        "content": "For privacy questions, reach us at info@yumoyumo.com, call +1 302-719-1468, or write to 8 The Green Suite B, Dover, DE 19901, United States."
+      }
+    ],
+    "footer": "Thank you for trusting us. We're here to make money stuff less confusing and more rewarding — all while keeping your privacy safe and sound. Big hug! 🤗✨"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome! 👋",
+      "subtitle": "Sign in to your account",
+      "emailLabel": "Email / Username",
+      "emailPlaceholder": "Email or username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "toggle": "Don't have an account?",
+      "toggleAction": "Sign Up",
+      "error": "Invalid credentials",
+      "googleError": "Failed to sign in with Google",
+      "twitterError": "Failed to sign in with X (Twitter)",
+      "unknownError": "Unknown error"
+    },
+    "register": {
+      "title": "Join the Yumo World! 🎀",
+      "subtitle": "Create your account and start collecting eligible app rewards",
+      "walletLabel": "Wallet Address",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Your username",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "email@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create your password",
+      "passwordConfirmLabel": "Password Confirm",
+      "passwordConfirmPlaceholder": "Confirm your password",
+      "dateOfBirthLabel": "Date of Birth",
+      "genderLabel": "Gender",
+      "genderOptional": "Optional",
+      "genderSelect": "Select",
+      "countryLabel": "Country",
+      "countrySelect": "Select Country",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "+1 555 123 4567",
+      "termsText": "Terms and Conditions and Privacy Policy",
+      "termsAgree": "and I agree",
+      "submit": "Sign Up",
+      "toggle": "Already a member?",
+      "toggleAction": "Sign In",
+      "error": "Registration failed"
+    },
+    "social": {
+      "or": "or"
+    }
+  },
+  "alerts": {
+    "auth": {
+      "termsRequired": "Please accept the Terms and Conditions and Privacy Policy."
+    },
+    "dashboard": {
+      "fileSizeError": "File size must be less than 10MB",
+      "fileRequired": "Please select a file first"
+    },
+    "wallet": {
+      "signatureRequired": "Signature required to connect. Please try again and approve the signature request.",
+      "connectionFailed": "Connection failed",
+      "pleaseTryAgain": "Please try again."
+    },
+    "waitlist": {
+      "privacyNote": "Yumo Yumo Inc., 8 The Green Suite B, Dover, DE 19901. We use your waitlist details for launch and update emails. Every marketing email will include unsubscribe instructions."
+    }
+  },
+  "support": {
+    "title": "Support Center",
+    "subtitle": "Have a question or need help? Submit a support ticket and we'll get back to you as soon as possible.",
+    "form": {
+      "username": "Username",
+      "usernamePlaceholder": "Your username",
+      "email": "Email Address",
+      "emailPlaceholder": "your@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Brief description of your issue",
+      "description": "Description",
+      "descriptionPlaceholder": "Please provide detailed information about your issue...",
+      "captcha": "Captcha Verification",
+      "captchaPlaceholder": "Enter code",
+      "captchaHint": "Enter the 4-digit code shown above",
+      "verify": "Verify",
+      "submit": "Submit Support Ticket",
+      "submitting": "Submitting Ticket..."
+    },
+    "success": {
+      "title": "Ticket Submitted Successfully!",
+      "message": "We've received your support request. Our team will get back to you soon."
+    },
+    "errors": {
+      "captchaRequired": "Please verify the captcha first.",
+      "fillAll": "Please fill in all fields.",
+      "captchaIncorrect": "Captcha code is incorrect. Please try again."
+    }
+  },
+  "app": {
+    "scanReveal": {
+      "itemsRead": "{count} items read",
+      "receiptRead": "Receipt read",
+      "processing": "Uncovering the hidden cost",
+      "valueLabel": "Product value",
+      "paidLabel": "You paid",
+      "splitCap": "the gap: the price's invisible journey",
+      "layersTitle": "The price grew at every hand-off.",
+      "shareLabel": "your invisible share",
+      "unit": "estimated",
+      "opening": "the full breakdown opens in a moment…",
+      "eyebrow": "Analysing receipt",
+      "itemCount": "{count} items",
+      "readHeadline": "We read the {merchant} receipt",
+      "valueSentence": "The real value of what you bought is {value}. You paid {paid}.",
+      "doneEyebrow": "analysis complete",
+      "doneHeadline": "→ opening result",
+      "uploading": "Uploading file",
+      "reading": "Reading receipt"
+    },
+    "pushOptIn": {
+      "title": "Bill reminders",
+      "body": "Want a heads-up before due dates? Turn on notifications.",
+      "enable": "Turn on",
+      "dismiss": "Not now"
+    },
+    "resultHero": {
+      "ratioCap": "{pct}% of {paid} sits in layers not printed on the receipt."
+    },
+    "xrayCard": {
+      "title": "Receipt X-ray",
+      "estimateBadge": "estimated read",
+      "persona": {
+        "workspaceHunter": "workspace hunter",
+        "eveningRewarder": "evening rewarder",
+        "routineRestocker": "routine restocker",
+        "socialConnector": "social connector",
+        "inflationVictim": "price-squeezed",
+        "impulseNomad": "impulse nomad",
+        "balancedShopper": "balanced shopper"
+      },
+      "read": {
+        "workspaceHunter": "This {merchant} stop behaves less like a coffee, more like workspace rent.",
+        "eveningRewarder": "A small evening reward ritual from {merchant}.",
+        "routineRestocker": "{merchant} is part of the weekly rhythm — keeping the home running.",
+        "socialConnector": "This {merchant} receipt is the trace of a moment shared outside.",
+        "inflationVictim": "At {merchant}, basics are bought but price layers overshadow the product.",
+        "impulseNomad": "{merchant} is an impulse stop — not on the list, but it caught the moment.",
+        "balancedShopper": "This {merchant} receipt reads as a balanced spending habit."
+      }
+    },
+    "sectorCompare": {
+      "title": "Sector comparison",
+      "thisReceipt": "This receipt",
+      "sectorAvg": "Sector avg.",
+      "sourcePrefix": "source"
+    },
+    "resultSources": {
+      "label": "Sources",
+      "seeAll": "see all"
+    },
+    "yumbie": {
+      "chat": {
+        "greeting": "Hi! Ask me anything about your spending.",
+        "placeholder": "Message Yumbie…",
+        "send": "Send",
+        "close": "Close",
+        "thinking": "Yumbie is thinking…",
+        "fallback": "I couldn't answer just now — try again in a moment?",
+        "chips": {
+          "todayEarned": "What did I earn today?",
+          "giveTip": "Give me a tip",
+          "showLastReceipt": "Show my last receipt",
+          "monthSpend": "What did I spend this month?",
+          "myCpoints": "How many cPoints do I have?",
+          "whatsHere": "What's on this page?",
+          "help": "Help me"
+        }
+      },
+      "daily": {
+        "yesterdayReceiptsPoints": "You added {receipts} receipts yesterday, +{points} cPoints.",
+        "yesterdayReceipts": "You added {receipts} receipts yesterday — nice work.",
+        "streak": "{days} days in a row — we're doing great together.",
+        "topCategory": "Lately your biggest shelf is {label}.",
+        "newMonth": "A new month, a fresh start. Last month your biggest shelf was {label}.",
+        "newMonthNoCat": "A new month, a fresh start. Let's begin again.",
+        "streakMilestone": "{days}-day streak! We're going strong together.",
+        "newMonthCapWin": "New month! Last month you kept {label} under your limit — nice.",
+        "streakLapsed": "Your progress is right here — let's pick up where you left off."
+      },
+      "insight": {
+        "pill": "Yumbie noticed something",
+        "up": {
+          "slight": "{label} ticked up a little this week.",
+          "notable": "{label} has grown a bit lately. Want to look together?"
+        },
+        "down": "{label} is calmer than last month — nice going.",
+        "flat": "{label} looks steady.",
+        "setCap": "Set a soft limit",
+        "dismiss": "Got it",
+        "capPrompt": "Monthly soft limit for {label}:",
+        "capSave": "Save",
+        "capSaved": "Okay, I noted {amount} for {label}. I won't push — just a gentle reminder.",
+        "close": "Close"
+      },
+      "notify": {
+        "title": "Yumbie",
+        "monthFresh": "A new month, a fresh start. Shall we take a small step today?",
+        "monthFreshCapWin": "Last month you kept {label} under your limit. New month — let's keep it up.",
+        "streakLapse": "Your progress is right here — let's pick up where you left off.",
+        "insight": "I noticed something small in your spending. Want to look together?",
+        "weeklyReview": "Shall we look back at your week together?",
+        "dailyRecap": "You added {receipts} receipts yesterday. Today's recap is ready.",
+        "gentleReturn": "Your {label} shelf is waiting — drop by if you like.",
+        "billReminderDays": "Heads up — your {name} bill is due in {days} days.",
+        "billReminderDaysAmount": "Heads up — your {name} bill (~{amount}) is due in {days} days.",
+        "billReminderToday": "Your {name} bill is due today — a small reminder from me.",
+        "billReminderTodayAmount": "Your {name} bill (~{amount}) is due today — a gentle reminder.",
+        "toggle": "Notifications"
+      },
+      "review": {
+        "pill": "Weekly recap",
+        "intro": "Let's look back at your week together.",
+        "topCategory": "Biggest: {label} at {pct}%.",
+        "weekPoints": "You earned +{points} cPoints this week.",
+        "streak": "{days} days in a row — that effort counts.",
+        "closing": "A good week. See you tomorrow."
+      },
+      "workspace": {
+        "onDuty": "Yumbie on duty",
+        "here": "Yumbie's here",
+        "ambient": {
+          "sleeping": "Dozing off…",
+          "reading": "Reading a bit",
+          "daydreaming": "Daydreaming",
+          "lookingAround": "Looking around"
+        },
+        "rooms": {
+          "preening": "Tidying up",
+          "admiring": "Checking the ranks",
+          "aiming": "Eyeing the goal",
+          "checking": "Checking alerts",
+          "pottering": "Pottering about",
+          "tasking": "Checking the quest board",
+          "studying": "Studying the charts",
+          "filing": "Sorting the bills"
+        },
+        "today": {
+          "newReceipt": "Re-doing your scan",
+          "picking": "Picking up the receipt",
+          "toScanner": "Taking it to scan",
+          "toDoor": "Re-filing your receipt",
+          "handoff": "Filed ✓",
+          "scanning": "Scanning…",
+          "streakCheck": "Streak check",
+          "watering": "Watering the plant",
+          "tidying": "Tidying the shelf",
+          "shiftContinues": "Shift continues"
+        },
+        "receipts": {
+          "archiveShift": "Archive shift",
+          "inboxHasReceipt": "A receipt is in the inbox",
+          "picking": "Picking up the receipt",
+          "toFiling": "Taking it to filing",
+          "archiving": "Archiving…",
+          "next": "Next one…",
+          "searching": "Searching the archive"
+        },
+        "wallet": {
+          "counting": "Counting the vault",
+          "collecting": "Collecting cPoints",
+          "picked": "cPoint collected",
+          "toVault": "Carrying to the vault",
+          "stacking": "Stacking…",
+          "polishing": "Polishing a coin"
+        },
+        "patterns": {
+          "reviewing": "Reviewing patterns",
+          "approaching": "Walking to the board",
+          "measuring": "Measuring the bars",
+          "inspecting": "Inspecting closely",
+          "trendUp": "Spotting a trend",
+          "shiftContinues": "Shift continues"
+        },
+        "scan": {
+          "ready": "Ready to scan",
+          "receiving": "Receiving the document",
+          "processing": "Scanning…",
+          "filed": "Filed",
+          "standby": "Standing by at the scanner"
+        },
+        "bills": {
+          "billsShift": "Bills shift",
+          "duePile": "A bill is due",
+          "picking": "Picking up the bill",
+          "toTerminal": "Taking it to pay",
+          "paying": "Paying…",
+          "paid": "Paid",
+          "checking": "Checking due dates",
+          "shiftContinues": "Shift continues"
+        },
+        "door": {
+          "passing": "Passing through the door",
+          "toDoor": "Heading to the door"
+        },
+        "sky": {
+          "dayShift": "Day shift",
+          "nightShift": "Night shift"
+        },
+        "fx": {
+          "plusReceipt": "+1 receipt",
+          "plusCPoint": "+1 cPoint",
+          "archived": "archived",
+          "plusTrend": "+trend",
+          "scanFailed": "couldn't read"
+        }
+      }
+    },
+    "nav": {
+      "home": "Home",
+      "homeMenu": "Home",
+      "dashboard": "Dashboard",
+      "mine": "Mine",
+      "receipts": "Receipts",
+      "insights": "Insights",
+      "leaderboard": "Leaderboard",
+      "tasks": "Tasks",
+      "rewards": "Rewards",
+      "settings": "Settings",
+      "profile": "Profile",
+      "menu": "Menu",
+      "close": "Close",
+      "closeMenu": "Close menu",
+      "sidebar": {
+        "insights": "Insights",
+        "insightsSub": "Spending, hidden cost, trends",
+        "games": "Mini Games",
+        "gamesSub": "Budget race, trivia",
+        "guild": "Guild",
+        "guildSub": "Group savings, competition",
+        "basket": "Basket Compare",
+        "basketSub": "Compare alternative products",
+        "ai": "AI My Life",
+        "aiSub": "Personal finance assistant",
+        "market": "Market Tracker",
+        "marketSub": "Price timeline, inflation",
+        "social": "Social Feed",
+        "socialSub": "Friend activities"
+      },
+      "admin": {
+        "_": "Admin",
+        "fileUpload": "File Upload",
+        "bulkUpload": "Bulk Receipt Upload",
+        "analyzeFile": "Analyze from file",
+        "downloadReceipt": "Download receipt",
+        "downloadLog": "Download log",
+        "downloadRawOcr": "Download RAW OCR"
+      },
+      "approvals": "Approvals",
+      "rejected": "Rejected",
+      "section": {
+        "dashboard": "Dashboard",
+        "explore": "Explore",
+        "account": "Account"
+      },
+      "feedback": "Feedback",
+      "merchants": "Merchants"
+    },
+    "comingSoon": {
+      "short": "Soon",
+      "title": "Coming soon",
+      "description": "This feature is under development. Check back later!"
+    },
+    "sidebar": {
+      "defaultUser": "User",
+      "defaultTitle": "Economy Detective",
+      "season": "Season",
+      "days": "days"
+    },
+    "home": {
+      "recentReceipts": "Recent Receipts",
+      "addWithScan": "Add with Scan",
+      "quickAction": {
+        "scan": "Scan Receipt",
+        "insights": "Insights",
+        "leaderboard": "Leaderboard",
+        "convert": "Convert",
+        "referral": "Referral"
+      },
+      "quickActionsTitle": "Quick actions",
+      "receiptsEmpty": "No receipts yet",
+      "viewAll": "View all",
+      "treasure": "Treasure",
+      "treasureDays": "{count} days",
+      "checkIn": "Check in",
+      "checkedIn": "Checked in"
+    },
+    "profile": {
+      "tokenSummary": "Token summary",
+      "fromReceipts": "From receipts",
+      "questRewards": "Quest rewards",
+      "free": "Free"
+    },
+    "topbar": {
+      "search": {
+        "placeholder": "Search merchant or receipt ID..."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "empty": "No notifications yet",
+        "emptyDesc": "Receipt & reward updates will appear here",
+        "willAppear": "Notifications will appear here",
+        "markAllRead": "Mark all as read"
+      },
+      "upload": "Upload",
+      "logout": "Log out",
+      "testnet": "Testnet",
+      "mainnet": "Mainnet",
+      "language": {
+        "tr": "Turkish",
+        "en": "English",
+        "aria": "Change language"
+      }
+    },
+    "dashboard": {
+      "welcome": "Welcome to Yumo Yumo",
+      "hiddenCosts": "You've uncovered {amount} {currency} in hidden costs. What else is hiding in your receipts?",
+      "noReceipts": "Every receipt tells a story. Upload one to discover the hidden costs you're paying.",
+      "uploadReceipt": "Upload receipt",
+      "spent": "Spent",
+      "honor": "Honor",
+      "hidden": "Hidden",
+      "value": "Value",
+      "rewards": "Rewards",
+      "hiddenCostByCategory": "Hidden Cost by Category",
+      "activeQuests": "Active Quests",
+      "hiddenCostInsight": "Hidden Cost Insight",
+      "hiddenCostPercent": "This month, {percent}% of your spending went to hidden costs.",
+      "retailBrandPercent": "Most came from retail & brand margins ({percent}% of hidden costs).",
+      "error": {
+        "load": "Failed to load dashboard data",
+        "network": "No internet connection. Please check your network and try again.",
+        "login": "Please log in to view receipts",
+        "receipts": "Failed to load receipts data"
+      },
+      "quests": {
+        "notActive": "⚠️ Not active"
+      },
+      "totalReceipts": "You have uploaded {count} receipt(s) in total."
+    },
+    "receipts": {
+      "title": "Receipts",
+      "description": "View and manage all your mined receipts",
+      "export": "Export CSV",
+      "exportShort": "Export",
+      "loading": "Loading...",
+      "empty": "No receipts found",
+      "emptyDesc": "Try adjusting your filters or upload a new receipt.",
+      "upload": "Upload Receipt",
+      "merchant": "Merchant",
+      "category": "Category",
+      "date": "Date",
+      "time": "Time",
+      "total": "Total",
+      "status": "Status",
+      "hiddenCost": "Hidden Cost",
+      "reward": "Reward",
+      "actions": "Actions",
+      "view": "View",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this receipt? This action cannot be undone.",
+      "deleted": "Receipt deleted successfully",
+      "error": {
+        "load": "Failed to load receipts",
+        "network": "No internet connection. Please check your network and try again.",
+        "login": "Please log in to view receipts",
+        "parse": "Failed to parse receipts data",
+        "delete": "Failed to delete receipt",
+        "title": "Could not load receipts"
+      },
+      "user": "User",
+      "na": "N/A"
+    },
+    "errors": {
+      "login": {
+        "noInternet": "No internet connection. Please check your network and try again.",
+        "invalidServerResponse": "Invalid response from server. Please try again.",
+        "invalidCredentials": "Invalid username or password",
+        "errorOccurred": "An error occurred. Please try again.",
+        "selectCountryFirst": "Please select your country first. Go to your profile settings to select your country."
+      },
+      "receiptDetail": {
+        "notFound": "Receipt not found",
+        "backToList": "Back to receipt list",
+        "goToRewards": "Go to rewards",
+        "loadFailed": "Failed to load receipt",
+        "deleteFailed": "Failed to delete receipt",
+        "deleteConfirm": "Are you sure you want to delete this receipt? This action cannot be undone."
+      },
+      "upload": {
+        "pdfFailed": "PDF conversion failed. Please convert the PDF to an image (PNG/JPG) and try again.",
+        "uploadFailed": "Upload failed",
+        "saveFailed": "Failed to save receipt",
+        "walletRequired": "Connect your wallet to save the receipt.",
+        "unknownError": "Unknown error"
+      },
+      "admin": {
+        "logsLoadFailed": "Logs could not be loaded",
+        "noLogsToDownload": "No logs to download",
+        "zipCreateFailed": "ZIP could not be created",
+        "filesLoadFailed": "Files could not be loaded",
+        "noFilesToDownload": "No files to download",
+        "zipFileCreateFailed": "ZIP file could not be created"
+      },
+      "api": {
+        "noFile": "No file provided",
+        "screenshotDetected": "Screenshot detected. Please upload a photo of a real receipt, not a screenshot.",
+        "fileMustBeImageOrPdf": "File must be an image or PDF",
+        "fileSizeExceeded": "File size exceeds 4.5 MB limit",
+        "invalidFileData": "Invalid file data",
+        "marginGeneral": "Please place the receipt on a surface and leave some space above, below, and on both sides.",
+        "marginVertical": "Leave some space above and below the receipt.",
+        "marginHorizontal": "Leave some space on the left and right of the receipt.",
+        "marginTooMany": "Too many photos with insufficient margins today. Please follow photo guidelines.",
+        "uploadFailed": "Failed to upload receipt",
+        "unauthorized": "Unauthorized",
+        "usernamePasswordRequired": "Username and password are required",
+        "internalServerError": "Internal server error",
+        "selectCountryFirst": "Please select your country first",
+        "duplicateSameUser": "You already uploaded this receipt",
+        "duplicateVisual": "This looks like a duplicate receipt (similar image detected)",
+        "duplicateOtherUser": "This receipt was uploaded by another user",
+        "analyzeFailed": "Failed to analyze receipt",
+        "serviceBusy": "The service is busy right now. Please try again in a minute or two.",
+        "receiptNotFound": "Receipt not found",
+        "notValidReceipt": "This document doesn't appear to be a valid receipt.",
+        "receiptCountryMismatch": "This receipt is from a different country than your account. Please upload receipts from your registered country, or update your country in Settings.",
+        "totalNotReliable": "Total amount could not be reliably extracted from the receipt.",
+        "unknown": "An error occurred",
+        "allFieldsRequired": "All fields are required",
+        "invalidEmail": "Invalid email address",
+        "invalidBirthDate": "Invalid birth date",
+        "futureBirthDate": "Birth date cannot be in the future",
+        "usernameInvalid": "Username must be 3-32 characters and use only letters, numbers, dot, dash, or underscore",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "passwordRequirements": "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character",
+        "accountAlreadyExists": "An account with this email or username already exists",
+        "tooManyRegistrationAttempts": "Too many registration attempts. Please try again later",
+        "tooManyRequests": "Too many requests. Please try again later",
+        "invalidRequestOrigin": "Registration request failed security check. Refresh the page and try again",
+        "ageRestriction": "Yumo Yumo is available only to users 18 or older",
+        "registrationFailed": "Failed to register account",
+        "emailAlreadyExists": "Email already exists",
+        "usernameAlreadyExists": "Username already exists",
+        "captchaRequired": "Captcha token is required",
+        "captchaFailed": "Captcha verification failed",
+        "captchaNotConfigured": "Captcha service is not configured",
+        "emailAlreadyVerified": "Email is already verified",
+        "noEmailOnAccount": "No email is attached to this account",
+        "resendVerificationFailed": "Failed to resend verification email",
+        "verificationCooldown": "Please wait before requesting another email",
+        "userNotFound": "User not found",
+        "identifierRequired": "Email or username is required",
+        "resetEmailFailed": "Failed to send password reset email",
+        "resetTokenPasswordRequired": "Token and password are required",
+        "resetInvalid": "Password reset link is invalid",
+        "resetExpired": "Password reset link has expired",
+        "resetConsumed": "Password reset link has already been used",
+        "resetFailed": "Failed to reset password",
+        "legalAcceptanceRequired": "Terms and privacy acceptance is required"
+      },
+      "rejection": {
+        "noBackground": "Make sure the area around the receipt—where it starts and ends—is clearly visible. Place the receipt on a dark surface and leave space around all edges.",
+        "missingDocId": "Receipt is missing required document identifier (invoice no, POS/terminal)."
+      },
+      "quality": {
+        "insufficient": "Photo quality insufficient",
+        "improve": "Photo quality can be improved"
+      },
+      "memory": "Memory error",
+      "duplicateWarning": "Warning: Duplicate Receipt",
+      "duplicateReceipt": "Duplicate Receipt",
+      "sessionEnded": "Session ended. Please log in again."
+    },
+    "auth": {
+      "login": {
+        "badge": "Trusted sign-in",
+        "headline": "Return to your Yumo Yumo profile and pick up where you left off.",
+        "subheadline": "Sign in with the account you verified to continue into your receipt flow, rewards, and profile history.",
+        "title": "Welcome back",
+        "description": "Use your username and password to enter the app.",
+        "username": "Username",
+        "usernamePlaceholder": "Enter your username",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "submit": "Sign in",
+        "submitting": "Signing in...",
+        "helper": "If your email is not verified yet, we will route you to the verification screen automatically.",
+        "featureAccessTitle": "Direct access",
+        "featureAccessBody": "The same verified account works across the full Yumo Yumo app experience.",
+        "featureTrustTitle": "Protected identity",
+        "featureTrustBody": "Verified email status stays attached to your session so access stays clean and controlled.",
+        "flowHint": "Need a fresh start? You can reset your password without leaving this flow.",
+        "forgotPassword": "Forgot password?",
+        "resetSuccess": "Your password has been updated. Sign in with your new password.",
+        "noAccount": "Don't have an account?",
+        "registerLink": "Create one"
+      },
+      "register": {
+        "badge": "Protected onboarding",
+        "headline": "Create your Yumo Yumo account and start from a trusted profile.",
+        "subheadline": "Your account starts with secure verification, country-aware defaults, and a clean path into the app.",
+        "featureSecureTitle": "Protected against bots",
+        "featureSecureBody": "Turnstile screens new signups before they ever touch the auth layer.",
+        "featureRewardsTitle": "Ready for the app",
+        "featureRewardsBody": "Once your email is verified, the same account can flow directly into rewards and receipt mining.",
+        "featureProfileTitle": "Built for your profile",
+        "featureProfileBody": "Country and birth date are captured up front so the app starts with the right defaults.",
+        "title": "Create account",
+        "description": "Open a new account with your email, username, and country.",
+        "email": "Email",
+        "username": "Username",
+        "birthDate": "Birth date",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "country": "Country",
+        "countryPlaceholder": "Select your country",
+        "countryOther": "Other",
+        "countryOtherStarTitle": "Not integrated yet",
+        "countryOtherNotice": "Other countries aren't integrated yet, so the app can't be used on-chain and earns no rewards. Your country will be detected from your receipts, but uploads won't produce rewards.",
+        "countryLockNotice": "Important: the country you choose now can't be changed later from settings.",
+        "locale": "Companion language",
+        "localeHint": "The language Yumbie will speak with you. You can change it later in settings.",
+        "captchaLabel": "Captcha verification",
+        "submit": "Create account",
+        "submitting": "Creating account...",
+        "verifyHint": "We'll send a verification link right after signup. You'll need to confirm your email before entering the app.",
+        "haveAccount": "Already have an account?",
+        "signIn": "Sign in",
+        "passwordMismatch": "Passwords do not match",
+        "captchaRequired": "Please complete the captcha challenge",
+        "legalRequired": "You need to accept the terms and privacy notice to continue.",
+        "legalNotice": "Your uploaded and usage-derived data may be anonymized or aggregated and used in insight, analytics, and reporting products.",
+        "acceptTermsPrefix": "I have read and accept the",
+        "acceptTermsLink": "Terms & Conditions",
+        "acceptTermsSuffix": ".",
+        "acceptPrivacyPrefix": "I have read the",
+        "acceptPrivacyLink": "Privacy Notice / KVKK Disclosure",
+        "acceptPrivacySuffix": "."
+      },
+      "verify": {
+        "pendingTitle": "Verify your email",
+        "pendingBody": "We sent a verification link to your inbox. Confirm it to unlock the app.",
+        "pendingEmailFailedBody": "Your account was created, but we could not send the verification email automatically. Use the resend button below.",
+        "verifiedTitle": "Email verified",
+        "verifiedBody": "Your account is now verified. You can continue straight into the app.",
+        "expiredTitle": "Verification link expired",
+        "expiredBody": "This verification link has expired. Request a fresh email and try again.",
+        "consumedTitle": "Verification link already used",
+        "consumedBody": "This link has already been used. If you still cannot access the app, request another verification email.",
+        "invalidTitle": "Verification link invalid",
+        "invalidBody": "The verification link is missing or invalid. Request a new one from this screen.",
+        "resend": "Resend verification email",
+        "resending": "Sending email...",
+        "resendSuccess": "Verification email sent",
+        "resendError": "Could not resend verification email",
+        "continueToApp": "Continue to app",
+        "logout": "Sign out",
+        "signingOut": "Signing out...",
+        "needAnotherAccount": "Need a different account?",
+        "registerAgain": "Register again"
+      },
+      "forgot": {
+        "badge": "Recovery flow",
+        "headline": "Reset access without starting your account over.",
+        "subheadline": "Enter your username or email and we will send a secure reset link to the inbox attached to your account.",
+        "title": "Forgot your password?",
+        "description": "Request a password reset link and choose a new password from your inbox.",
+        "identifier": "Email or username",
+        "identifierPlaceholder": "name@example.com or yumouser",
+        "submit": "Send reset link",
+        "submitting": "Sending reset link...",
+        "success": "If that account exists, a password reset email is on the way.",
+        "hint": "For privacy, this screen always shows the same success state even if the account is not found.",
+        "backToLogin": "Back to sign in",
+        "featureInboxTitle": "Inbox-first recovery",
+        "featureInboxBody": "The reset link goes to the email already attached to the account.",
+        "featureSafeTitle": "Single-use access",
+        "featureSafeBody": "Each reset link expires quickly and invalidates the previous one."
+      },
+      "reset": {
+        "badge": "Secure reset",
+        "headline": "Set a new password and get back into Yumo Yumo.",
+        "subheadline": "Use the secure link from your inbox to choose a fresh password for your account.",
+        "title": "Create a new password",
+        "description": "Your new password should be at least 8 characters long.",
+        "password": "New password",
+        "confirmPassword": "Confirm new password",
+        "submit": "Update password",
+        "submitting": "Updating password...",
+        "passwordMismatch": "Passwords do not match",
+        "successTitle": "Password updated",
+        "successBody": "Your password has been changed successfully. You can sign in again now.",
+        "invalidTitle": "Reset link unavailable",
+        "invalidBody": "This reset link is missing or no longer usable. Request a fresh one to continue.",
+        "signIn": "Go to sign in",
+        "requestAnother": "Request another reset email",
+        "featureFastTitle": "Fast recovery",
+        "featureFastBody": "Once the password is updated, you can sign straight back into the app.",
+        "featureSecureTitle": "Token-based reset",
+        "featureSecureBody": "Reset links are single-use and time-limited for account safety."
+      }
+    },
+    "filter": {
+      "search": {
+        "placeholder": "Search merchant or receipt ID..."
+      },
+      "status": {
+        "all": "All Status",
+        "verified": "Verified",
+        "needsReview": "Needs Review",
+        "rejected": "Rejected"
+      },
+      "country": {
+        "all": "All Countries",
+        "th": "Thailand",
+        "tw": "Taiwan",
+        "tr": "Turkey",
+        "us": "United States"
+      },
+      "verifiedOnly": "Verified only",
+      "clear": "Clear",
+      "expense": {
+        "all": "All expense types"
+      }
+    },
+    "status": {
+      "verified": "Verified",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "analyzed": "Analyzed",
+      "scanned": "Scanned"
+    },
+    "mine": {
+      "upload": "Upload",
+      "scan": "Scan",
+      "review": "Review",
+      "mining": "Data Contribution",
+      "breakdown": "Breakdown",
+      "verify": "Verify",
+      "uploadReceipt": "Upload Receipt",
+      "processing": "Processing receipt...",
+      "privacy": {
+        "title": "Privacy Note:",
+        "description": "Your receipt images are processed securely. We extract only the necessary information and do not store your images."
+      },
+      "back": "Back",
+      "continue": "Continue",
+      "receipt": "Receipt",
+      "blockchainNote": "This receipt will be recorded on the blockchain",
+      "verifyReceipt": "Verify Receipt",
+      "merchant": "Merchant",
+      "total": "Total",
+      "hiddenCost": "Hidden Cost",
+      "reward": "Reward",
+      "saving": "Saving...",
+      "receiptMined": "Receipt Mined!",
+      "successDescription": "You've successfully mined hidden costs from this receipt",
+      "earned": "Earned",
+      "pending": "Pending",
+      "rewardNote": "Note: Rewards are not yet claimable. This feature will be available soon.",
+      "uploadNext": "Upload Next Receipt",
+      "deleteAndUploadNew": "Delete and Upload New Receipt",
+      "goToReceipts": "Go to Receipts",
+      "error": {
+        "upload": "Upload Failed",
+        "analyze": "Receipt Analysis Failed",
+        "rejected": "Receipt Rejected",
+        "underReview": "Receipt Under Review",
+        "underReviewDesc": "This receipt requires manual review because another receipt with the same total and date was found. Please wait for approval.",
+        "pdfConversion": "PDF conversion failed",
+        "noReceiptId": "No receipt ID returned from upload",
+        "analysisFailed": "Failed to analyze receipt. Please try again.",
+        "processImage": "Failed to process receipt image"
+      },
+      "step": {
+        "sendingFile": "Sending file to server"
+      },
+      "toast": {
+        "timeSaved": "Time saved",
+        "timeSkipped": "Time skipped"
+      },
+      "duplicateToastDesc": "This receipt may have been uploaded before. ({id}…)",
+      "duplicateNotSavedDesc": "This receipt was uploaded before. Duplicate receipts are not saved.",
+      "photoTooLargeDesc": "Photo too large. Please try again; large photos will be compressed on the server.",
+      "desktopOnlyTitle": "Receipt upload on mobile",
+      "desktopOnlyDescription": "To scan and upload receipts, please open the app on your phone.",
+      "desktopOnlyAppStore": "App Store",
+      "desktopOnlyPlayStore": "Google Play"
+    },
+    "breakdown": {
+      "title": "Hidden Cost Breakdown",
+      "totalHiddenCost": "Total Hidden Cost",
+      "costItemsIdentified": "{count} cost items identified",
+      "storeOperations": "Store & Operations",
+      "supplyChain": "Supply Chain & Journey",
+      "retailBrand": "Retail & Brand Layer",
+      "stateLayer": "State Layer (On Receipt)",
+      "estimated": "Estimated",
+      "otaCommission": "OTA Commission",
+      "storeOperationsDesc": "Store operations, staff, utilities, and payment processing",
+      "supplyChainDesc": "Supply chain, logistics, and distribution costs",
+      "retailBrandDesc": "Retail margin, brand, and marketing costs",
+      "distributionTitle": "Cost Distribution",
+      "distributionSubtitle": "See where your payment goes",
+      "productValue": "Product Value",
+      "productValueDesc": "The actual value of what you received",
+      "importSystem": "Import & System",
+      "importSystemDesc": "Logistics, storage, and infrastructure costs",
+      "stateLayerDesc": "VAT and government fees",
+      "exciseTax": "Excise Tax (ÖTV)",
+      "exciseTaxDesc": "Special consumption tax baked into the shelf price of tobacco, alcohol, or fuel. You pay it, but it is never itemised on the receipt.",
+      "total": "Total",
+      "bucket": {
+        "store": "Store",
+        "supply": "Supply",
+        "retail": "Retail",
+        "excise": "Excise (ÖTV)",
+        "government": "Government",
+        "other": "Other"
+      },
+      "itemsTitle": "Receipt Items",
+      "itemsSubtitle": "Line items read from your receipt",
+      "itemsCount": "{count} items",
+      "itemQty": "Qty",
+      "itemUnitPrice": "Unit",
+      "itemEmpty": "No line items were read from this receipt."
+    },
+    "mining": {
+      "title": "Data Contribution",
+      "step": {
+        "extracting": "Extracting Data",
+        "extractingDesc": "Analyzing receipt structure",
+        "calculating": "Calculating Hidden Costs",
+        "calculatingDesc": "Computing cost breakdown",
+        "categorizing": "Categorizing Expenses",
+        "categorizingDesc": "Mapping to expense categories",
+        "generating": "Generating Receipt",
+        "generatingDesc": "Creating blockchain-ready receipt",
+        "finalizing": "Finalizing",
+        "finalizingDesc": "Completing data contribution process"
+      },
+      "modal": {
+        "title": "Data Contribution",
+        "description": "Processing your receipt on the server...",
+        "progress": "Progress",
+        "uploading": "Uploading Receipt",
+        "uploadingDesc": "Sending receipt image to server...",
+        "ocr": "OCR Processing",
+        "ocrDesc": "Extracting text from receipt image...",
+        "extraction": "Data Extraction",
+        "extractionDesc": "Identifying date, total, and VAT...",
+        "merchant": "Merchant Verification",
+        "merchantDesc": "Verifying merchant and category...",
+        "calculation": "Calculating Hidden Costs",
+        "calculationDesc": "Computing pricing breakdown and rewards...",
+        "verification": "Anti-Cheat Verification",
+        "verificationDesc": "Checking for duplicates and validating data...",
+        "complete": "Complete!",
+        "completeDesc": "Receipt analysis finished successfully."
+      }
+    },
+    "pipeline": {
+      "errorTitle": "Something went wrong",
+      "retry": "Try again",
+      "analyzing": "Analyzing receipt",
+      "hiddenCostFound": "Hidden cost found",
+      "paid": "Paid",
+      "realValue": "Real value",
+      "viewDetails": "View details",
+      "breakdownTitle": "Cost breakdown",
+      "viewNext": "Continue",
+      "saveReceipt": "Save receipt",
+      "saving": "Saving…",
+      "doneTitle": "Done",
+      "doneSub": "Receipt saved.",
+      "scanAgain": "Scan new receipt",
+      "viewReceipts": "View receipts",
+      "potentialReward": "Potential reward",
+      "stage": {
+        "upload": "Uploading receipt…",
+        "ocr": "Reading text (OCR)…",
+        "extract": "Extracting date & total…",
+        "merchant": "Identifying merchant…",
+        "hidden": "Calculating hidden costs…",
+        "verify": "Verifying…"
+      },
+      "story": {
+        "upload": {
+          "short": "Seal",
+          "title": "Sealing your receipt",
+          "sub": "We send your file securely and prepare it for analysis."
+        },
+        "ocr": {
+          "short": "Read",
+          "title": "Reading the text",
+          "sub": "OCR extracts lines so we can understand what you paid for."
+        },
+        "extract": {
+          "short": "Extract",
+          "title": "Finding date & total",
+          "sub": "We locate the key numbers that anchor the whole story."
+        },
+        "enrich": {
+          "short": "Merchant",
+          "title": "Identifying the merchant",
+          "sub": "We match the business and category to enrich the analysis."
+        },
+        "verify": {
+          "short": "Trust",
+          "title": "Trust & anti-duplicate",
+          "sub": "We validate signals and protect rewards from duplicates."
+        },
+        "reward": {
+          "short": "Reward",
+          "title": "Calculating your reward",
+          "sub": "We convert hidden costs into cPoints and finalize your result."
+        }
+      }
+    },
+    "upload": {
+      "dropzone": {
+        "dropHere": "Drop receipt image or PDF here",
+        "clickToBrowse": "or click to browse"
+      },
+      "card": {
+        "title": "Upload Receipt",
+        "description": "Drag and drop an image or PDF, or click to browse",
+        "dropHere": "Drop your receipt here",
+        "clickToSelect": "or click to select a file",
+        "browseFiles": "Browse Files",
+        "uploaded": "Receipt Uploaded",
+        "readyToAnalyze": "Ready to analyze"
+      }
+    },
+    "insights": {
+      "title": "Insights",
+      "description": "Understand where your money goes and how to save more",
+      "empty": "No insights available yet",
+      "emptyDesc": "Mine a few receipts first to see your spending patterns and hidden costs.",
+      "noMatch": "No receipts match filters",
+      "noMatchDesc": "Try changing the time range or filters to see insights.",
+      "error": "Failed to load insights",
+      "timeRange": {
+        "all": "all time",
+        "7d": "last 7 days",
+        "30d": "last 30 days",
+        "90d": "last 90 days"
+      },
+      "filters": {
+        "timeRange": "Time range",
+        "allTime": "All time",
+        "last7Days": "Last 7 days",
+        "last30Days": "Last 30 days",
+        "last90Days": "Last 90 days",
+        "country": "Country",
+        "allCountries": "All countries",
+        "category": "Category",
+        "allCategories": "All categories",
+        "searchMerchant": "Search merchant...",
+        "currency": "Currency",
+        "clear": "Clear"
+      },
+      "truthMetric": {
+        "title": "You paid more than product value.",
+        "subtitle": "Hidden costs beyond the actual product value",
+        "percentOfSpending": "{percent}% of spending",
+        "totalSpend": "Total Spend",
+        "paidExTax": "Paid Ex-Tax",
+        "productValue": "Product Value",
+        "hiddenIndex": "Hidden Index",
+        "disclaimer": "Tax/VAT is shown separately. Hidden cost excludes state layer.",
+        "confidence": "Confidence coverage: {percent}% verified"
+      },
+      "moneyFlow": {
+        "title": "Where your money went",
+        "insightText": "Out of {total} you paid: {product} product / {retail} retail / {system} system / {tax} tax.",
+        "productValue": "Product Value",
+        "retailHidden": "Retail Hidden",
+        "importSystem": "Import/System",
+        "taxVat": "Tax/VAT"
+      },
+      "timePatterns": {
+        "title": "Spend vs Hidden Cost Trend",
+        "subtitle": "Track your spending and hidden costs over time.",
+        "notEnoughData": "Not enough data yet — upload more receipts.",
+        "trendingUp": "Hidden cost rate is trending upward.",
+        "trendingDown": "Hidden cost rate is trending downward.",
+        "categoryAboveBaseline": "{category} category is consistently above baseline ({categoryPercent}% vs {avgPercent}% average).",
+        "noPatterns": "No significant patterns detected yet.",
+        "notEnoughForTrend": "Not enough data for trend analysis",
+        "weekOf": "Week of {date}",
+        "patternInsights": "Pattern Insights",
+        "spend": "Spend",
+        "hiddenCost": "Hidden Cost"
+      },
+      "behaviorTrap": {
+        "title": "Behavior Trap Detector",
+        "subtitle": "Hidden cost rate by day & time",
+        "notEnoughData": "Not enough data yet — upload more receipts.",
+        "needReceipts": "Need at least {count} receipts to detect patterns.",
+        "avgHiddenRate": "Avg hidden rate:",
+        "totalSpend": "Total spend:",
+        "totalHidden": "Total hidden:",
+        "rateRange": "Hidden cost rate: {min}% - {max}%",
+        "low": "Low",
+        "high": "High"
+      },
+      "merchantTables": {
+        "title": "Top Hidden Cost Merchants",
+        "merchant": "Merchant",
+        "hiddenCost": "Hidden Cost",
+        "avgPercent": "Avg %",
+        "count": "Count",
+        "noData": "No merchant data available"
+      },
+      "whatIf": {
+        "title": "What-if Simulator",
+        "subtitle": "Small reductions in hidden costs compound quickly.",
+        "reduction": "Reduction",
+        "youWouldHaveSaved": "You would have saved",
+        "reduceBy": "Reduce by {percent}%",
+        "custom": "Custom"
+      },
+      "spendingPulse": {
+        "title": "Spending Pulse",
+        "subtitle": "Track your spending pace and month-end forecast",
+        "dailyBurnRate": "Daily burn rate",
+        "receiptFrequency": "Receipt frequency",
+        "projectedMonthEnd": "Projected month-end",
+        "notEnoughData": "Not enough data yet — upload more receipts.",
+        "cumulativeSpend": "Cumulative Spend vs Time",
+        "topSpendingDay": "Top spending day",
+        "mostFrequentCategory": "Most frequent category",
+        "perDay": "per day",
+        "receiptsPerDay": "receipts/day",
+        "forecast": "forecast",
+        "cumulative": "Cumulative",
+        "daySpend": "Day spend",
+        "actual": "Actual",
+        "projected": "Projected"
+      },
+      "trustLayer": {
+        "title": "Trust Layer",
+        "onlyVerified": "Only verified receipts generate rewards. {count} low-confidence receipt{plural} flagged.",
+        "allVerified": "All receipts are verified.",
+        "noReceipts": "No receipts available.",
+        "noData": "No receipt data available",
+        "verified": "Verified",
+        "lowConfidence": "Low Confidence"
+      },
+      "categories": {
+        "grocery": "Grocery",
+        "restaurant": "Restaurant",
+        "cafe": "Cafe",
+        "fuel": "Fuel",
+        "marketplace": "Online",
+        "pharmacy": "Pharmacy",
+        "electronics": "Electronics",
+        "apparel": "Apparel",
+        "fashion": "Fashion",
+        "beauty": "Beauty",
+        "personal_care": "Personal care",
+        "home": "Home",
+        "alcohol": "Alcohol",
+        "tobacco": "Tobacco",
+        "utilities": "Utilities",
+        "travel": "Travel",
+        "hospitality_lodging": "Lodging",
+        "healthcare": "Healthcare",
+        "services": "Services",
+        "convenience": "Convenience",
+        "other": "Other"
+      },
+      "products": {
+        "genericItem": "generic item"
+      }
+    },
+    "tasks": {
+      "title": "Tasks",
+      "description": "Complete social media tasks, challenges, and content creation to earn rewards",
+      "notActive": "⚠️ Not active",
+      "completed": "Completed",
+      "earned": "{amount} points earned",
+      "all": "All Tasks",
+      "socialMedia": "Social Media",
+      "challenge": "Challenge",
+      "contentCreation": "Content Creation",
+      "community": "Community",
+      "empty": "No tasks found for selected filter",
+      "progress": "Progress",
+      "steps": "Steps",
+      "moreSteps": "+{count} more steps",
+      "start": "Start Task",
+      "error": "Failed to load tasks"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "description": "Account balances and transaction history",
+      "cPointsTotal": "Total cPoints",
+      "cPointsBreakdown": "cPoints Breakdown",
+      "totalEarned": "Total Earned",
+      "activity": "Activity Log",
+      "receiptVerified": "Receipt verified",
+      "taskCompleted": "Task completed",
+      "adjustment": "Adjustment",
+      "claim": "Claim",
+      "completed": "COMPLETED",
+      "pending": "PENDING",
+      "noActivity": "No activity recorded",
+      "awarenessToken": "Contribution score",
+      "awarenessDesc": "Total points are calculated from your verified receipt and quest contributions.",
+      "rewardToken": "Contribution breakdown",
+      "rewardDesc": "Receipt points come from analyzed/verified receipts, and quest points come from completed tasks.",
+      "receiptFrom": "Receipt from {merchant}"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "description": "Top miners and hidden cost discoverers",
+      "subtitle": "Hidden cost hunters",
+      "season": "Season",
+      "global": "Global",
+      "weekly": "Weekly",
+      "daily": "Daily",
+      "receiptsAndStreak": "{receipts} receipts · {days} day streak",
+      "receiptsAndDays": "{receipts} receipts · {days} days",
+      "hiddenCostLabel": "hidden cost",
+      "uploadToRank": "Upload receipts to get on the board.",
+      "yourRank": "Your rank",
+      "you": "You",
+      "rank": "Rank",
+      "user": "User",
+      "receipts": "Receipts",
+      "hiddenCost": "Hidden Cost",
+      "streak": "Streak",
+      "days": "days",
+      "badges": "Badges",
+      "honor": "Honor",
+      "totalAyumo": "Total receipt cPoints",
+      "totalRyumo": "Total quest cPoints",
+      "totalAyumoAdminHint": "All-time receipt cPoints earned (admin only)",
+      "totalRyumoAdminHint": "All-time quest cPoints earned (admin only)",
+      "error": "Failed to load leaderboard",
+      "empty": "No leaderboard data available",
+      "seasonLabel": "Season"
+    },
+    "honor": {
+      "tipsTitle": "To improve your Honor:",
+      "tipPhoto": "Frame the receipt clearly and fully; keep the camera in focus.",
+      "tipCondition": "Keep the receipt legible and intact; wet or crumpled receipts may not be read.",
+      "tipBackground": "Place the receipt on a dark, flat surface; leave space around the edges."
+    },
+    "settings": {
+      "title": "Settings",
+      "account": "Account",
+      "accountDesc": "Manage your account information",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "emailNone": "No email on file",
+      "emailVerified": "Verified",
+      "emailUnverified": "Not verified",
+      "updateEmail": "Update email",
+      "emailDialogTitle": "Update email",
+      "emailDialogDesc": "Enter your new email and current password. Changing your email clears verification until you confirm the new address.",
+      "emailDialogPasswordOnly": "Enter your current password to save the email address in the field above.",
+      "emailSaveHint": "Type your email and tap Save email. We will send a verification link to that address.",
+      "emailUnsaved": "Not saved yet",
+      "saveEmail": "Save email",
+      "emailSaved": "Email updated",
+      "emailVerifyReminder": "Check your inbox to verify your new email address.",
+      "error": {
+        "emailInvalid": "Invalid email address",
+        "emailInUse": "That email is already in use",
+        "emailLoad": "Could not load email",
+        "emailSave": "Could not update email",
+        "login": "Please log in to save settings",
+        "displayNameRequired": "Display name is required",
+        "allFieldsRequired": "All fields are required",
+        "passwordsNotMatch": "New passwords do not match",
+        "passwordLength": "Password must be at least 8 characters",
+        "saveProfile": "Failed to save profile",
+        "saveAccount": "Failed to save account settings",
+        "changePassword": "Failed to change password",
+        "savePreferences": "Failed to save preferences"
+      },
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Enter your display name",
+      "gender": {
+        "_": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "nonBinary": "Non Binary",
+        "other": "Other",
+        "preferNotToSay": "Prefer not to say"
+      },
+      "genderPlaceholder": "Select gender (optional)",
+      "birthDate": "Date of Birth",
+      "birthDatePlaceholder": "Select date (optional)",
+      "password": "Password",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "passwordDesc": "Enter your current password and choose a new one.",
+      "wallet": {
+        "_": "Wallet",
+        "connect": "Connect Wallet",
+        "connecting": "Connecting...",
+        "signing": "Signing...",
+        "disconnect": "Disconnect"
+      },
+      "walletDesc": "Manage your connected wallet",
+      "connectedAddress": "Connected Address",
+      "appearance": "Appearance",
+      "appearanceDesc": "Switch between light and dark theme",
+      "themeLight": "Light theme",
+      "themeDark": "Dark theme",
+      "themeSwitch": "Toggle theme",
+      "sound": {
+        "_": "Sound effects",
+        "volume": "Volume",
+        "mute": "Mute",
+        "unmute": "Unmute"
+      },
+      "soundDesc": "Enabled by default (plays after your first tap)",
+      "appLanguage": "Application language",
+      "appLanguageHint": "Language for menus, buttons, and app screens.",
+      "appLanguageSaved": "Application language updated",
+      "cookiePreferences": "Cookie preferences",
+      "cookiePreferencesDesc": "Manage analytics and consent cookies for Yumo Yumo.",
+      "openCookiePreferences": "Open cookie preferences",
+      "preferences": "Profile & income",
+      "preferencesDesc": "Occupation and monthly income (optional)",
+      "occupation": "Occupation",
+      "occupationPlaceholder": "e.g. Engineer, Teacher",
+      "monthlyIncome": "Monthly average income",
+      "monthlyIncomePlaceholder": "Select USD band (optional)",
+      "incomeBand": {
+        "under_30": "Under 30,000 ₺",
+        "30_35": "30,000 – 35,000 ₺",
+        "35_45": "35,000 – 45,000 ₺",
+        "45_60": "45,000 – 60,000 ₺",
+        "60_70": "60,000 – 70,000 ₺",
+        "70_85": "70,000 – 85,000 ₺",
+        "85_100": "85,000 – 100,000 ₺",
+        "100_120": "100,000 – 120,000 ₺",
+        "120_150": "120,000 – 150,000 ₺",
+        "150_plus": "150,000 ₺ and above"
+      },
+      "save": "Save Account Settings",
+      "saving": "Saving...",
+      "saved": "Account settings saved successfully",
+      "savePreferences": "Save Preferences",
+      "preferencesSaved": "Preferences saved successfully",
+      "changing": "Changing...",
+      "passwordChanged": "Password changed successfully",
+      "cancel": "Cancel"
+    },
+    "admin": {
+      "approvals": {
+        "title": "Pending Approvals",
+        "description": "Approve receipts over 20,000 TL",
+        "noPending": "No pending receipts",
+        "noPendingDesc": "There are currently no pending receipts.",
+        "approve": "Approve",
+        "reject": "Reject",
+        "view": "View",
+        "merchant": "Merchant",
+        "user": "User",
+        "date": "Date",
+        "total": "Total",
+        "status": "Status",
+        "actions": "Actions",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "approveConfirm": "Are you sure you want to approve this receipt?",
+        "rejectConfirm": "Are you sure you want to reject this receipt?",
+        "rejectReason": "Rejection reason (optional):",
+        "error": {
+          "unauthorized": "Unauthorized - Admin access required",
+          "forbidden": "Forbidden - Admin access required",
+          "load": "Failed to load pending receipts",
+          "approve": "Failed to approve receipt",
+          "reject": "Failed to reject receipt",
+          "notPending": "Receipt is not pending approval"
+        }
+      },
+      "rejected": {
+        "title": "Rejected Receipts",
+        "description": "Receipts that were rejected by admin",
+        "noRejected": "No rejected receipts",
+        "noRejectedDesc": "There are no rejected receipts.",
+        "view": "View",
+        "merchant": "Merchant",
+        "user": "User",
+        "date": "Date",
+        "total": "Total",
+        "status": "Status",
+        "actions": "Actions",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "error": {
+          "unauthorized": "Unauthorized - Admin access required",
+          "forbidden": "Forbidden - Admin access required",
+          "load": "Failed to load rejected receipts"
+        }
+      },
+      "allReceipts": {
+        "title": "All Receipts",
+        "description": "Every receipt in the system, across all statuses",
+        "approvalQueue": "Approval queue",
+        "searchPlaceholder": "Search merchant or receipt ID",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "empty": "No receipts",
+        "emptyDesc": "No receipts match this filter.",
+        "view": "View",
+        "merchant": "Merchant",
+        "user": "User",
+        "date": "Date",
+        "total": "Total",
+        "status": "Status",
+        "actions": "Actions",
+        "userView": "User view",
+        "adminTools": "Admin tools (OCR & pipeline)",
+        "prev": "Previous",
+        "next": "Next",
+        "pageLabel": "Showing {from}–{to}",
+        "filters": {
+          "all": "All",
+          "pending": "Pending",
+          "verified": "Verified",
+          "rejected": "Rejected"
+        },
+        "error": {
+          "unauthorized": "Unauthorized - Admin access required",
+          "forbidden": "Forbidden - Admin access required",
+          "load": "Failed to load receipts"
+        }
+      },
+      "feedback": {
+        "title": "Feedback",
+        "description": "User-reported receipt issues",
+        "empty": "No feedback yet",
+        "emptyDesc": "User reports will appear here.",
+        "reporter": "Reporter",
+        "bugTypes": "Bug types",
+        "viewReceipt": "View receipt",
+        "receiptNotSaved": "Receipt not saved yet",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "error": {
+          "unauthorized": "Unauthorized - Admin access required",
+          "forbidden": "Forbidden - Admin access required",
+          "load": "Failed to load feedback"
+        }
+      },
+      "stats": {
+        "totalReceipts": "Total receipts in system: {count}"
+      },
+      "merchants": {
+        "title": "Merchants",
+        "description": "Approve new businesses (set tier to candidate or verified).",
+        "filterAll": "All",
+        "filterUnverified": "Pending approval",
+        "filterCandidate": "Candidate",
+        "filterVerified": "Verified",
+        "displayName": "Display name",
+        "canonicalName": "Canonical name",
+        "category": "Category",
+        "tierLabel": "Tier",
+        "tier": {
+          "unverified": "Unverified",
+          "candidate": "Candidate",
+          "verified": "Verified"
+        },
+        "patternCount": "Patterns",
+        "actions": "Actions",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "noMerchants": "No merchants",
+        "noMerchantsDesc": "No merchants match the selected filter.",
+        "approveCandidate": "Approve (candidate)",
+        "approveVerified": "Approve (verified)",
+        "approveConfirm": "Approve \"{name}\" as {tier}?",
+        "error": {
+          "unauthorized": "Unauthorized - Admin access required",
+          "forbidden": "Forbidden - Admin access required",
+          "load": "Failed to load merchants",
+          "approve": "Failed to approve merchant",
+          "reject": "Failed to reject merchant"
+        },
+        "acceptCandidate": "Accept (candidate)",
+        "acceptVerified": "Accept (verified)",
+        "reject": "Reject",
+        "rejectConfirm": "Reject \"{name}\"? This will remove it from the list.",
+        "tooltip": {
+          "candidate": "Accept as candidate: listed for matching, standard reward",
+          "verified": "Accept as verified: listed and higher reward multiplier",
+          "reject": "Reject: remove from list (fişlerde tekrar çıkabilir)"
+        }
+      }
+    },
+    "reportBug": {
+      "button": "Report a bug",
+      "title": "Report a bug",
+      "submit": "Submit",
+      "selectAtLeastOne": "Please select at least one option",
+      "types": {
+        "category_wrong": "Category wrong",
+        "date_wrong": "Date wrong",
+        "merchant_name_wrong": "Merchant name wrong",
+        "time_wrong": "Time wrong",
+        "total_wrong": "Total amount wrong"
+      }
+    },
+    "correctionModal": {
+      "button": "See a field that's wrong?",
+      "title": "See a field that's wrong?",
+      "subtitle": "Fix it and earn extra reward (if it's correct).",
+      "fieldLabel": "Which field?",
+      "selectField": "Select a field",
+      "valueLabel": "Correct value",
+      "enterValue": "Enter the correct value",
+      "submit": "Send correction",
+      "successPending": "Thanks — your correction was sent for review.",
+      "successApplied": "Thanks — your correction was applied and sent for review.",
+      "pendingBadge": "under review",
+      "detailsTitle": "Receipt details",
+      "awaitingApproval": "awaiting approval",
+      "underReview": "receipt under review",
+      "noChanges": "Change at least one field",
+      "multiSubtitle": "Edit any fields you want, then send. You can fix several at once.",
+      "error": "Could not send the correction",
+      "dateConfirm": {
+        "title": "Is this receipt's date right?",
+        "body": "We read the date as {date}, which is outside the current month, so it didn't earn a reward. If that's wrong, correct the date and we'll re-check it.",
+        "futureTitle": "This date can't be in the future",
+        "futureBody": "We read the date as {date}, which is in the future — a receipt can't be dated ahead, so it didn't earn a reward. Please enter the correct date.",
+        "cta": "Correct the date"
+      },
+      "fields": {
+        "merchant_name": "Merchant name",
+        "date": "Date",
+        "time": "Time",
+        "total": "Total amount",
+        "vat": "VAT amount"
+      }
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "Error",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "tryAgain": "Try Again",
+      "somethingWentWrong": "Something went wrong",
+      "user": "User",
+      "na": "N/A",
+      "share": "Share",
+      "linkCopied": "Link copied",
+      "claimable": "Claimable",
+      "shareReceipt": "Share Receipt",
+      "dismissBanner": "Dismiss banner",
+      "account": "Account"
+    },
+    "receiptDetail": {
+      "total": "Total",
+      "hiddenCost": "Hidden Cost",
+      "reward": "Reward",
+      "status": "Status",
+      "proofEyebrow": "Proof of expense",
+      "youPaid": "You paid",
+      "realValue": "Real value",
+      "rewardReady": "Reward ready",
+      "rewardVerifying": "Verifying",
+      "bonus": "Bonus",
+      "hiddenTitle": "Where your money went",
+      "ofTotal": "of total",
+      "tapForDetail": "Tap for detail",
+      "estimatedBadge": "Estimated",
+      "readFromReceipt": "Read from receipt",
+      "embeddedTax": "Embedded tax",
+      "itemsTitle": "Items",
+      "itemsEmpty": "No line items were read from this receipt.",
+      "brandQuestion": "What's the brand?",
+      "brandHint": "We couldn't read this product's brand — add it to track your favorites.",
+      "brandPlaceholder": "Search or type a brand",
+      "brandUnbranded": "No brand",
+      "brandSave": "Save",
+      "brandSaved": "Thanks!",
+      "showMore": "Show {count} more",
+      "showLess": "Show less",
+      "detailsTitle": "Receipt details",
+      "uploaded": "Uploaded",
+      "readConfidence": "Read confidence",
+      "category": "Category",
+      "merchant": "Merchant",
+      "duplicateTitle": "Already uploaded",
+      "duplicateBody": "This receipt matches an earlier upload.",
+      "viewOriginal": "View original",
+      "photoTipTitle": "Photo tip",
+      "adminSection": "Admin tools",
+      "adminEvidence": "Evidence",
+      "adminWarnings": "Warnings",
+      "adminRejections": "Rejection reasons",
+      "downloadImage": "Download image",
+      "downloadCard": "Download card",
+      "downloading": "Downloading…",
+      "deleteReceipt": "Delete receipt",
+      "deleting": "Deleting…",
+      "deleteConfirmTitle": "Delete receipt",
+      "deleteConfirmBody": "This receipt will be permanently deleted. This cannot be undone."
+    },
+    "empty": {
+      "noData": "No data available"
+    },
+    "quests": {
+      "active": "Active Quests",
+      "notActive": "⚠️ Not active",
+      "dailyTitle": "Daily Quests",
+      "today": "Today",
+      "xpToday": "+ {x} XP today",
+      "weeklyGoal": "Weekly Goal",
+      "selectGoalThisWeek": "Select a goal for this week (you haven't yet).",
+      "noWeeklyGoal": "No weekly goal.",
+      "noDailyQuests": "No daily quests yet.",
+      "loadError": "Failed to load tasks",
+      "completedBadge": "Completed",
+      "completeQuest": "Complete quest",
+      "conditionsNotMet": "Conditions not met",
+      "viewAll": "View all quests",
+      "streak": "Streak"
+    },
+    "receiptViewer": {
+      "noImage": "No image available",
+      "title": "Receipt Image",
+      "previewWillAppear": "Receipt preview will appear here",
+      "rotate": "Rotate",
+      "zoom": "Zoom"
+    },
+    "evidence": {
+      "value": "Value",
+      "score": "Score",
+      "downloadImage": "Download image",
+      "selectedTotal": "Selected Total",
+      "fromLine": "From Line",
+      "reasons": "Reasons",
+      "ocrLines": "OCR Lines",
+      "rawOcrText": "Raw OCR Text",
+      "verificationReasons": "Verification Reasons",
+      "title": "Evidence & Confidence",
+      "visionJsonIntro": "Vision JSON download button is below, in the first section.",
+      "visionJsonSectionTitle": "Google Vision JSON (Admin)",
+      "visionJsonSectionDesc": "Raw Vision API response (responses[0]); same content as receipt_vision_raw.",
+      "visionJsonDownloadBtn": "Download Vision JSON",
+      "receiptImageTitle": "Receipt Image (Blob)"
+    },
+    "potentialReward": {
+      "honorEffect": "Reward rate",
+      "title": "Your Potential Reward",
+      "potential": "(potential)",
+      "description": "Your potential reward has been calculated from this analysis.",
+      "rewardNote": "Reward estimate ready.",
+      "rewardDesc": "Save the analysis to add this receipt to your history.",
+      "check1": "Data processed locally",
+      "check2": "Hidden costs revealed",
+      "check3": "Potential reward calculated",
+      "back": "Back",
+      "save": "Save Analysis",
+      "saving": "Saving...",
+      "honorFromReceipt": "Honor from this receipt",
+      "honorBonus": "Honor Bonus 1.2x applied",
+      "honorAdminNote": "Admin: Your honor score is not updated; this receipt would affect a normal user's Honor this way."
+    },
+    "receiptScanner": {
+      "cameraNotSupported": "Camera not supported",
+      "pickFile": "Pick file",
+      "scan": "Scan",
+      "takePhoto": "Take Photo",
+      "desktopCameraHint": "Live camera capture works on phones and tablets. To scan with your camera, open the app on your mobile device.",
+      "desktopPickFileHint": "You can still upload a receipt photo or PDF from this computer using Pick file below.",
+      "uploadTitle": "Upload Receipt",
+      "uploadSubtitle": "Take a photo with your camera or choose an image from your gallery.",
+      "cameraNotAvailable": "Camera not available",
+      "placeReceipt": "Place receipt in frame",
+      "holdVertical": "Hold phone vertically so the receipt fits.",
+      "cameraPermissionHint": "Enable camera permission in browser settings.",
+      "openingCamera": "Opening camera…",
+      "expenseTypeTitle": "Choose receipt type",
+      "expenseTypeSubtitle": "This affects how the receipt is categorized and rewarded.",
+      "expensePersonal": "Personal Expense",
+      "expensePersonalDesc": "Your own shopping — groceries, cafés, fuel, etc.",
+      "expenseOther": "Other Expenses",
+      "expenseOtherDesc": "Bulk receipts collected on behalf of a business or someone else.",
+      "expenseTypeBack": "Change type",
+      "expenseOtherBadge": "Reduced reward",
+      "expenseTypeHint": "You can switch the type anytime on the next step."
+    },
+    "scanIntro": {
+      "title": "Before you scan",
+      "subtitle": "A quick look at how Yumo Yumo turns your receipts into a clearer picture of your spending.",
+      "purposeTitle": "Built around your daily spending",
+      "purposeDesc": "Yumo Yumo helps you manage your everyday spending habits. Each receipt you add builds your spending history and sharpens your price comparisons.",
+      "expenseTypeTitle": "Personal vs. other expenses",
+      "expenseTypeDesc": "Personal expenses are your own shopping and earn the full reward. Other expenses are receipts you collect for a business or someone else — they are saved with a reduced reward and stay out of your personal price baselines.",
+      "dateRuleTitle": "Receipts from the current month earn rewards",
+      "dateRuleDesc": "Add receipts within the month of purchase to earn rewards. Receipts from an earlier month are still saved and counted in your spending history, and they keep your records complete.",
+      "dontShowAgain": "Don't show this again",
+      "cta": "Got it, let's scan"
+    },
+    "vectorReceipt": {
+      "seeYouAgain": "We look forward to seeing you again",
+      "timeNa": "Time N/A",
+      "thankYou": "Thank you for choosing YumoYumo"
+    },
+    "photoGuidelines": {
+      "title": "Photo Guidelines",
+      "receiptUpright": "Receipt must be upright",
+      "receiptUprightDesc": "Place the receipt on a flat surface and hold your camera perpendicular to the receipt.",
+      "entireReceipt": "Entire receipt visible",
+      "entireReceiptDesc": "The full receipt must be in frame with no edges cut off. If too close, move the camera away from the receipt.",
+      "cleanBackground": "Clean background",
+      "cleanBackgroundDesc": "No other objects should be around or on the receipt. Place it on a clean, flat surface.",
+      "sufficientLight": "Sufficient lighting",
+      "sufficientLightDesc": "Please ensure there is sufficient lighting. Avoid direct light sources.",
+      "sharpFocused": "Sharp and focused",
+      "sharpFocusedDesc": "Hold your camera steady and focus on the receipt. The photo should not be blurry.",
+      "margins": "Margins around receipt",
+      "marginsDesc": "Leave some space around the receipt (top, bottom, left, and right). The receipt should not touch the edges of the photo."
+    },
+    "compactPieChart": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "hoverDetails": "Hover over chart segments to see details",
+      "hidden": "hidden"
+    },
+    "deepScan": {
+      "generatingReport": "Generating report"
+    },
+    "miningComplete": {
+      "congrats": "CONGRATULATIONS!",
+      "success": "ANALYSIS COMPLETE",
+      "receiptAnalyzed": "Your receipt has been successfully analyzed!",
+      "foundHidden": "Found Hidden Cost",
+      "potentialReward": "Potential Reward",
+      "stats": "Total Statistics",
+      "totalReceipts": "Receipts Analyzed",
+      "totalHidden": "Total Hidden Cost",
+      "mineAnother": "Analyze New Receipt",
+      "viewHistory": "View History",
+      "totalPotential": "Potential Reward"
+    }
+  },
+  "dashboard": {
+    "financialOs": "FINANCIAL OS",
+    "notifications": "NOTIFICATIONS",
+    "unread": "unread",
+    "markAllRead": "Mark all as read",
+    "noNotificationsTitle": "No new notifications.",
+    "noNotificationsBody": "Daily notes and account movement will appear here.",
+    "notificationCenter": "Open notification center",
+    "newNotification": "New notification",
+    "rhythmEyebrow": "This week",
+    "thisWeek": "This Week",
+    "todayEyebrow": "Today's notes",
+    "todaysEvents": "Today",
+    "noEventsTitle": "Nothing new for today.",
+    "noEventsBody": "Calendar, bill, travel, and event notes will appear here.",
+    "platformEyebrow": "Yumo learns",
+    "platform": "",
+    "live": "",
+    "profileEyebrow": "Hello",
+    "level": "LEVEL",
+    "xpThreshold": "threshold",
+    "shoppingEyebrow": "Shopping",
+    "shoppingTitle": "Shopping list",
+    "shoppingEmptyTitle": "Your shopping list is empty for now",
+    "shoppingEmptyBody": "When you start scanning receipts, Yumo will fill this in for you",
+    "shoppingHint": "Looks suitable for your list.",
+    "listCandidate": "List candidate",
+    "todayNote": "Today",
+    "contributionScore": "Contribution score",
+    "total": "total",
+    "items": "items",
+    "notes": "notes",
+    "addProfilePhoto": "Add profile photo",
+    "home": "Today",
+    "scan": "Scan",
+    "myWorld": "My World",
+    "social": "Friends",
+    "web3": "Web3",
+    "verifyEyebrow": "Workhub",
+    "verifyTitle": "Contribute to the vision, earn prizes",
+    "verifyBody": "Help build Yumo's decentralized price intelligence. Each verification sharpens the network — and earns prizes along the way.",
+    "verifyPending": "pending",
+    "verifyMore": "See more",
+    "verifyEmptyTitle": "No tasks to verify right now",
+    "verifyEmptyBody": "Yumo will fill this in as new receipts arrive.",
+    "verifyQuotaUsed": "Today",
+    "verifyQuotaRemaining": "verifications left",
+    "verifyConfirm": "Yes, correct",
+    "verifyReject": "No, different",
+    "verifySkip": "Don't know, skip",
+    "verifyCorrectTitle": "What's the correct one?",
+    "verifyCorrectHint": "Type the merchant's full name as on the receipt",
+    "verifyCorrectSave": "Save and continue",
+    "verifySimilar": "Similar merchants — tap to autofill",
+    "servicesEyebrow": "My service providers",
+    "servicesTitle": "Subscriptions & bills",
+    "servicesAdd": "+ Add",
+    "servicesEmptyTitle": "No providers yet",
+    "servicesEmptyBody": "Add recurring services like electricity, internet, or digital subscriptions and Yumo will remind you of due dates.",
+    "servicesReminderHint": "Reminders arrive 3 and 1 days before due date",
+    "servicesDayCounter": "days",
+    "servicesUpcomingTitle": "Upcoming payments",
+    "servicesAddTitle": "Add service provider",
+    "servicesStepCategory": "1 · Category",
+    "servicesStepName": "2 · Provider name",
+    "servicesStepNameHint": "You pick the brand — Yumo doesn't collect logos, only stores the name you write",
+    "servicesStepDay": "3 · Payment day",
+    "servicesStepReminder": "4 · Reminder",
+    "servicesPaymentDayLabel": "Day of month",
+    "servicesReminder3": "3 days before",
+    "servicesReminder1": "1 day before",
+    "servicesReminderSameDay": "Morning of due date",
+    "servicesSubmit": "Add and remind",
+    "shoppingListAdd": "+ Add",
+    "shoppingItemPlaceholder": "New item...",
+    "shoppingItemSave": "Add",
+    "shoppingHintMatch": "When you upload a receipt, Yumo auto-matches your list and shows price differences across stores",
+    "todayMicroEyebrow": "Today's move",
+    "todayMicroAddReceipt": "Add your first receipt",
+    "todayMicroSeconds": "sec",
+    "todayMicroContribution": "contribution"
+  },
+  "xray": {
+    "title": "Receipt X-Ray",
+    "dominantLabel": "Dominant",
+    "personaLabel": "Persona",
+    "detectedSignals": "Detected signals",
+    "layer": {
+      "need": {
+        "title": "Need Layer",
+        "sub": "What you truly need"
+      },
+      "mood": {
+        "title": "Mood Layer",
+        "sub": "Reward, relaxation, escape"
+      },
+      "inflation": {
+        "title": "Inflation Layer",
+        "sub": "Price deviation vs product value"
+      },
+      "social": {
+        "title": "Social Layer",
+        "sub": "Out-of-home life and context"
+      },
+      "hiddenCost": {
+        "title": "Hidden Cost",
+        "sub": "Yumo core model"
+      }
+    },
+    "signals": {
+      "basicNeedCategory": "Basic need category",
+      "mandatoryService": "Mandatory service expense",
+      "luxuryWantCategory": "Luxury / want category",
+      "entertainmentExpense": "Entertainment expense",
+      "lowAmountSmallPurchase": "Low amount — small purchase",
+      "highAmountStockPurchase": "High amount — stock/bulk purchase",
+      "rewardRelaxationCategory": "Reward / relaxation category",
+      "eveningEndOfDayReward": "Evening — end-of-day reward tendency",
+      "afternoonBreakTime": "Afternoon break time",
+      "weekendHigherMood": "Weekend — higher mood potential",
+      "smallAmountLowRiskReward": "Small amount — low risk reward",
+      "socialMealReward": "Dining out — social reward",
+      "highHiddenCostRatio": "Hidden cost exceeds {pct}% of total",
+      "brandMarkupExceedsImport": "Brand markup exceeds import cost",
+      "retailMarkupExceedsProduct": "Retail markup exceeds product value",
+      "importLogisticsSignificant": "Import & logistics layer significant",
+      "intermediaryInflation": "Price heavily inflated by intermediaries",
+      "moderateInflation": "Moderate intermediary inflation",
+      "socialVenueCategory": "Social / out-of-home venue",
+      "restaurantSocialContext": "Restaurant — social meal context",
+      "nightlifeSocialContext": "Nightlife — social context",
+      "groceryHome": "Grocery — at-home",
+      "utilityBillHome": "Utility bill — entirely at-home",
+      "onlineNoPhysicalSocial": "Online purchase — no physical sociality",
+      "brandAmount": "Retail & Brand: {amount} {currency}",
+      "importAmount": "Import & System: {amount} {currency}",
+      "stateAmount": "State share (VAT): {amount} {currency}"
+    },
+    "labels": {
+      "needHigh": "Basic Need",
+      "needMid": "Mixed",
+      "needLow": "Want / Luxury",
+      "moodHigh": "Reward / Relaxation",
+      "moodMid": "Some Mood Effect",
+      "moodLow": "Functional",
+      "inflationHigh": "High Price Deviation",
+      "inflationMid": "Moderate Deviation",
+      "inflationLow": "Low Deviation",
+      "socialHigh": "Out-of-Home Life",
+      "socialMid": "Mixed",
+      "socialLow": "Home / Digital",
+      "hiddenCostHigh": "High Hidden Cost",
+      "hiddenCostMid": "Moderate Hidden Cost",
+      "hiddenCostLow": "Low Hidden Cost"
+    },
+    "descriptions": {
+      "need": {
+        "high": "The items on this receipt are essential life necessities.",
+        "mid": "A mix of needs and wants.",
+        "low": "This receipt leans toward pleasure, luxury, or desire."
+      },
+      "mood": {
+        "high": "This receipt behaves like a reward, escape, or relaxation ritual.",
+        "mid": "A slight mood influence, but not a full reward.",
+        "low": "This receipt is mostly functional."
+      },
+      "inflation": {
+        "high": "Price has deviated heavily from the product's real value. Intermediary layers are dominant.",
+        "mid": "There is a noticeable markup, but still within reasonable bounds.",
+        "low": "Price and value are fairly close."
+      },
+      "social": {
+        "high": "This receipt is part of a moment spent outside, with others.",
+        "mid": "A balance between social context and practicality.",
+        "low": "This receipt points to home life or personal digital shopping."
+      },
+      "hiddenCost": {
+        "high": "A large share of what you paid does not go to the product itself; intermediaries, brand, and tax layers are thick.",
+        "mid": "Hidden cost exists but product value still holds a meaningful share.",
+        "low": "Most of what you paid goes to the product itself."
+      }
+    },
+    "oneLine": {
+      "workspaceHunter": "This {merchant} receipt is not just a coffee; it behaves like workspace rent, cool air, and a break cost.",
+      "eveningRewarder": "A small evening reward ritual from {merchant}.",
+      "routineRestocker": "{merchant} is part of the weekly rhythm; restocking and keeping the home running.",
+      "socialConnector": "This {merchant} receipt is not just spending; it's a trace of a moment shared outside.",
+      "inflationVictim": "At {merchant}, basic needs are bought but price layers overshadow the product itself.",
+      "impulseNomad": "{merchant} is the product of an impulse decision; not on the need list, but it caught the mood.",
+      "needDominant": "This {merchant} receipt is a practical answer to basic needs.",
+      "moodDominant": "This {merchant} receipt carries the trace of a reward or relaxation moment.",
+      "inflationDominant": "At {merchant}, the gap between price and product value is striking.",
+      "socialDominant": "This {merchant} receipt is part of out-of-home life and social context.",
+      "hiddenCostDominant": "On this {merchant} receipt, a significant share of the total goes to layers outside the product.",
+      "fallback": "This {merchant} receipt carries behavioral layers worth reading."
+    },
+    "narrative": {
+      "workspaceHunter": "This {merchant} stop is not really about the drink; it's the signal that you want to pack up your desk and move there. The coffee isn't the main product — it's the price of a workspace permit.",
+      "eveningRewarder": "After the weight of the day, this small thing from {merchant} looks like a moment of giving yourself permission. Not a reward — a breath.",
+      "routineRestocker": "A {merchant} run keeps the rhythm going; but if anything outside the list snuck in, even routines have their little escapes.",
+      "socialConnector": "This {merchant} receipt isn't just food or drink; it's a trace of being at the same table with others, conversation, and the feeling of being outside.",
+      "inflationVictim": "Basic items come off the shelves at {merchant}, but a significant slice of what you paid doesn't reach the product itself; shelves, logistics, and brand step in between.",
+      "impulseNomad": "This {merchant} receipt is an unplanned stop. It wasn't needed, but something in that moment caught you. Mood sometimes jumps ahead of the list.",
+      "fallback": "Let's look at what this {merchant} receipt actually says between the lines.",
+      "needAndInflation": "Even though it's a basic need, price layers are quite thick.",
+      "moodAndSocial": "This reward also carries social context; not alone, lived outside.",
+      "hiddenCostAndNeed": "Hidden cost is high but this is a necessity purchase; hard to avoid.",
+      "socialAndMood": "The social setting is also a source of relaxation and reward.",
+      "highRatio": "{pct}% of what you paid does not go to the product itself.",
+      "eveningMood": "Evening timing gives this purchase a reward character."
+    }
+  },
+  "goals": {
+    "title": "Goals",
+    "streak": "{count}-day streak",
+    "addFinancialGoal": "Add financial goal",
+    "todaysPlan": "Today's plan",
+    "actions": "{count} actions",
+    "noActions": "No open tasks right now. Continue from the Tasks screen.",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "receiptTrust": "Receipt trust",
+    "quests": "Quests",
+    "complete": "Complete",
+    "questsAll": "All",
+    "questsDaily": "Daily",
+    "questsWeekly": "Weekly",
+    "dailyQuest": "Daily quest",
+    "weeklyQuest": "Weekly quest",
+    "questDone": "Done",
+    "questOngoing": "Ongoing",
+    "questProgress": "Progress {current} / {target}",
+    "noQuests": "No incomplete quests. New receipts or weekly rotation will show here.",
+    "patterns": "Life",
+    "financialGoals": "Financial goals",
+    "add": "Add",
+    "noFinancialGoals": "No active goals saved. Add one or tap the + above.",
+    "deleteGoal": "Delete goal",
+    "goalTarget": "Target {amount}",
+    "addGoalButton": "Add financial goal",
+    "trustCard": {
+      "title": "Receipt quality",
+      "desc": "Clear receipts raise your trust score and unlock better rewards.",
+      "improve": "How to improve"
+    },
+    "trustSheet": {
+      "title": "How to improve your receipt quality",
+      "tip1": "Make sure all edges of the receipt are visible. Cut-off corners prevent OCR from reading the total amount.",
+      "tip2": "Upload a real photo of the receipt, not a screenshot. Screenshots lack required metadata.",
+      "tip3": "Date, total, and merchant name must be visible. All three together trigger reward calculation.",
+      "tip4": "Avoid blurry or dark photos. Poor lighting is the biggest factor in reducing OCR confidence.",
+      "understood": "Got it"
+    },
+    "financialSheet": {
+      "title": "Add financial goal",
+      "desc": "Goal is saved via /api/goals (same data as Insights).",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Summer holiday fund",
+      "amountLabel": "Target amount ({currency})",
+      "deadlineLabel": "Deadline (optional · YYYY-MM-DD)",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…",
+      "saveError": "Could not save. Check your session and connection."
+    }
+  },
+  "rewardsPage": {
+    "title": "Season Rewards",
+    "daysLeft": "{count} days left",
+    "yourRewards": "Your Rewards",
+    "contributionBalance": "Contribution Balance",
+    "totalProof": "Your total proof contribution",
+    "fromReceipts": "From receipts",
+    "fromQuests": "From quests",
+    "receiptCPoints": "Receipt cPoints",
+    "bonusCPoints": "Bonus cPoints",
+    "earnedFromReceipts": "Earned from verified receipts",
+    "earnedFromQuests": "Earned from completed quests",
+    "nextUnlocks": "Next Unlocks",
+    "milestoneChallenge": "Milestone challenge",
+    "reached": "✓ Reached",
+    "howYouEarn": "How You Earn",
+    "earnReceiptLabel": "Receipt upload",
+    "earnReceiptDesc": "Season XP · Account XP · Contribution · cPoints",
+    "earnVerifyLabel": "Verify and earn",
+    "earnVerifyDesc": "Verify others' receipts → earn cPoints + Season XP",
+    "earnDailyLabel": "Daily quests",
+    "earnDailyDesc": "cPoints · Season XP",
+    "earnWeeklyLabel": "Weekly quests",
+    "earnWeeklyDesc": "More cPoints · Season XP",
+    "earnQualityLabel": "High quality receipts",
+    "earnQualityDesc": "Better reward outcome",
+    "activity": "Activity",
+    "all": "All",
+    "receipts": "Receipts",
+    "quests": "Quests",
+    "noActivity": "No activity yet",
+    "invitesTitle": "Your invites",
+    "invitesSubtitle": "Activity and earnings of the people you invited",
+    "seasonRecap": "This Season So Far",
+    "receiptsVerified": "Receipts verified",
+    "questsCompleted": "Quests completed",
+    "cPointsEarned": "cPoints earned",
+    "seasonXp": "Season XP",
+    "currentLevel": "Current level",
+    "rewardBoost": "Reward boost",
+    "bestMove": "Best move today",
+    "go": "Go",
+    "receipt": "Receipt",
+    "receiptVerified": "Receipt verified",
+    "dailyQuest": "Daily quest",
+    "weeklyQuest": "Weekly quest",
+    "rewardBoostArrow": "Reward boost → {multiplier}x"
+  },
+  "notificationsPage": {
+    "eyebrow": "INBOX",
+    "title": "Notifications",
+    "unread": "{count} unread",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications.",
+    "emptyDesc": "New updates will appear here when they arrive.",
+    "defaultTitle": "Notification",
+    "defaultBody": "Details available"
+  },
+  "bills": {
+    "title": "My Bills",
+    "providerCount": "{count} provider",
+    "headerSubtitle": "{count} tracked · bills & memberships",
+    "tabBills": "Bills",
+    "tabSubscriptions": "Memberships",
+    "summary": {
+      "monthly": "Monthly",
+      "upcoming": "Upcoming",
+      "tracked": "Tracked",
+      "subs": "Memberships"
+    },
+    "heroTitle": "This month",
+    "heroSubsTitle": "Memberships",
+    "heroEmpty": "Add your first item — I'll show your payment status here.",
+    "heroProgress": "{paid} / {total} paid",
+    "heroAllPaid": "all paid this month",
+    "heroPendingLabel": "pending · {count} bill",
+    "heroPendingNoAmount": "{count} pending",
+    "heroPaidLabel": "Paid this month",
+    "heroNextLabel": "Next payment",
+    "dayLetter": "d",
+    "everyDay": "{day} ea. month",
+    "menu": "Menu",
+    "editName": "Edit name",
+    "markPaid": "Mark as paid",
+    "markPaidShort": "Mark paid",
+    "undoPaid": "Unmark as paid",
+    "delete": "Delete",
+    "deleteConfirm": "Delete {name}?",
+    "deleteConfirmDesc": "Reminders will be cancelled too.",
+    "deleteConfirmYes": "Delete",
+    "cancel": "Cancel",
+    "deleted": "{name} deleted",
+    "deleteFailed": "Could not delete",
+    "uploadFailed": "Upload failed",
+    "renamePrompt": "New provider name",
+    "providerRenamed": "Renamed to: {name}",
+    "renamedBadge": "renamed",
+    "paidThisPeriod": "Paid this period",
+    "paidJustNow": "Paid · {date}",
+    "stepCategory": "Pick category",
+    "stepName": "Provider name",
+    "stepDay": "Payment day",
+    "stepAmountTime": "Amount & time",
+    "stepReminders": "Reminders",
+    "stepSample": "Sample document",
+    "choosePlaceholder": "category",
+    "namePreview": "Provider name",
+    "noAmountPreview": "no amount",
+    "noAmount": "no amount",
+    "estimated": "estimated",
+    "reminder3Short": "3 days",
+    "reminder1Short": "1 day",
+    "sameDay": "Same day",
+    "before": "before",
+    "morning": "morning",
+    "reminderHintOff": "No reminders set",
+    "reminderHintOn": "{n} reminder(s) active",
+    "optional": "optional",
+    "clear": "Clear",
+    "undoPaidShort": "Undo",
+    "reminderActive": "Reminders on",
+    "today": "Today",
+    "daysLeft": "{days}d left",
+    "nextOn": "Next",
+    "itemBill": "bill",
+    "itemSubscription": "membership",
+    "addSubscription": "Add",
+    "allSubscriptions": "All memberships",
+    "emptySubscriptions": "No memberships yet",
+    "emptySubscriptionsDesc": "Add Netflix, Spotify or any recurring digital service to keep them in one place.",
+    "emptyAddSubscription": "Add your first membership",
+    "newSubscription": "New Membership",
+    "back": "Back",
+    "add": "Add",
+    "upcomingTitle": "Upcoming — 7 days",
+    "daysShort": "{days} days",
+    "allProviders": "All providers",
+    "loading": "Loading…",
+    "empty": "No providers yet",
+    "emptyDesc": "Add your bills and I'll remind you when they're due.",
+    "emptyAdd": "Add your first provider",
+    "categoryLabel": {
+      "electricity": "Electricity",
+      "water": "Water",
+      "gas": "Gas",
+      "phone": "Phone",
+      "internet": "Internet",
+      "streaming": "Streaming",
+      "entertainment": "Entertainment",
+      "digital_subscription": "Subscription",
+      "other": "Other"
+    },
+    "paymentDay": "every {day}th",
+    "uploadBill": "Upload bill",
+    "newProvider": "New Provider",
+    "categorySection": "Category — choose from list",
+    "nameSection": "Provider name — type it",
+    "namePlaceholder": "Provider name",
+    "sampleSection": "Sample document — optional",
+    "sampleChange": "Change document",
+    "sampleUpload": "Upload PDF / image",
+    "sampleHint": "If uploaded, the system will extract amount and date for the first record.",
+    "sampleRemove": "Remove",
+    "paymentDaySection": "Payment day — every month",
+    "reminderSection": "Reminder",
+    "reminder3": "3 days before",
+    "reminder1": "1 day before",
+    "reminderSameDay": "Same day",
+    "timeSection": "Time",
+    "amountSection": "Estimated amount",
+    "amountPlaceholder": "optional",
+    "saveFailed": "Could not save: {error}",
+    "saving": "Saving…",
+    "savingWithDoc": "Saving and analyzing…",
+    "submit": "Save Provider",
+    "closeSheet": "Close",
+    "shortDays": "{days}d",
+    "paymentDayHint": "If the month is shorter, shifts to the last day (e.g. Feb 28/29)",
+    "savedWithDoc": "Provider saved, sample document archived"
+  },
+  "breakdownCard": {
+    "title": "Cost Breakdown",
+    "estimated": "Estimated",
+    "totalPaid": "Total Paid",
+    "vat": "VAT",
+    "hiddenCostBreakdown": "Hidden Cost Breakdown",
+    "supplyChain": "Supply Chain",
+    "storeAndBrand": "Store & Brand",
+    "totalHiddenCost": "Total Hidden Cost",
+    "referencePrice": "Reference Price"
+  },
+  "rewardCard": {
+    "title": "Potential Reward",
+    "subtitle": "cPoints earned for this receipt",
+    "totalPoints": "cPoints earned",
+    "calculating": "Calculating cPoints…",
+    "receipt": "Receipt",
+    "quest": "Quest",
+    "honorBonus": "Honor Bonus 1.2x applied",
+    "firstMerchantBonus": "You were the first to upload this merchant; a thank-you bonus (1.2x) was applied because it was verified.",
+    "quality": "Quality",
+    "rawReward": "Raw reward",
+    "conversionRate": "Conversion rate",
+    "appliedLimits": "Applied limits:",
+    "partial": {
+      "title": "Payment confirmed — {pct}% of the reward for now",
+      "fullEstimate": "Estimated full reward after itemized receipt: {amount} cPoints",
+      "followUp": "Upload the itemized store receipt listing products to claim the rest of your reward.",
+      "uploadCta": "Upload itemized receipt"
+    },
+    "itemizedDialog": {
+      "title": "Itemized store receipt",
+      "description": "Upload a receipt that lists products and matches the same date, total, and merchant as this slip. The remaining reward is added to your slip record.",
+      "merchant": "Merchant",
+      "date": "Date",
+      "total": "Total",
+      "upload": "Choose receipt",
+      "uploading": "Uploading…",
+      "later": "Later",
+      "mismatch": "This receipt did not match your slip. Check that the date, total, and merchant name are the same."
+    },
+    "noReward": {
+      "pos_slip": "Card slips prove payment; upload the itemized store receipt or e-invoice for the full reward path.",
+      "payment_receipt": "Payment is confirmed on this slip, but itemized proof of expense is missing — upload the store receipt or e-invoice.",
+      "order_list": "Order lists and unpaid tabs are recorded but do not qualify for rewards.",
+      "no_payment_proof": "Payment is not confirmed on this document, so no reward applies.",
+      "out_of_current_month": "Only receipts dated in the current calendar month are accepted for rewards.",
+      "missing_receipt_date": "Receipt date could not be verified for the current-month rule.",
+      "document_rejected": "This document type is not accepted as proof of expense.",
+      "vision_failed": "The image could not be analyzed. Please retake the photo and try again.",
+      "reward_pending_verification": "Reward could not be calculated yet. It may update after line verification.",
+      "amount_inconsistent": "The total doesn't match the listed items, so the reward is on hold. Check the amount and correct it if it's wrong.",
+      "duplicate_same_user": "You already uploaded this receipt. Duplicate receipts do not earn rewards.",
+      "duplicate_other_user": "This receipt was already uploaded. Duplicate receipts do not earn rewards.",
+      "generic": "This document was saved without a reward."
+    }
+  },
+  "extractionCard": {
+    "title": "Extracted Information",
+    "subtitle": "Server-side extraction results (read-only)",
+    "date": "Date",
+    "totalAmount": "Total Amount",
+    "vatAmount": "VAT Amount",
+    "confidence": "Confidence: {pct}%",
+    "rate": "Rate: {pct}%",
+    "sourceLine": "Extracted from line {line}"
+  },
+  "categoryPicker": {
+    "title": "Which category is this receipt?",
+    "subtitle": "We couldn't determine the category automatically. Please pick the closest one so we can value it correctly.",
+    "placeholder": "Select a category",
+    "submit": "Submit",
+    "skip": "Skip for now",
+    "submitting": "Submitting…",
+    "successToast": "Thanks — your pick will be reviewed.",
+    "errorToast": "Could not submit. Please try again.",
+    "reviewNote": "Your choice goes to review and is applied after approval."
+  }
+}

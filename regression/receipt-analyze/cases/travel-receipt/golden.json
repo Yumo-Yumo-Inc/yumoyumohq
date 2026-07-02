@@ -1,0 +1,27 @@
+{
+  "receiptId": "case-travel-receipt",
+  "status": "analyzed",
+  "merchant": {
+    "name": "Thai AirAsia Co., Ltd.",
+    "category": "travel",
+    "country": "TH"
+  },
+  "detectedCountry": "TH",
+  "llmSource": "gemini-vision",
+  "total": 1890,
+  "currency": "THB",
+  "symbol": "THB",
+  "vatAmount": 123.64,
+  "vatRate": 0.07,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}

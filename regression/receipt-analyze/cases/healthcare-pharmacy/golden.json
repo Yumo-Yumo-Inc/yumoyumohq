@@ -1,0 +1,27 @@
+{
+  "receiptId": "case-healthcare-pharmacy",
+  "status": "analyzed",
+  "merchant": {
+    "name": "Memorial Hospital Pharmacy",
+    "category": "pharmacy",
+    "country": "TR"
+  },
+  "detectedCountry": "TR",
+  "llmSource": "gemini-vision",
+  "total": 742.5,
+  "currency": "TRY",
+  "symbol": "TRY",
+  "vatAmount": 74.25,
+  "vatRate": 0.1,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}

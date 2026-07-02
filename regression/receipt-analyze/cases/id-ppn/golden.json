@@ -1,0 +1,27 @@
+{
+  "receiptId": "case-id-ppn",
+  "status": "analyzed",
+  "merchant": {
+    "name": "PT Sumber Kopi Indonesia",
+    "category": "cafe",
+    "country": "ID"
+  },
+  "detectedCountry": "ID",
+  "llmSource": "gemini-vision",
+  "total": 125000,
+  "currency": "IDR",
+  "symbol": "Rp",
+  "vatAmount": 13750,
+  "vatRate": 0.11,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}

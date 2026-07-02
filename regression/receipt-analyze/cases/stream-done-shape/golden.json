@@ -1,0 +1,33 @@
+{
+  "receiptId": "stream-1",
+  "status": "pending",
+  "merchant": {
+    "name": "Tealive Sunway",
+    "category": "cafe",
+    "country": "MY"
+  },
+  "detectedCountry": "MY",
+  "llmSource": "gpt-4o-vision",
+  "total": 42,
+  "currency": "MYR",
+  "symbol": "RM",
+  "vatAmount": 2.52,
+  "vatRate": 0.06,
+  "reward": {
+    "raw": 0.5,
+    "final": 0.5,
+    "ryumo": 0.5,
+    "token": "aYUMO",
+    "verifiedThankYou": null
+  },
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}

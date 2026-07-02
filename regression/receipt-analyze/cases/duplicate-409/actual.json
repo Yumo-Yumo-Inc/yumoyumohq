@@ -1,0 +1,6 @@
+{
+  "error": "This receipt was already uploaded.",
+  "duplicateType": "content",
+  "existingReceiptId": "existing-receipt-uuid",
+  "existingUsername": "alice"
+}

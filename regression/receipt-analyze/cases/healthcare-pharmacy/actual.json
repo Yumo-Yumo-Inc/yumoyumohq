@@ -1,0 +1,22 @@
+{
+  "receiptId": "case-healthcare-pharmacy",
+  "status": "analyzed",
+  "detectedCountry": "TR",
+  "llmSource": "gemini-vision",
+  "merchant": {
+    "name": "Memorial Hospital Pharmacy",
+    "category": "pharmacy",
+    "country": "TR"
+  },
+  "pricing": {
+    "totalPaid": 742.5,
+    "vatAmount": 74.25,
+    "vatRate": 0.1,
+    "currency": "TRY",
+    "symbol": "TRY"
+  },
+  "extraction": {
+    "total": { "value": 742.5, "confidence": 0.89 },
+    "vat": { "value": 74.25, "rate": 0.1, "confidence": 0.83 }
+  }
+}

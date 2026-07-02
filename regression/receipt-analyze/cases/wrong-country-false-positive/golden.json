@@ -1,0 +1,27 @@
+{
+  "receiptId": "case-wrong-country-false-positive",
+  "status": "analyzed",
+  "merchant": {
+    "name": "Migros Ticaret A.S.",
+    "category": "grocery",
+    "country": "TR"
+  },
+  "detectedCountry": "TR",
+  "llmSource": "gpt-4o-vision",
+  "total": 325.95,
+  "currency": "TRY",
+  "symbol": "TRY",
+  "vatAmount": 29.63,
+  "vatRate": 0.1,
+  "reward": null,
+  "duplicate": {
+    "isDuplicate": false,
+    "duplicateReceiptId": null,
+    "duplicateType": null,
+    "duplicateUsername": null
+  },
+  "fraud": null,
+  "riskScore": null,
+  "rejected": null,
+  "error": null
+}
