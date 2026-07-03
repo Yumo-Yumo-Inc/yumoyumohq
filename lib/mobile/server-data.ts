@@ -220,7 +220,6 @@ async function getProfileBundle(username: string, serverTime: string) {
   const accountLevel = getAccountLevelFromXp(accountXp);
   const seasonLevel = getSeasonLevelFromXp(seasonXp);
   const updatedAt = toIso(profileRow?.updated_at, fallbackUpdatedAt);
-  const updatedAt = toIso(profileRow?.updated_at, fallbackUpdatedAt);
   const canonicalCountry =
     normalizeCountryCode(storedCountry) ||
     normalizeCountryCode(profileRow?.country as string | null) ||
