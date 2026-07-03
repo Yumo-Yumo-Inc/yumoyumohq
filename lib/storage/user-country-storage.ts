@@ -218,18 +218,76 @@ export async function getUserCountry(username: string): Promise<string | null> {
   return normalized;
 }
 
+function toTimestamp(value: unknown): number {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Date.parse(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 0;
+}
+
+async function healCountryDrift(username: string, resolved: string, usersCountry: string, profileCountry: string): Promise<void> {
+  if (!sql) return;
+  try {
+    if (resolved !== usersCountry) {
+      await sql`
+        UPDATE users
+        SET country = ${resolved}, updated_at = CURRENT_TIMESTAMP
+        WHERE username = ${username}
+      `;
+    }
+    if (resolved !== profileCountry) {
+      await sql`
+        UPDATE user_profiles
+        SET country = ${resolved}, updated_at = CURRENT_TIMESTAMP
+        WHERE username = ${username}
+      `;
+    }
+  } catch (error) {
+    console.warn("[user-country-storage] Country drift heal failed:", error);
+  }
+}
+
 async function readRawUserCountry(username: string): Promise<string | null> {
   if (isDatabaseAvailable()) {
     try {
       const rows = await sql`
-        SELECT COALESCE(NULLIF(u.country, ''), NULLIF(up.country, '')) AS country
+        SELECT
+          NULLIF(u.country, '') AS users_country,
+          NULLIF(up.country, '') AS profile_country,
+          u.updated_at AS users_updated_at,
+          up.updated_at AS profile_updated_at
         FROM users u
         FULL OUTER JOIN user_profiles up ON up.username = u.username
         WHERE COALESCE(up.username, u.username) = ${username}
         LIMIT 1
       `;
-      const country = (rows[0] as { country?: string | null } | undefined)?.country ?? null;
-      if (country) return country;
+      const row = rows[0] as
+        | {
+            users_country?: string | null;
+            profile_country?: string | null;
+            users_updated_at?: unknown;
+            profile_updated_at?: unknown;
+          }
+        | undefined;
+      if (!row) return null;
+
+      const usersCountry = row.users_country ?? null;
+      const profileCountry = row.profile_country ?? null;
+      if (!usersCountry && !profileCountry) return null;
+      if (!usersCountry) return profileCountry;
+      if (!profileCountry) return usersCountry;
+      if (usersCountry === profileCountry) return usersCountry;
+
+      const usersTs = toTimestamp(row.users_updated_at);
+      const profileTs = toTimestamp(row.profile_updated_at);
+      const resolved = profileTs >= usersTs ? profileCountry : usersCountry;
+      console.warn(
+        `[user-country-storage] Country drift for ${username}: users=${usersCountry} profile=${profileCountry}, resolved=${resolved}`
+      );
+      void healCountryDrift(username, resolved, usersCountry, profileCountry);
+      return resolved;
     } catch (error) {
       console.warn("[user-country-storage] Failed to resolve effective user country from DB:", error);
     }

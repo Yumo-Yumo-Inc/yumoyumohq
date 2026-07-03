@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { loadBootstrapSnapshot } from "@/lib/bootstrap";
+import { syncSessionAccountCountryToCache } from "@/lib/auth/account-country";
 import {
   NOTIFICATIONS_QUERY_KEY,
   PROFILE_QUERY_KEY,
@@ -73,7 +74,10 @@ export function OfflineBootstrapManager() {
     };
 
     void loadBootstrapSnapshot()
-      .then(() => {
+      .then(async () => {
+        await syncSessionAccountCountryToCache().catch((error) => {
+          console.warn("[offline-bootstrap] account country sync failed:", error);
+        });
         invalidate();
         void syncMobileData().catch((error) => {
           console.warn("[offline-bootstrap] initial sync failed:", error);

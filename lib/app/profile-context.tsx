@@ -17,8 +17,7 @@ import { PROFILE_QUERY_KEY } from "./query-keys";
 import { syncMobileData } from "@/lib/sync";
 import { LevelUpPopup, type LevelUpEvent } from "@/components/app/level-up-popup";
 import type { MobileLevelEvent } from "@/lib/mobile/action-result-types";
-import { fetchAccountCountryFromApi } from "@/lib/auth/account-country";
-import { normalizeCountryCode } from "@/lib/shared/countries";
+import { fetchAccountCountryWithRetry } from "@/lib/auth/account-country";
 
 export interface AppProfile {
   username?: string;
@@ -58,31 +57,15 @@ export interface AppProfile {
   } | null;
 }
 
-async function resolveCanonicalCountry(cachedCountry: string | null): Promise<string | null> {
-  const fromApi = await fetchAccountCountryFromApi();
-  if (fromApi) {
-    if (fromApi !== cachedCountry) {
-      void patchCachedProfileFields({ country: fromApi }).catch(() => {});
-    }
-    return fromApi;
-  }
-  return normalizeCountryCode(cachedCountry);
-}
-
 async function fetchProfileData(): Promise<AppProfile> {
-  const [countryFromApi] = await Promise.all([
-    fetchAccountCountryFromApi(),
-    loadBootstrapSnapshot().catch(() => {}),
-  ]);
+  const country = await fetchAccountCountryWithRetry();
+  await loadBootstrapSnapshot().catch(() => {});
   const { profile, progress, wallet } = await readCachedProfile();
   if (!profile || !progress || !wallet) {
     throw new Error("Profile cache not ready");
   }
-  const country =
-    countryFromApi ??
-    (await resolveCanonicalCountry(profile.country ?? null));
-  if (countryFromApi && countryFromApi !== profile.country) {
-    void patchCachedProfileFields({ country: countryFromApi }).catch(() => {});
+  if (country && country !== profile.country) {
+    await patchCachedProfileFields({ country });
   }
   return {
     username: profile.username,
@@ -92,7 +75,7 @@ async function fetchProfileData(): Promise<AppProfile> {
     birthDate: profile.birthDate ?? null,
     occupation: profile.occupation ?? null,
     city: profile.city ?? null,
-    country,
+    country: country ?? null,
     website: profile.website ?? null,
     bio: profile.bio ?? null,
     declaredMonthlyIncomeBand: profile.declaredMonthlyIncomeBand ?? null,

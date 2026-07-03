@@ -1,6 +1,7 @@
 "use client";
 
 import { localDb, getMetaValue, setMetaValue } from "@/lib/local-db";
+import { getSessionAccountCountry } from "@/lib/auth/account-country";
 import type {
   BootstrapPayload,
   BootstrapSnapshot,
@@ -108,30 +109,34 @@ function mergeUserProfileRecords(
 async function applyUserProfileRecord(record: CachedUserProfileRecord | null): Promise<void> {
   if (!record) return;
 
-  const existing = await localDb.get("user_profile", record.id);
-  const incomingCountry = record.country?.trim() || null;
+  const sessionCountry = getSessionAccountCountry();
+  const incomingRecord =
+    sessionCountry != null ? { ...record, country: sessionCountry } : record;
+
+  const existing = await localDb.get("user_profile", incomingRecord.id);
+  const incomingCountry = incomingRecord.country?.trim() || null;
   const existingCountry = existing?.country?.trim() || null;
 
   // Account country is immutable server-side — never keep a stale local copy.
   if (incomingCountry && incomingCountry !== existingCountry) {
     await localDb.set("user_profile", {
-      ...(existing ?? record),
-      ...record,
+      ...(existing ?? incomingRecord),
+      ...incomingRecord,
       country: incomingCountry,
-      version: Math.max(existing?.version ?? 0, record.version) + 1,
-      updated_at: record.updated_at,
+      version: Math.max(existing?.version ?? 0, incomingRecord.version) + 1,
+      updated_at: incomingRecord.updated_at,
     });
     return;
   }
 
-  if (!existing || record.version > existing.version) {
-    await localDb.set("user_profile", record);
+  if (!existing || incomingRecord.version > existing.version) {
+    await localDb.set("user_profile", incomingRecord);
     return;
   }
 
-  if (syncedUserProfileSubsetDiffers(existing, record)) {
+  if (syncedUserProfileSubsetDiffers(existing, incomingRecord)) {
     await localDb.set("user_profile", {
-      ...mergeUserProfileRecords(existing, record),
+      ...mergeUserProfileRecords(existing, incomingRecord),
       version: existing.version + 1,
     });
   }
