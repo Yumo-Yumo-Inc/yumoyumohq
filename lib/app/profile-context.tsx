@@ -17,6 +17,7 @@ import { PROFILE_QUERY_KEY } from "./query-keys";
 import { syncMobileData } from "@/lib/sync";
 import { LevelUpPopup, type LevelUpEvent } from "@/components/app/level-up-popup";
 import type { MobileLevelEvent } from "@/lib/mobile/action-result-types";
+import { fetchAccountCountryFromApi } from "@/lib/auth/account-country";
 import { normalizeCountryCode } from "@/lib/shared/countries";
 
 export interface AppProfile {
@@ -58,32 +59,31 @@ export interface AppProfile {
 }
 
 async function resolveCanonicalCountry(cachedCountry: string | null): Promise<string | null> {
-  try {
-    const response = await fetch("/api/auth/country", {
-      credentials: "include",
-      cache: "no-store",
-    });
-    if (!response.ok) {
-      return normalizeCountryCode(cachedCountry);
+  const fromApi = await fetchAccountCountryFromApi();
+  if (fromApi) {
+    if (fromApi !== cachedCountry) {
+      void patchCachedProfileFields({ country: fromApi }).catch(() => {});
     }
-    const data = (await response.json()) as { country?: string | null };
-    const resolved = normalizeCountryCode(data.country);
-    if (resolved && resolved !== cachedCountry) {
-      void patchCachedProfileFields({ country: resolved }).catch(() => {});
-    }
-    return resolved ?? normalizeCountryCode(cachedCountry);
-  } catch {
-    return normalizeCountryCode(cachedCountry);
+    return fromApi;
   }
+  return normalizeCountryCode(cachedCountry);
 }
 
 async function fetchProfileData(): Promise<AppProfile> {
-  await loadBootstrapSnapshot().catch(() => {});
+  const [countryFromApi] = await Promise.all([
+    fetchAccountCountryFromApi(),
+    loadBootstrapSnapshot().catch(() => {}),
+  ]);
   const { profile, progress, wallet } = await readCachedProfile();
   if (!profile || !progress || !wallet) {
     throw new Error("Profile cache not ready");
   }
-  const country = await resolveCanonicalCountry(profile.country ?? null);
+  const country =
+    countryFromApi ??
+    (await resolveCanonicalCountry(profile.country ?? null));
+  if (countryFromApi && countryFromApi !== profile.country) {
+    void patchCachedProfileFields({ country: countryFromApi }).catch(() => {});
+  }
   return {
     username: profile.username,
     displayName: profile.displayName ?? undefined,

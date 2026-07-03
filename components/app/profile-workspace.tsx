@@ -77,7 +77,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
   const [occupation, setOccupation] = useState("");
   const [incomeBand, setIncomeBand] = useState("");
   const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
   const [website, setWebsite] = useState("");
   const [bio, setBio] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -258,32 +257,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     setBio(profile?.bio ?? "");
   }, [profile]);
 
-  // Country is immutable and drives receipt eligibility — always prefer the live
-  // server value over a stale IndexedDB bootstrap cache (e.g. TW after admin set TH).
-  useEffect(() => {
-    let alive = true;
-    void syncMobileData({ fullProfile: true, force: true }).catch(() => {});
-    fetch("/api/auth/country", { credentials: "include", cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { country?: string | null } | null) => {
-        if (!alive || !data?.country) return;
-        const resolved = normalizeCountryCode(data.country);
-        if (!resolved) return;
-        setCountry(resolved);
-        void patchCachedProfileFields({ country: resolved }).catch(() => {});
-      })
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const resolved = normalizeCountryCode(profile?.country);
-    if (resolved) {
-      setCountry(resolved);
-    }
-  }, [profile?.country]);
+  const accountCountry = normalizeCountryCode(profile?.country) ?? "";
 
   const accountLevel = profile?.accountLevel ?? 1;
   const accountXp = profile?.accountXp ?? 0;
@@ -420,7 +394,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
           occupation: occupation.trim() || null,
           declaredMonthlyIncomeBand: incomeBand || null,
           city: city.trim() || null,
-          country: country || null,
+          country: accountCountry || null,
           website: website.trim() || null,
           bio: bio.trim() || null,
         }),
@@ -440,7 +414,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         birthDate: savedBirthDate,
         occupation: occupation.trim() || null,
         city: city.trim() || null,
-        country: country || null,
+        country: accountCountry || null,
         website: website.trim() || null,
         bio: bio.trim() || null,
         declaredMonthlyIncomeBand: incomeBand || null,
@@ -589,7 +563,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     const avatarLabel = displayLabel.slice(0, 2).toUpperCase();
     const contributionTotal = Math.round(profile?.contributionPoints?.total ?? 0);
     const seasonXp = Math.round(profile?.seasonXp ?? 0);
-    const heroLocation = [city.trim(), country ? getCountryByCode(country)?.name ?? country : ""]
+    const heroLocation = [city.trim(), accountCountry ? getCountryByCode(accountCountry)?.name ?? accountCountry : ""]
       .filter(Boolean)
       .join(", ");
     const healthValue = Math.max(0, Math.min(100, Number(profile?.honor ?? 50) || 0));
@@ -1199,7 +1173,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                   id="profile-income"
                   value={incomeBand}
                   onValueChange={setIncomeBand}
-                  countryCode={country}
+                  countryCode={accountCountry}
                   locale={locale}
                   className={`h-14 rounded-[16px] border-white/10 bg-white/[0.03] text-[17px] text-white ${fieldClass}`}
                   placeholder={t("settings.monthlyIncomePlaceholder")}
@@ -1239,11 +1213,11 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                   {l("Ülke", "Country", "Страна", "ประเทศ", "País", "国家")}
                 </Label>
                 <div className="flex h-14 items-center justify-between rounded-[16px] border border-white/10 bg-white/[0.02] px-4">
-                  <span className={`text-[17px] ${country ? "text-white" : "text-white/40"}`}>
-                    {country
-                      ? isOtherCountry(country)
+                  <span className={`text-[17px] ${accountCountry ? "text-white" : "text-white/40"}`}>
+                    {accountCountry
+                      ? isOtherCountry(accountCountry)
                         ? l("Diğer", "Other", "Другое", "อื่นๆ", "Otro", "其他")
-                        : getCountryByCode(country)?.name ?? country
+                        : getCountryByCode(accountCountry)?.name ?? accountCountry
                       : l("Seçilmedi", "Not selected", "Не выбрано", "ยังไม่ได้เลือก", "No seleccionado", "未选择")}
                   </span>
                   <span className="flex items-center gap-1.5 text-xs text-white/40">
@@ -1880,7 +1854,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                   id="profile-income"
                   value={incomeBand}
                   onValueChange={setIncomeBand}
-                  countryCode={country}
+                  countryCode={accountCountry}
                   locale={locale}
                   className={fieldClass}
                   placeholder={t("settings.monthlyIncomePlaceholder")}
@@ -1910,11 +1884,11 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
               <div className="space-y-2">
                 <Label htmlFor="profile-country">{l("Ülke", "Country", "Страна", "ประเทศ", "País", "国家")}</Label>
                 <div className="flex h-12 items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-4">
-                  <span className={country ? "" : "opacity-50"} style={{ color: "var(--app-text)" }}>
-                    {country
-                      ? isOtherCountry(country)
+                  <span className={accountCountry ? "" : "opacity-50"} style={{ color: "var(--app-text)" }}>
+                    {accountCountry
+                      ? isOtherCountry(accountCountry)
                         ? l("Diğer", "Other", "Другое", "อื่นๆ", "Otro", "其他")
-                        : getCountryByCode(country)?.name ?? country
+                        : getCountryByCode(accountCountry)?.name ?? accountCountry
                       : l("Seçilmedi", "Not selected", "Не выбрано", "ยังไม่เลือก", "No seleccionado", "未选择")}
                   </span>
                   <span className="flex items-center gap-1.5 text-xs" style={{ color: "var(--app-text-muted)" }}>
@@ -1926,10 +1900,10 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                   {l("Kayıt sırasında seçilen ülke değiştirilemez.", "The country chosen at signup can't be changed.", "Страну, выбранную при регистрации, изменить нельзя.", "ประเทศที่เลือกตอนสมัครไม่สามารถเปลี่ยนได้", "El país elegido al registrarte no se puede cambiar.", "注册时选择的国家无法更改。")}
                 </p>
                 <p className="text-xs leading-5" style={{ color: "var(--app-text-muted)" }}>
-                  {country
+                  {accountCountry
                     ? locale === "tr"
-                      ? `Gelir karşılıkları ${getCountryByCode(country)?.currency ?? "USD"} para birimine göre hesaplanır.`
-                      : `Income equivalents are shown in ${getCountryByCode(country)?.currency ?? "USD"}.`
+                      ? `Gelir karşılıkları ${getCountryByCode(accountCountry)?.currency ?? "USD"} para birimine göre hesaplanır.`
+                      : `Income equivalents are shown in ${getCountryByCode(accountCountry)?.currency ?? "USD"}.`
                     : locale === "tr"
                       ? "Yerel para birimi karşılıklarını görmek için ülke seç."
                       : "Select a country to see local currency equivalents."}
