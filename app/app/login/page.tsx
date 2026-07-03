@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { translateApiError, useAppLocale } from "@/lib/i18n/app-context";
-import { clearOfflineSessionCache } from "@/lib/offline/cache";
+import { prepareAuthenticatedSessionCache } from "@/lib/auth/session-cache";
 
 const isCaptchaRequired = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -85,7 +85,13 @@ function LoginPageContent() {
       }
 
       localStorage.removeItem("login_username");
-      await clearOfflineSessionCache().catch(() => {});
+      try {
+        await prepareAuthenticatedSessionCache();
+      } catch {
+        setError(t("errors.login.noInternet"));
+        setIsLoading(false);
+        return;
+      }
       if (data.emailVerified === false) {
         window.location.href = "/app/verify-email";
         return;

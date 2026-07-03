@@ -27,6 +27,13 @@ async function fetchBootstrapFromNetwork(): Promise<void> {
   await writeBootstrapPayload(payload);
 }
 
+/** Always fetch bootstrap from the server and replace the local offline cache. */
+export async function refreshBootstrapCacheFromServer(): Promise<BootstrapSnapshot> {
+  bootstrapPromise = null;
+  await fetchBootstrapFromNetwork();
+  return readBootstrapSnapshot();
+}
+
 export async function loadBootstrapSnapshot(): Promise<BootstrapSnapshot> {
   if (bootstrapPromise) {
     return bootstrapPromise;

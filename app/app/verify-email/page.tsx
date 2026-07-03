@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { translateApiError, useAppLocale } from "@/lib/i18n/app-context";
-import { clearOfflineSessionCache } from "@/lib/offline/cache";
+import { clearAuthenticatedSessionCache } from "@/lib/auth/session-cache";
 
 type VerifyStatus = "pending" | "verified" | "expired" | "consumed" | "invalid";
 
@@ -84,7 +84,7 @@ function VerifyEmailPageContent() {
     setIsLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      await clearOfflineSessionCache().catch(() => {});
+      await clearAuthenticatedSessionCache();
     } finally {
       window.location.href = "/app/login";
     }

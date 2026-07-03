@@ -22,7 +22,8 @@ import { useAppProfile } from "@/lib/app/profile-context";
 import { useSound } from "@/lib/audio/sound-context";
 import { useAppLocale, type AppLocale } from "@/lib/i18n/app-context";
 import { openCookiePreferences } from "@/lib/legal/cookie-consent";
-import { clearOfflineSessionCache, patchCachedProfileAvatar, patchCachedProfileFields } from "@/lib/offline/cache";
+import { patchCachedProfileAvatar, patchCachedProfileFields } from "@/lib/offline/cache";
+import { clearAuthenticatedSessionCache } from "@/lib/auth/session-cache";
 import { getCountryByCode, normalizeCountryCode, isOtherCountry } from "@/lib/shared/countries";
 import { formatDateOnly } from "@/lib/shared/date-only";
 import { getStreakBarFilledCount } from "@/lib/streak/streak-math";
@@ -464,7 +465,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     setIsLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-      await clearOfflineSessionCache().catch(() => {});
+      await clearAuthenticatedSessionCache();
       window.location.href = "/app/login";
     } finally {
       setIsLoggingOut(false);
