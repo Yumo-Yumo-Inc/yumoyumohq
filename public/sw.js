@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const STATIC_CACHE = `yumo-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `yumo-runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";
