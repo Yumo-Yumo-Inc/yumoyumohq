@@ -18,6 +18,7 @@ import {
   getMobileLevelSnapshot,
 } from "@/lib/mobile/server-data";
 import { upsertOtherExpenseReceipt } from "@/lib/receipt/db/other-expense";
+import { getUserWalletAddress } from "@/lib/wallet/user-wallet";
 
 /** Adds user_profiles.display_name (display name) to each record in the receipt list. */
 async function enrichReceiptsWithDisplayNames(receipts: (ReceiptAnalysis & { displayName?: string | null })[]): Promise<(ReceiptAnalysis & { displayName?: string | null })[]> {
@@ -234,6 +235,15 @@ export async function POST(req: Request) {
     // Add username to receipt
     receipt.username = username;
     receipt.createdAt = new Date().toISOString();
+
+    // The reward wallet is account-level. If the upload didn't carry a live
+    // wallet (common on mobile, where the connect flow runs in a separate
+    // browser session), fall back to the wallet linked to the account. This is
+    // what lets the receipt count toward a reward epoch.
+    if (!receipt.walletAddress) {
+      const storedWallet = await getUserWalletAddress(username);
+      if (storedWallet) receipt.walletAddress = storedWallet;
+    }
     
     console.log("[api/receipts] POST request:", {
       receiptId: receipt.receiptId,

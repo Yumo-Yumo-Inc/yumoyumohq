@@ -164,6 +164,25 @@ export function WalletConnectButton() {
               sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
               userRejectedRef.current = false; // Reset rejection flag on success
               console.log("SIWS authentication successful");
+
+              // Persist the wallet to the account (verified path). This decouples
+              // rewards from the live connection: once linked, receipt uploads and
+              // reward epochs read the account wallet even if the browser tab has
+              // no live connection (common on mobile).
+              try {
+                await fetch("/api/wallet/link", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({
+                    walletAddress: publicKey.toString(),
+                    message: messageText,
+                    signature: signatureBytes,
+                  }),
+                });
+              } catch (linkErr) {
+                console.warn("Wallet account-link failed (non-fatal):", linkErr);
+              }
             } else {
               console.warn("Invalid signature format received");
               hasSignedRef.current = false;

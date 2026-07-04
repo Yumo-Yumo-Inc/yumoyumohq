@@ -53,10 +53,11 @@ async function getMau(): Promise<number> {
 async function getEpochRawClaims(windowStart: string, windowEnd: string): Promise<RawClaim[]> {
   const rows = await sql`
     SELECT
-      e.username                              AS username,
-      COALESCE(SUM(e.points_delta), 0)::float AS points,
-      r.wallet_address                        AS wallet_address
+      e.username                                        AS username,
+      COALESCE(SUM(e.points_delta), 0)::float           AS points,
+      COALESCE(r.wallet_address, u.wallet_address)      AS wallet_address
     FROM contribution_point_events e
+    LEFT JOIN users u ON u.username = e.username
     LEFT JOIN LATERAL (
       SELECT wallet_address
       FROM receipts
@@ -67,7 +68,7 @@ async function getEpochRawClaims(windowStart: string, windowEnd: string): Promis
     WHERE e.created_at >= ${windowStart} AND e.created_at < ${windowEnd}
       AND e.username IS NOT NULL
       AND e.username != ${getPrimaryAdmin()}
-    GROUP BY e.username, r.wallet_address
+    GROUP BY e.username, COALESCE(r.wallet_address, u.wallet_address)
     HAVING COALESCE(SUM(e.points_delta), 0) > 0
   `;
   return (rows as any[])

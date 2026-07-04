@@ -10,6 +10,7 @@ import { IncomeBandSelect } from "@/components/app/income-band-select";
 import { ThemeCard } from "@/components/app/theme-card";
 import { ReferralShareCard } from "@/components/app/referral-share-card";
 import { WalletConnectButton } from "@/components/wallet-connect-button";
+import { WalletAddressLink } from "@/components/wallet-address-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +57,7 @@ function WalletPanel({ locale }: { locale: string }) {
         )}
       </p>
       <WalletConnectButton />
+      <WalletAddressLink locale={locale} />
     </div>
   );
 }
