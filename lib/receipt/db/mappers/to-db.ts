@@ -88,7 +88,11 @@ export function receiptToDbColumns(receipt: ReceiptAnalysis) {
 
   return {
     receiptId: receipt.receiptId,
-    status: receipt.status,
+    // Persist status lowercase. Display/offline layers use tokens like
+    // "VERIFIED"; if one round-trips back into a save it must not create a
+    // case-variant row that slips past LOWER(status) checks and the partial
+    // unique index on content_hash.
+    status: typeof receipt.status === "string" ? receipt.status.toLowerCase() : receipt.status,
     username: receipt.username || null,
     merchantName: normalizeMerchantDisplayName(merchant.name) ?? merchant.name,
     // Phase 6: Legal name is a separate column. When it comes from Gemini,
