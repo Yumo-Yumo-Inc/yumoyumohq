@@ -5,7 +5,7 @@
 
 import { getSql } from "@/lib/db/client";
 import { isFaz2Enabled } from "@/config/oracle-phases";
-import { parseFullReceiptWithGPT } from "@/app/api/receipt/analyze/services/gpt-full-receipt-service";
+import { parseFullReceiptWithGemini } from "@/app/api/receipt/analyze/services/gpt-full-receipt-service";
 import type { ReceiptContext } from "@/app/api/receipt/analyze/types";
 
 async function enqueuePostProcessForReceipt(receiptId: string): Promise<void> {
@@ -30,7 +30,7 @@ async function enqueuePostProcessForReceipt(receiptId: string): Promise<void> {
 
 async function patchReceiptWithLineItems(
   receiptId: string,
-  gptResult: Awaited<ReturnType<typeof parseFullReceiptWithGPT>>
+  gptResult: Awaited<ReturnType<typeof parseFullReceiptWithGemini>>
 ): Promise<void> {
   if (!gptResult?.lineItems?.length) return;
 
@@ -61,7 +61,7 @@ async function patchReceiptWithLineItems(
 }
 
 /**
- * Schedule TR line-item GPT extraction without blocking the analyze response.
+ * Schedule TR line-item Gemini OCR extraction without blocking the analyze response.
  */
 export function scheduleBackgroundLineItems(context: ReceiptContext): void {
   const ctxAny = context as any;
@@ -86,7 +86,7 @@ export function scheduleBackgroundLineItems(context: ReceiptContext): void {
 
   void (async () => {
     try {
-      const result = await parseFullReceiptWithGPT(fullText, {
+      const result = await parseFullReceiptWithGemini(fullText, {
         countryCode: country,
         preferHighAccuracy: true,
       });

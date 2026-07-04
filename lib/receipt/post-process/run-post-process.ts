@@ -60,7 +60,7 @@ import { upsertOtherExpenseReceipt } from "@/lib/receipt/db/other-expense";
 import { evaluateAchievements } from "@/lib/achievements/evaluate";
 import {
   gptFullReceiptToGeminiLineItems,
-  parseFullReceiptWithGPT,
+  parseFullReceiptWithGemini,
 } from "@/app/api/receipt/analyze/services/gpt-full-receipt-service";
 
 function merchantCategoryToInternal(category: string | null | undefined): string {
@@ -186,7 +186,7 @@ async function ensureLineItemsForPostProcess(
   if (!ocrText) return receiptData;
 
   console.log(`[run-post-process] ${receiptId}: structured lines missing; extracting line items in background post-process`);
-  const gptResult = await parseFullReceiptWithGPT(ocrText, {
+  const gptResult = await parseFullReceiptWithGemini(ocrText, {
     countryCode: country,
     preferHighAccuracy: true,
   });
