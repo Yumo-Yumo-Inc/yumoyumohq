@@ -191,6 +191,35 @@ export default function RewardsPage() {
           </CardContent>
         </Card>
 
+        {/* ── 1b. Unlock Journey entry (permanent account ladder) ──────── */}
+        <Link href="/app/rewards/journey" className="block group">
+          <div
+            className="relative flex items-center gap-3 overflow-hidden border px-4 py-3.5 transition-transform group-hover:scale-[1.01] group-active:scale-[0.99]"
+            style={{
+              borderColor: "rgba(245,166,35,0.3)",
+              borderRadius: "var(--app-radius-md, 10px)",
+              background: "linear-gradient(135deg, rgba(245,166,35,0.08), var(--app-bg-surface, transparent))",
+            }}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px"
+              style={{ background: "linear-gradient(90deg, transparent, rgba(245,166,35,0.5), transparent)" }}
+            />
+            <div className="p-2 rounded-xl flex-shrink-0" style={{ background: "rgba(245,166,35,0.14)" }}>
+              <Sparkles className="h-4 w-4" style={{ color: "#F5A623" }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">{t("rewardsPage.journeyLink")}</p>
+              <p className="text-xs text-muted-foreground leading-snug">{t("rewardsPage.journeyLinkDesc")}</p>
+            </div>
+            <span className="font-mono text-sm font-bold tabular-nums flex-shrink-0" style={{ color: "#F5A623" }}>
+              Lv.{profile?.accountLevel ?? 1}
+            </span>
+            <ArrowRight className="h-4 w-4 flex-shrink-0" style={{ color: "rgba(245,166,35,0.7)" }} />
+          </div>
+        </Link>
+
         {/* ── 2. Today's Best Move ─────────────────────────────────────── */}
         {bestMove && (
           <Card className="card-cinematic border-amber-500/30 bg-amber-500/5">

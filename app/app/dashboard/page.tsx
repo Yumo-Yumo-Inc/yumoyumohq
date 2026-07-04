@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Camera,
@@ -89,6 +89,7 @@ function formatCurrency(amount: number, currency: string, locale: YumoLocale): s
 }
 
 function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
+  const [expanded, setExpanded] = useState(false);
   const { data: buckets = [], isLoading } = useQuery({
     queryKey: ["dashboard-category-spending"],
     queryFn: () => fetchCategorySpending(),
@@ -126,8 +127,6 @@ function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
   const lastWeekLabel = byLocale(locale, "Bu hafta", "Last week", "На этой неделе", "สัปดาห์นี้", "Esta semana", "本周");
   const spendingBreakdownLabel = byLocale(locale, "Harcama Dağılımı", "Spending Breakdown", "Распределение расходов", "การกระจายค่าใช้จ่าย", "Desglose de gastos", "支出分布");
   const detailsLabel = byLocale(locale, "Detay", "Details", "Подробнее", "รายละเอียด", "Detalles", "详情");
-  const weeklySpendLabel = byLocale(locale, "Haftalık harcama", "Weekly spend", "Расходы за неделю", "ใช้จ่ายรายสัปดาห์", "Gasto semanal", "每周支出");
-  const vsLastWeekLabel = byLocale(locale, "geçen haftaya göre", "vs last week", "к прошлой неделе", "เทียบสัปดาห์ก่อน", "vs semana pasada", "对比上周");
 
   if (buckets.length === 0) {
     return (
@@ -173,135 +172,93 @@ function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
     );
   }
 
-  const maxWeek = Math.max(1, ...(weekly?.weeks.map((w) => w.total) ?? [0]));
-  const hasWeekly = !!weekly && weekly.weeks.some((w) => w.total > 0);
+  const visibleBuckets = expanded ? buckets : buckets.slice(0, 2);
+  const hiddenCount = buckets.length - 2;
 
   return (
-    <ShellCard className="p-4 sm:p-5">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
-            {lastWeekLabel}
-          </p>
-          <p className="mt-0.5 text-base font-black text-[var(--app-text-primary)]">
-            {spendingBreakdownLabel}
-          </p>
-        </div>
+    <section aria-label={spendingBreakdownLabel}>
+      {/* Header: typography carries hierarchy, no card frame */}
+      <div className="flex items-baseline gap-2.5">
+        <h2 className="text-sm font-extrabold tracking-tight text-[var(--app-text-primary)]">
+          {spendingBreakdownLabel}
+        </h2>
+        <span className="text-[11px] font-semibold text-[var(--app-text-muted)]">
+          {lastWeekLabel.toLocaleLowerCase()}
+        </span>
         <Link
           href="/app/insights"
-          className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--app-border)] bg-[var(--app-bg-surface3)] px-3 py-1.5 text-[11px] font-bold text-[var(--app-text-secondary)] transition hover:brightness-110"
+          className="ml-auto flex items-center gap-0.5 text-[11.5px] font-bold text-[var(--app-text-secondary)] transition hover:text-[var(--app-text-primary)]"
         >
           {detailsLabel}
           <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
 
-      {/* Weekly bars */}
-      {hasWeekly && weekly && (
-        <div className="mt-4">
-          <div className="flex items-end justify-between gap-2">
-            <span className="text-xs font-bold text-[var(--app-text-secondary)]">{weeklySpendLabel}</span>
-            <div className="text-right">
-              {weekly.deltaPct != null && (
-                <span
-                  className={cn(
-                    "text-[11px] font-bold",
-                    weekly.deltaPct <= 0 ? "text-emerald-500" : "text-amber-500",
-                  )}
-                >
-                  {weekly.deltaPct <= 0 ? "▼" : "▲"} {Math.abs(weekly.deltaPct)}% {vsLastWeekLabel}
-                </span>
-              )}
-              <p className="text-sm font-black text-[var(--app-text-primary)]">
-                {formatCurrency(weekly.currentWeekTotal, currency, locale)}
-              </p>
-            </div>
-          </div>
-          <div className="mt-3 flex h-16 items-stretch gap-2">
-            {weekly.weeks.map((w, i) => {
-              const pct = Math.max(6, Math.round((w.total / maxWeek) * 100));
-              const isCurrent = i === weekly.currentWeekIndex;
-              return (
-                <div key={w.key} className="flex flex-1 flex-col items-center justify-end gap-1.5">
-                  <div className="flex w-full flex-1 items-end">
-                    <div
-                      style={{ height: `${pct}%` }}
-                      className={cn(
-                        "w-full rounded-md transition-[height] duration-700",
-                        isCurrent ? "bg-[#8b5cf6]" : "bg-[var(--app-text-muted)]/15",
-                      )}
-                    />
-                  </div>
-                  <span
-                    className={cn(
-                      "text-[9px] font-bold",
-                      isCurrent ? "text-[#a78bfa]" : "text-[var(--app-text-muted)]",
-                    )}
-                  >
-                    {w.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Category rows */}
-      <div className="mt-4 space-y-3">
+      {/* Single stacked proportion bar — the whole week in one glance */}
+      <div className="mt-3.5 flex gap-0.5 overflow-hidden rounded-[7px]" style={{ height: 14 }}>
         {buckets.map((bucket) => {
-          const pct = totalSpend > 0 ? Math.round((bucket.total / totalSpend) * 100) : 0;
-          const barWidth = Math.max(4, pct);
+          const pct = totalSpend > 0 ? (bucket.total / totalSpend) * 100 : 0;
           return (
-            <div key={bucket.key} className="space-y-1.5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span
-                    className="grid h-8 w-8 shrink-0 place-items-center rounded-xl"
-                    style={{ color: bucket.chartColor.dot, backgroundColor: bucket.chartColor.dotBg }}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-current" />
-                  </span>
-                  <span className="truncate text-sm font-bold text-[var(--app-text-primary)]">
-                    {bucket.label[locale]}
-                  </span>
-                </div>
-                <div className="shrink-0 text-right">
-                  <span className="text-sm font-black text-[var(--app-text-primary)]">
-                    {formatCurrency(bucket.total, bucket.currency, locale)}
-                  </span>
-                  <span className="ml-1.5 text-[10px] font-bold text-[var(--app-text-muted)]">%{pct}</span>
-                </div>
-              </div>
-              {/* Progress bar */}
-              <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--app-text-muted)]/15">
-                <div
-                  className="h-full rounded-full transition-[width] duration-700"
-                  style={{
-                    width: `${barWidth}%`,
-                    backgroundImage: `linear-gradient(to right, ${bucket.chartColor.barStart}, ${bucket.chartColor.barEnd})`,
-                  }}
-                />
-              </div>
+            <div
+              key={bucket.key}
+              className="rounded-[3px] transition-[width] duration-700"
+              style={{
+                width: `${Math.max(2, pct)}%`,
+                backgroundImage: `linear-gradient(to right, ${bucket.chartColor.barStart}, ${bucket.chartColor.barEnd})`,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Category rows — hairline separators, no boxes */}
+      <div className="mt-2">
+        {visibleBuckets.map((bucket, i) => {
+          const pct = totalSpend > 0 ? Math.round((bucket.total / totalSpend) * 100) : 0;
+          return (
+            <div
+              key={bucket.key}
+              className={cn(
+                "flex items-center gap-2.5 py-2",
+                i > 0 && "border-t border-[var(--app-border)]",
+              )}
+            >
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: bucket.chartColor.dot }}
+              />
+              <span className="truncate text-[13px] font-bold text-[var(--app-text-primary)]">
+                {bucket.label[locale]}
+              </span>
+              <span className="text-[10.5px] font-bold text-[var(--app-text-muted)]">%{pct}</span>
+              <span className="ml-auto font-mono text-[13px] font-bold tabular-nums text-[var(--app-text-primary)]">
+                {formatCurrency(bucket.total, bucket.currency, locale)}
+              </span>
             </div>
           );
         })}
       </div>
 
-      {/* Total */}
-      <div
-        className="mt-4 flex items-center justify-between rounded-[16px] border px-3 py-2.5"
-        style={{ background: "var(--app-bg-surface3)", borderColor: "var(--app-border)" }}
-      >
-        <span className="text-xs font-bold" style={{ color: "var(--app-text-secondary)" }}>
-          {byLocale(locale, "Toplam harcama", "Total spent", "Всего потрачено", "ใช้จ่ายทั้งหมด", "Gasto total", "总支出")}
-        </span>
-        <span className="text-sm font-black" style={{ color: "var(--app-text-primary)" }}>
-          {formatCurrency(totalSpend, currency, locale)}
-        </span>
-      </div>
-    </ShellCard>
+      {hiddenCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-1 w-full py-1.5 text-[11.5px] font-bold tracking-wide text-[var(--app-text-muted)] transition hover:text-[var(--app-text-secondary)]"
+        >
+          {expanded
+            ? byLocale(locale, "– Daralt", "– Collapse", "– Свернуть", "– ย่อ", "– Contraer", "– 收起")
+            : byLocale(
+                locale,
+                `+ ${hiddenCount} kategori daha`,
+                `+ ${hiddenCount} more categories`,
+                `+ ещё ${hiddenCount} категории`,
+                `+ อีก ${hiddenCount} หมวดหมู่`,
+                `+ ${hiddenCount} categorías más`,
+                `+ 还有 ${hiddenCount} 个类别`,
+              )}
+        </button>
+      )}
+    </section>
   );
 }
 

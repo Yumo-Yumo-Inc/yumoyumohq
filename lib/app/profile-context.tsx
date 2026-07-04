@@ -16,6 +16,8 @@ import { patchCachedProfileFields, readCachedProfile } from "@/lib/offline/cache
 import { PROFILE_QUERY_KEY } from "./query-keys";
 import { syncMobileData } from "@/lib/sync";
 import { LevelUpPopup, type LevelUpEvent } from "@/components/app/level-up-popup";
+import { UnlockRevealModal } from "@/components/app/journey/unlock-reveal-modal";
+import { getUnlocksBetween, type AccountUnlock } from "@/config/account-unlocks";
 import type { MobileLevelEvent } from "@/lib/mobile/action-result-types";
 import { fetchAccountCountryWithRetry } from "@/lib/auth/account-country";
 
@@ -128,6 +130,25 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
   const prevLevelsRef = useRef<{ account: number; season: number } | null>(null);
   const lastLevelEventKeyRef = useRef<string | null>(null);
   const [levelUpEvent, setLevelUpEvent] = useState<LevelUpEvent | null>(null);
+  const [pendingUnlocks, setPendingUnlocks] = useState<{ level: number; unlocks: AccountUnlock[] } | null>(null);
+  const [activeUnlockReveal, setActiveUnlockReveal] = useState<{ level: number; unlocks: AccountUnlock[] } | null>(null);
+
+  // Unlock reveal plays once per unlock key — guarded via localStorage so a
+  // profile refetch or another device session can't replay an already-seen reveal.
+  const queueUnlockReveal = useCallback((fromLevel: number, toLevel: number) => {
+    const seenKey = "yumo_unlock_reveal_seen";
+    let seen: string[] = [];
+    try {
+      seen = JSON.parse(window.localStorage.getItem(seenKey) ?? "[]");
+      if (!Array.isArray(seen)) seen = [];
+    } catch { seen = []; }
+    const fresh = getUnlocksBetween(fromLevel, toLevel).filter((u) => !seen.includes(u.key));
+    if (fresh.length === 0) return;
+    try {
+      window.localStorage.setItem(seenKey, JSON.stringify([...seen, ...fresh.map((u) => u.key)]));
+    } catch { /* localStorage unavailable — reveal still plays this once */ }
+    setPendingUnlocks({ level: toLevel, unlocks: fresh });
+  }, []);
 
   const { data: profile, isLoading: loading, isError } = useQuery({
     queryKey: PROFILE_QUERY_KEY,
@@ -182,6 +203,9 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
       prev !== null &&
       (profile.accountLevel > prev.account || profile.seasonLevel > prev.season)
     ) {
+      if (profile.accountLevel > prev.account) {
+        queueUnlockReveal(prev.account, profile.accountLevel);
+      }
       announceLevelUp({
         id: Date.now(),
         account:
@@ -208,6 +232,25 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [levelUpEvent]);
 
+  // The unlock reveal waits for the level-up popup to leave the stage, then plays.
+  useEffect(() => {
+    if (levelUpEvent || !pendingUnlocks) return;
+    setActiveUnlockReveal(pendingUnlocks);
+    setPendingUnlocks(null);
+  }, [levelUpEvent, pendingUnlocks]);
+
+  // Dev preview: /app/...?unlockPreview=<level> plays the reveal for that level.
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    const params = new URLSearchParams(window.location.search);
+    const lvl = Number(params.get("unlockPreview"));
+    if (!Number.isFinite(lvl) || lvl < 1) return;
+    const unlocks = getUnlocksBetween(lvl - 1, lvl);
+    if (unlocks.length > 0) {
+      window.setTimeout(() => setActiveUnlockReveal({ level: lvl, unlocks }), 300);
+    }
+  }, []);
+
   const refresh = useCallback(async () => {
     await syncMobileData().catch(() => {});
     await queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
@@ -220,6 +263,13 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
       {children}
       {levelUpEvent ? (
         <LevelUpPopup event={levelUpEvent} onDismiss={() => setLevelUpEvent(null)} />
+      ) : null}
+      {!levelUpEvent && activeUnlockReveal ? (
+        <UnlockRevealModal
+          unlocks={activeUnlockReveal.unlocks}
+          level={activeUnlockReveal.level}
+          onDismiss={() => setActiveUnlockReveal(null)}
+        />
       ) : null}
     </ProfileContext.Provider>
   );

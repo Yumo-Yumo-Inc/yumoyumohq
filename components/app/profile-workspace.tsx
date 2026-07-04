@@ -8,6 +8,7 @@ import { AvatarImage } from "@/components/app/avatar-image";
 import { APP_LOCALES } from "@/components/app/app-locale-dropdown";
 import { IncomeBandSelect } from "@/components/app/income-band-select";
 import { ThemeCard } from "@/components/app/theme-card";
+import { ProfileRecentReceipts } from "@/components/app/profile-recent-receipts";
 import { ReferralShareCard } from "@/components/app/referral-share-card";
 import { WalletConnectButton } from "@/components/wallet-connect-button";
 import { WalletAddressLink } from "@/components/wallet-address-link";
@@ -697,7 +698,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
           accountLevel={accountLevel}
           className="overflow-hidden rounded-[26px]"
           style={{
-            borderColor: "rgba(255, 176, 68, 0.34)",
+            borderColor: "var(--profile-hero-border, rgba(255, 176, 68, 0.34))",
             boxShadow: "var(--profile-hero-shadow, 0 0 0 1px rgba(255,176,68,0.05), 0 26px 52px rgba(0,0,0,0.28))",
           }}
         >
@@ -751,7 +752,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
 
               <div className="min-w-0 flex-1 pt-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-[30px] font-semibold tracking-[-0.04em] text-white">{displayLabel}</h1>
+                  <h1 className="profile-hero-title text-[30px] font-semibold tracking-[-0.04em]">{displayLabel}</h1>
                   <span
                     className="inline-flex items-center rounded-full border border-[#f0b548]/60 bg-[#f0b548]/10 px-3 py-1 text-[13px] font-semibold"
                     style={{ color: "var(--profile-level-text, #f7cb63)" }}
@@ -1515,6 +1516,8 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
             </ThemeCard>
           ))}
         </div>
+
+        <ProfileRecentReceipts accountLevel={accountLevel} locale={locale} numLocale={numLocale} />
 
         <Button
           variant="outline"

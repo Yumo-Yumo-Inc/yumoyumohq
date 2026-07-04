@@ -626,7 +626,8 @@
       "error": "Invalid credentials",
       "googleError": "Failed to sign in with Google",
       "twitterError": "Failed to sign in with X (Twitter)",
-      "unknownError": "Unknown error"
+      "unknownError": "Unknown error",
+      "captchaLabel": "Human verification"
     },
     "register": {
       "title": "Join the Yumo World! 🎀",
@@ -2548,7 +2549,25 @@
       "saveError": "Could not save. Check your session and connection."
     }
   },
+  "journeyPage": {
+    "title": "Unlock Journey",
+    "back": "Back to rewards",
+    "accountLevel": "Account level",
+    "nextUnlockAt": "Next unlock · Lv.{level}",
+    "comingSoon": "Coming soon",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "xpToUnlock": "{xp} XP to unlock"
+  },
+  "unlockReveal": {
+    "aria": "New unlock",
+    "kicker": "LEVEL {level} · UNLOCKED",
+    "tryNow": "See your journey",
+    "later": "Later"
+  },
   "rewardsPage": {
+    "journeyLink": "Unlock Journey",
+    "journeyLinkDesc": "Your permanent account ladder — every unlock from level 1 to 50",
     "title": "Season Rewards",
     "daysLeft": "{count} days left",
     "yourRewards": "Your Rewards",

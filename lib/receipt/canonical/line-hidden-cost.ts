@@ -39,6 +39,7 @@ import { detectGuardedProductCategory } from "./product-category-guards";
 import { categorySeriesMap } from "@/lib/mining/categorySeriesMap";
 import { toHiddenCategory, computeLineComposition, commercialKatFor, isNonPurchaseLine } from "@/lib/mining/hiddenCostComposition";
 import { countryHasExciseModel } from "@/lib/mining/exciseTax";
+import { commercialKatOverride } from "@/lib/mining/hiddenCostOverrides";
 
 // ─────────────────────────────────────────────
 // Types
@@ -68,6 +69,8 @@ export interface LineHiddenCostResult {
    *   weighted_index     — production_cost_weights, category-based PPI-weighted (producer_gap)
    *   market_benchmark_cpi — TÜİK CPI sub-series benchmark (market_benchmark)
    *   fallback_avg_index — avg(CPI GENEL + PPI C) (other/fallback, full tier)
+   *   sector_margin      — paid / verified retail-only commercial kat (inflation_only tier, when a
+   *                        verified commercial_margins row exists for the country+category)
    *   inflation_premium  — amount paid / (annual CPI/GENEL multiplier) (inflation_only tier)
    *   no_data            — inflation_only tier but no CPI data available → hidden cost is 0
    *   profit_margin_factor — profit_margin_factor divisor only
@@ -83,6 +86,7 @@ export interface LineHiddenCostResult {
     | "weighted_index"
     | "market_benchmark_cpi"
     | "fallback_avg_index"
+    | "sector_margin"
     | "inflation_premium"
     | "no_data"
     | "profit_margin_factor"
@@ -358,6 +362,26 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
     // it does NOT fall back to a fixed 35% rate (per the product decision, §3).
     // Short-circuits BEFORE the TR-specific special cases (wholesale market/fuel excise/category_kat/TÜİK).
     if (hiddenCostTier === "inflation_only") {
+      // ── sector_margin: verified retail-only commercial kat for this country+category.
+      // "Üreticiden alsaydı" = producer selling price → reference = commercialBase / kat;
+      // hidden = paid − reference = retail/distribution markup (+ embeddedTax already split
+      // out above). Only is_verified=TRUE rows reach commercialKatOverride (drafts stay
+      // inert). No embedded TR constant fallback here — commercialKatOverride is country-
+      // scoped, so an absent row falls through to the CPI premium below, never TR's kat.
+      const katOverride = commercialKatOverride(taxCat);
+      if (katOverride && katOverride.kat > 1) {
+        reference = commercialBase / katOverride.kat;
+        const hidden = Math.max(0, lineTotal - reference);
+        results.push({
+          observation: obs,
+          reference_price: Math.round(reference * 100) / 100,
+          hidden_cost_line: Math.round(hidden * 100) / 100,
+          calc_method: "sector_margin",
+          model_type: "fallback",
+        });
+        continue;
+      }
+
       const cpiGenelYoY = economicMultipliers?.other;
       if (cpiGenelYoY && cpiGenelYoY > 1) {
         reference = commercialBase / cpiGenelYoY;
@@ -711,6 +735,7 @@ export async function computeReceiptHiddenFromLineItems(
     const cat = toHiddenCategory(r.observation.canonical_name || r.observation.raw_name, r.observation.category_lvl1);
     let high = r.calc_method === "izmir_hal" || r.calc_method === "fuel_otv" || cat === "tobacco" || cat === "alcohol";
     if (r.calc_method === "category_kat") high = commercialKatFor(cat)?.conf === "high";
+    if (r.calc_method === "sector_margin") high = commercialKatOverride(cat)?.conf === "high";
     if (high) completePaid += lt; else incompletePaid += lt;
   }
   return { totalHidden: totalHiddenCanonical, completePaid, incompletePaid, methodCounts };

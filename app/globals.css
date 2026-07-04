@@ -288,8 +288,13 @@
   --receipt-card-border: rgba(0, 0, 0, 0.08);
   --receipt-card-border-strong: rgba(0, 0, 0, 0.14);
   /* Profile page hero + sticky save — light counterparts (dark defaults are inline fallbacks). */
-  --profile-hero-bg: radial-gradient(circle at top center, rgba(201, 168, 76, 0.18), transparent 38%), linear-gradient(180deg, #FFFDF8 0%, #F4F0E7 100%);
-  --profile-hero-shadow: 0 0 0 1px rgba(201, 168, 76, 0.10), 0 14px 34px rgba(0, 0, 0, 0.10);
+  --profile-hero-bg:
+    radial-gradient(130% 90% at 14% -12%, rgba(214, 170, 80, 0.22), transparent 52%),
+    radial-gradient(110% 100% at 108% 112%, rgba(201, 168, 76, 0.14), transparent 52%),
+    linear-gradient(168deg, #FFFDF8 0%, #FAF4E9 48%, #F3EBDB 100%);
+  --profile-hero-border: rgba(186, 150, 62, 0.28);
+  --profile-hero-shadow: 0 0 0 1px rgba(201, 168, 76, 0.08), 0 10px 30px rgba(120, 96, 44, 0.10);
+  --profile-hero-title: #4A3B22;
   --profile-avatar-bg: #FFFFFF;
   --profile-avatar-button-bg: #FFFFFF;
   --profile-chip-bg: rgba(14, 116, 144, 0.08);
@@ -298,6 +303,16 @@
   --profile-level-text: #8A6520;
   --profile-track-bg: rgba(0, 0, 0, 0.10);
   --profile-save-backdrop: linear-gradient(180deg, rgba(242, 239, 232, 0), rgba(242, 239, 232, 0.90) 44%, rgba(242, 239, 232, 0.97) 100%);
+}
+
+/* Profile hero title — heavy white display in dark; softer warm ink in light
+   (DM Sans is variable, so the 550 weight renders true). */
+.profile-hero-title {
+  color: var(--profile-hero-title, #ffffff);
+}
+.dark.app-theme-light .profile-hero-title {
+  font-weight: 550;
+  letter-spacing: -0.02em;
 }
 
 /* Light theme: beyaz metin sınıflarını okunabilir koyu renklerle eşleştir */

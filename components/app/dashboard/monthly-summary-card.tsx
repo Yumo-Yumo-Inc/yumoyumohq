@@ -25,15 +25,34 @@ function byLocale(
   return en;
 }
 
+function intlLocaleTag(locale: YumoLocale): string {
+  switch (locale) {
+    case "tr": return "tr-TR";
+    case "ru": return "ru-RU";
+    case "th": return "th-TH";
+    case "es": return "es-ES";
+    case "zh": return "zh-CN";
+    default:   return "en-US";
+  }
+}
+
 /** Current calendar month key (UTC) — matches buildOfflineInsightsRecord. */
 function currentMonthKey(): string {
   return new Date().toISOString().slice(0, 7);
 }
 
-/** Tiny inline sparkline from a numeric series (last 6 months of spend). */
-function Sparkline({ points, color }: { points: number[]; color: string }) {
-  const w = 72;
-  const h = 26;
+/** Previous calendar month key (UTC), for the month-over-month delta. */
+function previousMonthKey(): string {
+  const d = new Date();
+  d.setUTCDate(1);
+  d.setUTCMonth(d.getUTCMonth() - 1);
+  return d.toISOString().slice(0, 7);
+}
+
+/** Area sparkline over the last months of spend — fills the hero column. */
+function HeroSparkline({ points }: { points: number[] }) {
+  const w = 220;
+  const h = 40;
   const valid = points.filter((p) => Number.isFinite(p));
   if (valid.length < 2) return null;
   const max = Math.max(...valid);
@@ -42,24 +61,67 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
   const stepX = w / (points.length - 1);
   const coords = points.map((p, i) => {
     const x = i * stepX;
-    const y = h - ((p - min) / span) * h;
+    const y = h - 6 - ((p - min) / span) * (h - 12);
     return [x, y] as const;
   });
-  const d = coords.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+  const line = coords
+    .map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`)
+    .join(" ");
   const [lastX, lastY] = coords[coords.length - 1];
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible" aria-hidden>
-      <path d={d} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={lastX} cy={lastY} r={2.6} fill={color} />
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      className="mt-4 block h-10 w-full"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id="hero-spark-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#8b5cf6" stopOpacity="0.25" />
+          <stop offset="1" stopColor="#8b5cf6" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={`${line} L${w} ${h} L0 ${h} Z`} fill="url(#hero-spark-fill)" />
+      <path d={line} fill="none" stroke="#8b5cf6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={lastX} cy={lastY} r={3.5} fill="#a78bfa" />
     </svg>
   );
 }
 
-function Card({ children }: { children: React.ReactNode }) {
+/** Borderless stat block — a colored left hairline + typography, no card box. */
+function StatBlock({
+  value,
+  label,
+  sub,
+  tone,
+}: {
+  value: string;
+  label: string;
+  sub?: string;
+  tone: "neutral" | "gold" | "hidden";
+}) {
+  const border =
+    tone === "hidden"
+      ? "border-l-[#ef6a43]/40"
+      : "border-l-[var(--app-gold-border)]";
+  const valueColor =
+    tone === "gold"
+      ? "text-[var(--app-gold-light)]"
+      : tone === "hidden"
+        ? "text-[#ef6a43]"
+        : "text-[var(--app-text-primary)]";
   return (
-    <section className="rounded-[24px] border border-[var(--app-border)] bg-[var(--app-bg-elevated)] p-3.5 shadow-[var(--app-shadow-card)] backdrop-blur-xl sm:p-4">
-      {children}
-    </section>
+    <div className={`border-l-2 pl-3 ${border}`}>
+      <p className={`font-mono text-[17px] font-bold tabular-nums leading-tight ${valueColor}`}>
+        {value}
+      </p>
+      <p className="mt-0.5 text-[9px] font-extrabold uppercase tracking-[0.09em] text-[var(--app-text-muted)]">
+        {label}
+      </p>
+      {sub ? (
+        <p className="mt-0.5 text-[10px] font-semibold text-[var(--app-text-muted)]">{sub}</p>
+      ) : null}
+    </div>
   );
 }
 
@@ -85,41 +147,68 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
 
   const monthKey = currentMonthKey();
   const month = insights?.monthly?.[monthKey];
+  const prevMonth = insights?.monthly?.[previousMonthKey()];
   const spent = month?.totalSpent ?? 0;
   const hidden = month?.hiddenCostTotal ?? 0;
+  const receiptCount = month?.receiptCount ?? 0;
   const currency = insights?.currency || "TRY";
-  const trueValue = Math.max(0, spent - hidden);
-  const abovePct = trueValue > 0 ? Math.round((hidden / trueValue) * 100) : 0;
   const earned = Math.round(cpoints?.earnedThisMonth ?? 0);
   const trend = insights?.spendingTrend ?? [];
 
-  const summaryLabel = byLocale(locale, "AYLIK ÖZET", "MONTHLY SUMMARY", "ИТОГ МЕСЯЦА", "สรุปรายเดือน", "RESUMEN MENSUAL", "本月概览");
-  const spentLabel = byLocale(locale, "Bu ay harcanan", "Spent this month", "Потрачено за месяц", "ใช้จ่ายเดือนนี้", "Gastado este mes", "本月支出");
-  const hiddenLabel = byLocale(locale, "GİZLİ MALİYET", "HIDDEN COST", "СКРЫТАЯ СТОИМОСТЬ", "ต้นทุนแฝง", "COSTO OCULTO", "隐藏成本");
-  const cpointsLabel = byLocale(locale, "KAZANILAN CPOINTS", "CPOINTS EARNED", "ЗАРАБОТАНО CPOINTS", "CPOINTS ที่ได้รับ", "CPOINTS GANADOS", "获得 CPOINTS");
-  const thisMonthLabel = byLocale(locale, "bu ay", "this month", "за месяц", "เดือนนี้", "este mes", "本月");
+  const prevSpent = prevMonth?.totalSpent ?? 0;
+  const deltaPct =
+    prevSpent > 0 ? Math.round(((spent - prevSpent) / prevSpent) * 100) : null;
+
+  // Hidden cost share of every 100 units paid (spent-based, honest framing).
+  const hiddenPer100 = spent > 0 ? Math.round((hidden / spent) * 100) : 0;
+
+  const monthName = new Intl.DateTimeFormat(intlLocaleTag(locale), {
+    month: "long",
+  }).format(new Date());
+
+  const spentEyebrow = byLocale(
+    locale,
+    `${monthName} · Aylık Harcama`,
+    `${monthName} · Monthly Spend`,
+    `${monthName} · Расходы за месяц`,
+    `${monthName} · ค่าใช้จ่ายรายเดือน`,
+    `${monthName} · Gasto mensual`,
+    `${monthName} · 本月支出`,
+  );
+  const vsLastMonth = byLocale(locale, "geçen aya göre", "vs last month", "к прошлому месяцу", "เทียบเดือนก่อน", "vs mes pasado", "对比上月");
+  const proofLabel = byLocale(locale, "Doğrulanmış Kanıt", "Verified Proofs", "Проверенные чеки", "หลักฐานที่ยืนยันแล้ว", "Pruebas verificadas", "已验证凭证");
+  const earnedLabel = byLocale(locale, "Bu Ay Kazanç", "Earned This Month", "Заработано за месяц", "รายได้เดือนนี้", "Ganado este mes", "本月收益");
+  const hiddenLabel = byLocale(locale, "Gizli Pay", "Hidden Cost", "Скрытая доля", "ต้นทุนแฝง", "Costo oculto", "隐藏成本");
+  const hiddenSub =
+    hiddenPer100 > 0
+      ? byLocale(
+          locale,
+          `her ₺100'de ₺${hiddenPer100}`,
+          `${hiddenPer100} in every 100`,
+          `${hiddenPer100} из каждых 100`,
+          `${hiddenPer100} ในทุก 100`,
+          `${hiddenPer100} de cada 100`,
+          `每 100 中有 ${hiddenPer100}`,
+        )
+      : undefined;
 
   if (isLoading) {
     return (
-      <Card>
-        <div className="animate-pulse space-y-3">
-          <div className="h-3 w-28 rounded-full bg-[var(--app-text-muted)]/15" />
-          <div className="h-8 w-40 rounded-lg bg-[var(--app-text-muted)]/15" />
-          <div className="h-12 w-full rounded-lg bg-[var(--app-text-muted)]/10" />
-        </div>
-      </Card>
+      <section className="animate-pulse space-y-3 pt-1">
+        <div className="h-3 w-36 rounded-full bg-[var(--app-text-muted)]/15" />
+        <div className="h-11 w-52 rounded-lg bg-[var(--app-text-muted)]/15" />
+        <div className="h-10 w-full rounded-lg bg-[var(--app-text-muted)]/10" />
+      </section>
     );
   }
 
   // No spend recorded this month → honest empty state, no fabricated numbers.
   if (spent <= 0) {
     return (
-      <Card>
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#c79a3f]">
-            {summaryLabel}
-          </p>
-        </div>
+      <section className="pt-1">
+        <p className="text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+          {spentEyebrow}
+        </p>
         <p className="mt-2 text-sm font-semibold text-[var(--app-text-secondary)]">
           {displayName
             ? byLocale(
@@ -148,90 +237,56 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
           <Camera className="h-3.5 w-3.5" strokeWidth={2.2} />
           {byLocale(locale, "Fiş Ekle", "Add Receipt", "Добавить чек", "เพิ่มใบเสร็จ", "Agregar recibo", "添加收据")}
         </Link>
-      </Card>
+      </section>
     );
   }
 
   return (
-    <Card>
-      {/* Header: label + premium chip */}
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#c79a3f]">
-          {summaryLabel}
+    <section
+      aria-label={spentEyebrow}
+      className="grid grid-cols-[1.5fr_1fr] items-start gap-4 pt-1"
+    >
+      {/* Left: the hero number, boxless on the page ground */}
+      <div className="min-w-0">
+        <p className="text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+          {spentEyebrow}
         </p>
-        <span className="inline-flex items-center gap-1 rounded-full border border-[#c79a3f]/35 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-[#c79a3f]">
-          + PREMIUM
-        </span>
+        <p className="mt-1.5 font-mono text-[38px] font-bold leading-none tracking-tight tabular-nums text-[var(--app-text-primary)]">
+          {formatMoney(spent, currency, locale)}
+        </p>
+        {deltaPct != null && (
+          <p
+            className={`mt-2 text-[12.5px] font-bold ${
+              deltaPct <= 0 ? "text-emerald-500" : "text-amber-500"
+            }`}
+          >
+            {deltaPct <= 0 ? "▼" : "▲"} %{Math.abs(deltaPct)} {vsLastMonth}
+          </p>
+        )}
+        <HeroSparkline points={trend} />
       </div>
 
-      {/* Welcome line */}
-      <p className="mt-2 text-[13px] font-semibold text-[var(--app-text-secondary)]">
-        {displayName
-          ? byLocale(
-              locale,
-              `Tekrar hoş geldin, ${displayName} — paran nereye gitti, işte burada.`,
-              `Welcome back, ${displayName} — here's where your money went.`,
-              `С возвращением, ${displayName} — вот куда ушли твои деньги.`,
-              `ยินดีต้อนรับกลับ ${displayName} — นี่คือที่ที่เงินของคุณไป`,
-              `Bienvenido de nuevo, ${displayName} — aquí está a dónde fue tu dinero.`,
-              `${displayName}，欢迎回来 — 这是你的钱去向。`,
-            )
-          : byLocale(
-              locale,
-              "Paran nereye gitti, işte burada.",
-              "Here's where your money went.",
-              "Вот куда ушли твои деньги.",
-              "นี่คือที่ที่เงินของคุณไป",
-              "Aquí está a dónde fue tu dinero.",
-              "这是你的钱去向。",
-            )}
-      </p>
-
-      {/* Big amount + sparkline */}
-      <div className="mt-2.5 flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[26px] font-black leading-none tracking-tight text-[var(--app-text-primary)]">
-            {formatMoney(spent, currency, locale)}
-          </p>
-          <p className="mt-1 text-[11px] font-semibold text-[var(--app-text-muted)]">{spentLabel}</p>
-        </div>
-        <div className="shrink-0 pb-0.5">
-          <Sparkline points={trend} color="#d6a44c" />
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="my-3 h-px w-full bg-[var(--app-border)]" />
-
-      {/* Hidden cost + cPoints */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--app-text-muted)]">
-            {hiddenLabel}
-          </p>
-          <p className="mt-1 text-base font-black text-[#ef6a43]">
-            {formatMoney(hidden, currency, locale)}
-          </p>
-          <p className="mt-0.5 text-[11px] font-medium text-[var(--app-text-muted)]">
-            {byLocale(
-              locale,
-              `gerçek değerin %${abovePct} üzerinde`,
-              `${abovePct}% above true value`,
-              `на ${abovePct}% выше реальной стоимости`,
-              `สูงกว่ามูลค่าจริง ${abovePct}%`,
-              `${abovePct}% sobre el valor real`,
-              `高于真实价值 ${abovePct}%`,
-            )}
-          </p>
-        </div>
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--app-text-muted)]">
-            {cpointsLabel}
-          </p>
-          <p className="mt-1 text-base font-black text-[var(--app-text-primary)]">+{earned.toLocaleString()}</p>
-          <p className="mt-0.5 text-[11px] font-medium text-[var(--app-text-muted)]">{thisMonthLabel}</p>
-        </div>
-      </div>
-    </Card>
+      {/* Right: Proof of Expense identity column — the dashboard's second
+          sentence: spending produces proof, proof produces earnings. */}
+      <aside className="flex flex-col gap-4 pt-1">
+        <p className="text-[9.5px] font-extrabold uppercase tracking-[0.16em] text-[var(--app-gold-light)]">
+          {byLocale(locale, "Harcama Kanıtı", "Proof of Expense", "Proof of Expense", "Proof of Expense", "Proof of Expense", "Proof of Expense")}
+        </p>
+        {receiptCount > 0 && (
+          <StatBlock value={String(receiptCount)} label={proofLabel} tone="neutral" />
+        )}
+        {earned > 0 && (
+          <StatBlock value={`+${earned.toLocaleString()} cP`} label={earnedLabel} tone="gold" />
+        )}
+        {hidden > 0 && (
+          <StatBlock
+            value={formatMoney(hidden, currency, locale)}
+            label={hiddenLabel}
+            sub={hiddenSub}
+            tone="hidden"
+          />
+        )}
+      </aside>
+    </section>
   );
 }

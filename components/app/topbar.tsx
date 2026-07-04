@@ -151,7 +151,13 @@ export function Topbar({
   const headerBg = "var(--app-header-bg)";
   // On the dashboard the yellow XP bar already reads as the header's natural lower
   // edge, so the divider drops to a near-invisible hairline instead of a visible line.
-  const headerBorder = homeVariant ? "rgba(255,255,255,0.06)" : "var(--app-header-border)";
+  // Profile mode: the hero card carries the visual weight; the header melts
+  // into the page with no divider line.
+  const headerBorder = mode === "profile"
+    ? "transparent"
+    : homeVariant
+      ? "rgba(255,255,255,0.06)"
+      : "var(--app-header-border)";
   const compactCPoints =
     cPoints >= 1_000_000
       ? `${(cPoints / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`

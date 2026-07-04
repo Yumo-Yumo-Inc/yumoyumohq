@@ -672,7 +672,8 @@
       "error": "E-posta veya şifre hatalı",
       "googleError": "Google ile giriş başarısız oldu",
       "twitterError": "X (Twitter) ile giriş başarısız oldu",
-      "unknownError": "Bilinmeyen hata"
+      "unknownError": "Bilinmeyen hata",
+      "captchaLabel": "İnsan doğrulaması"
     },
     "register": {
       "title": "Yumo Dünyasına Katıl! 🎀",
@@ -2548,7 +2549,25 @@
       "saveError": "Kaydedilemedi. Oturumu ve bağlantını kontrol et."
     }
   },
+  "journeyPage": {
+    "title": "Kilit Yolculuğu",
+    "back": "Ödüllere dön",
+    "accountLevel": "Hesap seviyesi",
+    "nextUnlockAt": "Sıradaki kilit · Sv.{level}",
+    "comingSoon": "Yakında",
+    "unlocked": "Açıldı",
+    "locked": "Kilitli",
+    "xpToUnlock": "Açılmasına {xp} XP"
+  },
+  "unlockReveal": {
+    "aria": "Yeni kilit açıldı",
+    "kicker": "SEVİYE {level} · KİLİT AÇILDI",
+    "tryNow": "Yolculuğunu gör",
+    "later": "Sonra"
+  },
   "rewardsPage": {
+    "journeyLink": "Kilit Yolculuğu",
+    "journeyLinkDesc": "Kalıcı hesap merdivenin — 1'den 50'ye tüm kilitler",
     "title": "Sezon Ödülleri",
     "daysLeft": "{count} gün kaldı",
     "yourRewards": "Ödülleriniz",

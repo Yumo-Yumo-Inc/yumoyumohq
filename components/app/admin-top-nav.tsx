@@ -31,6 +31,7 @@ const ADMIN_TABS = [
       "/app/admin/ocr-download",
       "/app/admin/analyze-file",
       "/app/admin/economic-indices",
+      "/app/admin/hidden-cost-data",
     ],
   },
   { label: "Tools", href: "/app/admin/quest-test", match: ["/app/admin/quest-test"] },
