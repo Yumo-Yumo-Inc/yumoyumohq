@@ -1144,6 +1144,7 @@
         "notValidReceipt": "This document doesn't appear to be a valid receipt.",
         "receiptCountryMismatch": "This receipt is from a different country than your account. Please upload receipts from your registered country, or update your country in Settings.",
         "totalNotReliable": "Total amount could not be reliably extracted from the receipt.",
+        "merchantNotReadable": "Merchant name could not be read from the receipt. Please try again.",
         "unknown": "An error occurred",
         "allFieldsRequired": "All fields are required",
         "invalidEmail": "Invalid email address",
@@ -2755,7 +2756,8 @@
       "title": "Payment confirmed — {pct}% of the reward for now",
       "fullEstimate": "Estimated full reward after itemized receipt: {amount} cPoints",
       "followUp": "Upload the itemized store receipt listing products to claim the rest of your reward.",
-      "uploadCta": "Upload itemized receipt"
+      "uploadCta": "Upload itemized receipt",
+      "ceiling": "You earned {current} cPoints now — complete the items to earn up to {full} cPoints."
     },
     "itemizedDialog": {
       "title": "Itemized store receipt",
@@ -2766,7 +2768,16 @@
       "upload": "Choose receipt",
       "uploading": "Uploading…",
       "later": "Later",
-      "mismatch": "This receipt did not match your slip. Check that the date, total, and merchant name are the same."
+      "mismatch": "This receipt did not match your slip. Check that the date, total, and merchant name are the same.",
+      "manualToggle": "Enter items manually",
+      "manualBackToUpload": "Upload a document instead",
+      "manualHint": "Manually entered items unlock part of the remaining reward. Uploading the itemized document unlocks all of it.",
+      "manualItemName": "Item name",
+      "manualItemPrice": "Price",
+      "manualAddRow": "Add item",
+      "manualSave": "Save items",
+      "manualSaving": "Saving…",
+      "manualEmpty": "Add at least one item name."
     },
     "noReward": {
       "pos_slip": "Card slips prove payment; upload the itemized store receipt or e-invoice for the full reward path.",

@@ -712,7 +712,7 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
         SELECT
           uq.id, uq.progress, uq.target, uq.status,
           uq.completed_at, uq.updated_at,
-          qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
+          qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
         FROM user_quests uq
         JOIN quest_templates qt ON uq.quest_template_id = qt.id
         WHERE uq.username = ${username}
@@ -728,20 +728,25 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
     );
   } catch (e) {
     console.warn("[server-data] V2 daily query failed, using legacy:", e);
-    dailyRows = toRows<Record<string, unknown>>(
-      await sql`
-        SELECT
-          uq.id, uq.progress, uq.target, uq.status,
-          uq.completed_at, uq.updated_at,
-          qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
-        FROM user_quests uq
-        JOIN quest_templates qt ON uq.quest_template_id = qt.id
-        WHERE uq.username = ${username}
-          AND qt.type IN ('D1','D3','D4','D5','D6','D7','D8','D9','D_ADMIN_FREE_300XP')
-          AND (uq.expires_at AT TIME ZONE 'UTC')::date = ${todayStr}::date
-        ORDER BY qt.type, uq.id DESC
-      `
-    );
+    try {
+      dailyRows = toRows<Record<string, unknown>>(
+        await sql`
+          SELECT
+            uq.id, uq.progress, uq.target, uq.status,
+            uq.completed_at, uq.updated_at,
+            qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
+          FROM user_quests uq
+          JOIN quest_templates qt ON uq.quest_template_id = qt.id
+          WHERE uq.username = ${username}
+            AND qt.type IN ('D1','D3','D4','D5','D6','D7','D8','D9','D_ADMIN_FREE_300XP')
+            AND (uq.expires_at AT TIME ZONE 'UTC')::date = ${todayStr}::date
+          ORDER BY qt.type, uq.id DESC
+        `
+      );
+    } catch (legacyErr) {
+      console.warn("[server-data] legacy daily query failed:", legacyErr);
+      dailyRows = [];
+    }
   }
 
   const dailyByType = new Map<string, CachedQuestRecord>();
@@ -759,7 +764,7 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
       target: Number(row.target ?? 1) || 1,
       status: String(row.status ?? "active"),
       completedAt: row.completed_at ? toIso(row.completed_at, updatedAt) : null,
-      rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+      rewardRyumo: Number(row.reward_bint ?? 0) || 0,
       rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
       updated_at: updatedAt,
       version: toVersion(updatedAt),
@@ -783,7 +788,7 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
         SELECT
           uq.id, uq.progress, uq.target, uq.status,
           uq.completed_at, uq.updated_at,
-          qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
+          qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
         FROM user_quests uq
         JOIN quest_templates qt ON uq.quest_template_id = qt.id
         WHERE uq.username = ${username}
@@ -800,22 +805,27 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
     );
   } catch (e) {
     console.warn("[server-data] V2 weekly query failed, using legacy:", e);
-    weeklyRows = toRows<Record<string, unknown>>(
-      await sql`
-        SELECT
-          uq.id, uq.progress, uq.target, uq.status,
-          uq.completed_at, uq.updated_at,
-          qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
-        FROM user_quests uq
-        JOIN quest_templates qt ON uq.quest_template_id = qt.id
-        WHERE uq.username = ${username}
-          AND qt.type IN ('W1A','W1B','W1C','W2','W3','W4','W5','W6')
-          AND uq.expires_at >= ${start}::date
-          AND uq.expires_at < (${end}::date + INTERVAL '1 day')
-        ORDER BY uq.created_at DESC
-        LIMIT 1
-      `
-    );
+    try {
+      weeklyRows = toRows<Record<string, unknown>>(
+        await sql`
+          SELECT
+            uq.id, uq.progress, uq.target, uq.status,
+            uq.completed_at, uq.updated_at,
+            qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
+          FROM user_quests uq
+          JOIN quest_templates qt ON uq.quest_template_id = qt.id
+          WHERE uq.username = ${username}
+            AND qt.type IN ('W1A','W1B','W1C','W2','W3','W4','W5','W6')
+            AND uq.expires_at >= ${start}::date
+            AND uq.expires_at < (${end}::date + INTERVAL '1 day')
+          ORDER BY uq.created_at DESC
+          LIMIT 1
+        `
+      );
+    } catch (legacyErr) {
+      console.warn("[server-data] legacy weekly query failed:", legacyErr);
+      weeklyRows = [];
+    }
   }
 
   const questRecords = Array.from(dailyByType.values());
@@ -835,7 +845,7 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
         target: Number(row.target ?? 1) || 1,
         status: String(row.status ?? "active"),
         completedAt: row.completed_at ? toIso(row.completed_at, updatedAt) : null,
-        rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+        rewardRyumo: Number(row.reward_bint ?? 0) || 0,
         rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
         updated_at: updatedAt,
         version: toVersion(updatedAt),
@@ -850,7 +860,7 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
 
     const optionRows = toRows<Record<string, unknown>>(
       await sql`
-        SELECT id, type, title, reward_ryumo, reward_season_xp
+        SELECT id, type, title, reward_bint, reward_season_xp
         FROM quest_templates
         WHERE type IN ('W1A','W1B','W1C','W2','W3','W4','W5','W6')
       `
@@ -869,7 +879,7 @@ async function getQuestRecords(username: string, serverTime: string): Promise<Ca
         target: selectionState?.targetsByType?.[type] ?? 1,
         status: "available",
         completedAt: null,
-        rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+        rewardRyumo: Number(row.reward_bint ?? 0) || 0,
         rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
         updated_at: serverTime,
         version: toVersion(serverTime),
@@ -1229,7 +1239,7 @@ async function fetchLeaderboardEntries(
     }
 
     const ryumoBalanceRows = toRows<Record<string, unknown>>(await dbSql`
-      SELECT username, COALESCE(ryumo_balance, 0)::float as val
+      SELECT username, COALESCE(bint_balance, 0)::float as val
       FROM user_profiles
       WHERE username = ANY(${usernames}::text[])
     `);
@@ -1237,7 +1247,7 @@ async function fetchLeaderboardEntries(
       if (row.username != null) totalRyumoByUser[String(row.username)] += Number(row.val ?? 0) || 0;
     }
     const ryumoBonusRows = toRows<Record<string, unknown>>(await dbSql`
-      SELECT r.username, COALESCE(SUM(rr.ryumo_bonus_amount), 0)::float as val
+      SELECT r.username, COALESCE(SUM(rr.bint_bonus_amount), 0)::float as val
       FROM receipts r
       LEFT JOIN receipt_rewards rr ON r.receipt_id = rr.receipt_id
       WHERE r.username = ANY(${usernames}::text[])
@@ -1583,7 +1593,7 @@ async function getActionQuestRecords(username: string, serverTime: string): Prom
       SELECT
         uq.id, uq.progress, uq.target, uq.status,
         uq.completed_at, uq.updated_at,
-        qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
+        qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
       FROM user_quests uq
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
       WHERE uq.username = ${username}
@@ -1595,7 +1605,7 @@ async function getActionQuestRecords(username: string, serverTime: string): Prom
       SELECT
         uq.id, uq.progress, uq.target, uq.status,
         uq.completed_at, uq.updated_at,
-        qt.type, qt.title, qt.reward_ryumo, qt.reward_season_xp
+        qt.type, qt.title, qt.reward_bint, qt.reward_season_xp
       FROM user_quests uq
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
       WHERE uq.username = ${username}
@@ -1622,7 +1632,7 @@ async function getActionQuestRecords(username: string, serverTime: string): Prom
       target: Number(row.target ?? 1) || 1,
       status: String(row.status ?? "active"),
       completedAt: row.completed_at ? toIso(row.completed_at, updatedAt) : null,
-      rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+      rewardRyumo: Number(row.reward_bint ?? 0) || 0,
       rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
       updated_at: updatedAt,
       version: toVersion(updatedAt),
@@ -1648,7 +1658,7 @@ async function getActionQuestRecords(username: string, serverTime: string): Prom
       target: Number(row.target ?? 1) || 1,
       status: String(row.status ?? "active"),
       completedAt: row.completed_at ? toIso(row.completed_at, updatedAt) : null,
-      rewardRyumo: Number(row.reward_ryumo ?? 0) || 0,
+      rewardRyumo: Number(row.reward_bint ?? 0) || 0,
       rewardSeasonXp: Number(row.reward_season_xp ?? 0) || 0,
       updated_at: updatedAt,
       version: toVersion(updatedAt),

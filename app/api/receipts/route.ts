@@ -265,10 +265,35 @@ export async function POST(req: Request) {
         (existingStatus === "saved" && incomingStatus === "verified"));
 
     if (isIdempotentRepeat && existingReceipt) {
+      // The analyze step persists + auto-verifies the row WITHOUT a wallet
+      // (the wallet only reaches this save call). When the row is already
+      // terminal we skip the heavy save path — but the wallet must still be
+      // stamped, or the user can never enter a reward epoch (build-epoch
+      // requires a receipt with wallet_address). Persist it here before skipping.
+      const incomingWallet =
+        typeof receipt.walletAddress === "string" ? receipt.walletAddress.trim() : "";
+      const existingWallet = (existingReceipt as { walletAddress?: string | null }).walletAddress;
+      if (incomingWallet && !existingWallet) {
+        try {
+          const sql = getSql();
+          if (sql) {
+            await warmUpConnection();
+            await sql`
+              UPDATE receipts SET wallet_address = ${incomingWallet}, updated_at = now()
+              WHERE receipt_id = ${receipt.receiptId} AND username = ${username}
+                AND wallet_address IS NULL
+            `;
+            (existingReceipt as { walletAddress?: string | null }).walletAddress = incomingWallet;
+          }
+        } catch (walletErr) {
+          console.warn("[api/receipts] wallet stamp on idempotent skip failed:", walletErr);
+        }
+      }
       console.log("[api/receipts] ⏭ Idempotent skip:", {
         receiptId: receipt.receiptId,
         existingStatus,
         incomingStatus,
+        walletStamped: Boolean(incomingWallet && !existingWallet),
       });
       return NextResponse.json({
         ...sanitizeReceiptForClient(existingReceipt, { isAdmin }),

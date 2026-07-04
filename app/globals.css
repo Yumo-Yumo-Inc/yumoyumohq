@@ -287,6 +287,17 @@
   --receipt-card-bg: #FFFFFF;
   --receipt-card-border: rgba(0, 0, 0, 0.08);
   --receipt-card-border-strong: rgba(0, 0, 0, 0.14);
+  /* Profile page hero + sticky save — light counterparts (dark defaults are inline fallbacks). */
+  --profile-hero-bg: radial-gradient(circle at top center, rgba(201, 168, 76, 0.18), transparent 38%), linear-gradient(180deg, #FFFDF8 0%, #F4F0E7 100%);
+  --profile-hero-shadow: 0 0 0 1px rgba(201, 168, 76, 0.10), 0 14px 34px rgba(0, 0, 0, 0.10);
+  --profile-avatar-bg: #FFFFFF;
+  --profile-avatar-button-bg: #FFFFFF;
+  --profile-chip-bg: rgba(14, 116, 144, 0.08);
+  --profile-chip-border: rgba(14, 116, 144, 0.28);
+  --profile-chip-text: #0E7490;
+  --profile-level-text: #8A6520;
+  --profile-track-bg: rgba(0, 0, 0, 0.10);
+  --profile-save-backdrop: linear-gradient(180deg, rgba(242, 239, 232, 0), rgba(242, 239, 232, 0.90) 44%, rgba(242, 239, 232, 0.97) 100%);
 }
 
 /* Light theme: beyaz metin sınıflarını okunabilir koyu renklerle eşleştir */
@@ -311,19 +322,26 @@
 .dark.app-theme-light .text-white,
 .dark.app-theme-light .text-white\/95,
 .dark.app-theme-light .text-white\/90,
-.dark.app-theme-light .text-white\/80 {
+.dark.app-theme-light .text-white\/80,
+.dark.app-theme-light .text-white\/78 {
   color: var(--app-text-primary) !important;
 }
+.dark.app-theme-light .text-white\/74,
 .dark.app-theme-light .text-white\/70,
 .dark.app-theme-light .text-white\/65,
+.dark.app-theme-light .text-white\/64,
+.dark.app-theme-light .text-white\/62,
 .dark.app-theme-light .text-white\/60,
+.dark.app-theme-light .text-white\/58,
 .dark.app-theme-light .text-white\/50 {
   color: var(--app-text-secondary) !important;
 }
 .dark.app-theme-light .text-white\/45,
+.dark.app-theme-light .text-white\/44,
 .dark.app-theme-light .text-white\/40,
 .dark.app-theme-light .text-white\/35,
 .dark.app-theme-light .text-white\/30,
+.dark.app-theme-light .text-white\/28,
 .dark.app-theme-light .text-white\/25,
 .dark.app-theme-light .text-white\/20 {
   color: var(--app-text-muted) !important;
@@ -350,15 +368,21 @@
 .dark.app-theme-light .bg-white\/\[0\.2\] {
   background-color: var(--app-border) !important;
 }
+.dark.app-theme-light .border-white\/12,
 .dark.app-theme-light .border-white\/10,
+.dark.app-theme-light .border-white\/8,
 .dark.app-theme-light .border-white\/5,
 .dark.app-theme-light .border-white\/\[0\.06\],
 .dark.app-theme-light .border-white\/\[0\.08\] {
   border-color: var(--app-border) !important;
 }
+.dark.app-theme-light .bg-white\/\[0\.02\],
+.dark.app-theme-light .bg-white\/\[0\.025\],
 .dark.app-theme-light .bg-white\/\[0\.03\],
+.dark.app-theme-light .bg-white\/\[0\.04\],
 .dark.app-theme-light .bg-white\/\[0\.05\],
-.dark.app-theme-light .bg-white\/\[0\.08\] {
+.dark.app-theme-light .bg-white\/\[0\.08\],
+.dark.app-theme-light .bg-white\/10 {
   background-color: var(--app-bg-elevated) !important;
 }
 .dark.app-theme-light .border-white\/\[0\.06\],

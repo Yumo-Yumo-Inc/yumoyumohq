@@ -10,12 +10,15 @@ export const PUBLIC_ANALYZE_FAILURE_MESSAGE = "Failed to analyze receipt";
  */
 export const VISION_PROVIDERS_BUSY_MESSAGE =
   "The service is busy right now. Please try again in a minute or two.";
+export const MERCHANT_NAME_NOT_READ_MESSAGE =
+  "Merchant name could not be read from the receipt. Please try again.";
 
 const SAFE_PUBLIC_MESSAGES = new Set<string>([
   "Unauthorized",
   "Receipt not found",
   "Please select your country first",
   "Total amount could not be reliably extracted",
+  MERCHANT_NAME_NOT_READ_MESSAGE,
   "Receipt country does not match your account country",
   PUBLIC_RECEIPT_REJECTION_MESSAGE,
   PUBLIC_ANALYZE_FAILURE_MESSAGE,
@@ -81,6 +84,10 @@ export function toPublicAnalyzeMessage(
 
   if (/total amount could not be reliably extracted/i.test(trimmed)) {
     return "Total amount could not be reliably extracted";
+  }
+
+  if (/merchant name could not be read from the receipt/i.test(trimmed)) {
+    return MERCHANT_NAME_NOT_READ_MESSAGE;
   }
 
   if (

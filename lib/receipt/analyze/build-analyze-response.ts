@@ -178,7 +178,12 @@ export function buildAnalyzeResponse({
     },
     reward: {
       conversionRate: 1,
-      raw: finalRewardAmount,
+      // raw = pre-fraction full estimate when a partial (base) reward was
+      // granted; proof matching / manual item completion unlock up to this.
+      raw:
+        typeof (context as any).rewardFullEstimate === "number"
+          ? (context as any).rewardFullEstimate
+          : finalRewardAmount,
       final: finalRewardAmount,
       ryumo: finalBintAmount,
       token: "cPoints",

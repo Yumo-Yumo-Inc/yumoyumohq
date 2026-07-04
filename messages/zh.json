@@ -929,6 +929,7 @@
         "receiptNotFound": "未找到收据",
         "notValidReceipt": "这份文件似乎不是有效的收据。",
         "totalNotReliable": "无法可靠地从收据中提取总金额。",
+        "merchantNotReadable": "无法从收据中读取商家名称，请重试。",
         "unknown": "发生错误",
         "allFieldsRequired": "所有字段都是必填的",
         "invalidEmail": "无效的电子邮件地址",

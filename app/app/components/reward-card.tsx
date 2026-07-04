@@ -26,6 +26,7 @@ export function RewardCard({ reward, cPoints, receiptDate, qualityHonor, onReque
   const { t } = useAppLocale();
   const noRewardMessage = resolveNoRewardMessage(reward, t, { receiptDate });
   const pendingItemized = reward?.pendingItemizedReceipt === true;
+  const fullEstimate = reward?.fullRewardEstimate ?? null;
   // cPoints are written by background post-process after analyze responds, so on
   // first render the real value isn't ready yet → show a calculating state.
   const isCalculating = cPoints == null && !noRewardMessage;
@@ -61,6 +62,14 @@ export function RewardCard({ reward, cPoints, receiptDate, qualityHonor, onReque
             )}
             {pendingItemized && (
               <div className="mt-3 space-y-2 rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-left">
+                {fullEstimate != null && fullEstimate > 0 && (
+                  <p className="text-sm font-medium text-sky-900 dark:text-sky-100">
+                    {t("rewardCard.partial.ceiling", {
+                      current: String(Math.round(reward?.final ?? 0)),
+                      full: String(Math.round(fullEstimate)),
+                    })}
+                  </p>
+                )}
                 <p className="text-sm text-sky-800 dark:text-sky-200">{t("rewardCard.partial.followUp")}</p>
                 {onRequestItemizedUpload && (
                   <Button

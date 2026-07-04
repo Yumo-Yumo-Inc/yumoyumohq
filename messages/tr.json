@@ -1144,6 +1144,7 @@
         "notValidReceipt": "Bu belge geçerli bir fiş gibi görünmüyor.",
         "receiptCountryMismatch": "Bu fiş hesap ülkenizden farklı bir ülkeden görünüyor. Kayıtlı olduğunuz ülkeden fiş yükleyin ya da Ayarlar'dan ülkenizi güncelleyin.",
         "totalNotReliable": "Fişin değeri tespit edilemedi.",
+        "merchantNotReadable": "İşletme adı okunamadı, lütfen tekrar deneyiniz.",
         "unknown": "Bir hata oluştu",
         "allFieldsRequired": "Tüm alanlar zorunludur",
         "invalidEmail": "Geçersiz e-posta adresi",
@@ -2755,7 +2756,8 @@
       "title": "Ödeme doğrulandı — şimdilik ödülün {pct}% kadarı",
       "fullEstimate": "Kalemli fiş yüklendiğinde tahmini tam ödül: {amount} cPoints",
       "followUp": "Ödülün geri kalanını almak için ürün kalemlerinin listelendiği kasa fişini yükleyin.",
-      "uploadCta": "Kasa fişi yükle"
+      "uploadCta": "Kasa fişi yükle",
+      "ceiling": "Şu an {current} cPoints kazandın — kalemleri tamamlarsan {full} cPoints'e kadar çıkabilir."
     },
     "itemizedDialog": {
       "title": "Kalemli kasa fişi",
@@ -2766,7 +2768,16 @@
       "upload": "Fiş seç",
       "uploading": "Yükleniyor…",
       "later": "Sonra",
-      "mismatch": "Fiş slip ile eşleşmedi. Tarih, tutar ve işletme adının aynı olduğundan emin olun."
+      "mismatch": "Fiş slip ile eşleşmedi. Tarih, tutar ve işletme adının aynı olduğundan emin olun.",
+      "manualToggle": "Kalemleri elle gir",
+      "manualBackToUpload": "Bunun yerine belge yükle",
+      "manualHint": "Elle girilen kalemler kalan ödülün bir bölümünü açar. Kalemli belgeyi yüklersen tamamı açılır.",
+      "manualItemName": "Ürün adı",
+      "manualItemPrice": "Fiyat",
+      "manualAddRow": "Kalem ekle",
+      "manualSave": "Kalemleri kaydet",
+      "manualSaving": "Kaydediliyor…",
+      "manualEmpty": "En az bir ürün adı ekle."
     },
     "noReward": {
       "pos_slip": "Kart slipi ödeme kanıtıdır; tam ödül için kalemli mağaza fişi veya e-fatura yükleyin.",

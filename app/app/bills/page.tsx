@@ -119,6 +119,33 @@ async function resizeForBillUpload(file: File): Promise<File> {
   }
 }
 
+/**
+ * Runs the bill through the shared receipt analyze pipeline. The bills page
+ * deliberately surfaces NO reward information (decision 2026-07-04); only the
+ * extracted merchant name is used (provider auto-rename). Failures are
+ * non-blocking — the upload itself already succeeded.
+ */
+async function analyzeBillDocument(
+  receiptId: string | undefined
+): Promise<{ merchantName?: string }> {
+  if (!receiptId) return {};
+  try {
+    const res = await fetch("/api/receipt/analyze", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ receiptId, stream: false }),
+    });
+    if (!res.ok) return {};
+    const body = (await res.json().catch(() => ({}))) as {
+      merchant?: { name?: string | null } | null;
+    };
+    return { merchantName: body?.merchant?.name ?? undefined };
+  } catch {
+    return {};
+  }
+}
+
 async function uploadProviderExampleDocument(
   providerId: number,
   file: File
@@ -140,7 +167,9 @@ async function uploadProviderExampleDocument(
     if (res.status === 413) throw new Error("dosya_cok_buyuk_4_5mb");
     throw new Error(`sample_upload_failed_${res.status}`);
   }
-  return res.json();
+  const json = (await res.json()) as { receiptId?: string; analyzed?: boolean };
+  await analyzeBillDocument(json.receiptId);
+  return json;
 }
 
 /* ─────────────────────────────────────────────── */
@@ -1341,7 +1370,14 @@ function ProviderCard({
         if (res.status === 413) throw new Error("dosya_cok_buyuk_4_5mb");
         throw new Error(`upload_failed_${res.status}`);
       }
-      return res.json();
+      const json = (await res.json()) as {
+        receiptId?: string;
+        extracted?: { merchantName?: string } | null;
+      };
+      // Shared analyze pipeline (classification, provider linking, rewards
+      // credited in the background) — the bills page shows no reward info.
+      const analysis = await analyzeBillDocument(json.receiptId);
+      return { ...json, analyzedMerchantName: analysis.merchantName };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["service-providers"] });
@@ -1349,7 +1385,9 @@ function ProviderCard({
       onBillUploaded?.();
 
       // Auto-rename if OCR found a better merchant name AND current name is generic.
-      const merchantName: string | undefined = data?.extracted?.merchantName?.trim();
+      const merchantName: string | undefined = (
+        data?.analyzedMerchantName ?? data?.extracted?.merchantName
+      )?.trim();
       if (
         merchantName &&
         merchantName.length >= 3 &&

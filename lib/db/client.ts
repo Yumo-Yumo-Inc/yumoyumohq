@@ -7,7 +7,47 @@ if (typeof window !== "undefined") {
   throw new Error("db/client is a server-only module. Do not import in client components.");
 }
 
-import { neon } from "@neondatabase/serverless";
+import { neon, neonConfig } from "@neondatabase/serverless";
+import { Agent as HttpsAgent, request as httpsRequest } from "node:https";
+
+// Node's built-in fetch funnels every request to the same origin through a
+// single keep-alive socket, so concurrent Neon HTTP queries execute one at a
+// time (each paying a full network round trip). The undici package cannot be
+// used here because the Next.js server bundle aliases it back to the built-in
+// fetch, so the driver gets a hand-rolled fetch on node:https with a real
+// connection pool instead.
+const neonHttpsAgent = new HttpsAgent({ keepAlive: true, maxSockets: 64 });
+
+neonConfig.fetchFunction = (input: string | URL, init?: {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}) =>
+  new Promise((resolve, reject) => {
+    const req = httpsRequest(
+      typeof input === "string" ? input : input.href,
+      { method: init?.method ?? "POST", headers: init?.headers, agent: neonHttpsAgent },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (chunk) => chunks.push(chunk));
+        res.on("end", () => {
+          const text = Buffer.concat(chunks).toString("utf8");
+          const status = res.statusCode ?? 0;
+          resolve({
+            ok: status >= 200 && status < 300,
+            status,
+            statusText: res.statusMessage ?? "",
+            headers: { get: (name: string) => res.headers[name.toLowerCase()] ?? null },
+            text: () => Promise.resolve(text),
+            json: () => Promise.resolve(JSON.parse(text)),
+          });
+        });
+      }
+    );
+    req.on("error", reject);
+    if (init?.body) req.write(init.body);
+    req.end();
+  });
 
 /** Row object from tagged-template queries (values are DB driver–dependent). */
 export type SqlRow = Record<string, any>;

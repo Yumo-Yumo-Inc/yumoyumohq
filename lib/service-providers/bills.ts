@@ -56,6 +56,9 @@ export async function insertDigitalBillStub(input: {
     status: "pending_bill_review",
     receiptHash,
     imagePhash,
+    // resolveReceiptImageBuffer reads receipt_data.blobUrl — required so the
+    // analyze pipeline can load the bill image after this stub insert.
+    blobUrl,
   });
   const stubSource = JSON.stringify({
     kind: "service_provider_bill_upload",

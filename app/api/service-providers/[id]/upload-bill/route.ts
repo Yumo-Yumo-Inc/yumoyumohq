@@ -137,13 +137,14 @@ export async function POST(
       imagePhash: null,
     });
 
-    // NOTE: This used to call /api/receipt/analyze, but that pipeline is
-    // designed for classic retail receipts (line items, VAT, hidden cost,
-    // fraud, reward). Digital bill rules differ: no line items, provider is
-    // pre-matched, the period matters, no reward/margin. Bill-mode extraction
-    // will be written as a separate endpoint in Phase 2. For now, only store
-    // the stub row and the blob; the user can manually enter amount/period
-    // under the provider.
+    // The bill goes through the SAME analyze pipeline as receipts (decision
+    // 2026-07-04): Gemini classifies the document, paid core utility bills
+    // (electricity/water/gas) earn rewards, membership bills stay record_only.
+    // The client triggers POST /api/receipt/analyze with this receiptId after
+    // upload (analyzeNext), mirroring the scan flow. Provider link and
+    // receipt_kind='digital_bill' on the stub row survive the analyze write,
+    // so provider bill history picks the row up either way. The bills page
+    // itself surfaces no reward information.
     return NextResponse.json({
       success: true,
       receiptId: stub.receiptId,
@@ -153,6 +154,7 @@ export async function POST(
       blobUrl: stub.blobUrl,
       status: stub.status,
       analyzed: false,
+      analyzeNext: true,
       extracted: null,
       provider: null,
       pollUrl: `/api/receipt/${stub.receiptId}`,

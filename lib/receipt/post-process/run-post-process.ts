@@ -25,6 +25,7 @@ import {
   mergeGrantedRewardIntoReceiptData,
   resolveGrantedReward,
 } from "@/lib/receipt/resolve-granted-reward";
+import { autoLinkUtilityReceipt } from "@/lib/service-providers/auto-link";
 import { checkAndActivateReferral } from "@/lib/referral/referral-activation";
 import { applyReferralBonus } from "@/lib/referral/referral-bonus";
 import {
@@ -78,6 +79,23 @@ function merchantCategoryToInternal(category: string | null | undefined): string
     konaklama: "hospitality_lodging", hotel: "hospitality_lodging",
   };
   return map[raw] ?? "other";
+}
+
+/** Migration 110 adds `source`; keep post-process working until it is applied. */
+async function deleteOcrLineItemsForReceipt(
+  sql: NonNullable<ReturnType<typeof getSql>>,
+  receiptId: string
+): Promise<void> {
+  try {
+    await sql`DELETE FROM receipt_line_items WHERE receipt_id = ${receiptId} AND source <> 'user_manual'`;
+  } catch (err) {
+    const msg = (err as Error)?.message ?? String(err);
+    if (msg.includes("source") && msg.includes("does not exist")) {
+      await sql`DELETE FROM receipt_line_items WHERE receipt_id = ${receiptId}`;
+      return;
+    }
+    throw err;
+  }
 }
 
 export interface PostProcessResult {
@@ -453,7 +471,9 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
             analyzed_at = now()
         `;
 
-        await sql`DELETE FROM receipt_line_items WHERE receipt_id = ${receiptId}`;
+        // user_manual rows are user-typed completions, not OCR output — a
+        // re-analyze must not wipe them.
+        await deleteOcrLineItemsForReceipt(sql, receiptId);
         lineItemsWritten = 0;
         for (const r of results) {
           if (!(await receiptRowExists(sql, receiptId))) {
@@ -898,6 +918,15 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       } catch (e) {
         console.warn("[run-post-process] itemized→slip matching failed:", e);
       }
+    }
+
+    // Utility bill → bills section: whatever channel the document came from,
+    // a core utility bill (electricity/water/gas) is linked to (or creates) a
+    // service provider so it shows up under Faturalarım. No-op for other types.
+    if ((row.document_type ?? "") === "utility_bill") {
+      autoLinkUtilityReceipt(receiptId).catch((e) => {
+        console.warn("[run-post-process] utility auto-link failed (non-blocking):", e);
+      });
     }
 
     // Referral: activation check + bonus (fire-and-forget)

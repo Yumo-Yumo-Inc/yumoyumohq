@@ -604,7 +604,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         icon: <Diamond className="h-4 w-4 text-[#ff63b4]" />,
         tint: "rgba(255, 95, 177, 0.10)",
         border: "rgba(255, 95, 177, 0.18)",
-        text: "#ffffff",
+        text: "var(--app-text-primary, #ffffff)",
         progress: 0,
       },
     ];
@@ -642,7 +642,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         icon: <Diamond className="h-4 w-4 text-[#ff63b4]" />,
         tint: "rgba(255, 95, 177, 0.10)",
         border: "rgba(255, 95, 177, 0.18)",
-        text: "#ffffff",
+        text: "var(--app-text-primary, #ffffff)",
         progress: 0,
       },
     ];
@@ -696,14 +696,14 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
           className="overflow-hidden rounded-[26px]"
           style={{
             borderColor: "rgba(255, 176, 68, 0.34)",
-            boxShadow: "0 0 0 1px rgba(255,176,68,0.05), 0 26px 52px rgba(0,0,0,0.28)",
+            boxShadow: "var(--profile-hero-shadow, 0 0 0 1px rgba(255,176,68,0.05), 0 26px 52px rgba(0,0,0,0.28))",
           }}
         >
           <div
             className="relative p-5"
             style={{
               background:
-                "radial-gradient(circle at top center, rgba(255,171,71,0.14), transparent 34%), linear-gradient(180deg, rgba(24,24,28,0.98) 0%, rgba(14,15,21,0.98) 100%)",
+                "var(--profile-hero-bg, radial-gradient(circle at top center, rgba(255,171,71,0.14), transparent 34%), linear-gradient(180deg, rgba(24,24,28,0.98) 0%, rgba(14,15,21,0.98) 100%))",
             }}
           >
             <input
@@ -719,7 +719,10 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
             />
 
             <div className="mb-4 flex items-start justify-between gap-3">
-              <div className="relative h-[96px] w-[96px] shrink-0 overflow-visible rounded-full border-2 border-[#f0a73e] bg-[#10131a] shadow-[0_16px_34px_rgba(0,0,0,0.34)]">
+              <div
+                className="relative h-[96px] w-[96px] shrink-0 overflow-visible rounded-full border-2 border-[#f0a73e] shadow-[0_16px_34px_rgba(0,0,0,0.34)]"
+                style={{ background: "var(--profile-avatar-bg, #10131a)" }}
+              >
                 <div className="h-full w-full overflow-hidden rounded-full">
                   {avatarUrl ? (
                     <AvatarImage src={avatarUrl} className="h-full w-full object-cover" />
@@ -732,7 +735,11 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                 <button
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-[#1a1c22] text-white shadow-[0_8px_18px_rgba(0,0,0,0.32)]"
+                  className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border text-white shadow-[0_8px_18px_rgba(0,0,0,0.32)]"
+                  style={{
+                    background: "var(--profile-avatar-button-bg, #1a1c22)",
+                    borderColor: "var(--app-border-strong, rgba(255,255,255,0.2))",
+                  }}
                   aria-label={l("Fotoğraf değiştir", "Change photo", "Сменить фото", "เปลี่ยนรูป", "Cambiar foto", "更换头像")}
                   disabled={isUploadingAvatar || isRemovingAvatar}
                 >
@@ -743,11 +750,21 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
               <div className="min-w-0 flex-1 pt-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-[30px] font-semibold tracking-[-0.04em] text-white">{displayLabel}</h1>
-                  <span className="inline-flex items-center rounded-full border border-[#f0b548]/60 bg-[#f0b548]/10 px-3 py-1 text-[13px] font-semibold text-[#f7cb63]">
+                  <span
+                    className="inline-flex items-center rounded-full border border-[#f0b548]/60 bg-[#f0b548]/10 px-3 py-1 text-[13px] font-semibold"
+                    style={{ color: "var(--profile-level-text, #f7cb63)" }}
+                  >
                     {`Lv.${accountLevel}`}
                   </span>
                 </div>
-                <div className="mt-3 inline-flex items-center rounded-full border border-[#4fb9d7]/35 bg-[#153341]/72 px-4 py-2 text-[14px] font-semibold text-[#54d8fb] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                <div
+                  className="mt-3 inline-flex items-center rounded-full border px-4 py-2 text-[14px] font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  style={{
+                    background: "var(--profile-chip-bg, rgba(21,51,65,0.72))",
+                    borderColor: "var(--profile-chip-border, rgba(79,185,215,0.35))",
+                    color: "var(--profile-chip-text, #54d8fb)",
+                  }}
+                >
                   {`${contributionTotal.toLocaleString(numLocale, { maximumFractionDigits: 0 })} cPoints`}
                 </div>
                 <div className="mt-4 flex items-center gap-2 text-[15px] text-white/72">
@@ -769,7 +786,10 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
             </div>
 
             <div className="space-y-2">
-              <div className="h-3 overflow-hidden rounded-full bg-white/[0.08]">
+              <div
+                className="h-3 overflow-hidden rounded-full"
+                style={{ background: "var(--profile-track-bg, rgba(255,255,255,0.08))" }}
+              >
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -779,7 +799,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                 />
               </div>
               <div className="text-[14px] text-white/72">
-                <span className="font-semibold text-[#f5b819]">
+                <span className="font-semibold" style={{ color: "var(--profile-level-text, #f5b819)" }}>
                   {xpInLevel.toLocaleString(numLocale, { maximumFractionDigits: 0 })}
                 </span>
                 <span>{` / ${xpRange.toLocaleString(numLocale, { maximumFractionDigits: 0 })} XP to Level ${accountLevel + 1}`}</span>
@@ -1504,11 +1524,17 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
           {t("topbar.logout")}
         </Button>
 
-        <div className="sticky bottom-20 z-20 rounded-[24px] bg-[linear-gradient(180deg,rgba(10,11,16,0.0),rgba(10,11,16,0.88)_44%,rgba(10,11,16,0.96)_100%)] px-1 pt-4 backdrop-blur lg:bottom-6">
+        <div
+          className="sticky bottom-20 z-20 rounded-[24px] px-1 pt-4 backdrop-blur lg:bottom-6"
+          style={{
+            background:
+              "var(--profile-save-backdrop, linear-gradient(180deg, rgba(10,11,16,0.0), rgba(10,11,16,0.88) 44%, rgba(10,11,16,0.96) 100%))",
+          }}
+        >
           <Button
             onClick={saveProfile}
             disabled={isSaving}
-            className="h-16 w-full rounded-[18px] border-0 bg-[linear-gradient(135deg,#ff7a1f_0%,#ff6b62_52%,#f43492_100%)] text-[17px] font-semibold text-white shadow-[0_22px_42px_rgba(255,106,119,0.30)] hover:opacity-95"
+            className="h-16 w-full rounded-[18px] border-0 bg-[linear-gradient(135deg,#ff7a1f_0%,#ff6b62_52%,#f43492_100%)] text-[17px] font-semibold text-[#fff] shadow-[0_14px_30px_rgba(255,106,119,0.26)] hover:opacity-95"
           >
             {isSaving ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Save className="mr-3 h-5 w-5" />}
             {locale === "tr" ? "Değişiklikleri kaydet" : "Save changes"}

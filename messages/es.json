@@ -890,6 +890,7 @@
         "receiptNotFound": "Recibo no encontrado",
         "notValidReceipt": "Este documento no parece ser un recibo válido.",
         "totalNotReliable": "No se pudo extraer de manera confiable el monto total del recibo.",
+        "merchantNotReadable": "No se pudo leer el nombre del comercio en el recibo. Vuelve a intentarlo.",
         "unknown": "Ocurrió un error",
         "allFieldsRequired": "Todos los campos son obligatorios",
         "invalidEmail": "Dirección de correo electrónico no válida",
