@@ -8,6 +8,10 @@
 import { loadBootstrapSnapshot } from "@/lib/bootstrap";
 import { readCachedReceiptLineItems } from "@/lib/offline/cache";
 import type { UserFacingText } from "@/lib/product-architecture/dashboard-contract";
+import {
+  resolveCategoryLvl1,
+  type CanonicalProductCategory,
+} from "@/lib/receipt/category-taxonomy";
 
 export type ChartColor = {
   dot: string;
@@ -24,31 +28,53 @@ export type CategoryBucket = {
   currency: string;
 };
 
-const CATEGORY_MAP: Record<string, { label: UserFacingText }> = {
-  food_grocery:    { label: { tr: "Market & Gıda",     en: "Grocery",       ru: "Продукты",       th: "ของชำ",              es: "Comestibles",     zh: "食杂"   } },
-  grocery:         { label: { tr: "Market & Gıda",     en: "Grocery",       ru: "Продукты",       th: "ของชำ",              es: "Comestibles",     zh: "食杂"   } },
-  supermarket:     { label: { tr: "Market & Gıda",     en: "Grocery",       ru: "Продукты",       th: "ของชำ",              es: "Comestibles",     zh: "食杂"   } },
-  food_restaurant: { label: { tr: "Yeme & İçme",       en: "Food & Drink",  ru: "Еда и напитки",  th: "อาหารและเครื่องดื่ม", es: "Comida y bebida", zh: "餐饮"   } },
-  restaurant:      { label: { tr: "Yeme & İçme",       en: "Food & Drink",  ru: "Еда и напитки",  th: "อาหารและเครื่องดื่ม", es: "Comida y bebida", zh: "餐饮"   } },
-  food:            { label: { tr: "Yeme & İçme",       en: "Food & Drink",  ru: "Еда и напитки",  th: "อาหารและเครื่องดื่ม", es: "Comida y bebida", zh: "餐饮"   } },
-  cafe:            { label: { tr: "Yeme & İçme",       en: "Food & Drink",  ru: "Еда и напитки",  th: "อาหารและเครื่องดื่ม", es: "Comida y bebida", zh: "餐饮"   } },
-  household_supply:{ label: { tr: "Ev & Yaşam",        en: "Home & Living", ru: "Дом и быт",      th: "บ้านและไลฟ์สไตล์",  es: "Hogar y vida",    zh: "家居生活" } },
-  household:       { label: { tr: "Ev & Yaşam",        en: "Home & Living", ru: "Дом и быт",      th: "บ้านและไลฟ์สไตล์",  es: "Hogar y vida",    zh: "家居生活" } },
-  home:            { label: { tr: "Ev & Yaşam",        en: "Home & Living", ru: "Дом и быт",      th: "บ้านและไลฟ์สไตล์",  es: "Hogar y vida",    zh: "家居生活" } },
-  personal_care:   { label: { tr: "Kişisel Bakım",     en: "Personal Care", ru: "Уход за собой",  th: "ดูแลตัวเอง",         es: "Cuidado personal",zh: "个人护理" } },
-  beauty:          { label: { tr: "Kişisel Bakım",     en: "Personal Care", ru: "Уход за собой",  th: "ดูแลตัวเอง",         es: "Cuidado personal",zh: "个人护理" } },
-  health:          { label: { tr: "Sağlık & Eczane",   en: "Health",        ru: "Здоровье",       th: "สุขภาพ",             es: "Salud",           zh: "健康"   } },
-  pharmacy:        { label: { tr: "Sağlık & Eczane",   en: "Health",        ru: "Здоровье",       th: "สุขภาพ",             es: "Salud",           zh: "健康"   } },
-  electronics:     { label: { tr: "Elektronik",        en: "Electronics"    } },
-  transport:       { label: { tr: "Ulaşım",            en: "Transport",     ru: "Транспорт",      th: "การเดินทาง",          es: "Transporte",      zh: "交通"   } },
-  transportation:  { label: { tr: "Ulaşım",            en: "Transport",     ru: "Транспорт",      th: "การเดินทาง",          es: "Transporte",      zh: "交通"   } },
-  clothing:        { label: { tr: "Giyim & Moda",      en: "Fashion"        } },
-  fashion:         { label: { tr: "Giyim & Moda",      en: "Fashion"        } },
-  entertainment:   { label: { tr: "Eğlence",           en: "Entertainment", ru: "Развлечения",    th: "บันเทิง",            es: "Entretenimiento", zh: "娱乐"   } },
-  baby_supply:     { label: { tr: "Bebek & Çocuk",     en: "Baby & Kids",   ru: "Дети",           th: "ลูกน้อย",            es: "Bebés y niños",   zh: "母婴"   } },
+// Display buckets keyed by the value returned from the canonical taxonomy
+// (via CANON_TO_DISPLAY). Several canonical categories intentionally collapse
+// into one consumer-facing row — e.g. `restaurant` and `alcohol` both read as
+// "Food & Drink". Every label carries all six locales because the dashboard
+// renders `label[locale]` directly with no fallback.
+const DISPLAY: Record<string, UserFacingText> = {
+  grocery:       { tr: "Market & Gıda",  en: "Grocery",         ru: "Продукты",       th: "ของชำ",              es: "Comestibles",      zh: "食杂"    },
+  food_drink:    { tr: "Yeme & İçme",    en: "Food & Drink",    ru: "Еда и напитки",  th: "อาหารและเครื่องดื่ม", es: "Comida y bebida",  zh: "餐饮"    },
+  home:          { tr: "Ev & Yaşam",     en: "Home & Living",   ru: "Дом и быт",      th: "บ้านและไลฟ์สไตล์",  es: "Hogar y vida",     zh: "家居生活" },
+  personal_care: { tr: "Kişisel Bakım",  en: "Personal Care",   ru: "Уход за собой",  th: "ดูแลตัวเอง",         es: "Cuidado personal", zh: "个人护理" },
+  health:        { tr: "Sağlık & Eczane",en: "Health",          ru: "Здоровье",       th: "สุขภาพ",             es: "Salud",            zh: "健康"    },
+  electronics:   { tr: "Elektronik",     en: "Electronics",     ru: "Электроника",    th: "อิเล็กทรอนิกส์",     es: "Electrónica",      zh: "电子产品" },
+  fuel:          { tr: "Ulaşım & Yakıt", en: "Fuel & Transport",ru: "Топливо",        th: "เชื้อเพลิง",         es: "Combustible",      zh: "燃油"    },
+  fashion:       { tr: "Giyim & Moda",   en: "Fashion",         ru: "Одежда",         th: "แฟชั่น",             es: "Moda",             zh: "服饰"    },
+  tobacco:       { tr: "Tütün",          en: "Tobacco",         ru: "Табак",          th: "ยาสูบ",              es: "Tabaco",           zh: "烟草"    },
+  services:      { tr: "Hizmetler",      en: "Services",        ru: "Услуги",         th: "บริการ",             es: "Servicios",        zh: "服务"    },
+  hospitality:   { tr: "Konaklama",      en: "Accommodation",   ru: "Проживание",     th: "ที่พัก",             es: "Alojamiento",      zh: "住宿"    },
+  sports:        { tr: "Spor",           en: "Sports",          ru: "Спорт",          th: "กีฬา",               es: "Deportes",         zh: "运动"    },
+  pets:          { tr: "Evcil Hayvan",   en: "Pets",            ru: "Питомцы",        th: "สัตว์เลี้ยง",         es: "Mascotas",         zh: "宠物"    },
+  baby:          { tr: "Bebek & Çocuk",  en: "Baby & Kids",     ru: "Дети",           th: "ลูกน้อย",            es: "Bebés y niños",    zh: "母婴"    },
+};
+
+// Canonical lvl1 enum (source of truth) → consumer-facing display bucket key.
+const CANON_TO_DISPLAY: Record<CanonicalProductCategory, string> = {
+  groceries:   "grocery",
+  restaurant:  "food_drink",
+  alcohol:     "food_drink",
+  fuel:        "fuel",
+  apparel:     "fashion",
+  cosmetics:   "personal_care",
+  electronics: "electronics",
+  home:        "home",
+  tobacco:     "tobacco",
+  pharmacy:    "health",
+  services:    "services",
+  hospitality: "hospitality",
+  sports:      "sports",
+  pets:        "pets",
+  baby:        "baby",
+  other:       "other",
 };
 
 const OTHER_LABEL: UserFacingText = { tr: "Diğer", en: "Other", ru: "Другое", th: "อื่น ๆ", es: "Otros", zh: "其他" };
+
+function displayLabel(key: string): UserFacingText {
+  return DISPLAY[key] ?? OTHER_LABEL;
+}
 
 // 4 max-contrast colors, assigned by chart position (index 0-2 = top-3, index 3 = other).
 // Each row in the chart having a distinct color takes priority over the same
@@ -60,38 +86,13 @@ const CHART_PALETTE: ChartColor[] = [
   { dot: "var(--chart-other-dot)", dotBg: "var(--chart-other-dot-bg)", barStart: "var(--chart-other-bar-start)", barEnd: "var(--chart-other-bar-end)" },  // gray (other) — flips with theme
 ];
 
-function normalizeCat(raw: string | null): string {
-  if (!raw) return "other";
-  const norm = raw
-    .toLowerCase()
-    .replace(/ş/g, "s").replace(/ğ/g, "g").replace(/ı/g, "i")
-    .replace(/ö/g, "o").replace(/ü/g, "u").replace(/ç/g, "c")
-    .replace(/â/g, "a").replace(/î/g, "i").replace(/û/g, "u")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (/market|grocery|supermarket|bakkal|gida|manav|smarket/.test(norm)) return "food_grocery";
-  if (/restoran|restaurant|kafe|cafe|yeme|icme|fastfood|fast food|pizza|burger|lokanta|yiyecek|food|doner/.test(norm)) return "food_restaurant";
-  if (/ev yasam|household|home|temizl|kuru temiz|mobilya|furniture|hirdavat/.test(norm)) return "household_supply";
-  if (/kisisel bakim|personal|kozmetik|cosmet|beauty|guzellik|parfum|bakim/.test(norm)) return "personal_care";
-  if (/saglik|health|pharma|eczane|ilac|doktor|hastane|optik|medikal/.test(norm)) return "health";
-  if (/elektron|electron|teknoloji|bilgisayar|telefon|tablet|tech/.test(norm)) return "electronics";
-  if (/ulasim|transport|akaryakit|benzin|petrol|taxi|taksi|otobus|metro|rent a car|kirala/.test(norm)) return "transport";
-  if (/giyim|cloth|fashion|apparel|tekstil|ayakkabi|shoes|moda/.test(norm)) return "clothing";
-  if (/eglen|entertain|cinema|sinema|spor|oyun|muzik|konser/.test(norm)) return "entertainment";
-  if (/bebek|baby|child|cocuk|kid/.test(norm)) return "baby_supply";
-
-  if (norm in CATEGORY_MAP) return norm;
-
-  return `raw:${norm.slice(0, 40)}`;
-}
-
-function rawCatLabel(key: string): { tr: string; en: string } {
-  const display = key
-    .replace(/^raw:/, "")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-  return { tr: display, en: display };
+// Resolve a line item to a display bucket key. lvl1→lvl2 recovery lives in the
+// canonical taxonomy (shared with the write-time pipeline); here we only map the
+// canonical category onto its consumer-facing display bucket.
+function resolveDisplayKey(lvl1: string | null, lvl2: string | null): string {
+  const canon = resolveCategoryLvl1(lvl1, lvl2);
+  if (canon == null) return "other";
+  return CANON_TO_DISPLAY[canon] ?? "other";
 }
 
 export async function fetchCategorySpending(range?: {
@@ -124,7 +125,7 @@ export async function fetchCategorySpending(range?: {
     if (untilStr && dateStr > untilStr) continue;
     if (!item.lineTotalGross || item.lineTotalGross <= 0) continue;
 
-    const cat = normalizeCat(item.categoryLvl1);
+    const cat = resolveDisplayKey(item.categoryLvl1, item.categoryLvl2);
     if (cat === "other") {
       otherTotal += item.lineTotalGross;
     } else {
@@ -148,16 +149,13 @@ export async function fetchCategorySpending(range?: {
   const spillover = sortedNamed.slice(3).reduce((sum, [, v]) => sum + v, 0);
   const digerTotal = otherTotal + spillover;
 
-  const buckets: CategoryBucket[] = top3.map(([key, total], index) => {
-    const meta = key.startsWith("raw:") ? null : CATEGORY_MAP[key];
-    return {
-      key,
-      label:      meta ? meta.label : rawCatLabel(key),
-      chartColor: CHART_PALETTE[index],
-      total,
-      currency:   dominantCurrency,
-    };
-  });
+  const buckets: CategoryBucket[] = top3.map(([key, total], index) => ({
+    key,
+    label:      displayLabel(key),
+    chartColor: CHART_PALETTE[index],
+    total,
+    currency:   dominantCurrency,
+  }));
 
   // Always append the "other" row as the 4th entry, even if digerTotal is 0.
   buckets.push({
@@ -265,7 +263,7 @@ export async function fetchNamedCategoryTotals(range?: {
     if (!dateStr || dateStr < cutoffStr) continue;
     if (untilStr && dateStr > untilStr) continue;
     if (!item.lineTotalGross || item.lineTotalGross <= 0) continue;
-    const cat = normalizeCat(item.categoryLvl1);
+    const cat = resolveDisplayKey(item.categoryLvl1, item.categoryLvl2);
     if (cat === "other") continue;
     totals.set(cat, (totals.get(cat) ?? 0) + item.lineTotalGross);
     const cur = item.currency || "TRY";
@@ -276,8 +274,10 @@ export async function fetchNamedCategoryTotals(range?: {
   for (const [cur, count] of currencyCount) {
     if (count > maxCount) { maxCount = count; dominantCurrency = cur; }
   }
-  return [...totals.entries()].map(([key, total]) => {
-    const meta = key.startsWith("raw:") ? null : CATEGORY_MAP[key];
-    return { key, label: meta ? meta.label : rawCatLabel(key), total, currency: dominantCurrency };
-  });
+  return [...totals.entries()].map(([key, total]) => ({
+    key,
+    label: displayLabel(key),
+    total,
+    currency: dominantCurrency,
+  }));
 }

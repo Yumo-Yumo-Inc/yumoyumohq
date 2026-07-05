@@ -206,3 +206,42 @@ export function isCanonicalProductCategory(
 ): value is CanonicalProductCategory {
   return value != null && CANONICAL_SET.has(value);
 }
+
+/**
+ * Recover a canonical lvl1 from the finer lvl2 product-group label. The pipeline
+ * often fills lvl2 (e.g. "doctor_visit", "alcohol", "snacks_nuts") even when lvl1
+ * lands on the "other" catch-all — most notably services rendered as products
+ * (medical, dental, nursing) which have no lvl1 roof of their own. Returns a
+ * canonical category, or null when lvl2 carries no usable signal.
+ */
+export function canonicalFromLvl2(
+  lvl2: string | null | undefined
+): CanonicalProductCategory | null {
+  if (lvl2 == null) return null;
+  const key = normKey(String(lvl2));
+  if (!key) return null;
+  // Medical / clinical services surface only in lvl2, never as an lvl1 roof.
+  if (
+    /(^|\s)(doctor|doktor|nurs|hemsire|medical|medikal|clinic|klinik|hospital|hastane|dental|dis hekim|muayene|pharma|eczane|ilac|health|saglik)/.test(
+      key
+    )
+  ) {
+    return "pharmacy";
+  }
+  const canon = normalizeProductCategoryLvl1(lvl2);
+  return canon != null && canon !== "other" ? canon : null;
+}
+
+/**
+ * Canonical lvl1 with an lvl2 fallback: use lvl1 when it carries signal, else
+ * recover from lvl2, else return lvl1's result (null or "other"). A correct lvl1
+ * is never overridden — lvl2 only fills the gap when lvl1 is empty or "other".
+ */
+export function resolveCategoryLvl1(
+  lvl1: string | null | undefined,
+  lvl2: string | null | undefined
+): CanonicalProductCategory | null {
+  const c1 = normalizeProductCategoryLvl1(lvl1);
+  if (c1 != null && c1 !== "other") return c1;
+  return canonicalFromLvl2(lvl2) ?? c1;
+}

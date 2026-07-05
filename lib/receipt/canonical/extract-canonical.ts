@@ -10,7 +10,7 @@ import {
   normalizeItemDisplayName,
   normalizeMerchantDisplayName,
 } from "../name-normalization";
-import { normalizeProductCategoryLvl1 } from "../category-taxonomy";
+import { resolveCategoryLvl1 } from "../category-taxonomy";
 
 const NOW_ISO = () => new Date().toISOString();
 
@@ -230,9 +230,13 @@ function geminiLineToObservation(
     pack_size: null,
     // The product category from GPT is used first; falls back to the merchant category.
     // Collapse into the single canonical lvl1 taxonomy (gıda/grocery/Turkish-long → groceries, etc.).
+    // When lvl1 lands on "other", recover from the lvl2 subcategory signal
+    // (e.g. doctor_visit → pharmacy, alcohol → alcohol) so services/beverages
+    // are not silently bucketed as "other".
     category_lvl1:
-      normalizeProductCategoryLvl1(
-        normalizeCategoryText(item.category) ?? context.category
+      resolveCategoryLvl1(
+        normalizeCategoryText(item.category) ?? context.category,
+        normalizeCategoryText(item.subcategory)
       ) ?? null,
     category_lvl2: normalizeCategoryText(item.subcategory),
     unit_type: item.unitType ?? "adet",

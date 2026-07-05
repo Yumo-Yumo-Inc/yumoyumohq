@@ -11,7 +11,7 @@
  */
 
 import { getSql } from "@/lib/db/client";
-import { normalizeProductCategoryLvl1 } from "@/lib/receipt/category-taxonomy";
+import { resolveCategoryLvl1 } from "@/lib/receipt/category-taxonomy";
 import { isTrustWorkerEnabled } from "@/config/oracle-phases";
 import { writeReceiptContributionPoints } from "@/lib/receipt/db/contribution-points";
 import {
@@ -491,8 +491,10 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
               ? (o.category_lvl1 || taxRow?.category_lvl1 || null)
               : (taxRow?.category_lvl1 || o.category_lvl1 || null);
           // Single canonical lvl1 taxonomy — short English enum regardless of whether it comes from taxonomy or LLM.
-          const finalCategoryLvl1 = normalizeProductCategoryLvl1(rawCategoryLvl1);
+          // When lvl1 resolves to "other", recover from the lvl2 subcategory signal
+          // (e.g. doctor_visit → pharmacy) so services are not stored as "other".
           const finalCategoryLvl2 = taxRow?.category_lvl2 || o.category_lvl2 || null;
+          const finalCategoryLvl1 = resolveCategoryLvl1(rawCategoryLvl1, finalCategoryLvl2);
           await sql`
             INSERT INTO receipt_line_items (
               receipt_id, raw_name, canonical_name, brand, brand_status, category_lvl1, category_lvl2,
