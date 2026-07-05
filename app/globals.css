@@ -242,10 +242,12 @@
   --ys-line: #BCB29A;
   --ys-edge: #ACA288;
   --ys-edge2: #978D74;
-  /* Metin hiyerarşisi: derin siyah → orta koyu → muted */
-  --app-text-primary: #161616;
-  --app-text-secondary: #383838;
-  --app-text-muted: #686868;
+  /* Metin hiyerarşisi: warm ink over cream — translucent so the surface breathes
+     through (glass-like), softer than a flat cold near-black. One warm-dark base
+     at descending alphas keeps the hierarchy cohesive and reads clean, not heavy. */
+  --app-text-primary: rgba(30, 27, 22, 0.93);
+  --app-text-secondary: rgba(30, 27, 22, 0.66);
+  --app-text-muted: rgba(30, 27, 22, 0.50);
   /* Sınırlar: çok ince, zarif */
   --app-border: rgba(0, 0, 0, 0.08);
   --app-border-strong: rgba(0, 0, 0, 0.14);

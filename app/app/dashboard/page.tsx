@@ -15,6 +15,7 @@ import {
 import { AppShell } from "@/components/app/app-shell";
 import { ErrorState } from "@/components/app/error-state";
 import { MonthlySummaryCard } from "@/components/app/dashboard/monthly-summary-card";
+import { RecentReceiptsSection } from "@/components/app/dashboard/recent-receipts-section";
 import { YumbieWorkspaceGate } from "@/components/yumbie/YumbieWorkspaceGate";
 import { useAppProfile } from "@/lib/app/profile-context";
 import { cn } from "@/lib/utils";
@@ -405,8 +406,8 @@ export default function DashboardPage() {
       <div className="-mx-3 min-h-[100svh] overflow-hidden bg-[var(--app-bg-dashboard)] px-3 pb-28 pt-2 text-[var(--app-text-primary)] sm:-mx-4 sm:px-4 lg:m-0 lg:min-h-[calc(100svh-3rem)] lg:rounded-[36px] lg:border lg:border-[var(--app-border)] lg:p-6 lg:pb-8">
         <div className="absolute inset-x-0 top-0 h-[420px] bg-[linear-gradient(180deg,rgba(255,200,150,0.06),transparent_60%)]" />
         <div className="relative mx-auto max-w-[1320px] space-y-5 lg:space-y-6">
-          <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-            <div className="order-1 space-y-5 lg:col-span-8 lg:space-y-6">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
+            <div className="order-1 min-w-0 space-y-5 lg:col-span-8 lg:space-y-6">
               <MonthlySummaryCard locale={yumoLocale} />
               {/* Yumbie room — moved out of the global topbar band into the
                   Ledger position. The insight sheet portals to <body>, so the
@@ -416,6 +417,7 @@ export default function DashboardPage() {
               </div>
               <QuickCategoriesGrid locale={yumoLocale} />
               <SpendingCategoryCard locale={yumoLocale} />
+              <RecentReceiptsSection locale={yumoLocale} />
             </div>
           </div>
         </div>

@@ -28,7 +28,7 @@ export interface CategoryOption {
   count: number;
 }
 
-const CATEGORY_ICON: Record<string, LucideIcon> = {
+export const CATEGORY_ICON: Record<string, LucideIcon> = {
   cafe: Coffee,
   restaurant: UtensilsCrossed,
   grocery: ShoppingCart,

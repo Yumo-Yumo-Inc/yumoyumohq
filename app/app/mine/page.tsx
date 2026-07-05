@@ -744,101 +744,68 @@ export default function MinePage() {
     // Optimistic UI: Navigate to complete step (Done)
     setCurrentStep(4);
     
-    // Save in background
+    // Save in background. The UI already advanced to Done (optimistic), so the
+    // network call must not be raced by an arbitrary abort: a cold-start save
+    // (insert + daily quests + two level snapshots + mobile action result)
+    // legitimately runs several seconds, and the old 5s abort turned those into
+    // silent failures that left the receipt stuck on `scanned`. Each attempt now
+    // runs to completion, and any failure is retried once so a confirmed receipt
+    // reliably lands as `verified`. The server upsert is idempotent (a terminal
+    // row is skipped), which makes the retry safe.
+    const analysisToSave: ReceiptAnalysis = {
+      ...originalAnalysis,
+      status: "verified",
+      createdAt: new Date().toISOString(),
+    };
+
+    const applySaved = async (
+      saved: Partial<ReceiptAnalysis> & { actionResult?: MobileActionResult },
+    ) => {
+      await localDb.set(
+        "receipts",
+        createReceiptRecordFromAnalysis({
+          ...analysisToSave,
+          ...saved,
+          status: saved.status ?? analysisToSave.status,
+        }),
+      );
+      await rebuildLocalInsightsFromReceipts().catch(() => {});
+      if (saved.actionResult) {
+        await applyMobileActionResult(saved.actionResult, queryClient, { onLevelEvent: announceLevelUp });
+      } else {
+        await syncMobileData({ fullProfile: true }).catch(() => null);
+      }
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY("monthly") });
+      queryClient.invalidateQueries({ queryKey: QUESTS_DAILY_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
+    };
+
+    const postOnce = async (): Promise<Partial<ReceiptAnalysis> & { actionResult?: MobileActionResult }> => {
+      const response = await fetch("/api/receipts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(analysisToSave),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: `Save failed: ${response.status}` }));
+        throw new Error(errorData.error || "Failed to save receipt");
+      }
+      return response.json();
+    };
+
     const savePromise = (async () => {
       try {
-        const analysisToSave: ReceiptAnalysis = {
-          ...originalAnalysis,
-          status: "verified",
-          createdAt: new Date().toISOString(),
-        };
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-
+        let saved: Partial<ReceiptAnalysis> & { actionResult?: MobileActionResult };
         try {
-          const response = await fetch("/api/receipts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(analysisToSave),
-            signal: controller.signal,
-          });
-
-          clearTimeout(timeoutId);
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-            console.error("Failed to save receipt:", errorData);
-            throw new Error(errorData.error || "Failed to save receipt");
-          }
-
-          const saved = (await response.json()) as Partial<ReceiptAnalysis> & { actionResult?: MobileActionResult };
-          console.log("Receipt saved successfully:", saved.receiptId);
-          await localDb.set(
-            "receipts",
-            createReceiptRecordFromAnalysis({
-              ...analysisToSave,
-              ...saved,
-              status: saved.status ?? analysisToSave.status,
-            })
-          );
-          await rebuildLocalInsightsFromReceipts().catch(() => {});
-          if (saved.actionResult) {
-            await applyMobileActionResult(saved.actionResult, queryClient, { onLevelEvent: announceLevelUp });
-          } else {
-            await syncMobileData({ fullProfile: true }).catch(() => null);
-          }
-          queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY("monthly") });
-          queryClient.invalidateQueries({ queryKey: QUESTS_DAILY_QUERY_KEY });
-          queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
-        } catch (fetchError: unknown) {
-          clearTimeout(timeoutId);
-          if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-            console.warn("Save operation timed out, retrying in background");
-            fetch("/api/receipts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(analysisToSave),
-            })
-              .then(async (backgroundResponse) => {
-                if (!backgroundResponse.ok) {
-                  const errorData = await backgroundResponse
-                    .json()
-                    .catch(() => ({ error: `Background save failed: ${backgroundResponse.status}` }));
-                  throw new Error(errorData.error || "Background save failed");
-                }
-
-                const saved = (await backgroundResponse.json()) as Partial<ReceiptAnalysis> & {
-                  actionResult?: MobileActionResult;
-                };
-                console.log("Receipt saved successfully (background):", saved.receiptId);
-                await localDb.set(
-                  "receipts",
-                  createReceiptRecordFromAnalysis({
-                    ...analysisToSave,
-                    ...saved,
-                    status: saved.status ?? analysisToSave.status,
-                  })
-                );
-                await rebuildLocalInsightsFromReceipts().catch(() => {});
-                if (saved.actionResult) {
-                  await applyMobileActionResult(saved.actionResult, queryClient, { onLevelEvent: announceLevelUp });
-                } else {
-                  await syncMobileData({ fullProfile: true }).catch(() => null);
-                }
-                queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY("monthly") });
-                queryClient.invalidateQueries({ queryKey: QUESTS_DAILY_QUERY_KEY });
-                queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
-              })
-              .catch((err) => {
-                console.error("Background save failed:", err);
-              });
-          } else {
-            throw fetchError;
-          }
+          saved = await postOnce();
+        } catch (firstError: unknown) {
+          console.warn("Receipt save failed, retrying once:", firstError);
+          saved = await postOnce();
         }
+        console.log("Receipt saved successfully:", saved.receiptId);
+        await applySaved(saved);
       } catch (err: unknown) {
-        console.error("Failed to save receipt:", err);
+        console.error("Failed to save receipt (both attempts):", err);
       } finally {
         setIsSaving(false);
       }
