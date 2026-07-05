@@ -470,9 +470,9 @@ export async function getReceiptsByDateRange(
               AND extraction_date_value >= ${startStr} AND extraction_date_value <= ${endStr})
             OR
             ((extraction_date_value IS NULL OR extraction_date_value = '')
-              AND created_at >= ${start.toISOString()} AND created_at <= ${end.toISOString()})
+              AND receipts.created_at >= ${start.toISOString()} AND receipts.created_at <= ${end.toISOString()})
           )
-        ORDER BY created_at DESC
+        ORDER BY receipts.created_at DESC
       `;
     });
     return rows.map((row: any) => dbRowToReceipt(row));
@@ -523,7 +523,7 @@ export async function getReceiptsForInsights(
           merchant_place_id,
           extraction_date_value,
           extraction_time_value,
-          created_at,
+          receipts.created_at,
           pricing_total_paid,
           pricing_vat_amount,
           pricing_paid_ex_tax,
@@ -538,7 +538,7 @@ export async function getReceiptsForInsights(
         LEFT JOIN merchants m ON m.id = receipts.merchant_id
         WHERE username = ${username}
           AND COALESCE(expense_type, 'personal') = 'personal'
-        ORDER BY created_at DESC
+        ORDER BY receipts.created_at DESC
         LIMIT ${limit}
         OFFSET ${offset}
       `;
@@ -694,7 +694,7 @@ export async function getReceiptsByDateRangeForInsights(
           merchant_place_id,
           extraction_date_value,
           extraction_time_value,
-          created_at,
+          receipts.created_at,
           pricing_total_paid,
           pricing_vat_amount,
           pricing_paid_ex_tax,
@@ -714,9 +714,9 @@ export async function getReceiptsByDateRangeForInsights(
               AND extraction_date_value >= ${startStr} AND extraction_date_value <= ${endStr})
             OR
             ((extraction_date_value IS NULL OR extraction_date_value = '')
-              AND created_at >= ${start.toISOString()} AND created_at <= ${end.toISOString()})
+              AND receipts.created_at >= ${start.toISOString()} AND receipts.created_at <= ${end.toISOString()})
           )
-        ORDER BY created_at DESC
+        ORDER BY receipts.created_at DESC
       `;
     });
 
