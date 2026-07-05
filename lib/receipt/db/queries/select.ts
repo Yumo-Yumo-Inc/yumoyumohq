@@ -517,7 +517,7 @@ export async function getReceiptsForInsights(
       return await dbSql`
         SELECT
           receipt_id,
-          merchant_name,
+          COALESCE(m.display_name, receipts.merchant_name) AS merchant_name,
           merchant_country,
           merchant_category,
           merchant_place_id,
@@ -535,6 +535,7 @@ export async function getReceiptsForInsights(
           status,
           flags_rejected
         FROM receipts
+        LEFT JOIN merchants m ON m.id = receipts.merchant_id
         WHERE username = ${username}
           AND COALESCE(expense_type, 'personal') = 'personal'
         ORDER BY created_at DESC
@@ -687,7 +688,7 @@ export async function getReceiptsByDateRangeForInsights(
       return await dbSql`
         SELECT
           receipt_id,
-          merchant_name,
+          COALESCE(m.display_name, receipts.merchant_name) AS merchant_name,
           merchant_country,
           merchant_category,
           merchant_place_id,
@@ -705,6 +706,7 @@ export async function getReceiptsByDateRangeForInsights(
           status,
           flags_rejected
         FROM receipts
+        LEFT JOIN merchants m ON m.id = receipts.merchant_id
         WHERE username = ${username}
           AND COALESCE(expense_type, 'personal') = 'personal'
           AND (

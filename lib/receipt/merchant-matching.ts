@@ -23,6 +23,7 @@ import {
 import { isDatabaseAvailable } from "@/lib/receipt/db/connection";
 import {
   isValidMerchantCandidate,
+  merchantIdentityKey,
   normalizeMerchantForDbLookup,
 } from "@/lib/receipt/merchant-validation";
 import { normalizeMerchantDisplayName } from "@/lib/receipt/name-normalization";
@@ -88,6 +89,33 @@ function normalizeForPattern(name: string): string {
   return normalizeMerchantForDbLookup(name)
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/**
+ * Find an existing merchant that is the SAME as `displayName` despite spelling
+ * variation, scoped to one country. Uses an aggressive ASCII-alnum identity key
+ * (space/hyphen/case insensitive) computed identically in JS and SQL, so
+ * "Koh Pha-Ngan Hospital" reuses the "KOHPHANGAN HOSPITAL" row instead of
+ * creating a new unverified duplicate. Considers all tiers, preferring a
+ * verified/candidate row. Blank key (pure CJK/Thai script) falls back to the
+ * light exact match so keyless merchants are never collapsed together.
+ */
+async function findMerchantByIdentity(
+  displayName: string,
+  normalized: string,
+  countryCode: string | null
+): Promise<string | null> {
+  const key = merchantIdentityKey(displayName);
+  const res = key
+    ? await db.query<{ id: string }>(
+        "SELECT id FROM merchants WHERE regexp_replace(lower(COALESCE(canonical_name, display_name, '')), '[^a-z0-9]', '', 'g') = $1 AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL)) ORDER BY (tier = 'verified') DESC, (tier = 'candidate') DESC LIMIT 1",
+        [key, countryCode]
+      )
+    : await db.query<{ id: string }>(
+        "SELECT id FROM merchants WHERE LOWER(TRIM(canonical_name)) = $1 AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL)) LIMIT 1",
+        [normalized, countryCode]
+      );
+  return res.rows[0]?.id ?? null;
 }
 
 function similarity(a: string, b: string): number {
@@ -698,29 +726,26 @@ async function autoCreateMerchant(
         ? taxIdDigits
         : null;
 
-    const existing = await db.query<{ id: string }>(
-      "SELECT id FROM merchants WHERE LOWER(TRIM(canonical_name)) = $1 AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL)) LIMIT 1",
-      [normalized, countryCode]
-    );
-    if (existing.rows.length > 0) {
-      await addPatternIfMissing(existing.rows[0].id, displayName, normalized);
+    const existingId = await findMerchantByIdentity(displayName, normalized, countryCode);
+    if (existingId) {
+      await addPatternIfMissing(existingId, displayName, normalized);
       const row = (await db.query<{ id: string, vkn: string | null, tier: string }>(
         "SELECT id, vkn, tier FROM merchants WHERE id = $1",
-        [existing.rows[0].id]
+        [existingId]
       )).rows[0];
-      
+
       if (taxIdStr && !row.vkn) {
-        await db.query("UPDATE merchants SET vkn = $1 WHERE id = $2", [taxIdStr, existing.rows[0].id]);
+        await db.query("UPDATE merchants SET vkn = $1 WHERE id = $2", [taxIdStr, existingId]);
         console.log(`[autoCreateMerchant] Updated existing merchant with VKN: ${taxIdStr}`);
       }
       // Do not return unverified merchants - admin must approve first
       if (!TIER_MATCHABLE.includes(row.tier as (typeof TIER_MATCHABLE)[number])) {
         return null;
       }
-      
+
       const m = await db.query<MerchantRow>(
         "SELECT id, canonical_name, display_name, category, tier, country_code FROM merchants WHERE id = $1",
-        [existing.rows[0].id]
+        [existingId]
       );
       if (m.rows.length > 0) {
         const resultRow = m.rows[0];
@@ -817,16 +842,13 @@ export async function ensureUnverifiedMerchantForApproval(
     const countryCode = input.country?.trim().toUpperCase().slice(0, 2) || null;
     const category = input.category?.trim() || "other";
 
-    const existing = await db.query<{ id: string }>(
-      "SELECT id FROM merchants WHERE LOWER(TRIM(canonical_name)) = $1 AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL)) LIMIT 1",
-      [normalized, countryCode]
-    );
-    if (existing.rows.length > 0) {
-      await addPatternIfMissing(existing.rows[0].id, displayName, normalized);
+    const existingId = await findMerchantByIdentity(displayName, normalized, countryCode);
+    if (existingId) {
+      await addPatternIfMissing(existingId, displayName, normalized);
       if (taxIdStr) {
-        const currentVkn = await db.query<{ vkn: string | null }>("SELECT vkn FROM merchants WHERE id = $1", [existing.rows[0].id]);
+        const currentVkn = await db.query<{ vkn: string | null }>("SELECT vkn FROM merchants WHERE id = $1", [existingId]);
         if (!currentVkn.rows[0].vkn) {
-          await db.query("UPDATE merchants SET vkn = $1 WHERE id = $2", [taxIdStr, existing.rows[0].id]);
+          await db.query("UPDATE merchants SET vkn = $1 WHERE id = $2", [taxIdStr, existingId]);
           console.log("[ensureUnverifiedMerchantForApproval] Updated existing merchant with VKN:", taxIdStr);
         }
       }
@@ -857,12 +879,9 @@ export async function ensureUnverifiedMerchantForApproval(
       }
     } catch (insertErr: any) {
       if (insertErr?.code === "23505") {
-        const after = await db.query<{ id: string }>(
-          "SELECT id FROM merchants WHERE LOWER(TRIM(canonical_name)) = $1 AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL)) LIMIT 1",
-          [normalized, countryCode]
-        );
-        if (after.rows.length > 0) {
-          await addPatternIfMissing(after.rows[0].id, displayName, normalized);
+        const afterId = await findMerchantByIdentity(displayName, normalized, countryCode);
+        if (afterId) {
+          await addPatternIfMissing(afterId, displayName, normalized);
           console.log("[ensureUnverifiedMerchantForApproval] Merchant already existed (unique), pattern added:", name?.substring(0, 40));
         }
         return { created: false };

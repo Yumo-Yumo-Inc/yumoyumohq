@@ -325,7 +325,7 @@ async function getReceiptRecords(
             r.created_at,
             r.updated_at,
             r.wallet_address,
-            r.merchant_name,
+            COALESCE(m.display_name, r.merchant_name) AS merchant_name,
             r.merchant_country,
             r.merchant_category,
             r.merchant_place_id,
@@ -343,6 +343,7 @@ async function getReceiptRecords(
           FROM receipts r
           LEFT JOIN contribution_point_events cpe
             ON cpe.reference_id = r.receipt_id AND cpe.source_type = 'receipt_verified'
+          LEFT JOIN merchants m ON m.id = r.merchant_id
           WHERE r.username = ${username}
             AND COALESCE(r.updated_at, r.created_at) > ${since}
           ORDER BY COALESCE(r.updated_at, r.created_at) DESC
@@ -356,7 +357,7 @@ async function getReceiptRecords(
             r.created_at,
             r.updated_at,
             r.wallet_address,
-            r.merchant_name,
+            COALESCE(m.display_name, r.merchant_name) AS merchant_name,
             r.merchant_country,
             r.merchant_category,
             r.merchant_place_id,
@@ -374,6 +375,7 @@ async function getReceiptRecords(
           FROM receipts r
           LEFT JOIN contribution_point_events cpe
             ON cpe.reference_id = r.receipt_id AND cpe.source_type = 'receipt_verified'
+          LEFT JOIN merchants m ON m.id = r.merchant_id
           WHERE r.username = ${username}
           ORDER BY COALESCE(r.updated_at, r.created_at) DESC
           LIMIT ${limit}
