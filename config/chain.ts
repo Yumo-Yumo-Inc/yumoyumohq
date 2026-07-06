@@ -21,6 +21,23 @@ function env(name: string): string {
   return process.env[name]?.trim() ?? "";
 }
 
+/**
+ * Squads vault index per tokenomics pool (physical split of the supply,
+ * decision 2026-07-06). Index 0 is the staging vault the mint lands in;
+ * the split moves each ALLOCATIONS amount to its own vault so pool balances
+ * are independently auditable on-chain. Epoch/campaign funding proposals
+ * spend from the matching pool vault.
+ */
+export const POOL_VAULT_INDEX = {
+  treasuryStaging: 0,
+  userRewards: 1,
+  proofOfContribution: 2,
+  staking: 3,
+  liquidity: 4,
+  airdrop: 5,
+  referral: 6,
+} as const;
+
 export const chainConfig = {
   /** INT mint (SPL Token classic, decimals=6). */
   intMint: () => env("INT_MINT_ADDRESS"),

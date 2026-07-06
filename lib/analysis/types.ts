@@ -49,6 +49,8 @@ export interface MerchantPriceRow {
 export interface MerchantComparison {
   /** Canonical items the user bought at 2+ merchants — the comparison basis. */
   itemCount: number;
+  /** Display-ready names of the shared items backing the comparison (top few, by spend). */
+  items: string[];
   rows: MerchantPriceRow[];
 }
 

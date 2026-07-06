@@ -605,6 +605,19 @@ function MerchantCompareCard({ data, money, tr }: { data: AnalysisPayload | null
     >
       {mc && rows.length >= 2 ? (
         <>
+          {mc.items.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-1.5">
+              {mc.items.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border px-2.5 py-1 text-[11px] font-medium text-app-text-secondary"
+                  style={{ borderColor: "var(--app-border-strong)", background: "var(--app-bg-surface3)" }}
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          )}
           <StaggerList>
             {rows.map((row, i) => (
               <MetricBar
@@ -1089,6 +1102,16 @@ function categoryLabel(key: string, tr: boolean): string {
   return key.replace(/[_-]+/g, " ").replace(/^./, (c) => c.toUpperCase());
 }
 
+// Positional bar colors — distinct color per row (chart color rule, 2026-06-20).
+const LEAGUE_PALETTE = [
+  "linear-gradient(90deg, #ea580c, #fb923c)", // orange
+  "linear-gradient(90deg, #0284c7, #38bdf8)", // sky blue
+  "linear-gradient(90deg, #7c3aed, #a78bfa)", // purple
+  "linear-gradient(90deg, #0d9488, #34D399)", // teal
+  "linear-gradient(90deg, #be185d, #f472b6)", // pink
+  "linear-gradient(90deg, #64748b, #94a3b8)", // slate
+];
+
 function CategoryLeagueCard({ rows, tr, locale }: { rows: CategoryInflationRow[]; tr: boolean; locale: string }) {
   const usable = rows.filter((r) => r.personalPct != null || r.officialPct != null);
   const max = Math.max(0.01, ...usable.map((r) => Math.abs(r.personalPct ?? r.officialPct ?? 0)));
@@ -1098,46 +1121,28 @@ function CategoryLeagueCard({ rows, tr, locale }: { rows: CategoryInflationRow[]
       icon={<TrendingUp size={16} strokeWidth={2} />}
       eyebrow={tr ? "Kategori ligi" : "Category league"}
       title={tr ? "Senin verinde en hızlı zamlananlar" : "Fastest risers in your data"}
-      subtitle={tr ? "Yıllık · resmî endeks işaretli" : "Yearly · official index marked"}
+      subtitle={tr ? "Yıllık, kendi fişlerinden" : "Yearly, from your receipts"}
     >
       {usable.length > 0 ? (
-        <>
-          <StaggerList>
-            {usable
-              .slice()
-              .sort((a, b) => (b.personalPct ?? b.officialPct ?? 0) - (a.personalPct ?? a.officialPct ?? 0))
-              .slice(0, 6)
-              .map((row) => {
-                const val = row.personalPct ?? row.officialPct ?? 0;
-                const overOfficial = row.personalPct != null && row.officialPct != null && row.personalPct > row.officialPct;
-                return (
-                  <MetricBar
-                    key={row.category}
-                    label={categoryLabel(row.category, tr)}
-                    valueText={fmtPct(val, locale, false)}
-                    ratio={Math.abs(val) / max}
-                    color={
-                      row.personalPct == null
-                        ? "var(--app-bg-surface3)"
-                        : overOfficial
-                          ? "linear-gradient(90deg, #b91c1c, #F87171)"
-                          : "linear-gradient(90deg, #0d9488, #34D399)"
-                    }
-                  />
-                );
-              })}
-          </StaggerList>
-          <div className="mt-3 flex gap-4 text-[11px] text-app-text-muted">
-            <span className="flex items-center gap-1.5">
-              <i className="h-2 w-2 rounded-full" style={{ background: UP }} />
-              {tr ? "resmî endeksin üzerinde" : "above the official index"}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <i className="h-2 w-2 rounded-full" style={{ background: DOWN }} />
-              {tr ? "resmî endeksin altında" : "below the official index"}
-            </span>
-          </div>
-        </>
+        <StaggerList>
+          {usable
+            .slice()
+            .sort((a, b) => (b.personalPct ?? b.officialPct ?? 0) - (a.personalPct ?? a.officialPct ?? 0))
+            .slice(0, 6)
+            .map((row, i) => {
+              const val = row.personalPct ?? row.officialPct ?? 0;
+              return (
+                <MetricBar
+                  key={row.category}
+                  label={categoryLabel(row.category, tr)}
+                  valueText={fmtPct(val, locale, false)}
+                  ratio={Math.abs(val) / max}
+                  // Chart color rule (2026-06-20): every bar gets its own positional color.
+                  color={LEAGUE_PALETTE[i % LEAGUE_PALETTE.length]}
+                />
+              );
+            })}
+        </StaggerList>
       ) : (
         <EmptyState
           tr={tr}
