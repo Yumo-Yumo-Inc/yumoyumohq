@@ -40,6 +40,7 @@ import { useAppProfile } from "@/lib/app/profile-context";
 import { CountrySelectorModal } from "@/components/app/country-selector-modal";
 import { isCountryRequiredErrorPayload } from "@/lib/app/country-required";
 import { localDb } from "@/lib/local-db";
+import { saveLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import {
   createOptimisticReceiptRecord,
   createProcessingReceiptFromUpload,
@@ -510,6 +511,11 @@ export default function UploadPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       await localDb.set("receipts", createReceiptRecordFromAnalysis(data));
+      // Keep the original photo on this device: detail view reads it locally
+      // before hitting the server, and it outlives the short server retention.
+      if (uploadedFile && receiptIdToUse) {
+        await saveLocalReceiptImage(receiptIdToUse, uploadedFile).catch(() => {});
+      }
       await rebuildLocalInsightsFromReceipts().catch(() => {});
       if (data.actionResult) {
         await applyMobileActionResult(data.actionResult, queryClient, { onLevelEvent: announceLevelUp });

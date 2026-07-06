@@ -23,6 +23,15 @@ describe("reward-bonus", () => {
     expect(result.boostedReward).toBe(101.16);
   });
 
+  it("maps inflation percent into the [1.0, 2.0] CPI band", async () => {
+    const { cpiMultiplierFromInflationPercent } = await import("@/lib/receipt/reward-bonus");
+    expect(cpiMultiplierFromInflationPercent(0)).toBe(1.0); // no data / deflation
+    expect(cpiMultiplierFromInflationPercent(-2)).toBe(1.0); // never below 1
+    expect(cpiMultiplierFromInflationPercent(15)).toBe(1.5); // mid-band
+    expect(cpiMultiplierFromInflationPercent(30)).toBe(2.0); // band top
+    expect(cpiMultiplierFromInflationPercent(120)).toBe(2.0); // capped — max gap 2×
+  });
+
   it("returns zero stack when the base reward is zero", () => {
     const result = computeBonusStack({
       rawReward: 0,

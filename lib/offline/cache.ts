@@ -1,6 +1,7 @@
 "use client";
 
 import { localDb, getMetaValue, setMetaValue } from "@/lib/local-db";
+import { deleteLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import { getSessionAccountCountry } from "@/lib/auth/account-country";
 import type {
   BootstrapPayload,
@@ -182,7 +183,12 @@ async function persistPayload(payload: BootstrapPayload | SyncPayload): Promise<
 
   if ("deletions" in payload && Array.isArray(payload.deletions)) {
     await Promise.all(
-      payload.deletions.map((deletion) => localDb.delete(deletion.store, deletion.id))
+      payload.deletions.map(async (deletion) => {
+        await localDb.delete(deletion.store, deletion.id);
+        if (deletion.store === "receipts") {
+          await deleteLocalReceiptImage(deletion.id);
+        }
+      })
     );
   }
 

@@ -7,6 +7,7 @@ import { db, sql } from "@/lib/db/client";
 import { getReceiptById as getReceiptByIdFile, deleteReceipt as deleteReceiptFile } from "../../storage";
 import { isDatabaseAvailable } from "../connection";
 import { deleteOtherExpenseReceipt } from "../other-expense";
+import { deleteReceiptImageArtifacts } from "@/lib/scheduled-deletion";
 
 /**
  * Remove dependent rows so `DELETE FROM receipts` does not fail on FK constraints
@@ -88,6 +89,11 @@ export async function deleteReceipt(
     }
     
     const targetUsername = String(rows[0].username ?? "");
+
+    // Physically remove image artifacts (Vercel Blob / Neon fallback / local
+    // disk) before the scheduled_deletions row disappears with the child rows —
+    // otherwise the blob would be orphaned with no pending deletion left.
+    await deleteReceiptImageArtifacts(receiptId).catch(() => {});
 
     await deleteReceiptChildRows(receiptId);
 

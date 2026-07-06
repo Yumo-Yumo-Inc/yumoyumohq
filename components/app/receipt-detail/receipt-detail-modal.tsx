@@ -16,6 +16,7 @@ import { useAppLocale } from "@/lib/i18n/app-context";
 import { useReceiptDetail } from "@/lib/receipt/use-receipt-detail";
 import type { Receipt } from "@/lib/mock/types";
 import { localDb } from "@/lib/local-db";
+import { deleteLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import { syncMobileData } from "@/lib/sync";
 import {
   rememberDeletedReceiptId,
@@ -293,6 +294,7 @@ export function ReceiptDetailModal({ receiptId, onClose, onDeleted, mode = "deta
       }
       rememberDeletedReceiptId(deletedId);
       await localDb.delete("receipts", deletedId).catch(() => {});
+      await deleteLocalReceiptImage(deletedId);
       await syncMobileData().catch(() => null);
       stripReceiptIdFromAllReceiptQueries(queryClient, deletedId);
       await queryClient.invalidateQueries({ queryKey: ["receipts"] });

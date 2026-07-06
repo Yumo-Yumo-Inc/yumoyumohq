@@ -8,9 +8,10 @@ import type {
 } from "@/lib/offline/types";
 
 const DB_NAME = "yumo-offline-cache";
-const DB_VERSION = 7;
+const DB_VERSION = 8;
 const STORE_NAMES: LocalStoreName[] = [
   "receipts",
+  "receipt_images",
   "user_profile",
   "quests",
   "progress",

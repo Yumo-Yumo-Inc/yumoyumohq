@@ -48,7 +48,7 @@ const privacyContent = {
     {
       title: "7. Retention",
       content:
-        "We keep personal data only for as long as needed for the purposes described in this Notice, for account security, for service continuity, or to meet legal, tax, audit, and dispute-resolution obligations. Receipt image files are designed to be deleted from blob storage after approximately 48 hours, while receipt metadata, reward ledgers, fraud records, consent logs, and account records may be retained longer where needed for product integrity, legal compliance, dispute handling, and abuse prevention.",
+        "We keep personal data only for as long as needed for the purposes described in this Notice, for account security, for service continuity, or to meet legal, tax, audit, and dispute-resolution obligations. Receipt image files and the raw OCR/AI extraction output are designed to be deleted from storage after approximately 48 hours, while receipt metadata, reward ledgers, fraud records, consent logs, and account records may be retained longer where needed for product integrity, legal compliance, dispute handling, and abuse prevention.",
     },
     {
       title: "8. Your Rights",
@@ -108,6 +108,7 @@ const privacyContent = {
       headers: ["Data type", "Default retention approach", "Notes"],
       rows: [
         ["Receipt images", "Approximately 48 hours after upload", "May be kept longer only if required for abuse, legal, or dispute handling"],
+        ["Raw OCR and AI extraction output", "Approximately 48 hours after upload, deleted together with the image", "Structured receipt records derived from it are retained per the row below"],
         ["Receipt metadata and analysis outputs", "For account life plus legal/audit needs", "Used for insights, reward records, fraud prevention, and account history"],
         ["Account and consent records", "For account life plus legal limitation periods", "Includes Terms, Privacy, cookie, and marketing consent records"],
         ["Security, fraud, and abuse logs", "As needed for platform integrity", "May be retained after account closure where legally permitted"],

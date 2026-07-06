@@ -16,6 +16,7 @@ import { useAppProfile } from "@/lib/app/profile-context";
 import { RECEIPTS_QUERY_KEY } from "@/lib/app/query-keys";
 import { loadBootstrapSnapshot } from "@/lib/bootstrap";
 import { localDb } from "@/lib/local-db";
+import { deleteLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import { readCachedReceipts } from "@/lib/offline/cache";
 import { convertCachedReceiptToReceipt } from "@/lib/offline/receipt-cache";
 import { syncMobileData } from "@/lib/sync";
@@ -392,6 +393,7 @@ function ReceiptsPageContent() {
         if (response.status === 404) {
           rememberDeletedReceiptId(receiptId);
           await localDb.delete("receipts", receiptId).catch(() => {});
+          await deleteLocalReceiptImage(receiptId);
           await syncMobileData().catch(() => null);
           stripReceiptIdFromAllReceiptQueries(queryClient, receiptId);
           await queryClient.invalidateQueries({ queryKey: ["receipts"] });
@@ -401,6 +403,7 @@ function ReceiptsPageContent() {
       }
       rememberDeletedReceiptId(receiptId);
       await localDb.delete("receipts", receiptId);
+      await deleteLocalReceiptImage(receiptId);
       await syncMobileData().catch(() => null);
       stripReceiptIdFromAllReceiptQueries(queryClient, receiptId);
       await queryClient.invalidateQueries({ queryKey: ["receipts"] });

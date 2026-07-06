@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import { ChevronDown, Image as ImageIcon } from "lucide-react";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import type { Receipt, ReceiptLineItem } from "@/lib/mock/types";
@@ -108,10 +109,38 @@ export function ItemsStrip({ receipt }: { receipt: Receipt }) {
  */
 function OriginalReceiptImage({ receipt, isTr }: { receipt: Receipt; isTr: boolean }) {
   const [failed, setFailed] = useState(false);
+  const [localUrl, setLocalUrl] = useState<string | null>(null);
+  const [localChecked, setLocalChecked] = useState(false);
+
+  // Device-first: the photo scanned on this device lives in IndexedDB and
+  // outlives the short server-side retention window.
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    let cancelled = false;
+    if (receipt.id) {
+      getLocalReceiptImage(receipt.id)
+        .then((blob) => {
+          if (cancelled) return;
+          if (blob) {
+            objectUrl = URL.createObjectURL(blob);
+            setLocalUrl(objectUrl);
+          }
+          setLocalChecked(true);
+        })
+        .catch(() => setLocalChecked(true));
+    } else {
+      setLocalChecked(true);
+    }
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [receipt.id]);
+
   const directUrl = receipt.imageUrl;
   const apiUrl = receipt.id ? `/api/receipts/${encodeURIComponent(receipt.id)}/image` : null;
-  const src = directUrl || apiUrl;
-  if (!src) return null;
+  const src = localUrl || directUrl || apiUrl;
+  if (!localChecked || !src) return null;
 
   if (failed) {
     return (

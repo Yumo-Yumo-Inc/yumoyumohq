@@ -392,8 +392,20 @@ export interface LocalMetaRecord extends LocalRecordBase {
   value: string | null;
 }
 
+/**
+ * Locally cached original receipt photo (device-first hybrid display).
+ * Written right after a successful upload on this device; the detail view
+ * reads it before falling back to the server image endpoint.
+ */
+export interface CachedReceiptImageRecord extends LocalRecordBase {
+  blob: Blob;
+  contentType: string;
+  sizeBytes: number;
+}
+
 export type LocalStoreSchema = {
   receipts: CachedReceiptRecord;
+  receipt_images: CachedReceiptImageRecord;
   user_profile: CachedUserProfileRecord;
   quests: CachedQuestRecord;
   progress: CachedProgressRecord;

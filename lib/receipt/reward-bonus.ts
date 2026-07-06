@@ -41,6 +41,24 @@ export function getStreakMultiplier(): number {
   return value >= 1 ? value : 1;
 }
 
+/**
+ * CPI band cap (karar 2026-07-06): the annual inflation percent at/above which
+ * the CPI multiplier reaches its ×2 top. The multiplier maps inflation into
+ * the [×1.0, ×2.0] band — high-inflation countries earn more, but the
+ * cross-country gap from inflation alone never exceeds 2×.
+ */
+export function getCpiBandCapPercent(): number {
+  const value = envNumber("REWARD_CPI_BAND_CAP_PERCENT", 30);
+  return value > 0 ? value : 30;
+}
+
+/** Maps annual inflation percent into the [1.0, 2.0] multiplier band. */
+export function cpiMultiplierFromInflationPercent(inflationPercent: number): number {
+  const capPct = getCpiBandCapPercent();
+  const clamped = Math.min(Math.max(inflationPercent, 0), capPct);
+  return Math.round((1 + clamped / capPct) * 10000) / 10000;
+}
+
 export interface BonusStackInput {
   rawReward: number;
   firstScanOfDay: boolean;
