@@ -326,7 +326,7 @@ export async function processPendingDeletions(): Promise<{
     errors: [] as string[]
   };
 
-  const pendingDeletions = await getPendingDeletions(50); // Process 50 at a time
+  const pendingDeletions = await getPendingDeletions(150); // Batch size per hourly run — sized to drain the 48h-backfill backlog within days while staying inside the cron function's time budget
   result.total = pendingDeletions.length;
 
   console.log(`[scheduled-deletion] 🔄 Processing ${pendingDeletions.length} pending deletions...`);

@@ -328,6 +328,7 @@ export async function ensureDailyQuestsForUser(
           (username, quest_template_id, status, progress, target, season_number, expires_at)
         VALUES
           (${username}, ${templateId}, 'active', 0, ${s.target}, ${seasonNumber}, ${endOfDay.toISOString()})
+        ON CONFLICT (username, quest_template_id, ((expires_at AT TIME ZONE 'UTC')::date)) DO NOTHING
       `;
       insertedCount++;
       console.log(`[daily-generator] inserted ${s.type} (template=${templateId}, target=${s.target})`);
