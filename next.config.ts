@@ -45,7 +45,6 @@ const nextConfig: NextConfig = {
     return [
       { source: "/app/personal-insights", destination: "/app/patterns", permanent: true },
       { source: "/app/personal-insights/:path*", destination: "/app/patterns", permanent: true },
-      { source: "/app/analysis", destination: "/app/patterns", permanent: true },
       { source: "/app/settings", destination: "/app/profile", permanent: true },
       { source: "/app/account", destination: "/app/profile", permanent: false },
       { source: "/app/account/:path*", destination: "/app/profile", permanent: false },
