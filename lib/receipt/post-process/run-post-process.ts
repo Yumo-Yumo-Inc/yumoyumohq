@@ -50,6 +50,10 @@ import {
 } from "@/lib/receipt/reward-from-hidden-slice";
 import { getSeasonLevelMultiplier } from "@/config/season-level-config";
 import { cpiMultiplierFromInflationPercent } from "@/lib/receipt/reward-bonus";
+import {
+  capBonusToPerReceiptHeadroom,
+  resolveAccountLevel,
+} from "@/lib/receipt/reward-caps";
 import { getTuikReferencePriceBulk } from "@/lib/mining/tuikReferencePrice";
 import {
   validateReceiptExtraction,
@@ -609,10 +613,18 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       grantedBaseBint > 0
         ? Math.round((grantedBaseBint + extraReward) * 100) / 100
         : 0;
-    const grantedBintBonus =
+    const grantedBintBonusRaw =
       grantedBintTotal > 0
         ? Math.round(grantedBintTotal * cpiMultiplier * seasonLevelMultiplier * categoryCatalyzer * 100) / 100
         : 0;
+    // The bonus row also respects the per-receipt band ceiling: reward_final +
+    // bonus stays within the account-level decade cap (karar 2026-07-06).
+    const accountLevel = await resolveAccountLevel(row.username ?? "", 1);
+    const grantedBintBonus = capBonusToPerReceiptHeadroom({
+      grantedReward: grantedBintTotal,
+      bonus: grantedBintBonusRaw,
+      accountLevel,
+    });
     const mergedReceiptData = mergeGrantedRewardIntoReceiptData(
       receiptDataForProcessing,
       granted,
