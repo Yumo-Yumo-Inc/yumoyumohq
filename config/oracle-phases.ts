@@ -1,6 +1,7 @@
 /**
  * Oracle rollout phase flags.
- * Each phase is toggled via an env var. All default to disabled (false).
+ * Each phase is toggled via an env var. All default to disabled (false),
+ * except the retry cron which defaults to enabled.
  *
  * Example: to enable phase 2, add to .env.local:
  *   ORACLE_FAZ2_ENABLED=true
@@ -15,6 +16,12 @@
 function envBool(name: string): boolean {
   const v = process.env[name];
   return v === "true" || v === "1";
+}
+
+/** Default-on flag: disabled only when the env var is explicitly false. */
+function envBoolDefaultTrue(name: string): boolean {
+  const v = process.env[name];
+  return v !== "false" && v !== "0";
 }
 
 export const oraclePhases = {
@@ -33,9 +40,14 @@ export const oraclePhases = {
     return envBool("ORACLE_ACCOUNT_SEASON_LEVEL_ENABLED");
   },
 
-  /** Retry cron: re-queues failed post-process jobs. */
+  /**
+   * Retry cron: re-queues failed/stale post-process jobs. Default ON — the
+   * cron is the only mechanism draining receipts whose inline after()
+   * post-process died (fix 2026-07-06). Set ORACLE_RETRY_CRON_ENABLED=false
+   * to disable.
+   */
   get retryCronEnabled(): boolean {
-    return envBool("ORACLE_RETRY_CRON_ENABLED");
+    return envBoolDefaultTrue("ORACLE_RETRY_CRON_ENABLED");
   },
 };
 

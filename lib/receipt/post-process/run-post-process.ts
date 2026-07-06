@@ -49,7 +49,6 @@ import {
   computeRewardFromHiddenSlice,
 } from "@/lib/receipt/reward-from-hidden-slice";
 import { getSeasonLevelMultiplier } from "@/config/season-level-config";
-import { getEconomicIndexFromDB } from "@/lib/db/economicIndex";
 import { getTuikReferencePriceBulk } from "@/lib/mining/tuikReferencePrice";
 import {
   validateReceiptExtraction,
@@ -566,8 +565,15 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
     void totalHiddenCanonical;
 
     const bintTotal = baseBint + extraReward;
-    const cpiValue = await getEconomicIndexFromDB(country as "TR" | "US" | "TH" | "MY", "CPI", yearMonth, "GENEL");
-    const cpiMultiplier = cpiValue != null && Number(cpiValue) > 0 ? Number(cpiValue) : (country === "MY" ? 2 : 1.0);
+    // CPI multiplier = ANNUAL (YoY) CPI/GENEL factor, same semantics as the
+    // hidden-cost path. The raw economic_indices value is a 2025-01=1.0
+    // normalized ratio — consumed directly it drifts upward as the base month
+    // recedes (and a legacy percent series once yielded ×30.7 on TR receipts).
+    // Floor 1.0: deflation and missing data are neutral, never a penalty.
+    const rewardYoY = await fetchEconomicYoYMap(country, yearMonth);
+    const cpiGenelYoY = rewardYoY.get("CPI/GENEL");
+    const cpiMultiplier =
+      cpiGenelYoY && cpiGenelYoY > 1 ? Math.round(cpiGenelYoY * 10000) / 10000 : 1.0;
     const categoryCatalyzer = 1.0;
     let seasonLevelMultiplier = 1.0;
     if (row.username) {
