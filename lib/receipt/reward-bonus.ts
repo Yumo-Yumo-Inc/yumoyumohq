@@ -6,7 +6,7 @@
  * into the three-digit range while keeping the per-receipt / daily caps
  * meaningful:
  *
- *   boosted = (raw + scanBonus + firstScanOfDayBonus) × streakMultiplier
+ *   boosted = (raw + scanBonus + firstScanOfDayBonus) × streakMultiplier × itemizedMultiplier
  *
  * - scanBonus            — flat, every receipt whose hidden-cost slice earned
  *                          a nonzero raw reward (ineligible documents never
@@ -15,12 +15,27 @@
  * - firstScanOfDayBonus  — flat, first rewarded receipt of the UTC day.
  * - streakMultiplier     — applied when the user also had a rewarded receipt
  *                          the previous UTC day.
+ * - itemizedMultiplier   — product line items bring a bonus multiplier
+ *                          (karar 2026-07-04 revizyon 2026-07-06). Every
+ *                          document is priced from its hidden-cost slice;
+ *                          documents WITH line items (or complete documents
+ *                          like paid utility bills) get the multiplier,
+ *                          itemless payment proofs (POS slips) earn the base
+ *                          only until the items are completed.
  *
  * Defaults are env-overridable so the stack can be re-tuned per season
  * without a deploy.
  */
 
 import { getSql } from "@/lib/db/client";
+import {
+  getItemizedMultiplier,
+  getManualItemsMultiplier,
+} from "@/lib/receipt/vision-post-rules";
+
+// Multiplier values live in vision-post-rules.ts (the reward model's single
+// source); re-exported here so the bonus-stack callers have one import site.
+export { getItemizedMultiplier, getManualItemsMultiplier };
 
 function envNumber(name: string, fallback: number): number {
   const raw = process.env[name];
@@ -63,6 +78,8 @@ export interface BonusStackInput {
   rawReward: number;
   firstScanOfDay: boolean;
   streakActive: boolean;
+  /** Document proves its line items (or is a complete document, e.g. paid utility bill). */
+  itemized: boolean;
 }
 
 export interface BonusStackResult {
@@ -71,23 +88,34 @@ export interface BonusStackResult {
   scanBonus: number;
   firstScanOfDayBonus: number;
   streakMultiplier: number;
+  /** ×1 when the document has no proven line items. */
+  itemizedMultiplier: number;
 }
 
 /** Pure bonus math; only applies when the base reward is nonzero. */
 export function computeBonusStack(input: BonusStackInput): BonusStackResult {
   const raw = Math.max(0, input.rawReward);
   if (raw <= 0) {
-    return { boostedReward: 0, scanBonus: 0, firstScanOfDayBonus: 0, streakMultiplier: 1 };
+    return {
+      boostedReward: 0,
+      scanBonus: 0,
+      firstScanOfDayBonus: 0,
+      streakMultiplier: 1,
+      itemizedMultiplier: 1,
+    };
   }
   const scanBonus = getScanBonus();
   const firstScanOfDayBonus = input.firstScanOfDay ? getFirstScanOfDayBonus() : 0;
   const streakMultiplier = input.streakActive ? getStreakMultiplier() : 1;
-  const boosted = (raw + scanBonus + firstScanOfDayBonus) * streakMultiplier;
+  const itemizedMultiplier = input.itemized ? getItemizedMultiplier() : 1;
+  const boosted =
+    (raw + scanBonus + firstScanOfDayBonus) * streakMultiplier * itemizedMultiplier;
   return {
     boostedReward: Math.round(boosted * 100) / 100,
     scanBonus,
     firstScanOfDayBonus,
     streakMultiplier,
+    itemizedMultiplier,
   };
 }
 

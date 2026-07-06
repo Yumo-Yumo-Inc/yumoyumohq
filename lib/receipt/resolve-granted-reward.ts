@@ -7,6 +7,7 @@ import {
   computeHiddenRate,
   computeRewardFromHiddenSlice,
 } from "@/lib/receipt/reward-from-hidden-slice";
+import { getItemizedMultiplier } from "@/lib/receipt/vision-post-rules";
 
 export type GrantedRewardResolution = {
   rules: VisionPostRulesResult;
@@ -112,9 +113,17 @@ export function resolveGrantedReward(input: {
   const hiddenCostCore = Math.max(0, input.hiddenCostCore);
   const usdRate = Math.max(0.0001, input.usdRate);
   const rate = computeHiddenRate(paidExTax, hiddenCostCore);
-  const fullRewardEstimate =
+  // Base = hidden-cost slice; the itemized multiplier is the ceiling every
+  // payment-proven document can reach (karar 2026-07-04, revizyon 2026-07-06).
+  // rules.rewardFraction maps the granted share onto that ceiling: 1 for
+  // documents that prove their items, 1/multiplier for itemless proofs.
+  const baseReward =
     paidExTax > 0 && hiddenCostCore > 0
       ? computeRewardFromHiddenSlice(paidExTax, rate, usdRate)
+      : 0;
+  const fullRewardEstimate =
+    baseReward > 0
+      ? Math.round(baseReward * getItemizedMultiplier() * 100) / 100
       : 0;
   const rewardFraction =
     eligible && rules.rewardFraction > 0 ? rules.rewardFraction : 0;

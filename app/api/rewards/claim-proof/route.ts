@@ -12,6 +12,7 @@ import { NextResponse } from "next/server";
 import { getSessionUsername } from "@/lib/auth/session";
 import { sql } from "@/lib/db/client";
 import { FLAGS } from "@/config/feature-flags";
+import { chainConfig } from "@/config/chain";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -23,7 +24,18 @@ export async function GET(req: Request) {
   if (!username) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!sql) return NextResponse.json({ error: "Database not available" }, { status: 503 });
 
-  const epoch = Number(new URL(req.url).searchParams.get("epoch"));
+  const epochParam = new URL(req.url).searchParams.get("epoch");
+  let epoch: number;
+  if (epochParam === "latest") {
+    const latest = await sql`
+      SELECT max(epoch_number) AS n FROM reward_epochs WHERE status IN ('approved','published')
+    `;
+    const n = (latest as any[])[0]?.n;
+    if (!n) return NextResponse.json({ error: "No claimable epoch yet" }, { status: 404 });
+    epoch = Number(n);
+  } else {
+    epoch = Number(epochParam);
+  }
   if (!Number.isInteger(epoch) || epoch <= 0) {
     return NextResponse.json({ error: "Invalid epoch" }, { status: 400 });
   }
@@ -31,7 +43,8 @@ export async function GET(req: Request) {
   try {
     // Only expose proofs for epochs whose root is committed (approved/published).
     const head = await sql`
-      SELECT merkle_root, status FROM reward_epochs WHERE epoch_number = ${epoch}
+      SELECT merkle_root, status, distributor_address, distributor_root
+      FROM reward_epochs WHERE epoch_number = ${epoch}
     `;
     const epochRow = (head as any[])[0];
     if (!epochRow || !["approved", "published"].includes(epochRow.status)) {
@@ -39,12 +52,19 @@ export async function GET(req: Request) {
     }
 
     const rows = await sql`
-      SELECT wallet_address, raw_amount, int_amount, leaf_index, proof, claimed
+      SELECT wallet_address, raw_amount, int_amount, leaf_index, proof, claimed,
+             jito_proof, jito_leaf_index, claim_tx
       FROM reward_epoch_leaves
       WHERE epoch_number = ${epoch} AND username = ${username}
     `;
     const leaf = (rows as any[])[0];
     if (!leaf) return NextResponse.json({ error: "No allocation for this epoch" }, { status: 404 });
+
+    // The claim transaction needs the Jito distributor tree's proof, which is
+    // ingested separately (scripts/ingest-distributor-tree.ts) after the ops
+    // side builds and verifies the on-chain tree. Until then the leaf is
+    // visible but not claimable.
+    const claimReady = Boolean(leaf.jito_proof && epochRow.distributor_address);
 
     return NextResponse.json({
       ok: true,
@@ -55,6 +75,12 @@ export async function GET(req: Request) {
       leafIndex: leaf.leaf_index,
       proof: leaf.proof,
       claimed: leaf.claimed,
+      claimTx: leaf.claim_tx ?? null,
+      claimReady,
+      distributorAddress: epochRow.distributor_address ?? null,
+      intMint: chainConfig.intMint() || null,
+      jitoProof: leaf.jito_proof ?? null,
+      jitoLeafIndex: leaf.jito_leaf_index ?? null,
     });
   } catch (e) {
     console.error("[rewards/claim-proof] Error:", e);

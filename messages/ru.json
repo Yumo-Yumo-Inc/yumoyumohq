@@ -2165,7 +2165,14 @@
     "receiptVerified": "Чек подтвержден",
     "dailyQuest": "Ежедневный квест",
     "weeklyQuest": "Еженедельный квест",
-    "rewardBoostArrow": "Буст наград → {multiplier}x"
+    "rewardBoostArrow": "Буст наград → {multiplier}x",
+    "claimTitle": "INT к получению",
+    "claimEpoch": "Эпоха наград #{epoch}",
+    "claimNow": "Получить",
+    "claiming": "Получение…",
+    "claimDone": "Получено",
+    "claimOpensAtTge": "Получение откроется на TGE",
+    "claimWalletMismatch": "Подключённый кошелёк отличается от кошелька этого начисления. Подключите кошелёк начисления, чтобы получить."
   },
   "notificationsPage": {
     "eyebrow": "ВХОДЯЩИЕ",

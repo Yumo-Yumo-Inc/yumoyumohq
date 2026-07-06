@@ -5,12 +5,12 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { getClientEndpoint } from "@/lib/solana/rpc";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 const isUserRejectedWalletRequest = (error: unknown): boolean => {
@@ -34,13 +34,7 @@ export function SolanaWalletProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const network =
-    (process.env.NEXT_PUBLIC_SOLANA_NETWORK as WalletAdapterNetwork) ||
-    WalletAdapterNetwork.Mainnet;
-
-  const rpcUrl =
-    process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
-    "https://api.mainnet-beta.solana.com";
+  const rpcUrl = getClientEndpoint();
 
   // Suppress React duplicate key warnings for MetaMask
   useEffect(() => {

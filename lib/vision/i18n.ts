@@ -57,7 +57,7 @@ export const visionI18n: Record<WhitepaperLocale, VisionDict> = {
     "f.t4l": "In five years", "f.t4t": "Every price, one click away.", "f.t4d": "The world's prices are freely reachable. The economy is decentralised and fully transparent. People reach this data not only to manage their personal finance — but to grow their businesses, find their margins, and build on data that used to belong to no one. Twenty plus languages, every major currency.",
     "cl.q1": "We help people take back the say ", "cl.q2": "in how much they really pay.",
     "cta.tp": "Token allocation & emission — Technical Paper →",
-    "cl.draft": "Vision draft", "ft.note": "A vision paper. Subject to revision.",
+    "cl.draft": "v0.4", "ft.note": "A vision paper.",
   },
   tr: {
     "nav.status": "Vizyon · v0.4 · 2026",
@@ -107,7 +107,7 @@ export const visionI18n: Record<WhitepaperLocale, VisionDict> = {
     "f.t4l": "Beş yıl içinde", "f.t4t": "Her fiyat, bir tık uzakta.", "f.t4d": "Dünyanın fiyatları artık herkese açık. Ekonomi merkeziyetsiz ve tamamen şeffaf. İnsanlar bu veriye yalnızca kişisel finanslarını yönetmek için değil — işlerini büyütmek, marjlarını bulmak, kimsenin olmayan veriyle inşa etmek için ulaşıyor. Yirminin üzerinde dil, her büyük para birimi.",
     "cl.q1": "İnsanların gerçekte ne kadar ödediği üzerinde ", "cl.q2": "söz sahibi olmalarına yardımcı oluyoruz.",
     "cta.tp": "Token dağılımı ve emisyon — Teknik Belge →",
-    "cl.draft": "Vizyon taslağı", "ft.note": "Bir vizyon belgesi. Revizyona açıktır.",
+    "cl.draft": "v0.4", "ft.note": "Bir vizyon belgesi.",
   },
   es: {
     "nav.status": "Visión · v0.4 · 2026",
@@ -157,7 +157,7 @@ export const visionI18n: Record<WhitepaperLocale, VisionDict> = {
     "f.t4l": "En cinco años", "f.t4t": "Cada precio, a un clic.", "f.t4d": "Los precios del mundo están al alcance de todos. La economía está descentralizada y es totalmente transparente. La gente accede a estos datos no solo para gestionar sus finanzas personales — también para hacer crecer sus negocios, encontrar sus márgenes y construir con datos que antes no eran de nadie. Más de veinte idiomas, todas las monedas principales.",
     "cl.q1": "Ayudamos a la gente a recuperar el control ", "cl.q2": "sobre cuánto pagan realmente.",
     "cta.tp": "Asignación de tokens y emisión — Technical Paper →",
-    "cl.draft": "Borrador de visión", "ft.note": "Un documento de visión. Sujeto a revisión.",
+    "cl.draft": "v0.4", "ft.note": "Un documento de visión.",
   },
   ru: {
     "nav.status": "Видение · v0.4 · 2026",
@@ -207,7 +207,7 @@ export const visionI18n: Record<WhitepaperLocale, VisionDict> = {
     "f.t4l": "Через пять лет", "f.t4t": "Любая цена — в одном клике.", "f.t4d": "Цены мира свободно доступны. Экономика децентрализована и полностью прозрачна. Люди обращаются к этим данным не только чтобы управлять личными финансами — но и чтобы растить бизнес, находить маржи, строить на данных, которые раньше не принадлежали никому. Более двадцати языков, все основные валюты.",
     "cl.q1": "Мы помогаем людям вернуть себе право голоса ", "cl.q2": "в том, сколько они на самом деле платят.",
     "cta.tp": "Распределение токенов и эмиссия — Technical Paper →",
-    "cl.draft": "Черновик видения", "ft.note": "Документ-видение. Подлежит правке.",
+    "cl.draft": "v0.4", "ft.note": "Документ-видение.",
   },
   th: {
     "nav.status": "วิสัยทัศน์ · v0.4 · 2026",
@@ -257,7 +257,7 @@ export const visionI18n: Record<WhitepaperLocale, VisionDict> = {
     "f.t4l": "ในห้าปี", "f.t4t": "ทุกราคา ห่างเพียงคลิกเดียว", "f.t4d": "ราคาของโลกเข้าถึงได้อย่างเสรี เศรษฐกิจกระจายอำนาจและโปร่งใสเต็มที่ ผู้คนเข้าถึงข้อมูลนี้ไม่เพียงเพื่อจัดการการเงินส่วนตัว — แต่ยังเพื่อขยายธุรกิจ หามาร์จิ้น และสร้างจากข้อมูลที่เคยไม่เป็นของใคร มากกว่ายี่สิบภาษา ทุกสกุลเงินหลัก",
     "cl.q1": "เราช่วยให้คนได้สิทธิ์ในเสียง ", "cl.q2": "เกี่ยวกับสิ่งที่พวกเขาจ่ายจริง ๆ กลับคืนมา",
     "cta.tp": "การจัดสรรโทเค็นและการปล่อย — Technical Paper →",
-    "cl.draft": "ฉบับร่างวิสัยทัศน์", "ft.note": "เอกสารวิสัยทัศน์ อาจมีการแก้ไข",
+    "cl.draft": "v0.4", "ft.note": "เอกสารวิสัยทัศน์",
   },
   zh: {
     "nav.status": "愿景 · v0.4 · 2026",
@@ -307,7 +307,7 @@ export const visionI18n: Record<WhitepaperLocale, VisionDict> = {
     "f.t4l": "五年后", "f.t4t": "每一个价格，一次点击之外。", "f.t4d": "世界的价格自由可达。经济去中心化、完全透明。人们使用这份数据，不只是管理个人财务——也用它扩展生意、找到利润、用从前不属于任何人的数据来建造。二十多种语言，所有主要货币。",
     "cl.q1": "我们帮助人们夺回 ", "cl.q2": "他们究竟付了多少钱的话语权。",
     "cta.tp": "代币分配与发行 — Technical Paper →",
-    "cl.draft": "愿景草稿", "ft.note": "一份愿景文件。可能修订。",
+    "cl.draft": "v0.4", "ft.note": "一份愿景文件。",
   },
 };
 

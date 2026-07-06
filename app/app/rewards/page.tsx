@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReferralShareCard } from "@/components/app/referral-share-card";
+import { ClaimButton } from "@/components/rewards/claim-button";
 import { ReferralList } from "@/components/app/referral-list";
 import { loadBootstrapSnapshot } from "@/lib/bootstrap";
 import { useAppLocale } from "@/lib/i18n/app-context";
@@ -219,6 +220,10 @@ export default function RewardsPage() {
             <ArrowRight className="h-4 w-4 flex-shrink-0" style={{ color: "rgba(245,166,35,0.7)" }} />
           </div>
         </Link>
+
+        {/* ── 1c. On-chain claim (ships dark; renders only when the
+               claim-proof API returns an allocation) ─────────────────── */}
+        <ClaimButton />
 
         {/* ── 2. Today's Best Move ─────────────────────────────────────── */}
         {bestMove && (

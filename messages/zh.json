@@ -2170,7 +2170,14 @@
     "receiptVerified": "收据已验证",
     "dailyQuest": "每日任务",
     "weeklyQuest": "每周任务",
-    "rewardBoostArrow": "奖励加成 → {multiplier}x"
+    "rewardBoostArrow": "奖励加成 → {multiplier}x",
+    "claimTitle": "可领取的 INT",
+    "claimEpoch": "奖励周期 #{epoch}",
+    "claimNow": "领取",
+    "claiming": "领取中…",
+    "claimDone": "已领取",
+    "claimOpensAtTge": "领取将于 TGE 开放",
+    "claimWalletMismatch": "当前连接的钱包与该分配的钱包不同。请连接分配钱包以领取。"
   },
   "notificationsPage": {
     "eyebrow": "收件箱",

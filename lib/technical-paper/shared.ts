@@ -54,7 +54,7 @@ export const technicalPaperUiStrings: Record<TechnicalPaperLocale, TechnicalPape
     openMenu: "Menüyü aç",
     closeMenu: "Menüyü kapat",
     language: "Dil",
-    draftBadge: "v0.1 Taslak",
+    draftBadge: "v0.1",
   },
   en: {
     documentation: "Technical Doc",
@@ -65,7 +65,7 @@ export const technicalPaperUiStrings: Record<TechnicalPaperLocale, TechnicalPape
     openMenu: "Open menu",
     closeMenu: "Close menu",
     language: "Language",
-    draftBadge: "v0.1 Draft",
+    draftBadge: "v0.1",
   },
   es: {
     documentation: "Doc Técnico",
@@ -76,7 +76,7 @@ export const technicalPaperUiStrings: Record<TechnicalPaperLocale, TechnicalPape
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
     language: "Idioma",
-    draftBadge: "v0.1 Borrador",
+    draftBadge: "v0.1",
   },
   ru: {
     documentation: "Техдокумент",
@@ -87,7 +87,7 @@ export const technicalPaperUiStrings: Record<TechnicalPaperLocale, TechnicalPape
     openMenu: "Открыть меню",
     closeMenu: "Закрыть меню",
     language: "Язык",
-    draftBadge: "v0.1 Черновик",
+    draftBadge: "v0.1",
   },
   th: {
     documentation: "เอกสารเทคนิค",
@@ -98,7 +98,7 @@ export const technicalPaperUiStrings: Record<TechnicalPaperLocale, TechnicalPape
     openMenu: "เปิดเมนู",
     closeMenu: "ปิดเมนู",
     language: "ภาษา",
-    draftBadge: "v0.1 ฉบับร่าง",
+    draftBadge: "v0.1",
   },
   zh: {
     documentation: "技术文档",
@@ -109,6 +109,6 @@ export const technicalPaperUiStrings: Record<TechnicalPaperLocale, TechnicalPape
     openMenu: "打开菜单",
     closeMenu: "关闭菜单",
     language: "语言",
-    draftBadge: "v0.1 草案",
+    draftBadge: "v0.1",
   },
 };

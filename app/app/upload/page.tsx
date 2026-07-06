@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { DASHBOARD_QUERY_KEY, QUESTS_DAILY_QUERY_KEY, PROFILE_QUERY_KEY } from "@/lib/app/query-keys";
 import { useRouter } from "next/navigation";
-import { WalletConnectButton } from "@/components/wallet-connect-button";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { DesktopUploadMessage } from "@/components/app/desktop-upload-message";
@@ -70,7 +69,7 @@ async function markLocalReceiptRejected(receiptId: string): Promise<void> {
 export default function UploadPage() {
   const isDesktop = useIsDesktop();
   const { t } = useAppLocale();
-  const { connected, publicKey } = useWallet();
+  const { publicKey } = useWallet();
   const { profile, announceLevelUp } = useAppProfile();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -572,10 +571,6 @@ export default function UploadPage() {
 
   const handleSave = async () => {
     if (!analysis) return;
-    if (!isAdmin && !publicKey) {
-      alert(t("errors.upload.walletRequired") || "You need to connect your wallet to save the receipt.");
-      return;
-    }
 
     setIsSaving(true);
 
@@ -677,26 +672,7 @@ export default function UploadPage() {
     });
   };
 
-  // Admin: desktop uploads do not require a connected wallet (session is enough). Other users must connect a wallet.
-  if (!isAdmin && !connected) {
-    return (
-      <div className="min-h-screen bg-[var(--app-bg-shell)] text-[var(--app-text-primary)] relative font-sans">
-        <ThemeBg accountLevel={1} />
-        <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
-          <ThemeCard accountLevel={1} className="max-w-md w-full p-6">
-            <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--app-text-primary)" }}>
-              Cüzdanı Bağla
-            </h2>
-            <p className="text-sm mb-4" style={{ color: "var(--app-text-muted)" }}>
-              Fiş yüklemek için Solana cüzdanınızı bağlayın.
-            </p>
-            <WalletConnectButton />
-          </ThemeCard>
-        </div>
-      </div>
-    );
-  }
-
+  // Wallet is account-level and optional (2026-07-04): uploads require only a session.
   return (
     <AppShell>
       <div className="space-y-6">

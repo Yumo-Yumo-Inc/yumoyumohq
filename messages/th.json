@@ -2164,7 +2164,14 @@
     "receiptVerified": "ยืนยันใบเสร็จแล้ว",
     "dailyQuest": "ภารกิจรายวัน",
     "weeklyQuest": "ภารกิจรายสัปดาห์",
-    "rewardBoostArrow": "ตัวคูณรางวัล → {multiplier}x"
+    "rewardBoostArrow": "ตัวคูณรางวัล → {multiplier}x",
+    "claimTitle": "INT ที่รับได้",
+    "claimEpoch": "รอบรางวัล #{epoch}",
+    "claimNow": "รับ",
+    "claiming": "กำลังรับ…",
+    "claimDone": "รับแล้ว",
+    "claimOpensAtTge": "เปิดรับเมื่อ TGE",
+    "claimWalletMismatch": "กระเป๋าที่เชื่อมต่อไม่ตรงกับกระเป๋าของการจัดสรรนี้ กรุณาเชื่อมต่อกระเป๋าที่ถูกต้องเพื่อรับ"
   },
   "notificationsPage": {
     "eyebrow": "กล่องข้อความ",

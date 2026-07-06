@@ -2131,7 +2131,14 @@
     "receiptVerified": "Recibo verificado",
     "dailyQuest": "Misión diaria",
     "weeklyQuest": "Misión semanal",
-    "rewardBoostArrow": "Impulso de recompensa → {multiplier}x"
+    "rewardBoostArrow": "Impulso de recompensa → {multiplier}x",
+    "claimTitle": "INT reclamable",
+    "claimEpoch": "Época de recompensa #{epoch}",
+    "claimNow": "Reclamar",
+    "claiming": "Reclamando…",
+    "claimDone": "Reclamado",
+    "claimOpensAtTge": "El reclamo se abre en el TGE",
+    "claimWalletMismatch": "La billetera conectada difiere de la billetera de esta asignación. Conecta la billetera de la asignación para reclamar."
   },
   "notificationsPage": {
     "eyebrow": "BANDEJA DE ENTRADA",

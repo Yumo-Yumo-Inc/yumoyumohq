@@ -3,12 +3,13 @@
  * User completes a payment-proof document (POS slip / payment_receipt) that has
  * no line items by typing the items manually.
  *
- * Reward model (decision 2026-07-04):
- *   - base fraction was already granted at analyze time (PARTIAL_REWARD_FRACTION)
- *   - manual completion raises the reward to MANUAL_ITEMS_REWARD_FRACTION of the
- *     full estimate (reward_raw)
+ * Reward model (decision 2026-07-04, revision 2026-07-06):
+ *   - the hidden-cost base was already granted at analyze time; reward_raw holds
+ *     the ceiling (base × itemized multiplier)
+ *   - manual completion raises the reward to base × manual multiplier
+ *     (= ceiling × manual/itemized)
  *   - a later documentary match (itemized receipt upload) still unlocks the full
- *     estimate via proof matching
+ *     ceiling via proof matching
  *
  * Manual items are stored with source='user_manual': shown in the user's own
  * history, excluded from the anonymized data pool, never treated as verified
@@ -18,7 +19,10 @@
 import { NextResponse } from "next/server";
 import { getSessionUsername } from "@/lib/auth/session";
 import { getSql } from "@/lib/db/client";
-import { MANUAL_ITEMS_REWARD_FRACTION } from "@/lib/receipt/vision-post-rules";
+import {
+  getItemizedMultiplier,
+  getManualItemsMultiplier,
+} from "@/lib/receipt/vision-post-rules";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -134,16 +138,17 @@ export async function POST(req: Request) {
       `;
     }
 
-    // Raise the reward from the base fraction to the manual fraction of the
-    // full estimate. reward_raw holds the full pre-fraction estimate; if it is
-    // missing (legacy row) the reward stays as granted — no fabrication.
+    // Raise the reward from the base to base × manual multiplier. reward_raw
+    // holds the ceiling (base × itemized multiplier), so the manual target is
+    // ceiling × manual/itemized; if reward_raw is missing (legacy row) the
+    // reward stays as granted — no fabrication.
     const currentReward = receipt.reward_amount ?? 0;
     const fullEstimate = receipt.reward_raw ?? 0;
     let rewardDelta = 0;
     let newFinal = currentReward;
     if (fullEstimate > 0) {
-      const target =
-        Math.round(fullEstimate * MANUAL_ITEMS_REWARD_FRACTION * 100) / 100;
+      const manualShare = getManualItemsMultiplier() / getItemizedMultiplier();
+      const target = Math.round(fullEstimate * manualShare * 100) / 100;
       if (target > currentReward) {
         rewardDelta = Math.round((target - currentReward) * 100) / 100;
         newFinal = target;

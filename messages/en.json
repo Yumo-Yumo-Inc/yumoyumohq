@@ -2613,7 +2613,14 @@
     "receiptVerified": "Receipt verified",
     "dailyQuest": "Daily quest",
     "weeklyQuest": "Weekly quest",
-    "rewardBoostArrow": "Reward boost → {multiplier}x"
+    "rewardBoostArrow": "Reward boost → {multiplier}x",
+    "claimTitle": "Claimable INT",
+    "claimEpoch": "Reward epoch #{epoch}",
+    "claimNow": "Claim",
+    "claiming": "Claiming…",
+    "claimDone": "Claimed",
+    "claimOpensAtTge": "Claim opens at TGE",
+    "claimWalletMismatch": "The connected wallet differs from the wallet on this allocation. Connect the allocation wallet to claim."
   },
   "notificationsPage": {
     "eyebrow": "INBOX",

@@ -2613,7 +2613,14 @@
     "receiptVerified": "Fiş doğrulandı",
     "dailyQuest": "Günlük görev",
     "weeklyQuest": "Haftalık görev",
-    "rewardBoostArrow": "Ödül çarpanı → {multiplier}x"
+    "rewardBoostArrow": "Ödül çarpanı → {multiplier}x",
+    "claimTitle": "Talep edilebilir INT",
+    "claimEpoch": "Ödül dönemi #{epoch}",
+    "claimNow": "Talep et",
+    "claiming": "Talep ediliyor…",
+    "claimDone": "Talep edildi",
+    "claimOpensAtTge": "Talep TGE ile açılır",
+    "claimWalletMismatch": "Bağlı cüzdan bu tahsisin cüzdanından farklı. Talep için tahsis cüzdanını bağlayın."
   },
   "notificationsPage": {
     "eyebrow": "GELEN KUTUSU",
