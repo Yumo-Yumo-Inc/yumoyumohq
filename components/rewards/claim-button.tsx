@@ -17,7 +17,7 @@ import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { Coins, Lock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { buildNewClaimInstruction } from "@/lib/solana/distributor";
+import { buildClaimInstructions } from "@/lib/solana/distributor";
 import { getClientEndpoint } from "@/lib/solana/rpc";
 import { useAppLocale } from "@/lib/i18n/app-context";
 
@@ -68,7 +68,7 @@ export function ClaimButton() {
     setError(null);
     try {
       const connection = new Connection(getClientEndpoint(), "confirmed");
-      const ix = buildNewClaimInstruction({
+      const ixs = buildClaimInstructions({
         distributor: new PublicKey(proof.distributorAddress),
         claimant: publicKey,
         mint: new PublicKey(proof.intMint),
@@ -76,7 +76,7 @@ export function ClaimButton() {
         amountLocked: BigInt(0),
         proofHex: proof.jitoProof,
       });
-      const tx = new Transaction().add(ix);
+      const tx = new Transaction().add(...ixs);
       const signature = await sendTransaction(tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
       const confirm = await fetch("/api/rewards/claim-confirm", {

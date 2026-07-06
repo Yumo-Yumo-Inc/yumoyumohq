@@ -40,7 +40,7 @@ export async function verifyEpoch(epochNumber: number): Promise<VerifyResult> {
 
   const windowStart = new Date(epoch.window_start).toISOString();
   const windowEnd = new Date(epoch.window_end).toISOString();
-  const recomputed = await recomputeEpoch(windowStart, windowEnd);
+  const recomputed = await recomputeEpoch(epochNumber, windowEnd);
 
   // committed cumulative for the User Rewards bucket (approved/published epochs).
   const cumRows = await sql`

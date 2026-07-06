@@ -5,8 +5,13 @@
  * (features ship dark until the address exists).
  */
 
-/** Jito merkle-distributor deployed program (mainnet + devnet share this id). */
+/**
+ * Jito merkle-distributor program. Mainnet uses Jito's deployed instance;
+ * devnet has no official deployment, so rehearsals deploy a byte-identical
+ * dump under their own id and override via env (docs/devnet-rehearsal doc).
+ */
 export const JITO_DISTRIBUTOR_PROGRAM_ID =
+  process.env.NEXT_PUBLIC_DISTRIBUTOR_PROGRAM_ID?.trim() ||
   "mERKcfxMC5SqJn4Ld4BUris3WKZZ1ojjWJ3A3J5CKxv";
 
 /** SPL Memo v2 program. */

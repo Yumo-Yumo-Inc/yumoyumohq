@@ -49,8 +49,19 @@ async function getMau(): Promise<number> {
   return Number((rows as any[])[0]?.mau ?? 0);
 }
 
-/** Per-user bINT (summed positive points) accrued within [start, end). */
-async function getEpochRawClaims(windowStart: string, windowEnd: string): Promise<RawClaim[]> {
+/**
+ * Per-user bINT with carry-forward (karar 2026-07-06, "ödül asla kısılmaz"):
+ * a user's inclusion window is [their last settled epoch's window_end, windowEnd),
+ * NOT the epoch's own window. Wallet-less users are skipped (no leaf address),
+ * but their events stay unsettled — once they link a wallet, everything they
+ * accrued before is included in their first epoch. A user's leaf in any prior
+ * non-failed epoch marks those events as settled, which prevents double counting.
+ * The independent verifier reimplements this same rule (lib/rewards/verifier).
+ */
+async function getEpochRawClaims(
+  epochNumber: number,
+  windowEnd: string
+): Promise<RawClaim[]> {
   const rows = await sql`
     SELECT
       e.username                                        AS username,
@@ -58,6 +69,14 @@ async function getEpochRawClaims(windowStart: string, windowEnd: string): Promis
       COALESCE(r.wallet_address, u.wallet_address)      AS wallet_address
     FROM contribution_point_events e
     LEFT JOIN users u ON u.username = e.username
+    LEFT JOIN (
+      SELECT l.username, MAX(ep.window_end) AS settled_until
+      FROM reward_epoch_leaves l
+      JOIN reward_epochs ep ON ep.epoch_number = l.epoch_number
+      WHERE l.epoch_number < ${epochNumber}
+        AND ep.status IN ('pending_verification', 'verified', 'approved', 'published')
+      GROUP BY l.username
+    ) s ON s.username = e.username
     LEFT JOIN LATERAL (
       SELECT wallet_address
       FROM receipts
@@ -65,7 +84,8 @@ async function getEpochRawClaims(windowStart: string, windowEnd: string): Promis
       ORDER BY created_at DESC
       LIMIT 1
     ) r ON true
-    WHERE e.created_at >= ${windowStart} AND e.created_at < ${windowEnd}
+    WHERE e.created_at >= COALESCE(s.settled_until, '1970-01-01'::timestamptz)
+      AND e.created_at < ${windowEnd}
       AND e.username IS NOT NULL
       AND e.username != ${getPrimaryAdmin()}
     GROUP BY e.username, COALESCE(r.wallet_address, u.wallet_address)
@@ -96,7 +116,7 @@ export async function buildEpoch(
   windowEnd: string
 ): Promise<EpochResult> {
   const mau = await getMau();
-  const rawClaims = await getEpochRawClaims(windowStart, windowEnd);
+  const rawClaims = await getEpochRawClaims(epochNumber, windowEnd);
   const { claims, softCapScale, totalInt } = computeAmounts(rawClaims, mau);
 
   const leafHashes = claims.map((c) => hashLeaf(c));

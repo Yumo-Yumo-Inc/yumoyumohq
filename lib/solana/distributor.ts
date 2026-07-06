@@ -12,6 +12,7 @@ import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountIdempotentInstruction,
 } from "@solana/spl-token";
 import { sha256 } from "js-sha256";
 import { JITO_DISTRIBUTOR_PROGRAM_ID } from "@/config/chain";
@@ -81,6 +82,25 @@ export function buildNewClaimInstruction(params: NewClaimParams): TransactionIns
     ],
     data: Buffer.from(data),
   });
+}
+
+/**
+ * Full claim instruction set: the distributor program requires the claimant's
+ * token account to already exist (AccountNotInitialized otherwise — caught in
+ * the devnet rehearsal), so an idempotent ATA-create is prepended. The
+ * claimant pays for and signs both.
+ */
+export function buildClaimInstructions(params: NewClaimParams): TransactionInstruction[] {
+  const claimantAta = getAssociatedTokenAddressSync(params.mint, params.claimant);
+  return [
+    createAssociatedTokenAccountIdempotentInstruction(
+      params.claimant,
+      claimantAta,
+      params.claimant,
+      params.mint,
+    ),
+    buildNewClaimInstruction(params),
+  ];
 }
 
 export { ASSOCIATED_TOKEN_PROGRAM_ID };
