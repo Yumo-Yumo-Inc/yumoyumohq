@@ -14,9 +14,9 @@ Her kullanıcının, bir UTC günü içinde tüm fişlerden kazanılan toplam ö
 
 Kullanıcının günlük toplamı tavana ulaştığında, ek fişler işlenir ve kaydedilir ancak o gün için sıfır artışlı bINT üretir. Tavan UTC gece yarısında sıfırlanır. Bu değerler seviye başına yapılandırma aracılığıyla değiştirilebilir ve kullanıcı tabanı büyüdükçe, seviye dağılımı evrildikçe yeniden ayarlanır.
 
-## 4.23 Hedef mimari: formül tabanlı tavan
+## 4.23 Hedef mimari: formül tabanlı tavan (planlanan)
 
-Uzun vadeli tavan modeli, seviye başına düz tabloyu sürekli bir formülle değiştirir:
+Bu model planlanmıştır ve mevcut sürümde etkin değildir; bugün günlük tavan seviye başına tablolarla (4.22) belirlenir ve sağlık, fiş başına ödül oranı üzerinden etki eder (03 §3.5). Uzun vadeli tavan modeli, seviye başına düz tabloyu sürekli bir formülle değiştirir:
 
 ```
 etkin_günlük_tavan = temel_tavan × seviye_çarpanı × sağlık_skoru
@@ -32,4 +32,4 @@ Bu modelde, nötr sağlığa sahip düşük seviyeli bir kullanıcı temel tavan
 
 ### Geçiş yolu
 
-MVP tablosu ve hedef formül, TGE öncesi ve erken TGE sonrası dönemlerinde birlikte var olur. MVP tablosu, sağlık puanlama sistemi ve seviye dağılımının olgunlaştığı dönemde deterministik ve kolayca denetlenebilir tavanlar sağlar. Formül tabanlı model, güven katmanının sağlık ve seviye sinyalleri yeterli kalibrasyon derinliğine ulaştığında etkinleşir. Geçiş bir protokol yapılandırma değişikliğidir, akıllı kontrat taşıması değil.
+MVP tablosu, TGE öncesi ve erken TGE sonrası dönemler boyunca etkin modeldir. Sağlık puanlama sistemi ve seviye dağılımının henüz olgunlaşmakta olduğu dönemde deterministik ve kolayca denetlenebilir tavanlar sağlar. Formül tabanlı model, güven katmanının sağlık ve seviye sinyalleri yeterli kalibrasyon derinliğine ulaştığında etkinleşir. Geçiş bir protokol yapılandırma değişikliğidir, akıllı kontrat taşıması değil.

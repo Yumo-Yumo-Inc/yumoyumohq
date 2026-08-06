@@ -4,7 +4,7 @@
  */
 
 // ISO 3166-1 alpha-2 country codes
-export type CountryCode =
+type CountryCode =
   | "TH" // Thailand
   | "MY" // Malaysia
   | "TR" // Turkey
@@ -21,7 +21,7 @@ export type CountryCode =
   | string; // Allow other country codes
 
 // ISO 4217 currency codes
-export type CurrencyCode =
+type CurrencyCode =
   | "THB" // Thai Baht
   | "MYR" // Malaysian Ringgit
   | "TRY" // Turkish Lira
@@ -53,7 +53,7 @@ export type Category =
   | "other";
 
 // Sector classification
-export type SectorClass =
+type SectorClass =
   | "FOOD_BEVERAGE"
   | "RETAIL"
   | "SERVICES"
@@ -62,7 +62,7 @@ export type SectorClass =
   | "OTHER";
 
 // Brand tier classification
-export type BrandTier =
+type BrandTier =
   | "PREMIUM"
   | "MID_RANGE"
   | "BUDGET"

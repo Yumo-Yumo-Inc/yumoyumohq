@@ -12,6 +12,7 @@ Esta sección expresa la capacidad a través de variables de carga de trabajo. L
 | `L` | Líneas promedio por recibo |
 | `v` | Proporción de recibos verificados elegibles para recompensas |
 | `e` | Registros de eventos promedio por recibo |
+| `p` | Proporción de recibos enviados como PDF (la ruta OCR) |
 | `ρ_ocr` | Tasa de reintento de OCR |
 | `ρ_llm` | Tasa de reintento o autoconsistencia de LLM |
 | `B` | Tamaño de lote de liquidación en cadena |
@@ -31,7 +32,7 @@ Rows_m ≈ 30 × R_d × (1 + L + e)
 Volumen diario de llamadas a modelos:
 
 ```text
-OCR_d ≈ R_d × (1 + ρ_ocr)
+OCR_d ≈ R_d × p × (1 + ρ_ocr)
 LLM_d ≈ R_d × (1 + ρ_llm)
 ```
 

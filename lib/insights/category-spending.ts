@@ -13,7 +13,7 @@ import {
   type CanonicalProductCategory,
 } from "@/lib/receipt/category-taxonomy";
 
-export type ChartColor = {
+type ChartColor = {
   dot: string;
   dotBg: string;
   barStart: string;

@@ -7,10 +7,10 @@
 
 import { create } from "zustand";
 
-export type YumbieTaskKind = "process" | "scan";
-export type YumbieTaskStatus = "pending" | "running" | "done" | "error";
+type YumbieTaskKind = "process" | "scan";
+type YumbieTaskStatus = "pending" | "running" | "done" | "error";
 
-export interface YumbieTask {
+interface YumbieTask {
   id: string;
   kind: YumbieTaskKind;
   status: YumbieTaskStatus;

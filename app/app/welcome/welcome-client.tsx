@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { YumbieCompanion } from "@/components/app/home/yumbie-companion";
 import type { YumbieMood, YumbieExpression } from "@/lib/app/use-yumbie-mood";
-import { getEnabledCountries, getCountryByName } from "@/lib/shared/countries";
+import {
+  getEnabledCountries,
+  getCountryByCode,
+  isOtherCountry,
+} from "@/lib/shared/countries";
 import {
   TRANSLATIONS,
   SUPPORTED_LANGS,
@@ -40,7 +43,6 @@ type WelcomePageClientProps = {
 };
 
 export default function WelcomePageClient({ initialLang }: WelcomePageClientProps) {
-  const router = useRouter();
   const [step, setStep] = useState(0); // 0 | 1 | 2 | 3 (done)
   const [lang, setLang] = useState<Lang>(initialLang);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +57,7 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "other" | null>(null);
   const [country, setCountry] = useState("");
+  const [accountCountry, setAccountCountry] = useState<string | null>(null);
   const [incomeRange, setIncomeRange] = useState("");
   const [whyReasons, setWhyReasons] = useState<string[]>([]);
   const [tone, setTone] = useState<"warm" | "professional" | "energetic">("warm");
@@ -62,10 +65,30 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
 
   const t = TRANSLATIONS[lang];
   const countries = useMemo(() => getEnabledCountries(), []);
+  const effectiveCountry = accountCountry ?? country;
   const selectedCurrency = useMemo(() => {
-    const c = country ? getCountryByName(country) : undefined;
+    const c = effectiveCountry ? getCountryByCode(effectiveCountry) : undefined;
     return c?.currency ?? "USD";
-  }, [country]);
+  }, [effectiveCountry]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/country");
+        const data = await res.json().catch(() => ({}));
+        if (cancelled || !res.ok || !data.country) return;
+        const code = String(data.country).trim().toUpperCase();
+        setAccountCountry(code);
+        setCountry(code);
+      } catch {
+        // Legacy path: user picks country in the form.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const incomeOptions = useMemo(
     () => getIncomeOptions(selectedCurrency, lang),
     [selectedCurrency, lang],
@@ -211,7 +234,7 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
           display_name: displayName,
           age: age ? parseInt(age, 10) : null,
           gender,
-          country: country || null,
+          country: effectiveCountry || null,
           monthly_income_range: incomeRange || null,
           why_yumo_reasons: whyReasons,
           tone_preference: tone,
@@ -220,12 +243,12 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
         }),
       });
       if (res.ok) {
+        document.cookie = "onboarding_pending=; Max-Age=0; path=/; SameSite=Lax";
         setStep(3);
         setMood("happy");
         setExpression("celebrate");
       } else {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || t.genericError);
+        setError(t.genericError);
       }
     } catch {
       setError(t.genericError);
@@ -235,7 +258,8 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
   };
 
   const goToDashboard = () => {
-    router.push("/app");
+    document.cookie = "onboarding_pending=; Max-Age=0; path=/; SameSite=Lax";
+    window.location.assign("/app/dashboard");
   };
 
   return (
@@ -363,23 +387,34 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
                 <label className="block text-xs font-medium text-app-text-secondary mb-1.5">
                   {t.countryLabel}
                 </label>
-                <select
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="w-full h-11 px-3 rounded-xl bg-app-bg-surface border border-app-border text-app-text-primary focus:outline-none focus:border-app-gold/50 transition-colors appearance-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6680' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 12px center",
-                  }}
-                >
-                  <option value="">{t.countryPlaceholder}</option>
-                  {countries.map((c) => (
-                    <option key={c.code} value={c.name}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                {accountCountry ? (
+                  <div className="w-full h-11 px-3 rounded-xl bg-app-bg-surface3 border border-app-border text-app-text-primary flex items-center">
+                    {isOtherCountry(accountCountry)
+                      ? t.countryOtherAccount
+                      : (getCountryByCode(accountCountry)?.name ?? accountCountry)}
+                  </div>
+                ) : (
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full h-11 px-3 rounded-xl bg-app-bg-surface border border-app-border text-app-text-primary focus:outline-none focus:border-app-gold/50 transition-colors appearance-none"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6680' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 12px center",
+                    }}
+                  >
+                    <option value="">{t.countryPlaceholder}</option>
+                    {countries.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {accountCountry && (
+                  <p className="mt-1.5 text-[11px] text-app-text-muted">{t.countryFromRegistrationHint}</p>
+                )}
               </div>
             </div>
           </>
@@ -416,7 +451,7 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
                     </option>
                   ))}
                 </select>
-                {!country && (
+                {!effectiveCountry && (
                   <p className="mt-1.5 text-[11px] text-app-text-muted">
                     {t.incomeSelectCountryHint}
                   </p>

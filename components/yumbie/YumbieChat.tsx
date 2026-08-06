@@ -22,7 +22,7 @@ function pageKey(pathname: string): "dashboard" | "receipts" | "rewards" | "defa
 const CHIPS: Record<string, Array<{ key: string; href?: string }>> = {
   dashboard: [{ key: "todayEarned" }, { key: "giveTip" }],
   receipts: [{ key: "showLastReceipt", href: "/app/receipts" }, { key: "monthSpend" }],
-  rewards: [{ key: "myCpoints" }],
+  rewards: [{ key: "myPoints" }],
   default: [{ key: "whatsHere" }, { key: "help" }],
 };
 

@@ -2,7 +2,7 @@
  * Receipt data model types
  */
 
-export type ReceiptStatus =
+type ReceiptStatus =
   | "draft"
   | "verified"
   | "saved"
@@ -13,9 +13,9 @@ export type ReceiptStatus =
   | "rewarded_other"
   | "pending_bill_review";
 
-export type MerchantTier = "verified" | "candidate" | "unverified";
+type MerchantTier = "verified" | "candidate" | "unverified";
 
-export interface Merchant {
+interface Merchant {
   name: string;
   placeId?: string;
   category?: string;
@@ -29,7 +29,7 @@ export interface Merchant {
   tier?: MerchantTier | null;
 }
 
-export interface ExtractionField {
+interface ExtractionField {
   value: string | number;
   confidence: number;
   sourceLine?: number;
@@ -53,7 +53,7 @@ export interface VATExtraction extends ExtractionField {
   rate?: number; // VAT rate as decimal (e.g., 0.20 for 20%)
 }
 
-export interface Extraction {
+interface Extraction {
   date: DateExtraction;
   time?: TimeExtraction; // Optional time extraction
   total: TotalExtraction;
@@ -64,7 +64,7 @@ export interface Extraction {
  * Client-safe receipt line item, sourced from the receipt_line_items table.
  * Contains only data printed on the receipt — no hidden-cost decomposition.
  */
-export interface ReceiptLineItem {
+interface ReceiptLineItem {
   id?: number | null;
   rawName: string;
   canonicalName?: string | null;
@@ -105,7 +105,7 @@ export interface HiddenCostBreakdownItem {
   estimated?: boolean;
 }
 
-export interface HiddenCostBreakdown {
+interface HiddenCostBreakdown {
   importSystemCost: number;
   retailHiddenCost: number;
   /**
@@ -121,14 +121,17 @@ export interface HiddenCostBreakdown {
  * How the hidden-cost TOTAL was derived (the item-level distribution is always a
  * deterministic sector split). Drives the mandatory transparency notice:
  *  - item_derived: priced from the receipt's matched line items.
+ *  - retail_margin: items priced individually against a verified retail/
+ *    distribution margin multiple (sector_margin path) — not a producer cost gap.
  *  - category_derived: priced from the category cost-composition model (no items).
  *  - sector_average: generic items / LLM rate / fallback — a sector estimate that
  *    MUST be disclosed to the user (per the product decision, 2026-06-24).
  *  - inflation_premium: inflation_only countries — estimated from the general
  *    inflation (CPI) index; disclosed as an inflation-based estimate.
  */
-export type HiddenCostProvenance =
+type HiddenCostProvenance =
   | "item_derived"
+  | "retail_margin"
   | "category_derived"
   | "sector_average"
   | "inflation_premium";
@@ -167,6 +170,8 @@ export interface Reward {
   pendingItemizedReceipt?: boolean;
   /** Slip receipt id to pass when uploading the itemized follow-up. */
   pendingSlipReceiptId?: string;
+  /** Structured decomposition of how the points were computed (result screen). */
+  breakdown?: import("@/lib/receipt/reward-breakdown").RewardBreakdown;
 }
 
 /**
@@ -177,7 +182,7 @@ export interface Reward {
  * Reward formula: bINT = HiddenCost / USD_rate; bINT bonus = bINT × CPI × Level_Catalyzer × Category_Catalyzer.
  * Wire keys kept as `ayumo_amount` / `ryumo_bonus_amount` for the client; DB columns are bint_amount / bint_bonus_amount.
  */
-export interface ReceiptRewards {
+interface ReceiptRewards {
   /** Base bINT (category hidden cost / USD_rate) */
   base_reward_amount: number;
   /** Additional bINT (canonical delta / USD_rate; 0 if no canonical increase) */
@@ -218,7 +223,7 @@ export interface OCR {
   rawText: string;
 }
 
-export interface ReceiptVerification {
+interface ReceiptVerification {
   hash: string; // SHA-256 hash of receipt image for duplicate detection
   isDuplicate: boolean;
   duplicateReceiptId?: string;
@@ -229,10 +234,10 @@ export interface ReceiptVerification {
   passedGating: boolean; // Whether confidence thresholds are met
 }
 
-export type ProofType = "digital_receipt" | "physical_receipt" | "screenshot" | "manual";
-export type RewardTier = "A" | "B" | "C" | "none";
+type ProofType = "digital_receipt" | "physical_receipt" | "screenshot" | "manual";
+type RewardTier = "A" | "B" | "C" | "none";
 
-export interface ReceiptEvidence {
+interface ReceiptEvidence {
   hasExif?: boolean;
   exifTimestamp?: string; // ISO timestamp from EXIF data
   photoHash?: string; // Hash of the photo for verification
@@ -240,7 +245,7 @@ export interface ReceiptEvidence {
   locationMatch?: boolean; // Whether location matches merchant location
 }
 
-export interface ReceiptSource {
+interface ReceiptSource {
   app?: string; // Source app (e.g., "yumo", "booking.com", "uber")
   bookingId?: string; // External booking/reference ID
   captureType?: string; // How the receipt was captured (e.g., "camera", "upload", "api")
@@ -260,7 +265,7 @@ export interface ExtractionValidationResult {
   };
 }
 
-export type ReceiptExpenseType = "personal" | "other";
+type ReceiptExpenseType = "personal" | "other";
 
 export interface ReceiptAnalysis {
   receiptId: string;

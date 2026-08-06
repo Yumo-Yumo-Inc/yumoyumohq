@@ -38,7 +38,8 @@ import type { HiddenCostModelType } from "@/lib/mining/types";
 import { detectGuardedProductCategory } from "./product-category-guards";
 import { categorySeriesMap } from "@/lib/mining/categorySeriesMap";
 import { toHiddenCategory, computeLineComposition, commercialKatFor, isNonPurchaseLine } from "@/lib/mining/hiddenCostComposition";
-import { countryHasExciseModel } from "@/lib/mining/exciseTax";
+import type { HiddenCategory } from "@/lib/mining/hiddenCostComposition";
+import { countryHasExciseModel, getEffectiveExciseRate, getFuelExciseShare } from "@/lib/mining/exciseTax";
 import { commercialKatOverride } from "@/lib/mining/hiddenCostOverrides";
 
 // ─────────────────────────────────────────────
@@ -77,7 +78,7 @@ export interface LineHiddenCostResult {
    *   fallback_rate      — fixed rate (no data available)
    */
   calc_method:
-    | "izmir_hal"
+    | "wholesale_gap"
     | "fuel_otv"
     | "category_kat"
     | "non_purchase"
@@ -87,6 +88,7 @@ export interface LineHiddenCostResult {
     | "market_benchmark_cpi"
     | "fallback_avg_index"
     | "sector_margin"
+    | "category_inflation_premium"
     | "inflation_premium"
     | "no_data"
     | "profit_margin_factor"
@@ -142,9 +144,9 @@ export interface ComputeLineHiddenCostInput {
    */
   taxonomyByName?: Map<string, TaxonomyRow>;
   /**
-   * Pre-fetched current Izmir wholesale-market WHOLESALE prices: canonical_key → {avg TL, unit}.
-   * Producer/wholesale reference for fresh vegetables/fruit (real data). hidden = paid − wholesale×kg.
-   * See fetchIzmirHalBulk()
+   * Pre-fetched current wholesale-market prices for the receipt's country: canonical_key → {avg, unit}.
+   * Producer/wholesale reference for fresh vegetables/fruit (real data). hidden = paid − wholesale×qty.
+   * See fetchWholesaleBulk()
    */
   halPrices?: Map<string, { avg: number; unit: string }>;
   /**
@@ -184,6 +186,62 @@ export interface EconomicIndexMultipliers {
   cpi_08?: number;
   /** PPI-C: Manufacturing PPI — for the fallback average calculation */
   ppi_c?: number;
+  /**
+   * COICOP division multipliers ("01".."12"), present only for divisions the
+   * country actually publishes. Used by the inflation_only tier so a line is
+   * priced against ITS OWN division's inflation instead of headline CPI — a
+   * phone and a tomato no longer share one number. A division absent from this
+   * map falls back to `other` (CPI/GENEL).
+   */
+  cpi_divisions?: Partial<Record<CoicopDivision, number>>;
+}
+
+/** COICOP 2018 divisions, the canonical CPI series codes alongside "GENEL". */
+type CoicopDivision =
+  | "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12";
+
+/**
+ * HiddenCategory → COICOP division. Drives the category-based inflation premium
+ * in the inflation_only tier. Categories with no meaningful division stay unmapped
+ * and keep using headline CPI.
+ */
+const COICOP_BY_CATEGORY: Partial<Record<HiddenCategory, CoicopDivision>> = {
+  // 01 — food and non-alcoholic beverages
+  fresh_produce: "01", dairy: "01", meat_fish: "01", packaged_food: "01", bakery: "01",
+  bottled_water: "01", fruit_juice: "01", soft_drink_cola: "01", flavored_drink: "01",
+  // 02 — alcoholic beverages and tobacco
+  alcohol: "02", tobacco: "02",
+  // 03 — clothing and footwear
+  apparel: "03",
+  // 04 — housing, water, electricity, gas and other fuels
+  utilities_energy: "04", water_bill: "04",
+  // 05 — furnishings, household equipment and routine household maintenance
+  home_textile: "05", furniture: "05", glassware_decor: "05", white_goods: "05",
+  // 07 — transport
+  fuel: "07", vehicle: "07", bus_transport: "07", flight_domestic: "07",
+  // 08 — communication
+  mobile_phone: "08",
+  // 09 — recreation and culture (AV/computing equipment, sporting goods, streaming)
+  computer: "09", television: "09", small_electronics: "09", sporting_goods: "09",
+  digital_subscription: "09",
+  // 11 — restaurants and hotels
+  restaurant_dining: "11", food_delivery: "11", hotel_lodging: "11",
+  // 12 — miscellaneous goods and services (personal care)
+  cosmetics_perfume: "12",
+};
+
+/**
+ * Annual inflation multiplier for a line's own COICOP division, or null when the
+ * country does not publish that division (caller falls back to headline CPI).
+ */
+function categoryInflationMultiplier(
+  category: HiddenCategory,
+  multipliers: EconomicIndexMultipliers | undefined
+): number | null {
+  const division = COICOP_BY_CATEGORY[category];
+  if (!division) return null;
+  const value = multipliers?.cpi_divisions?.[division];
+  return typeof value === "number" && value > 1 ? value : null;
 }
 
 // ─────────────────────────────────────────────
@@ -226,12 +284,12 @@ function toInternalCategory(
     [["elektronik", "electronic", "telefon", "bilgisayar", "beyaz esya", "teknoloji"], "electronics"],
     [["kozmetik", "kisisel bakim", "bakim", "beauty", "parfum", "makyaj"], "beauty_personal_care"],
     [["giyim", "tekstil", "apparel", "fashion", "moda", "ayakkabi", "konfeksiyon"], "apparel_fashion"],
-    [["akaryakit", "yakit", "benzin", "motorin", "fuel", "petrol", "lpg", "istasyon"], "fuel"],
+    [["akaryakit", "yakit", "benzin", "motorin", "fuel", "petrol", "lpg", "istasyon", "transport"], "fuel"],
     [["elektrik", "dogalgaz", "fatura", "utilities", "abonelik fatura"], "utilities"],
     [["seyahat", "bilet", "ucak", "otobus", "travel", "ulasim", "ulastirma"], "travel_ticket"],
     [["konaklama", "otel", "hotel", "pansiyon"], "hospitality_lodging"],
     [["dijital", "digital", "yazilim", "abonelik", "uygulama", "oyun"], "services_digital"],
-    [["restoran", "restaurant", "yemek", "kafe", "cafe", "lokanta", "fast food"], "food_delivery"],
+    [["restoran", "restaurant", "yemek", "kafe", "cafe", "lokanta", "fast food", "food_service", "food service"], "food_delivery"],
     [["mobilya", "ev & yasam", "ev &", "ev/yasam", "yasam", "home", "mutfak gereç", "zucaciye"], "home_living"],
     // groceries_fmcg: food + all market sub-categories + cleaning (fast-moving consumer goods)
     [["gida", "grocery", "groceries", "fmcg", "supermarket", "market",
@@ -291,10 +349,20 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
   } = input;
 
   const receiptCategory = payload.merchant?.category_lvl1 ?? undefined;
+  // Food-service receipt (restaurant/cafe merchant): every line — meals AND drinks — is
+  // restaurant-prepared, so in the inflation_only tier the country's verified restaurant
+  // margin applies receipt-wide. Reference = what the same dish's ingredients would cost
+  // at retail ("if cooked at home"); a mojito on a restaurant receipt must not take the
+  // grocery kat of a bottled drink.
+  const receiptIsFoodService = toInternalCategory(null, receiptCategory) === "food_delivery";
   // Embedded tax (excise/TRT) is applied only in countries with a defined excise model.
   // Otherwise TR excise rates would leak into a US/IN receipt. In inflation_only countries
   // without an excise model, embeddedTax = 0, commercialBase = lineTotal.
   const applyEmbeddedTax = countryHasExciseModel(country);
+  // Non-TR receipts trust the LLM's category over the TR/EN name keywords (which
+  // misfire on local-language and restaurant items). TR keeps name-first — its
+  // curated keyword list resolves items the LLM leaves coarse. See toHiddenCategory.
+  const preferCategoryMap = (country ?? "TR").trim().toUpperCase().slice(0, 2) !== "TR";
   const results: LineHiddenCostResult[] = [];
 
   for (const obs of payload.observations) {
@@ -340,19 +408,63 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
     // hidden = lineTotal − reference, the tax is automatically included in the hidden amount.
     // For an iPhone, the 50% excise + TRT is captured here (category cost-composition alone missed this).
     const taxName = obs.canonical_name || obs.raw_name || "";
-    const taxCat = toHiddenCategory(taxName, obs.category_lvl1);
-    const taxComp = computeLineComposition(taxCat, lineTotal, {
-      quantity: obs.quantity, unitType: obs.unit_type, name: taxName,
-    });
-    const embeddedTax = applyEmbeddedTax
-      ? Math.min(lineTotal * 0.85, taxComp.components.otv + taxComp.components.trt)
-      : 0;
+    const taxCat = toHiddenCategory(taxName, obs.category_lvl1, { preferCategory: preferCategoryMap });
+    // Embedded excise: TR uses the detailed cost-composition model (ÖTV bands, TRT, fuel maktu);
+    // other excise-model countries (US) use a flat per-category effective excise share
+    // (getEffectiveExciseRate), so TR's constants never leak into a non-TR receipt.
+    let embeddedTax = 0;
+    if (applyEmbeddedTax) {
+      if ((country ?? "").toUpperCase() === "TR") {
+        const taxComp = computeLineComposition(taxCat, lineTotal, {
+          quantity: obs.quantity, unitType: obs.unit_type, name: taxName,
+        });
+        embeddedTax = Math.min(lineTotal * 0.85, taxComp.components.otv + taxComp.components.trt);
+      } else {
+        const guarded = detectGuardedProductCategory(taxName);
+        // Fuel (TH/VN) is a specific per-litre duty, not a flat share of price —
+        // needs the line's own quantity/unit, so it bypasses getEffectiveExciseRate.
+        const rate = guarded === "fuel"
+          ? getFuelExciseShare(country, taxName, lineTotal, obs.quantity, obs.unit_type)
+          : guarded ? getEffectiveExciseRate(country, guarded, taxName) : 0;
+        embeddedTax = Math.min(lineTotal * 0.85, lineTotal * rate);
+      }
+    }
     const commercialBase = Math.max(0, lineTotal - embeddedTax);
 
     let reference: number;
     let calc_method: LineHiddenCostResult["calc_method"];
     let tuik_match: LineHiddenCostResult["tuik_match"] | undefined;
     let taxonomy_match: LineHiddenCostResult["taxonomy_match"] | undefined;
+
+    // ── Fresh produce → current wholesale-market price (producer reference) ────
+    // Tier-AGNOSTIC and highest priority: fresh vegetables/fruit have a real wholesale
+    // price (TR: İzmir open data; US: USDA AMS terminal market). reference = wholesale_unit
+    // × qty; hidden = paid − reference. Runs BEFORE the inflation_only short-circuit so
+    // detailed-data countries (incl. inflation_only ones that have wholesale rows) use the
+    // real gap instead of a generic CPI premium. Empty map (no wholesale data) → falls through.
+    if (halPrices && halPrices.size > 0 && taxCat === "fresh_produce") {
+      const hn = taxName.toLowerCase()
+        .replace(/̇/g, "").replace(/ı/g, "i").replace(/ş/g, "s").replace(/ğ/g, "g")
+        .replace(/ü/g, "u").replace(/ö/g, "o").replace(/ç/g, "c");
+      let hal: { avg: number; unit: string } | undefined;
+      for (const [token, v] of halPrices) { if (token.length >= 3 && hn.includes(token)) { hal = v; break; } }
+      const qty = obs.quantity && obs.quantity > 0 ? obs.quantity : 1;
+      const ut = (obs.unit_type ?? "").toLowerCase();
+      const unitOk = hal ? (hal.unit === "kg" ? !/adet|piece|ad\b/.test(ut) : (/adet|piece|ad/.test(ut) || !ut)) : false;
+      if (hal && unitOk) {
+        const halRef = hal.avg * qty;
+        if (halRef > 0 && halRef < lineTotal) {
+          const hidden = Math.max(0, lineTotal - halRef);
+          results.push({
+            observation: obs,
+            reference_price: Math.round(halRef * 100) / 100,
+            hidden_cost_line: Math.round(hidden * 100) / 100,
+            calc_method: "wholesale_gap", model_type: modelType,
+          });
+          continue;
+        }
+      }
+    }
 
     // ── inflation_only tier: no detailed data → general inflation premium ─────
     // Detailed producer-gap data (taxonomy/wholesale market/TÜİK/commercial multiple) exists
@@ -368,7 +480,11 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
       // out above). Only is_verified=TRUE rows reach commercialKatOverride (drafts stay
       // inert). No embedded TR constant fallback here — commercialKatOverride is country-
       // scoped, so an absent row falls through to the CPI premium below, never TR's kat.
-      const katOverride = commercialKatOverride(taxCat);
+      // On food-service receipts the restaurant kat overrides the item's own category
+      // (product decision 2026-07-10: restaurant reference = home-cooked ingredient cost).
+      const marginCat: HiddenCategory =
+        receiptIsFoodService || taxCat === "restaurant_dining" ? "restaurant_dining" : taxCat;
+      const katOverride = commercialKatOverride(marginCat);
       if (katOverride && katOverride.kat > 1) {
         reference = commercialBase / katOverride.kat;
         const hidden = Math.max(0, lineTotal - reference);
@@ -382,7 +498,11 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
         continue;
       }
 
-      const cpiGenelYoY = economicMultipliers?.other;
+      // Prefer the line's OWN COICOP division inflation over headline CPI: a phone
+      // and a tomato must not share one number. Falls back to CPI/GENEL when the
+      // country does not publish that division.
+      const categoryYoY = categoryInflationMultiplier(marginCat, economicMultipliers);
+      const cpiGenelYoY = categoryYoY ?? economicMultipliers?.other;
       if (cpiGenelYoY && cpiGenelYoY > 1) {
         reference = commercialBase / cpiGenelYoY;
         const hidden = Math.max(0, lineTotal - reference);
@@ -390,7 +510,7 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
           observation: obs,
           reference_price: Math.round(reference * 100) / 100,
           hidden_cost_line: Math.round(hidden * 100) / 100,
-          calc_method: "inflation_premium",
+          calc_method: categoryYoY ? "category_inflation_premium" : "inflation_premium",
           model_type: "fallback",
         });
       } else {
@@ -403,36 +523,6 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
         });
       }
       continue;
-    }
-
-    // ── Priority 0: Fresh produce → current Izmir wholesale-market price (producer reference) ──
-    // Instead of deriving production cost from an index, fresh vegetables/fruit have a real
-    // wholesale price (Izmir Metropolitan Municipality open data). reference = wholesale_unit × kg;
-    // hidden = paid − reference. This captures the actual gap for fresh produce (not a generic 20%).
-    if (halPrices && halPrices.size > 0 && taxCat === "fresh_produce") {
-      const hn = taxName.toLowerCase()
-        .replace(/̇/g, "").replace(/ı/g, "i").replace(/ş/g, "s").replace(/ğ/g, "g")
-        .replace(/ü/g, "u").replace(/ö/g, "o").replace(/ç/g, "c");
-      let hal: { avg: number; unit: string } | undefined;
-      for (const [token, v] of halPrices) { if (token.length >= 3 && hn.includes(token)) { hal = v; break; } }
-      const qty = obs.quantity && obs.quantity > 0 ? obs.quantity : 1;
-      const ut = (obs.unit_type ?? "").toLowerCase();
-      const unitOk = hal ? (hal.unit === "kg" ? !/adet|piece|ad\b/.test(ut) : (/adet|piece|ad/.test(ut) || !ut)) : false;
-      if (hal && unitOk) {
-        const halRef = hal.avg * qty;
-        if (halRef > 0 && halRef < lineTotal) {
-          reference = halRef;
-          calc_method = "izmir_hal";
-          const hidden = Math.max(0, lineTotal - reference);
-          results.push({
-            observation: obs,
-            reference_price: Math.round(reference * 100) / 100,
-            hidden_cost_line: Math.round(hidden * 100) / 100,
-            calc_method, model_type: modelType,
-          });
-          continue;
-        }
-      }
     }
 
     // ── Priority 0b: Fuel → fixed excise + EPDK margin (NOT the TÜİK average) ──
@@ -673,7 +763,7 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
  * directly at upload time; since post-process calls the same engine, the result DOES NOT
  * CHANGE (single calculation). Fetches all inputs (weights, indices, wholesale market,
  * taxonomy, TÜİK) and runs computeLineHiddenCosts.
- * confidence: high (izmir_hal/fuel_otv/excise/category_kat-high), medium, low → completePaid/incompletePaid.
+ * confidence: high (wholesale_gap/fuel_otv/excise/category_kat-high), medium, low → completePaid/incompletePaid.
  */
 // Global inputs (weights/indices/wholesale market) are the same for everyone → short-lived cache (for upload speed).
 const _globalsCache = new Map<string, { at: number; data: [Record<string, ProductionCostWeightsRow>, Map<string, number>, EconomicIndexMultipliers | null, Map<string, { avg: number; unit: string }>] }>();
@@ -689,7 +779,7 @@ async function fetchHiddenCostGlobals(country: string, yearMonth: string) {
   await ensureHiddenCostOverrides(country);
   const data = await Promise.all([
     fetchProductionCostWeights(country), fetchEconomicYoYMap(country, yearMonth),
-    fetchEconomicIndexMultipliers(country, yearMonth), fetchIzmirHalBulk(),
+    fetchEconomicIndexMultipliers(country, yearMonth), fetchWholesaleBulk(country),
   ]) as [Record<string, ProductionCostWeightsRow>, Map<string, number>, EconomicIndexMultipliers | null, Map<string, { avg: number; unit: string }>];
   _globalsCache.set(key, { at: Date.now(), data });
   return data;
@@ -728,12 +818,23 @@ export async function computeReceiptHiddenFromLineItems(
 
   let completePaid = 0, incompletePaid = 0;
   const methodCounts: Record<string, number> = {};
+  // Mirrors the engine's food-service receipt handling: on restaurant/cafe receipts
+  // sector_margin lines were priced with the restaurant_dining kat, so the confidence
+  // classification must read that category's override, not the item's own.
+  const summaryFoodService = toInternalCategory(null, merchantCategory ?? undefined) === "food_delivery";
+  // Same TR / non-TR split the engine uses above, so classification reads the
+  // identical category the hidden amount was priced with.
+  const preferCategoryMap = (country ?? "TR").trim().toUpperCase().slice(0, 2) !== "TR";
   for (const r of results) {
     const lt = r.observation.line_total_gross ?? 0;
     methodCounts[r.calc_method] = (methodCounts[r.calc_method] ?? 0) + 1;
     if (r.calc_method === "non_purchase") continue;
-    const cat = toHiddenCategory(r.observation.canonical_name || r.observation.raw_name, r.observation.category_lvl1);
-    let high = r.calc_method === "izmir_hal" || r.calc_method === "fuel_otv" || cat === "tobacco" || cat === "alcohol";
+    const itemCat = toHiddenCategory(r.observation.canonical_name || r.observation.raw_name, r.observation.category_lvl1, { preferCategory: preferCategoryMap });
+    const cat: HiddenCategory =
+      r.calc_method === "sector_margin" && (summaryFoodService || itemCat === "restaurant_dining")
+        ? "restaurant_dining"
+        : itemCat;
+    let high = r.calc_method === "wholesale_gap" || r.calc_method === "fuel_otv" || cat === "tobacco" || cat === "alcohol";
     if (r.calc_method === "category_kat") high = commercialKatFor(cat)?.conf === "high";
     if (r.calc_method === "sector_margin") high = commercialKatOverride(cat)?.conf === "high";
     if (high) completePaid += lt; else incompletePaid += lt;
@@ -742,24 +843,30 @@ export async function computeReceiptHiddenFromLineItems(
 }
 
 // ─────────────────────────────────────────────
-// DB fetch: fetchIzmirHalBulk — current Izmir wholesale-market prices (fresh-produce reference)
+// DB fetch: fetchWholesaleBulk — current wholesale-market prices per country (fresh-produce reference)
 // ─────────────────────────────────────────────
 
 /**
- * Fetches current Izmir wholesale-market prices (latest trade_date, source=IZMIR_HAL_OPENDATA).
- * canonical_key → {avg TL, unit}. Same canonical (e.g. pear varieties) → lowest average
- * (conservative: shrinks the hidden share). Producer/wholesale reference for fresh vegetables/fruit.
+ * Fetches the most recent wholesale-market prices for a country from hks_hal_prices
+ * (TR: İzmir Metropolitan Municipality open data; US: USDA AMS terminal market; etc.),
+ * scoped by the `country` column and that country's latest trade_date. canonical_key →
+ * {avg, unit}. Same canonical (e.g. pear varieties) → lowest average (conservative:
+ * shrinks the hidden share). Producer/wholesale reference for fresh vegetables/fruit.
+ * Tier-agnostic: consumed by both the full-tier and inflation_only fresh-produce paths.
  */
-export async function fetchIzmirHalBulk(): Promise<Map<string, { avg: number; unit: string }>> {
+export async function fetchWholesaleBulk(
+  country: string
+): Promise<Map<string, { avg: number; unit: string }>> {
   const map = new Map<string, { avg: number; unit: string }>();
+  const cc = (country ?? "TR").trim().toUpperCase().slice(0, 2) || "TR";
   const { getSql } = await import("@/lib/db/client");
   const sql = getSql();
   if (!sql) return map;
   try {
     const rows = (await sql`
       SELECT canonical_key, unit, price_avg_tl FROM hks_hal_prices
-      WHERE source = 'IZMIR_HAL_OPENDATA' AND price_avg_tl > 0
-        AND trade_date = (SELECT MAX(trade_date) FROM hks_hal_prices WHERE source = 'IZMIR_HAL_OPENDATA')
+      WHERE country = ${cc} AND price_avg_tl > 0
+        AND trade_date = (SELECT MAX(trade_date) FROM hks_hal_prices WHERE country = ${cc} AND price_avg_tl > 0)
     `) as Array<{ canonical_key: string; unit: string; price_avg_tl: number }>;
     for (const r of rows) {
       const key = (r.canonical_key || "").toLowerCase().trim();
@@ -769,7 +876,7 @@ export async function fetchIzmirHalBulk(): Promise<Map<string, { avg: number; un
       if (!prev || Number(r.price_avg_tl) < prev.avg) map.set(key, { avg: Number(r.price_avg_tl), unit: u });
     }
   } catch (e) {
-    console.warn("[line-hidden-cost] fetchIzmirHalBulk failed:", (e as Error)?.message);
+    console.warn("[line-hidden-cost] fetchWholesaleBulk failed:", (e as Error)?.message);
   }
   return map;
 }
@@ -914,6 +1021,10 @@ export async function fetchEconomicIndexMultipliers(
       cpi_08:       pick("CPI",   "08"),
     };
 
+    // cpi_divisions is deliberately NOT populated here: this legacy reader applies
+    // `1 + value/100` to values that are stored as index ratios, which understates
+    // the multiplier. The category-based path is fed from fetchEconomicYoYMap via
+    // multipliersForCategory, which divides index levels 12 months apart.
     return multipliers;
   } catch (e) {
     console.warn(
@@ -1022,7 +1133,21 @@ function multipliersForCategory(
     cpi_11:       g("CPI/11"),
     cpi_07:       g("CPI/07"),
     cpi_08:       g("CPI/08"),
+    // COICOP divisions the country actually publishes. Absent divisions stay out of
+    // the map so the engine falls back to headline CPI rather than reading a neutral
+    // 1.0 as "zero inflation".
+    cpi_divisions: coicopDivisions(yoy),
   };
+}
+
+/** COICOP division → YoY multiplier, for the divisions present in the YoY map. */
+function coicopDivisions(yoy: Map<string, number>): Partial<Record<CoicopDivision, number>> {
+  const out: Partial<Record<CoicopDivision, number>> = {};
+  for (const division of ["01","02","03","04","05","06","07","08","09","10","11","12"] as CoicopDivision[]) {
+    const value = yoy.get(`CPI/${division}`);
+    if (typeof value === "number" && value > 0) out[division] = value;
+  }
+  return out;
 }
 
 // ─────────────────────────────────────────────

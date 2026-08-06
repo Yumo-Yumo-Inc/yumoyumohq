@@ -52,7 +52,7 @@ export function isAcademiaLocale(value: string): value is AcademiaLocale {
   return academiaLocales.includes(value as AcademiaLocale);
 }
 
-export function getAcademiaLocaleRoot(locale: AcademiaLocale) {
+function getAcademiaLocaleRoot(locale: AcademiaLocale) {
   return path.join(CONTENT_ROOT, locale);
 }
 

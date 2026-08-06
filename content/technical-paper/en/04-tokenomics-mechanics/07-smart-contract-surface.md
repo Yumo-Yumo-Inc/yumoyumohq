@@ -9,10 +9,10 @@ v1 runs on audited, widely-used programs rather than custom protocol code. No be
 | INT issuance and burn | SPL Token | Mint authority closed after genesis; burn under multisig |
 | Reward distribution and claim | Audited merkle distributor | Per-epoch root; root-set authority is multisig |
 | Treasury and authorities | Squads multisig | Separated root / treasury / clawback approvals |
-| Foundation NFT | Token-2022 (NonTransferable) | Backend mint, one per wallet |
+| Proof-of-expense SBT | Token-2022 (NonTransferable) | Backend mint, one per wallet |
 | Transparency commitments | Memo program | Epoch root and dataset hash written on-chain |
 
-bINT and ePoints are off-chain accounting units. They are not on-chain tokens; their balances live in the operations layer and settle into INT through the distributor.
+bINT is an off-chain accounting unit. It is not an on-chain token; its balances live in the operations layer. INT claims derived from eligible bINT balances settle through the distributor.
 
 ## 4.16 What goes on-chain
 
@@ -28,4 +28,4 @@ This separation keeps reward computation, independent verification, and fund mov
 
 ## 4.18 Audit posture
 
-The on-chain surface relies on programs that are already audited and in broad production use. The off-chain reward engine and the independent verifier are reviewed before launch, with a public report archive and a security reporting channel. Scope and report links are published as reviews complete.
+The on-chain surface relies on third-party open-source programs; the versions, program addresses, and relevant audit links are published. Review scope, report links, and a security-reporting channel for the off-chain reward engine and verifier must be published before launch.

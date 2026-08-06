@@ -17,7 +17,7 @@ export interface AnalysisOverview {
   receiptCount: number;
 }
 
-export interface PricePoint {
+interface PricePoint {
   /** ISO date (YYYY-MM-DD). */
   date: string;
   /** Normalised unit price (per pack unit) in `currency`. */
@@ -25,6 +25,8 @@ export interface PricePoint {
 }
 
 export interface PriceTrack {
+  /** Stable product identity key (normalised_name:p{packSize}:unitType). */
+  productKey: string;
   name: string;
   brand: string | null;
   packSize: number | null;
@@ -109,7 +111,7 @@ export interface ShrinkflationHit {
   impliedPct: number;
 }
 
-export interface PurchasingPowerStep {
+interface PurchasingPowerStep {
   monthsAgo: number;
   /** What today's 1000 units bought then, per official CPI. */
   equivalentValue: number;
@@ -137,6 +139,36 @@ export interface CommunityComparison {
   cities: Array<{ city: string; avgBasket: number; receiptCount: number }>;
   /** User's own average basket over the same window. */
   userAvgBasket: number | null;
+}
+
+/** A single purchase instance for a tracked product. */
+export interface ProductHistoryItem {
+  receiptId: string;
+  date: string;
+  merchantName: string | null;
+  quantity: number;
+  unitPrice: number | null;
+  lineTotal: number | null;
+  unitType: string | null;
+}
+
+export interface ProductHistoryStats {
+  min: number | null;
+  max: number | null;
+  avg: number | null;
+  latest: number | null;
+  count: number;
+  spanDays: number;
+}
+
+export interface ProductHistoryResponse {
+  productKey: string;
+  name: string;
+  brand: string | null;
+  packSize: number | null;
+  unitType: string | null;
+  stats: ProductHistoryStats;
+  history: ProductHistoryItem[];
 }
 
 export interface AnalysisPayload {

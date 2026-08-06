@@ -32,7 +32,7 @@ const NUMBER_LOCALE: Record<Locale, string> = {
 };
 
 /** Locale-correct percent: TR puts the sign before the number. */
-export function pct(value0to100: number, locale: string): string {
+function pct(value0to100: number, locale: string): string {
   const l = lc(locale);
   const n = Math.round(value0to100).toLocaleString(NUMBER_LOCALE[l]);
   return l === "tr" ? `%${n}` : `${n}%`;

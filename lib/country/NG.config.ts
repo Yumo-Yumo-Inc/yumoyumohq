@@ -80,4 +80,3 @@ export const NG_CONFIG: CountryConfig = {
   ]
 };
 
-export default NG_CONFIG;

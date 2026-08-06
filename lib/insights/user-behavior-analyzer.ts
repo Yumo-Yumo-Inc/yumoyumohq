@@ -13,7 +13,7 @@
 
 import { db } from "@/lib/db/client";
 
-export interface UserBehaviorProfileInput {
+interface UserBehaviorProfileInput {
   username: string;
 }
 
@@ -133,7 +133,7 @@ function computeArchetype(scores: {
   return "casual_shopper";
 }
 
-export async function analyzeUserBehavior(
+async function analyzeUserBehavior(
   input: UserBehaviorProfileInput
 ): Promise<UserBehaviorProfileResult> {
   const { username } = input;
@@ -303,7 +303,7 @@ export async function analyzeUserBehavior(
   };
 }
 
-export async function upsertUserBehaviorProfile(
+async function upsertUserBehaviorProfile(
   result: UserBehaviorProfileResult
 ): Promise<void> {
   await db.query(

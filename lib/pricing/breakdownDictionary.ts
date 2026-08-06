@@ -16,12 +16,12 @@ export interface BreakdownItemDef {
   maxShare?: number; // Soft maximum share (0-1)
 }
 
-export type BreakdownDictionary = Record<SuperCategory, BreakdownItemDef[]>;
+type BreakdownDictionary = Record<SuperCategory, BreakdownItemDef[]>;
 
 /**
  * Breakdown dictionary by super category
  */
-export const breakdownDictionary: BreakdownDictionary = {
+const breakdownDictionary: BreakdownDictionary = {
   food_service: [
     // Store & Operations
     { layerKey: "store_ops", label: "Shop Rent", description: "Store location costs", alphaBase: 3.0, minShare: 0.15, maxShare: 0.30 },

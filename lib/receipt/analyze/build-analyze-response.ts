@@ -1,7 +1,9 @@
-import type { ReceiptContext } from "@/app/api/receipt/analyze/types";
+import type { PipelineContext, ReceiptContext } from "@/app/api/receipt/analyze/types";
 import type { ExtractionValidationResult, HiddenCostBreakdownItem } from "@/lib/receipt/types";
 import { normalizeReceiptCategory } from "@/lib/receipt/categories";
 import { resolveNoRewardReasonForContext, resolveDuplicateNoRewardCode } from "@/lib/receipt/vision-post-rules";
+import { buildUploadRewardBreakdown } from "@/lib/receipt/reward-breakdown";
+import type { RewardCapResult } from "@/lib/receipt/reward-caps";
 
 type BuildAnalyzeResponseArgs = {
   context: ReceiptContext;
@@ -23,6 +25,16 @@ type BuildAnalyzeResponseArgs = {
   logBuffer: string[];
 };
 
+/** Fraud-analyzer output attached mid-pipeline; narrowed here from unknown. */
+interface FraudSignalsShape {
+  fraudScore?: number;
+  riskLevel?: string;
+  isValid?: boolean;
+  rejectionReasons?: string[];
+  warnings?: string[];
+  checks?: Record<string, unknown>;
+}
+
 export function buildAnalyzeResponse({
   context,
   receiptStatus,
@@ -42,40 +54,37 @@ export function buildAnalyzeResponse({
   breakdownItems,
   logBuffer,
 }: BuildAnalyzeResponseArgs) {
-  const ctxAny = context as any;
-  const earlyDuplicateInfo = ctxAny.earlyDuplicateInfo as
-    | { existingUsername?: string | null }
-    | undefined;
+  const ctx = context as PipelineContext;
+  const fraudSignals = (ctx.fraudSignals ?? null) as FraudSignalsShape | null;
+  const earlyDuplicateInfo = ctx.earlyDuplicateInfo ?? undefined;
   let effectiveRewardAmount = rewardAmount;
   if (earlyDuplicateInfo) {
     effectiveRewardAmount = 0;
-    ctxAny.noRewardReasonCode = resolveDuplicateNoRewardCode(
+    ctx.noRewardReasonCode = resolveDuplicateNoRewardCode(
       earlyDuplicateInfo.existingUsername,
       context.username
     );
-    ctxAny.noRewardExplanation = undefined;
+    ctx.noRewardExplanation = undefined;
   }
 
   const finalRewardAmount = effectiveRewardAmount;
   const finalBintAmount =
     finalRewardAmount <= 0 ? 0 : Math.round((bintAmount * finalRewardAmount) / Math.max(rewardAmount, 1) * 100) / 100;
   let noRewardReasonCode =
-    finalRewardAmount > 0 ? undefined : (ctxAny.noRewardReasonCode as string | undefined);
+    finalRewardAmount > 0 ? undefined : ctx.noRewardReasonCode ?? undefined;
   let noRewardExplanation =
-    finalRewardAmount > 0 ? undefined : (ctxAny.noRewardExplanation as string | undefined);
+    finalRewardAmount > 0 ? undefined : ctx.noRewardExplanation ?? undefined;
 
   if (finalRewardAmount <= 0 && !noRewardReasonCode) {
     const resolved = resolveNoRewardReasonForContext({
       existingCode: noRewardReasonCode ?? null,
       rewardAmount: finalRewardAmount,
       hiddenCostCore: hiddenCostCore,
-      judgment:
-        (ctxAny.llmJudgment as { rewardDecision?: string } | undefined)?.rewardDecision ??
-        null,
-      documentType: (ctxAny.documentType as string | null) ?? null,
-      paymentProven: (ctxAny.paymentProven as boolean | null) ?? null,
+      judgment: ctx.llmJudgment?.rewardDecision ?? null,
+      documentType: ctx.documentType ?? null,
+      paymentProven: ctx.paymentProven ?? null,
       receiptDate: context.date ?? null,
-      rewardEligibility: (ctxAny.rewardEligibility as string | null) ?? null,
+      rewardEligibility: ctx.rewardEligibility ?? null,
       posSlipOverride: false,
       isDuplicate: !!earlyDuplicateInfo,
       duplicateUsername: earlyDuplicateInfo?.existingUsername ?? null,
@@ -83,12 +92,12 @@ export function buildAnalyzeResponse({
     });
     noRewardReasonCode = resolved.code;
     noRewardExplanation = resolved.explanation;
-    ctxAny.noRewardReasonCode = resolved.code;
-    ctxAny.noRewardExplanation = resolved.explanation;
+    ctx.noRewardReasonCode = resolved.code;
+    ctx.noRewardExplanation = resolved.explanation;
   }
 
   const trustedMerchantMatch =
-    (context as any).merchantMatchTrusted === true ? (context as any).merchantMatch : undefined;
+    ctx.merchantMatchTrusted === true ? ctx.merchantMatch ?? undefined : undefined;
 
   return {
     receiptId: context.receiptId,
@@ -100,19 +109,15 @@ export function buildAnalyzeResponse({
     llmSource: context.llmSource || undefined,
     // Phase 6: merchant.name = display (short storefront name shown in the UI).
     // merchantLegalName = full legal name (separate DB column, admin panel).
-    merchantLegalName:
-      (context as { merchantLegalName?: string | null }).merchantLegalName ?? null,
+    merchantLegalName: ctx.merchantLegalName ?? null,
     // Phase 7: Payment and tax details — sourced from Gemini, written to the DB.
-    cardLast4: (context as { cardLast4?: string | null }).cardLast4 ?? null,
-    posProvider:
-      (context as { posProvider?: string | null }).posProvider ?? null,
-    taxOffice: (context as { taxOffice?: string | null }).taxOffice ?? null,
-    taxNumber: (context as { taxNumber?: string | null }).taxNumber ?? null,
-    paymentMethod:
-      (context as { paymentMethod?: string | null }).paymentMethod ?? null,
-    paymentProven:
-      (context as { paymentProven?: boolean | null }).paymentProven ?? null,
-    receiptNo: (context as { receiptNo?: string | null }).receiptNo ?? null,
+    cardLast4: ctx.cardLast4 ?? null,
+    posProvider: ctx.posProvider ?? null,
+    taxOffice: ctx.taxOffice ?? null,
+    taxNumber: ctx.taxNumber ?? null,
+    paymentMethod: ctx.paymentMethod ?? null,
+    paymentProven: ctx.paymentProven ?? null,
+    receiptNo: ctx.receiptNo ?? null,
     merchant: {
       name: trustedMerchantMatch?.displayName ?? context.merchantName,
       placeId: context.merchantPlaceId,
@@ -147,8 +152,8 @@ export function buildAnalyzeResponse({
       retailHiddenRate,
       currency: context.currency,
       symbol: context.currencySymbol,
-      category: normalizeReceiptCategory((context as any).pricingSourceCategory ?? context.category) ?? undefined,
-      internalCategory: (context as any).pricingInternalCategory ?? undefined,
+      category: normalizeReceiptCategory(ctx.pricingSourceCategory ?? context.category) ?? undefined,
+      internalCategory: ctx.pricingInternalCategory ?? undefined,
     },
     hiddenCost: {
       referencePrice,
@@ -164,8 +169,8 @@ export function buildAnalyzeResponse({
       totalHidden: hiddenCostCore,
       hiddenRate,
       // Computation provenance — drives the mandatory "sector average" notice.
-      provenance: (context as any).hiddenCostProvenance ?? undefined,
-      completeShare: (context as any).hiddenCostCompleteShare ?? undefined,
+      provenance: ctx.hiddenCostProvenance ?? undefined,
+      completeShare: ctx.hiddenCostCompleteShare ?? undefined,
       layers: context.hiddenCostBreakdown ? {
         platformEcosystem: context.hiddenCostBreakdown.layers.platformEcosystem,
         storeOperations: context.hiddenCostBreakdown.layers.storeOperations,
@@ -181,39 +186,42 @@ export function buildAnalyzeResponse({
       // raw = pre-fraction full estimate when a partial (base) reward was
       // granted; proof matching / manual item completion unlock up to this.
       raw:
-        typeof (context as any).rewardFullEstimate === "number"
-          ? (context as any).rewardFullEstimate
+        typeof ctx.rewardFullEstimate === "number"
+          ? ctx.rewardFullEstimate
           : finalRewardAmount,
       final: finalRewardAmount,
       ryumo: finalBintAmount,
       token: "cPoints",
       capsApplied: [],
-      verifiedThankYou: !!(context as any).verifiedThankYou,
+      verifiedThankYou: !!ctx.verifiedThankYou,
       noRewardReasonCode,
       noRewardExplanation,
       rewardFraction:
-        typeof (context as any).rewardFraction === "number"
-          ? (context as any).rewardFraction
-          : undefined,
+        typeof ctx.rewardFraction === "number" ? ctx.rewardFraction : undefined,
       fullRewardEstimate:
-        typeof (context as any).rewardFullEstimate === "number"
-          ? (context as any).rewardFullEstimate
-          : undefined,
-      pendingItemizedReceipt:
-        (context as any).pendingItemizedReceipt === true ? true : undefined,
+        typeof ctx.rewardFullEstimate === "number" ? ctx.rewardFullEstimate : undefined,
+      pendingItemizedReceipt: ctx.pendingItemizedReceipt === true ? true : undefined,
       pendingSlipReceiptId:
-        (context as any).pendingItemizedReceipt === true
-          ? context.receiptId
-          : undefined,
+        ctx.pendingItemizedReceipt === true ? context.receiptId : undefined,
+      // Upload-pass decomposition (base slice, scan bonuses, itemized/streak
+      // multipliers, cap + honor flags). Post-process appends the CPI/season
+      // factors and the final points. null when the receipt earned nothing.
+      breakdown:
+        buildUploadRewardBreakdown({
+          capResult: (ctx.rewardCap as RewardCapResult | undefined) ?? null,
+          rewardFinal: finalRewardAmount,
+          honorApplied:
+            typeof ctx.honorRewardFactor === "number" && ctx.honorRewardFactor < 1,
+        }) ?? undefined,
     },
     flags: {
       needsLLM: false,
       reasons: [],
-      docType: (context as any).documentType ?? "receipt",
-      revised: !!(context as any).revisedFromMandatoryFallback,
+      docType: ctx.documentType ?? "receipt",
+      revised: !!ctx.revisedFromMandatoryFallback,
       revisionSource:
-        typeof (context as any).llmMandatoryResolvedBy === "string"
-          ? (context as any).llmMandatoryResolvedBy
+        typeof ctx.llmMandatoryResolvedBy === "string"
+          ? ctx.llmMandatoryResolvedBy
           : undefined,
       ...(extractionFlagsRejected ? { rejected: true as const } : {}),
     },
@@ -223,75 +231,82 @@ export function buildAnalyzeResponse({
     },
     verification: {
       hash: context.hash || "",
-      isDuplicate: !!(context as any).earlyDuplicateInfo || !!(context as any).reviewExistingReceiptId,
-      duplicateReceiptId: (context as any).earlyDuplicateInfo?.existingReceiptId || (context as any).reviewExistingReceiptId,
-      duplicateType: (context as any).earlyDuplicateInfo?.duplicateType || ((context as any).reviewExistingReceiptId ? "content" : undefined),
-      duplicateUsername: (context as any).earlyDuplicateInfo?.existingUsername || (context as any).reviewExistingUsername,
+      isDuplicate: !!ctx.earlyDuplicateInfo || !!ctx.reviewExistingReceiptId,
+      duplicateReceiptId:
+        ctx.earlyDuplicateInfo?.existingReceiptId || ctx.reviewExistingReceiptId,
+      duplicateType:
+        ctx.earlyDuplicateInfo?.duplicateType ||
+        (ctx.reviewExistingReceiptId ? "content" : undefined),
+      duplicateUsername:
+        ctx.earlyDuplicateInfo?.existingUsername || ctx.reviewExistingUsername,
       confidenceScore: 0.8,
       merchantVerified: !!context.placesResult,
       passedGating: true,
     },
     receiptHash: context.hash || null,
     imagePhash: context.finalPerceptualHash || context.perceptualHash || null,
-    contentHash: context.contentHash || null,
-    fraud: (context as any).fraudSignals ? {
-      fraudScore: (context as any).fraudSignals.fraudScore,
-      riskLevel: (context as any).fraudSignals.riskLevel,
-      isValid: (context as any).fraudSignals.isValid,
-      rejectionReasons: (context as any).fraudSignals.rejectionReasons || [],
-      warnings: (context as any).fraudSignals.warnings || [],
-      checks: (context as any).fraudSignals.checks || {},
-    } : undefined,
-    riskScore: (context as any).fraudSignals?.fraudScore || null,
-    qualityHonor: (context as any).qualityHonorResult
+    // A content duplicate is still retained for audit, but must not be written
+    // as an active hash row: the partial unique index would make its later
+    // post-process fail. A payment proof that completes a restaurant tab is
+    // likewise a linked evidence row, not a second canonical expense hash.
+    contentHash:
+      ctx.earlyDuplicateInfo || ctx.proofCompletionExistingReceiptId
+        ? null
+        : context.contentHash || null,
+    fraud: fraudSignals
       ? {
-          level: (context as any).qualityHonorResult.level,
-          honorDelta: (context as any).qualityHonorResult.honorDelta,
-          rewardPct: (context as any).qualityHonorResult.rewardPct,
-          honorBonusApplied: (context as any).qualityHonorResult.honorBonusApplied,
-          reasons: (context as any).qualityHonorResult.reasons,
-          securityReasons: (context as any).qualityHonorResult.securityReasons,
-          qualityScore: (context as any).qualityHonorResult.qualityScore,
+          fraudScore: fraudSignals.fraudScore,
+          riskLevel: fraudSignals.riskLevel,
+          isValid: fraudSignals.isValid,
+          rejectionReasons: fraudSignals.rejectionReasons || [],
+          warnings: fraudSignals.warnings || [],
+          checks: fraudSignals.checks || {},
         }
       : undefined,
-    marginViolation: (context as any).marginViolationInfo || undefined,
-    rejectionInfo: (context as any).rejectionInfo || undefined,
+    riskScore: fraudSignals?.fraudScore || null,
+    qualityHonor: ctx.qualityHonorResult
+      ? {
+          level: ctx.qualityHonorResult.level,
+          honorDelta: ctx.qualityHonorResult.honorDelta,
+          rewardPct: ctx.qualityHonorResult.rewardPct,
+          honorBonusApplied: ctx.qualityHonorResult.honorBonusApplied,
+          reasons: ctx.qualityHonorResult.reasons,
+          securityReasons: ctx.qualityHonorResult.securityReasons,
+          qualityScore: ctx.qualityHonorResult.qualityScore,
+        }
+      : undefined,
+    marginViolation: ctx.marginViolationInfo || undefined,
+    rejectionInfo: ctx.rejectionInfo || undefined,
     pipelineLog: logBuffer.length > 0 ? logBuffer.join("\n") : undefined,
-    blobFilename: (context as any).blobFilename || null,
-    blobUrl: (context as any).blobUrl || null,
-    requiresMerchantApproval: (context as any).requiresMerchantApproval || false,
-    visionRawJson: (context as any).visionRawJson ?? undefined,
+    blobFilename: ctx.blobFilename || null,
+    blobUrl: ctx.blobUrl || null,
+    requiresMerchantApproval: ctx.requiresMerchantApproval || false,
+    visionRawJson: ctx.visionRawJson ?? undefined,
     visionMarkdown:
-      typeof (context as any).geminiMarkdown === "string"
-        ? (context as any).geminiMarkdown
+      typeof ctx.geminiMarkdown === "string"
+        ? ctx.geminiMarkdown
         : typeof context.fullText === "string" && context.fullText.length > 0
           ? context.fullText
           : null,
-    documentType: (context as any).documentType ?? null,
-    isPaymentProof: (context as any).isPaymentProof ?? null,
-    proofStatus: (context as any).proofStatus ?? null,
-    completeSlipReceiptId: (context as any).completeSlipReceiptId ?? null,
-    geminiLineItems: Array.isArray((context as any).geminiLineItems)
-      ? (context as any).geminiLineItems
+    documentType: ctx.documentType ?? null,
+    isPaymentProof: ctx.isPaymentProof ?? null,
+    proofStatus: ctx.proofStatus ?? null,
+    completeSlipReceiptId: ctx.completeSlipReceiptId ?? null,
+    geminiLineItems: Array.isArray(ctx.geminiLineItems) ? ctx.geminiLineItems : undefined,
+    gptFullReceiptResult: ctx.gptFullReceiptResult ?? undefined,
+    merchantAddress: ctx.merchantAddress
+      ? String(ctx.merchantAddress).trim() || undefined
       : undefined,
-    gptFullReceiptResult: (context as any).gptFullReceiptResult ?? undefined,
-    merchantAddress: (context as any).merchantAddress
-      ? String((context as any).merchantAddress).trim() || undefined
+    branchInfo: ctx.branchInfo ? String(ctx.branchInfo).trim() || undefined : undefined,
+    addressCity: ctx.addressCity ? String(ctx.addressCity).trim() || undefined : undefined,
+    addressDistrict: ctx.addressDistrict
+      ? String(ctx.addressDistrict).trim() || undefined
       : undefined,
-    branchInfo: (context as any).branchInfo
-      ? String((context as any).branchInfo).trim() || undefined
+    addressNeighborhood: ctx.addressNeighborhood
+      ? String(ctx.addressNeighborhood).trim() || undefined
       : undefined,
-    addressCity: (context as any).addressCity
-      ? String((context as any).addressCity).trim() || undefined
-      : undefined,
-    addressDistrict: (context as any).addressDistrict
-      ? String((context as any).addressDistrict).trim() || undefined
-      : undefined,
-    addressNeighborhood: (context as any).addressNeighborhood
-      ? String((context as any).addressNeighborhood).trim() || undefined
-      : undefined,
-    addressStreet: (context as any).addressStreet
-      ? String((context as any).addressStreet).trim() || undefined
+    addressStreet: ctx.addressStreet
+      ? String(ctx.addressStreet).trim() || undefined
       : undefined,
     extractionValidation: extractionValidationSnap,
     postProcessState: postProcessStateOut,

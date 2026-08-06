@@ -148,15 +148,15 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {
   Select,
-  SelectGroup,
+  
   SelectValue,
   SelectTrigger,
   SelectContent,
-  SelectLabel,
+  
   SelectItem,
-  SelectSeparator,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
+  
+  
+  
 }
 
 

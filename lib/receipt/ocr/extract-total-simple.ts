@@ -72,7 +72,7 @@ export function parseTurkishNumber(str: string): number | null {
 /**
  * Extract total amount from OCR lines
  */
-export function extractTotal(lines: OCRLine[]): TotalExtraction {
+function extractTotal(lines: OCRLine[]): TotalExtraction {
   // Use shared constants for total patterns
   const totalPatterns = [
     new RegExp(`(?:${TOTAL_KEY_RE.source.replace(/^\/|\/[gi]*$/g, '')})[\\s:]*([\\d,.\\s]+)`, 'i'),

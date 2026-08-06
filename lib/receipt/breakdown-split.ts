@@ -23,9 +23,24 @@ function roundCents(amount: number): number {
 }
 
 /**
+ * True when the receipt was paid without a card, so no card-processing fee was
+ * incurred by the merchant. Covers both extraction vocabularies: the raw Gemini
+ * enum ("nakit", "havale") and the validated schema ("cash", "bank_transfer").
+ * Unknown/absent methods return false — the card-fee row stays by default.
+ */
+export function isCardlessPayment(method: string | null | undefined): boolean {
+  if (!method) return false;
+  const m = method.trim().toLowerCase();
+  return m === "nakit" || m === "cash" || m === "havale" || m === "bank_transfer";
+}
+
+/**
  * Split `layerAmount` across the dictionary items of (`superCategory`, `layerKey`).
  * Falls back to a single generic row when the schema has no matching items or the
  * amount is not positive. The returned amounts always sum to round(layerAmount).
+ * `excludeLabels` drops schema items that do not apply to this receipt (e.g.
+ * "Payment Fees" on a cash receipt); their share flows to the remaining items
+ * through the alphaBase renormalisation, so the layer total is unchanged.
  */
 export function splitLayerIntoItems(
   layerAmount: number,
@@ -33,10 +48,13 @@ export function splitLayerIntoItems(
   layerKey: LayerKey,
   bucket: Bucket,
   fallbackLabel: string,
-  tooltip?: string
+  tooltip?: string,
+  excludeLabels?: ReadonlySet<string>
 ): HiddenCostBreakdownItem[] {
   const totalCents = Math.max(0, roundCents(layerAmount));
-  const defs = getBreakdownItems(superCategory).filter((d) => d.layerKey === layerKey);
+  const defs = getBreakdownItems(superCategory).filter(
+    (d) => d.layerKey === layerKey && !excludeLabels?.has(d.label)
+  );
   const totalAlpha = defs.reduce((sum, d) => sum + Math.max(0, d.alphaBase), 0);
 
   // Defensive: nothing to split into, or no signal → single generic row.

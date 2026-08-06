@@ -92,6 +92,20 @@
   --app-font-headline: 24px;
   --app-font-headline-lg: 28px;
   --app-font-display: 42px;
+  /* ── Signature surface system (scanui reçetesinin nötr/altın kardeşi).
+     Değerler --app-* katmanından türer → TierVarsInjector + light tema ile
+     otomatik döner. Yeni renk icat edilmez; light override yalnız gereken
+     iki token için (.dark.app-theme-light bloğunda). Düz 1px border YOK:
+     kenar = zemin kontrastı + hairline gradyanı + gölge/inner-glow. */
+  --surface-grad-flat: var(--app-bg-surface);
+  --surface-grad-elevated: linear-gradient(160deg, var(--app-bg-elevated) 0%, var(--app-bg-base) 100%);
+  --surface-grad-glass: var(--scanui-card-bg);
+  --surface-grad-value: linear-gradient(158deg, rgba(201, 168, 76, 0.12) 0%, var(--app-bg-elevated) 46%, var(--app-bg-base) 100%);
+  --surface-hairline: linear-gradient(90deg, transparent 0%, var(--app-border-strong) 28%, var(--app-border-strong) 72%, transparent 100%);
+  --surface-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --surface-shadow: var(--app-shadow-card);
+  --surface-glass-border: var(--scanui-card-border);
+  --surface-value-border: var(--app-gold-border);
 }
 
 :root {
@@ -257,6 +271,10 @@
   /* Altın aksanlar: açık zeminde biraz daha görünür */
   --app-gold-glow: rgba(201, 168, 76, 0.14);
   --app-gold-border: rgba(201, 168, 76, 0.24);
+  /* Signature surface — light overrides (gerisi --app-*'tan otomatik döner):
+     inner-glow açık zeminde parlak top-highlight; value tint krem üstünde okunur. */
+  --surface-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --surface-grad-value: linear-gradient(158deg, rgba(201, 168, 76, 0.16) 0%, var(--app-bg-elevated) 48%, var(--app-bg-surface3) 100%);
   /* Tailwind/shadcn token’ları */
   --background: 40 20% 97%;
   --foreground: 30 10% 9%;
@@ -446,6 +464,11 @@
   50%       { box-shadow: 0 0 0 3px rgba(201,168,76,0.16), 0 0 12px rgba(201,168,76,0.08); }
 }
 .quest-ready-pulse { animation: quest-ready-pulse 2.4s ease-in-out infinite; }
+
+/* Rotating avatar frame (animated/legendary profile-frame cosmetics). */
+@keyframes yumo-frame-spin { to { transform: rotate(360deg); } }
+.yumo-frame-spin { animation: yumo-frame-spin 5s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .yumo-frame-spin { animation: none; } }
 
 /* Weekly: mor nabız */
 @keyframes quest-weekly-pulse {

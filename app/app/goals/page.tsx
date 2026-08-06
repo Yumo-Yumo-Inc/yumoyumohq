@@ -144,7 +144,7 @@ function TrustCard({ trust, onImprove }: { trust: TrustResponse; onImprove: () =
           <div key={c.key} className="flex items-center gap-1.5">
             <CheckIcon pass={c.pass} warn={c.warn} />
             <span className="text-[10px]" style={{ color: "var(--app-text-muted)" }}>
-              {c.label}
+              {t(`goals.trustChecks.${c.key}`)}
             </span>
           </div>
         ))}

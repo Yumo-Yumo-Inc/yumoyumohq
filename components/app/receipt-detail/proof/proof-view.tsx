@@ -18,8 +18,14 @@ import { proofVars, FLAME, MONO } from "./theme";
 import { useTheme } from "@/lib/theme/theme-context";
 import { Reveal, Stamp } from "./primitives";
 import { RewardSeal } from "./reward-seal";
+import { useAppProfile } from "@/lib/app/profile-context";
+import { resolveSeal } from "@/config/proof-seals";
+import { RewardArt, rewardArtFor } from "@/components/app/season/reward-art";
+import { useCosmeticGrants } from "@/lib/app/use-cosmetic-grants";
+import { hasCapability } from "@/config/season-capabilities";
 import { ItemsStrip } from "./items-strip";
 import { MetaTags } from "./meta-tags";
+import { ChainAnchor } from "./chain-anchor";
 
 /** Positional palette for hidden-cost layers (distinct colour per layer). */
 const PF_LAYER_PALETTE = ["#9B8FF0", "#3FD9A0", "#FFC65A", "#F2A03C", "#7CA0FF", "#E879A8"];
@@ -61,6 +67,12 @@ export function ProofView(props: ProofViewProps) {
   const stackIndex = (bucket: string) => stackGroups.findIndex((g) => g.bucket === bucket);
 
   const verified = receipt.status === "VERIFIED";
+  // Proof-of-Expense seal — the owner's equipped season seal, stamped only on
+  // receipts that are actually verified (proven).
+  const { profile } = useAppProfile();
+  const proofSeal = verified ? resolveSeal(profile?.seal) : null;
+  const grants = useCosmeticGrants();
+  const deepPrice = hasCapability(grants, "deep_price");
   const rejected = receipt.status === "REJECTED";
   const statusLabel = verified ? t("status.verified") : rejected ? t("status.rejected") : t("status.pending");
   const statusColor = verified ? "#34D399" : rejected ? "#F87171" : "#C9A84C";
@@ -146,7 +158,14 @@ export function ProofView(props: ProofViewProps) {
           <Reveal>
             <div className="flex items-center justify-between gap-2">
               <span className="rounded-lg border px-2.5 py-1 text-[10.5px] uppercase tracking-[0.12em]" style={{ color: "var(--pf-soft)", borderColor: "var(--pf-line-strong)", fontFamily: MONO }}>{schemaLabel}</span>
-              <Stamp label={statusLabel} color={statusColor} />
+              <div className="flex items-center gap-2">
+                {proofSeal && (
+                  <span title={isTr ? proofSeal.label.tr : proofSeal.label.en} aria-label={isTr ? proofSeal.label.tr : proofSeal.label.en}>
+                    <RewardArt name={rewardArtFor(proofSeal.glyph, "seal")} tint={proofSeal.dark} size={30} />
+                  </span>
+                )}
+                <Stamp label={statusLabel} color={statusColor} />
+              </div>
             </div>
           </Reveal>
 
@@ -183,6 +202,22 @@ export function ProofView(props: ProofViewProps) {
               ))}
             </div>
           </Reveal>
+
+          {/* Deep Price Compare — season capability (unlocked at pass L22) */}
+          {deepPrice && (
+            <Reveal>
+              <div className="rounded-2xl p-3.5" style={{ background: "var(--pf-inset)", border: "1px solid rgba(167,139,250,0.35)" }}>
+                <span className="text-[10.5px] font-semibold uppercase tracking-wide" style={{ color: "#A78BFA" }}>
+                  {isTr ? "Derin Fiyat Karşılaştırma" : "Deep Price Compare"}
+                </span>
+                <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: "var(--pf-text)" }}>
+                  {isTr
+                    ? `Ödediğin ${currency}${total.toFixed(0)} içinde %${hiddenPctPaid.toFixed(0)} gizli maliyet var (${currency}${hidden.toFixed(0)}). Üretici değeri ${currency}${productValue.toFixed(0)} — yani ürüne göre ${productValue > 0 ? (total / productValue).toFixed(2) : "—"}× ödedin.`
+                    : `Of the ${currency}${total.toFixed(0)} you paid, ${hiddenPctPaid.toFixed(0)}% is hidden cost (${currency}${hidden.toFixed(0)}). The product value is ${currency}${productValue.toFixed(0)} — you paid ${productValue > 0 ? (total / productValue).toFixed(2) : "—"}× the product.`}
+                </p>
+              </div>
+            </Reveal>
+          )}
 
           {/* Reward */}
           <Reveal><div className="flex justify-start"><RewardSeal receipt={receipt} /></div></Reveal>
@@ -288,6 +323,7 @@ export function ProofView(props: ProofViewProps) {
 
           {/* Printed items + record */}
           <Reveal><ItemsStrip receipt={receipt} /></Reveal>
+          <Reveal><ChainAnchor receiptId={receipt.id} /></Reveal>
           <Reveal><MetaTags receipt={receipt} onReportBug={onReportBug} /></Reveal>
         </div>
 

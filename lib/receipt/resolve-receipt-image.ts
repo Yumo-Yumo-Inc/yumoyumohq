@@ -136,7 +136,7 @@ async function fetchUrlToBuffer(url: string): Promise<Buffer> {
   }
 }
 
-export type ReceiptImageSource =
+type ReceiptImageSource =
   | "receipt_data_url"
   | "receipt_data_embedded_url"
   | "receipts_column_blob_url"

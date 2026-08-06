@@ -4,7 +4,7 @@
 
 Proof of Contribution (PoC) rayı, INT tahsisinin mühendislik, tasarım, yönetişim ve ekosistem aktivasyonu işlerini ödüllendiren payıdır. Vision Paper tahsis payını belirler. Kurucu ekip, tam zamanlı işe alımlar, sözleşmeliler ve dış katkıcıların tümü PoC üzerinden, aynı etki ağırlıklı mantıkla kazanır.
 
-Bu kasıtlı bir yapısal seçimdir. "Ekip token'ları"nı "katkıcı token'ları"ndan ayırmak geleneksel düzendir; ekibe etki gözetmeksizin sabit bir tahsis verir ve uzun vadeli token sahibi güvenini bastıran bir asimetri yaratır. PoC rayı, kullanıcı-ödülü-dışı tüm ihraçları aynı işle-kazanılan mekanizmasından yönlendirerek o asimetriyi kapatır.
+PoC, ekip ve dış katkıcı dağıtımlarını aynı yayımlanmış değerlendirme ve hak ediş sürecine bağlar. Bu tasarım tek başına adil dağıtımı garanti etmez; denetlenebilirlik, sürümlü değerlendirme çizelgesinin, dağıtım kayıtlarının ve hak ediş sözleşmelerinin yayımlanmasına bağlıdır.
 
 ## 4.12 Dağıtımlar nasıl puanlanır
 
@@ -17,11 +17,11 @@ PoC ihracı periyodik dağıtımlarla gerçekleşir. Her dağıtım, yakın katk
 - Ekosistem aktivasyonu (pazar genişletme, ortak etkinleştirme, topluluk programları).
 - Somutlaştıkça yönetişim işi.
 
-Her katkıcı hak ediş eki ile bir INT dağıtımı alır. Hak kazanma takvimi politikadır; mevcut varsayılanlar mühendislik katkıları için endüstri standardı cliff-artı-doğrusal şekilleri ve proje sınırlı iş için daha kısa takvimleri takip eder.
+Her katkıcı için cliff, hak ediş süresi ve sözleşme adresi ilgili dağıtım kaydında açıkça belirtilir. Dağıtım yapılmadan önce değerlendirme çizelgesinin sürümü de aynı kayda eklenir.
 
 ## 4.13 Hak ediş
 
-Tüm PoC ihracı hak ediş taşır. Hak kazanma parametreleri katkıcının rolüne ve dağıtımın kapsamına bağlıdır:
+Tüm PoC ihracı hak ediş taşır; hiçbir PoC dağıtımı anında likit değildir. Hak kazanma parametreleri katkıcının rolüne ve dağıtımın kapsamına bağlıdır:
 
 | Dağıtım kapsamı | Cliff | Doğrusal hak ediş ufku | Saklayıcı |
 |---|---|---|---|
@@ -31,8 +31,6 @@ Tüm PoC ihracı hak ediş taşır. Hak kazanma parametreleri katkıcının rol�
 
 Tam cliff ve hak ediş süreleri politikadır ve her dağıtımın yayınlanmış kaydında belgelenir. Hak kazanma kontratları zincir üstü ve incelenebilirdir.
 
-## 4.14 TGE'de cPoints → bINT taşıması
+## 4.14 bINT muhasebe katmanı
 
-Token Üretim Olayı'ndan önce katkı kredileri cPoints olarak birikir. TGE'de cPoints devre dışı bırakılır ve yayınlanmış bir dönüşüm oranıyla bINT'e taşınır. Taşıma anlık görüntü tarihi olan tek seferlik bir olaydır. Dönüşüm oranı, yayınlanmış TGE takviminin parçasıdır ve anlık görüntü zamanında var olan kapalı beta katkı dağılımına karşı belirlenir.
-
-cPoints sahipleri taşımayı cüzdanlarında tek seferlik bir bINT mint olarak görür; o andan itibaren standart bINT → INT yaşam döngüsü (4.4) uygulanır.
+Doğrulanmış her katkı, bINT muhasebe katmanında yalnızca-ekle bir defter olayı olarak kaydedilir. Epoch mutabakatı bu olayları doğrudan toplayıp toplamı düz 1:1 oranıyla (4.24) INT'e dönüştürür; standart bINT → INT yaşam döngüsü (4.4) uygulanır. Ayrı bir geçiş olayı, anlık görüntü veya dönüşüm adımı yoktur.

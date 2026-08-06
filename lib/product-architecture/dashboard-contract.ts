@@ -2,7 +2,7 @@ import { buildLocaleCopy, dashboardMessages } from "./dashboard-locale-loader";
 
 export type YumoLocale = "tr" | "en" | "ru" | "th" | "es" | "zh";
 
-export type Daypart = "morning" | "noon" | "evening";
+type Daypart = "morning" | "noon" | "evening";
 
 export type UserFacingText = {
   tr: string;
@@ -13,17 +13,17 @@ export type UserFacingText = {
  * UserFacingText factory that takes all locales in a single call.
  * Argument order: tr, en, ru, th, es, zh — matches the `byLocale` helper elsewhere in the project.
  */
-export function uft(tr: string, en: string, ru: string, th: string, es: string, zh: string): UserFacingText {
+function uft(tr: string, en: string, ru: string, th: string, es: string, zh: string): UserFacingText {
   return { tr, en, ru, th, es, zh };
 }
 
-export type CompanionAction =
+type CompanionAction =
   | { kind: "external_search"; label: UserFacingText; query: string }
   | { kind: "internal_route"; label: UserFacingText; href: string }
   | { kind: "chat"; label: UserFacingText; href: string }
   | { kind: "reminder"; label: UserFacingText; href: string };
 
-export type YumbieProductCandidate = {
+type YumbieProductCandidate = {
   name: string;
   kind: string;
   heroEligible: boolean;
@@ -31,7 +31,7 @@ export type YumbieProductCandidate = {
   heroQuery: string | null;
 };
 
-export type YumbieMoment = {
+type YumbieMoment = {
   greeting: UserFacingText;
   opening: UserFacingText;
   context: UserFacingText;
@@ -217,7 +217,7 @@ export const DASHBOARD_COPY: Record<YumoLocale, DashboardCopy> = {
   zh: buildLocaleCopy(DASHBOARD_COPY_EN, dashboardMessages.zh),
 };
 
-export const DASHBOARD_WEEKDAYS: Record<YumoLocale, string[]> = {
+const DASHBOARD_WEEKDAYS: Record<YumoLocale, string[]> = {
   tr: ["PT", "SA", "ÇA", "PE", "CU", "CT", "PZ"],
   en: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"],
   ru: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"],
@@ -239,13 +239,13 @@ export function pickText(text: UserFacingText, locale: YumoLocale): string {
   return text[locale] || text.en || text.tr;
 }
 
-export function hasUnsafeUserFacingText(value: string | null | undefined): boolean {
+function hasUnsafeUserFacingText(value: string | null | undefined): boolean {
   const text = String(value ?? "").trim();
   if (!text) return false;
   return UNSAFE_USER_TEXT_PATTERNS.some((pattern) => pattern.test(text));
 }
 
-export function safeUserText(
+function safeUserText(
   value: string | null | undefined,
   fallback: UserFacingText,
   locale: YumoLocale
@@ -255,14 +255,14 @@ export function safeUserText(
   return text;
 }
 
-export function getDaypart(date = new Date()): Daypart {
+function getDaypart(date = new Date()): Daypart {
   const hour = date.getHours();
   if (hour < 11) return "morning";
   if (hour < 17) return "noon";
   return "evening";
 }
 
-export function buildYoutubeSearchUrl(query: string): string {
+function buildYoutubeSearchUrl(query: string): string {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
 
@@ -273,7 +273,7 @@ function cleanProductNameForHero(product: YumbieProductCandidate): string | null
   return product.name;
 }
 
-export function buildYumbieMoment(input: {
+function buildYumbieMoment(input: {
   daypart: Daypart;
   firstName: string;
   product?: YumbieProductCandidate;

@@ -22,7 +22,7 @@ const ROUTE_SCENE: Array<[RegExp, SceneId]> = [
   [/^\/app\/mine/, "wallet"],
   [/^\/app\/rewards/, "wallet"],
   [/^\/app\/patterns/, "patterns"],
-  [/^\/app\/(insights|personal-insights|insights-preview)/, "patterns"],
+  [/^\/app\/insights/, "patterns"],
   [/^\/app\/bills/, "bills"],
   [/^\/app\/upload/, "scan"],
 ];

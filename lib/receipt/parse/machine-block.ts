@@ -22,6 +22,15 @@ export interface MachineBlockData {
   rejection_reason: string | null;
   merchant_legal_name: string | null;
   merchant_display_name: string | null;
+  /**
+   * Chain/brand the model RECOGNISES the receipt as belonging to, in its official
+   * spelling — independent of how cleanly the name printed. Null when the model does
+   * not recognise a known brand, so a local shop is never given an invented identity.
+   * merchant_display_name stays the verbatim transcription and remains the evidence.
+   */
+  merchant_brand: string | null;
+  /** Model's own 0-1 confidence in merchant_brand. Null when no brand was given. */
+  merchant_brand_confidence: number | null;
   merchant_category: string | null;
   merchant_address: string | null;
   branch_info: string | null;
@@ -95,6 +104,8 @@ const KNOWN_DATA_KEYS: ReadonlySet<keyof MachineBlockData> = new Set([
   "rejection_reason",
   "merchant_legal_name",
   "merchant_display_name",
+  "merchant_brand",
+  "merchant_brand_confidence",
   "merchant_category",
   "merchant_address",
   "branch_info",
@@ -136,6 +147,7 @@ const KNOWN_DATA_KEYS: ReadonlySet<keyof MachineBlockData> = new Set([
 
 const NUMERIC_KEYS: ReadonlySet<keyof MachineBlockData> = new Set([
   "document_confidence",
+  "merchant_brand_confidence",
   "items_count",
   "total_vat",
   "total_paid",
@@ -299,6 +311,8 @@ function makeEmptyData(): MachineBlockData {
     document_confidence: null,
     rejection_reason: null,
     merchant_legal_name: null,
+    merchant_brand: null,
+    merchant_brand_confidence: null,
     merchant_display_name: null,
     merchant_category: null,
     merchant_address: null,

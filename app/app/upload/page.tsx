@@ -14,6 +14,7 @@ import { AppShell } from "@/components/app/app-shell";
 import { useYumbieStore } from "@/components/yumbie/useYumbieStore";
 import { BreakdownCard } from "../components/breakdown-card";
 import { RewardCard } from "../components/reward-card";
+import type { RewardBreakdown } from "@/lib/receipt/reward-breakdown";
 import { ItemizedReceiptUploadDialog } from "../components/itemized-receipt-upload-dialog";
 import { FieldCorrectionModal } from "@/components/app/field-correction-modal";
 import { Pencil } from "lucide-react";
@@ -68,7 +69,7 @@ async function markLocalReceiptRejected(receiptId: string): Promise<void> {
 
 export default function UploadPage() {
   const isDesktop = useIsDesktop();
-  const { t } = useAppLocale();
+  const { t, locale } = useAppLocale();
   const { publicKey } = useWallet();
   const { profile, announceLevelUp } = useAppProfile();
   const queryClient = useQueryClient();
@@ -79,8 +80,10 @@ export default function UploadPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [receiptId, setReceiptId] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<ReceiptAnalysis | null>(null);
-  // Per-receipt cPoints for the reward card. null = still computing in background.
-  const [receiptCPoints, setReceiptCPoints] = useState<number | null>(null);
+  // Per-receipt points (bINT) + XP for the reward card. null = still computing.
+  const [receiptBint, setReceiptBint] = useState<number | null>(null);
+  const [receiptXp, setReceiptXp] = useState<number | null>(null);
+  const [receiptBreakdown, setReceiptBreakdown] = useState<RewardBreakdown | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [miningStep, setMiningStep] = useState<
     "uploading" | "ocr" | "extraction" | "merchant" | "calculation" | "verification" | "complete"
@@ -106,16 +109,20 @@ export default function UploadPage() {
     setIsAdmin(!!profile?.isAdmin);
   }, [profile?.isAdmin]);
 
-  // Poll for this receipt's cPoints. Post-process computes contribution points
-  // in the background after analyze responds, so the reward card shows a
-  // calculating state until the real per-receipt value lands.
+  // Poll for this receipt's points (bINT) and XP. Points land at upload
+  // (reward.final) but the poll refines them from the ledger; XP is granted by
+  // background trust-update, so the reward card shows a calculating state until
+  // the real per-receipt XP lands (or resolves to 0 when the daily XP limit is hit).
   useEffect(() => {
     const id = analysis?.receiptId;
     if (!id) {
-      setReceiptCPoints(null);
+      setReceiptBint(null);
+      setReceiptXp(null);
+      setReceiptBreakdown(null);
       return;
     }
-    setReceiptCPoints(null);
+    setReceiptBint(null);
+    setReceiptXp(null);
     let cancelled = false;
     let attempts = 0;
     const poll = async () => {
@@ -124,16 +131,45 @@ export default function UploadPage() {
       try {
         const res = await fetch(`/api/receipts/${encodeURIComponent(id)}/status`, { cache: "no-store" });
         if (res.ok) {
-          const data = (await res.json()) as { contributionPoints?: number | null };
-          if (!cancelled && data.contributionPoints != null) {
-            setReceiptCPoints(Number(data.contributionPoints) || 0);
-            return;
+          const data = (await res.json()) as {
+            bint?: number | null;
+            xp?: number | null;
+            rewardBreakdown?: RewardBreakdown | null;
+            hiddenCost?: number | null;
+            finished?: boolean;
+          };
+          if (!cancelled && data.bint != null) setReceiptBint(Number(data.bint) || 0);
+          if (!cancelled && data.rewardBreakdown != null) setReceiptBreakdown(data.rewardBreakdown);
+          // Hidden cost may be revised once post-process re-prices the lines with
+          // resolved categories. Adopt the server's figure so the screen stops
+          // showing the coarser upload-time estimate. Points are untouched by
+          // that correction, so nothing else on the card has to move.
+          if (!cancelled && data.hiddenCost != null) {
+            const next = Number(data.hiddenCost);
+            if (Number.isFinite(next)) {
+              setAnalysis((prev) => {
+                if (!prev?.hiddenCost) return prev;
+                if (Math.abs((prev.hiddenCost.hiddenCostCore ?? 0) - next) < 0.01) return prev;
+                return { ...prev, hiddenCost: { ...prev.hiddenCost, hiddenCostCore: next } };
+              });
+            }
+          }
+          if (!cancelled && data.xp != null) {
+            setReceiptXp(Number(data.xp) || 0);
+            // XP and the hidden-cost correction are written by two independent
+            // background steps, so XP landing first is not proof the receipt is
+            // done. Stop only once the pipeline reports a terminal status,
+            // otherwise a correction arriving after XP would never be picked up.
+            if (data.finished) return;
           }
         }
       } catch {
         /* transient — retry below */
       }
-      if (!cancelled && attempts < 12) {
+      // 24 × 1.5s ≈ 36s: post-process (the authoritative ledger writer) can lag
+      // the upload response; a poll window that ends before it lands leaves the
+      // pre-cap upload estimate on screen, diverging from receipt history.
+      if (!cancelled && attempts < 24) {
         window.setTimeout(poll, 1500);
       }
     };
@@ -632,7 +668,7 @@ export default function UploadPage() {
       setShowThankYouModal(true);
     } catch (error: any) {
       console.error("[upload] Save failed:", error);
-      const msg = error?.message || translateApiError(error?.message, t) || t("errors.upload.unknown");
+      const msg = translateApiError(error?.message, t, true) || t("errors.upload.unknown");
       alert(`${t("errors.upload.saveFailed")}: ${msg}`);
     } finally {
       setIsSaving(false);
@@ -849,7 +885,7 @@ export default function UploadPage() {
                 <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--app-text-primary)" }}>
                   Styled Receipt
                 </h3>
-                <StyledReceipt analysis={analysis} locale="tr" className="flex-1" />
+                <StyledReceipt analysis={analysis} locale={locale} className="flex-1" />
               </ThemeCard>
               <div className="flex flex-col gap-4">
                 <ThemeCard accountLevel={accountLevel} className="p-4">
@@ -858,7 +894,9 @@ export default function UploadPage() {
                   </h3>
                   <RewardCard
                     reward={analysis.reward}
-                    cPoints={receiptCPoints}
+                    bint={receiptBint}
+                    xp={receiptXp}
+                    breakdown={receiptBreakdown ?? analysis.reward?.breakdown ?? null}
                     receiptDate={analysis.extraction?.date?.value}
                     qualityHonor={analysis.qualityHonor}
                     onRequestItemizedUpload={

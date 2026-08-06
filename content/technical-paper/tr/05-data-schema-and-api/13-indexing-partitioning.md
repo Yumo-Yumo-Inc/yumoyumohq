@@ -1,18 +1,18 @@
-# İndeksleme ve bölümleme
+# İndeksleme ve ölçekleme
 
-## 5.12 İndeksleme ve bölümleme
+## 5.12 İndeksleme ve ölçekleme
 
-`receipts` ve `receipt_line_items` `uploaded_at` alanına göre aylık bölümlendirilir. Aktif ürün penceresi sıcak veri katmanında tutulur; eski bölümler daha düşük maliyetli analitik katmana taşınır. Etkin indeks sınıfları:
+Kayıt sistemi, geleneksel B-tree indeksli **tek bir yönetilen Postgres örneğidir (Neon)**; geliştirme ve üretim ayrı dallardan (branch) sunulur. Temsili indeks sınıfları:
 
 | Tablo | İndeks | Kullanım |
 |---|---|---|
-| `receipts` | `(user_id, uploaded_at DESC)` | Kullanıcının fişlerini listele |
-| `receipts` | `(merchant_id, uploaded_at DESC)` | Satıcı kuyruğu |
-| `receipt_line_items` | `(canonical_product_id, uploaded_at DESC)` | Fiyat gözlemleri |
-| `price_observations` | `(canonical_product_id, observed_at)` | Enflasyon nabzı |
-| `canonical_products` | `embedding_vector` (yaklaşık en yakın komşu) | Aşama 4 eşleşme |
-| `bint_ledger` | `(user_id, created_at DESC)` | Bakiye sorguları |
+| `receipts` | kullanıcı + yükleme zamanı | Kullanıcının fişlerini listeleme |
+| `receipts` | işletme + yükleme zamanı | İşletme geçmişi |
+| `receipt_line_items` | kanonik ürün | Fiyat geçmişi okumaları |
+| `price_epoch_observations` | epoch + yaprak indeksi | Epoch okumaları ve dahil edilme kanıtları |
+| `contribution_point_events` | kullanıcı + oluşturma zamanı | Bakiye sorguları |
+| `merchants` | vergi no + ülke (unique, kısmi) | İşletme kimliği çözümleme |
 
-Vektör indeksi yeniden inşası en yüksek maliyetli indekstir ve kanonik katalog büyümesinin sınırlayıcı faktörüdür — 02 2.7 bunu maliyet kaldıracı olarak listeler. Spesifik indeksleme motoru ve ayar parametreleri iç operasyon katmanında yönetilir.
+`receipts` ve `receipt_line_items` tablolarının zamana göre bölümlenmesi ve eski verinin daha düşük maliyetli analitik katmana taşınması, hacim gerektirdiğinde devreye alınacak **ölçekleme seçenekleridir**; mevcut hacim tek örnek ve geleneksel indekslemeyle karşılanır. Spesifik motor ayarları iç operasyon katmanında kalır.
 
 ---

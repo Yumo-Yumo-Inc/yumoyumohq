@@ -2,43 +2,42 @@
 
 ## 5.3 Registro de recibo (normativo)
 
-El JSON de ciclo de vida completo. Esto es lo que devuelven las lecturas de `/v1/receipts/{id}`.
+El registro de recibo tal como lo devuelve la API propia de la aplicación (lecturas autenticadas por sesión bajo `/api/receipts`). Los nombres de campo mostrados son representativos del registro almacenado.
 
 ```json
 // Receipt
 {
-  "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-  "user_id": "01HXY8K3F9A2QZ0M1B7N4PQR00",
-  "wallet_address": "5Hg2...8fpA",
+  "receipt_id": "6f2b8c1e-4a7d-4f2b-9c41-0e5d8a3b7f10",
+  "user": "yumo_user",
   "uploaded_at": "2026-05-17T14:23:11Z",
-  "captured_at": "2026-05-17T14:21:00Z",
+  "receipt_date": "2026-05-17",
   "currency": "TRY",
   "merchant": {
-    "merchant_id": "01HXY...",
-    "chain_id": "chain.migros",
-    "name_raw": "MIGROS T.A.S. ŞUBE 4521",
+    "merchant_id": "f3b1c2d4-...",
+    "display_name": "Migros",
     "city": "Istanbul",
-    "tax_id_hash": "sha256:7f3a..."
+    "tax_id": "6200278131"
   },
   "totals": {
-    "subtotal_minor": 23450,
-    "tax_total_minor": 4221,
-    "grand_total_minor": 27671,
+    "subtotal": "234.50",
+    "tax_total": "42.21",
+    "grand_total": "276.71",
     "currency": "TRY"
   },
   "tax_lines": [
-    { "rate_pct": 18.0, "base_minor": 20000, "amount_minor": 3600 },
-    { "rate_pct": 8.0,  "base_minor": 7750,  "amount_minor": 620  }
+    { "rate_pct": 18.0, "base": "200.00", "amount": "36.00" },
+    { "rate_pct": 8.0,  "base": "77.50",  "amount": "6.20"  }
   ],
   "payment_method": "credit_card",
+  "document_type": "receipt",
+  "is_payment_proof": true,
   "line_items": [
     {
-      "line_item_id": "01HXY...01",
       "raw_text": "SUT 1L PINAR",
-      "canonical_product_id": "cp.pinar.milk.1l",
+      "canonical_product_id": "3f6a...-...",
       "qty": 2.0,
-      "unit_price_minor": 2350,
-      "line_total_minor": 4700,
+      "unit_price": "23.50",
+      "line_total": "47.00",
       "tax_rate_pct": 8.0,
       "match_confidence": "0.XX"
     }
@@ -57,13 +56,12 @@ El JSON de ciclo de vida completo. Esto es lo que devuelven las lecturas de `/v1
     "signals_present": ["total_reconciliation", "merchant_consistency"]
   },
   "rewards": {
-    "bint_minor_credited": 12500,
-    "bint_settled_at": null,
-    "epoints_minor_recorded": 845,
-    "statistics_only": false
+    "bint_credited": "125.00",
+    "reward_epoch": null
   },
   "status": "verified",
-  "schema_version": "1.0.0"
+  "proof_status": null,
+  "linked_receipt_id": null
 }
 ```
 
@@ -73,24 +71,27 @@ Los valores de confianza y la puntuación de confianza se muestran como marcador
 
 | Convención | Regla |
 |---|---|
-| IDs | ULID (Crockford base-32, 26 caracteres). Ordenados por tiempo, ordenables. |
-| Cantidades de moneda | Unidades menores (kuruş para TRY, centavos para USD). Evita la deriva de float. |
+| IDs | Claves primarias UUID para recibos y comerciantes; ids enteros seriales en las tablas de eventos y libro mayor. |
+| Cantidades de moneda | Valores decimales, serializados como cadenas decimales canónicas (2 decimales para dinero). |
 | Marcas de tiempo | ISO 8601 con sufijo `Z`. Siempre UTC. |
-| Hashes | Prefijo `sha256:` seguido de hex en minúsculas. |
+| Hashes | Hex en minúsculas, algoritmo nombrado por el contexto del campo. |
 | Anulable | Los campos ausentes usan `null` explícito. |
-| Enum de estado | `pending`, `verified`, `rejected`, `statistics_only`, `under_review`. |
+| Enum de estado | `verified`, `saved`, `analyzed`. |
 
-### Transiciones de estado
+### Manejo de estado y de prueba de pago
+
+Valores de estado en vivo:
 
 ```
-pending
-   │
-   ├──► verified  (pasa la puerta de confianza)
-   ├──► statistics_only  (p. ej., recibo de página de pedido con prueba de pago limitada)
-   ├──► under_review  (confianza límite, cola de apelaciones)
-   └──► rejected  (rechazo duro: señal antiabuso, manuscrito, imagen sintética)
+analyzed  — salida de la canalización producida, aún no persistida como registro conservado
+saved     — conservado por el usuario
+verified  — pasó las puertas de verificación; elegible para recompensas y la capa agregada
 ```
 
-Un recibo `verified` gana bINT. Un recibo `statistics_only` se cuenta en la memoria de precios y las estadísticas del hogar del usuario; el manejo agregado y de recompensas sigue las reglas 5.8.
+Los documentos con prueba de pago limitada (una página de pedido, por ejemplo) se manejan con un **par de campos separado**, no con un valor de estado: `proof_status` marca el registro como a la espera de prueba de pago, y `linked_receipt_id` apunta al documento de prueba de pago que lo resuelve una vez que el usuario sube uno. Tales registros se computan en las estadísticas propias del usuario pero no ganan recompensa y quedan fuera del agregado anonimizado.
+
+Un flujo de revisión manual para casos límite está planificado; no forma parte del conjunto de estados en vivo.
+
+Un recibo `verified` gana bINT. El manejo agregado de los registros no verificados sigue las reglas 5.8.
 
 ---

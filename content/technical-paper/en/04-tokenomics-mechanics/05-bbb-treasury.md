@@ -20,4 +20,4 @@ The signing tool, signer set, thresholds, emergency procedure, and operational t
 
 #### Authority transfer
 
-Program authorities are designed to move into more independent governance structures as the operational model matures. Each transfer is auditable as a public on-chain event; operational detail of the transfer procedure remains private.
+Any transfer of program authority is made through a separately published governance change that defines its scope and decision rules. Applied transfers are auditable from public on-chain events; operational detail of the transfer procedure remains private.

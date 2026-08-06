@@ -5,7 +5,7 @@
 
 import { SeededRNG } from "./dirichlet";
 
-export type Country = "TR" | "TH";
+type Country = "TR" | "TH";
 export type Channel = "OTA" | "direct";
 export type LodgingSubtype = "hotel" | "hostel" | "resort" | "apartment";
 
@@ -24,7 +24,7 @@ export interface HospitalityBreakdownInputs {
   chargedCurrency?: string; // Currency actually charged
 }
 
-export interface HospitalityBreakdownBucket {
+interface HospitalityBreakdownBucket {
   label: string;
   amount: number;
   percentOfPaidTotal: number;

@@ -38,7 +38,7 @@ export type { DuplicateCheckResult } from "./db";
 /**
  * Get all receipts for a user
  */
-export async function getAllReceipts(
+async function getAllReceipts(
   username: string, 
   limit: number = 100, 
   offset: number = 0,

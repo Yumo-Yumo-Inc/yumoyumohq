@@ -22,7 +22,7 @@ const ALLOWED_BUG_TYPES = [
   "total_wrong",
 ] as const;
 
-export function getAllowedBugTypes(): readonly string[] {
+function getAllowedBugTypes(): readonly string[] {
   return ALLOWED_BUG_TYPES;
 }
 

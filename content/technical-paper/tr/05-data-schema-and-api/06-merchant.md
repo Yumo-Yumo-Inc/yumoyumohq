@@ -5,12 +5,10 @@
 ```json
 // Merchant
 {
-  "merchant_id": "01HXY...",
-  "name_canonical": "Migros",
+  "merchant_id": "f3b1c2d4-...",
+  "display_name": "Migros",
   "name_aliases": ["MIGROS T.A.S.", "MIGROS A.S."],
-  "tax_id_hash": "sha256:7f3a...",
-  "chain_id": "chain.migros",
-  "branch_code": "4521",
+  "tax_id": "6200278131",
   "city": "Istanbul",
   "country": "TR",
   "merchant_class": "supermarket",
@@ -20,8 +18,10 @@
 }
 ```
 
-Ham vergi numarası yerine `tax_id_hash` — Yumo Yumo satıcı vergi numaralarını hash'li arama anahtarıyla yönetir; bu yapı veritabanı tehlikeye girerse hasar yarıçapını sınırlar.
+`tax_id`, satıcının resmî vergi tanımlayıcısıdır (Türkiye'de 10 haneli *Vergi Kimlik Numarası*). **Doğrulanmış alan** olarak saklanır: çıkarılan bir değer kabul edilmeden önce kontrol hanesi doğrulamasından geçer; böylece OCR yanlış okuması veya halüsinasyon ürünü bir numara yazılmak yerine atılır. `country` ile birlikte doğrulanmış bir vergi tanımlayıcısı, satıcıya isim varyantları arasında sabit bir kimlik verir — "MIGROS T.A.S." ve "MIGROS A.S." olarak basılan aynı zincir tek kayda çözülür.
 
-`branch_code` fırsatçı çıkarılır; tüm zincirler kullanmaz.
+Satıcı eşleştirmesi üç sinyali katmanlar: **tanınan marka** (zincirin resmî yazımı, çıkarım sırasında çözülür), **doğrulanmış vergi tanımlayıcısı** ve normalize edilmiş isim eşleştirmesi. Marka varsa öncelik alır; isim gürültülü olduğunda vergi tanımlayıcısı kimliği teyit eder veya kurar.
+
+Açık satıcı kimliği **marka + şehir + ülkedir**. Açık fiyat defteri dahil yayımlanan her yüzey, satıcıyı tam olarak bu ayrıntı düzeyinde taşır; mağaza ve adres düzeyi detay operasyon katmanında kalır ve hiçbir zaman yayımlanmaz.
 
 ---

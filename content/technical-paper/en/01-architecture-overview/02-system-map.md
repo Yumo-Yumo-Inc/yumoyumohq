@@ -16,7 +16,7 @@ flowchart LR
 
     subgraph Data["Off-chain data"]
         E[("Receipt records")]
-        F[("bINT / ePoints ledger")]
+        F[("bINT ledger")]
         G["Anonymized aggregates"]
     end
 
@@ -30,9 +30,9 @@ flowchart LR
     D --> E
     D --> F
     E --> G
-    F -. "batched settlement" .-> H
+    F -. "epoch distribution root" .-> H
     F -. "commitment" .-> J
     H --> I
 ```
 
-The map shows the public architecture boundary: user-facing preview is synchronous; bINT and ePoints accounting is written to the ledger first and later settled to the on-chain layer by settlement workers. The diagram focuses on protocol components and data movement.
+The map shows the public architecture boundary: user-facing preview is synchronous, while bINT accounting remains off-chain. Settlement workers commit an INT distribution root derived from eligible bINT credits to the on-chain layer. The diagram focuses on protocol components and data movement.

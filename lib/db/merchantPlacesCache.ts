@@ -130,7 +130,7 @@ export async function setMerchantPlaceCache(
  * 
  * @returns Number of deleted entries
  */
-export async function clearExpiredCache(): Promise<number> {
+async function clearExpiredCache(): Promise<number> {
   try {
     const result = await db.query<{ count: number }>(
       `DELETE FROM merchant_places_cache 

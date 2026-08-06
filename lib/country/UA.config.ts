@@ -70,4 +70,3 @@ export const UA_CONFIG: CountryConfig = {
   ]
 };
 
-export default UA_CONFIG;

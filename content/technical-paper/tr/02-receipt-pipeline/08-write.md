@@ -2,18 +2,18 @@
 
 ## 2.9 Aşama 6 — Çıktı yazımı
 
-Tek bir Postgres işlemi şunları yazar:
+Yazım, eşzamanlı akış ile arka plandaki son-işlem işçisi arasında bölünmüştür.
 
-```
-INSERT INTO receipts (...) VALUES (...);
-INSERT INTO receipt_line_items (...) VALUES (...);
-INSERT INTO price_observations (...) VALUES (...);
-INSERT INTO events (event_type, payload) VALUES ('receipt.verified', {...});
-```
+**Eşzamanlı yazım.** Fiş doğrulamayı geçtiğinde, eşzamanlı akış `receipts` satırını ham görsel-çıkarım kaydıyla birlikte ekler. Doğrulanmış önizleme bu durumdan sunulur: önizleme göründüğü anda kullanıcının fişi veritabanında vardır.
 
-`events` satırı iki aşağı akış tüketicisini tetikler:
+**Eşzamansız yazım.** Ardından arka plandaki son-işlem işçisi kaydı tamamlar:
 
-- **Güven puanlayıcı** (03) — olayı alır, güven puanını hesaplar, `trust_scores`'a yazar.
-- **Mutabakat işçisi** — bir `bINT.pending` kredisini kuyruğa alır. Asıl zincir üstü mint, eşzamansız katmanda gerçekleşir (01 Faz B).
+- `receipt_line_items` — kalemler, kanonik ürün çözümlemesinden (2.7) sonra yazılır; böylece her satır kanonik referansını taşır.
+- `receipt_rewards` — kullanıcıya gösterilen puan dökümü dahil ödül muhasebe kaydı.
+- `receipt_quality` — güven katmanının (03) okuduğu kalite değerlendirmesi.
 
-İşlem dahili bir yazım anahtarı üzerinde idempotenttir: işçi tekrar denerse oynatma güvenli.
+**Fiyat gözlemleri.** Fiyat gözlemleri, doğrulanmış fişleri okuyan, gözlemleri epoch başına toplayan ve epoch kökünü eşzamansız katmanda zincire taahhüt eden ayrı bir günlük fiyat-epoch akışı tarafından üretilir (01 Faz B). Fiş satırlarından türetilirler; fiş işleme hattının kendisi tarafından yazılmazlar.
+
+Aşağı akış işleri — güven puanlama, ödül mutabakatı, fiyat defteri — fiş ve kalite satırlarını doğrudan okur. Yazımlar fiş tanımlayıcısı üzerinde idempotenttir: işçi tekrar denerse oynatma güvenli.
+
+---

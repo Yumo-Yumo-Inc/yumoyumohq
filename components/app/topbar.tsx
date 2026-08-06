@@ -7,69 +7,17 @@ import { useTier } from "@/lib/theme/theme-context";
 import { Bell, Settings, Volume2, VolumeX } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AvatarImage } from "@/components/app/avatar-image";
+import { AvatarFrame } from "@/components/app/avatar-frame";
+import { AvatarSticker } from "@/components/app/avatar-sticker";
+import { useAppProfile } from "@/lib/app/profile-context";
+import { useOwnNameColor } from "@/lib/app/use-name-color";
+import { FounderMark } from "@/components/app/season/founder-mark";
 import { ThemeToggle } from "@/components/app/theme-toggle";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import { cn } from "@/lib/utils";
 import type { AppNotification } from "@/lib/app/use-notifications";
 import { useSound } from "@/lib/audio/sound-context";
 import yumoYellowLogo from "@/assets/yumo-yellow-mark-transparent.png";
-
-/**
- * Health score rendered as a progress ring hugging the avatar — the score is a
- * metric about the user themselves, so wrapping it around their avatar reads as
- * "your own state" at a glance. Color steps by score band so the status is legible
- * without reading any card: >=50 green, 30-49 orange, 10-29 red, 0-9 no colored arc
- * (only the faint track shows). The whole arc lives in stroke-dashoffset; the track
- * stays a faint white hairline to sit on the dark dashboard surface.
- */
-function HealthRing({
-  score,
-  size = 52,
-  className,
-}: {
-  score: number;
-  size?: number;
-  className?: string;
-}) {
-  const clamped = Math.max(0, Math.min(100, score));
-  const r = (size - 4) / 2;
-  const c = 2 * Math.PI * r;
-  const stroke =
-    clamped >= 50
-      ? "#34d399"
-      : clamped >= 30
-        ? "#fb923c"
-        : clamped >= 10
-          ? "#e85d75"
-          : null;
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      className={className}
-      role="img"
-      aria-label={`Health score ${clamped}`}
-    >
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={3.5} />
-      {stroke && (
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={stroke}
-          strokeWidth={3.5}
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - clamped / 100)}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dashoffset 0.6s ease, stroke 0.6s ease" }}
-        />
-      )}
-    </svg>
-  );
-}
 
 interface TopbarProps {
   title?: string;
@@ -78,12 +26,9 @@ interface TopbarProps {
   onBack?: () => void;
   accountLevel?: number;
   streak?: number;
-  /** Health/honor score 0–100 — drives the avatar progress ring on the dashboard. */
-  healthScore?: number;
   initials?: string;
   avatarUrl?: string;
   displayName?: string;
-  cPoints?: number;
   xpProgress?: number;
   hasXpInCurrentLevel?: boolean;
   unreadCount?: number;
@@ -108,11 +53,9 @@ export function Topbar({
   onBack,
   accountLevel = 1,
   streak = 0,
-  healthScore = 50,
   initials = "?",
   avatarUrl,
   displayName,
-  cPoints = 0,
   xpProgress = 0,
   hasXpInCurrentLevel = false,
   unreadCount = 0,
@@ -130,6 +73,8 @@ export function Topbar({
   const { t, locale, setLocale } = useAppLocale();
   const tier = useTier(accountLevel);
   const acc = tier.accent;
+  const nameColor = useOwnNameColor();
+  const { profile: cosmeticProfile } = useAppProfile();
   const { prefs, toggleEnabled } = useSound();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   /** Radix Popover generates unstable aria-controls ids during SSR vs client — render after mount. */
@@ -158,12 +103,6 @@ export function Topbar({
     : homeVariant
       ? "rgba(255,255,255,0.06)"
       : "var(--app-header-border)";
-  const compactCPoints =
-    cPoints >= 1_000_000
-      ? `${(cPoints / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`
-      : cPoints >= 1_000
-        ? `${(cPoints / 1_000).toFixed(1).replace(/\.0$/, "")}K`
-        : String(Math.round(cPoints));
   const barWidth = Math.max(0, Math.min(100, xpProgress));
   const barFill = hasXpInCurrentLevel
     ? "bg-gradient-to-r from-[#e6b800] via-[#f5d030] to-[#fde86a]"
@@ -239,37 +178,35 @@ export function Topbar({
                     definite size the photo resolves against grid/flex min-content and blows up to
                     fill the row. Inline width/height always applies even when a freshly-added
                     arbitrary utility is missing from a stale/cached stylesheet, so the box stays
-                    37px and clips the photo to a circle. The health ring is a separate, larger
-                    absolute overlay. */}
-                <div
-                  className="relative grid place-items-center overflow-hidden rounded-full border border-white/12 bg-white/[0.07] text-white"
-                  style={{ width: 37, height: 37 }}
-                >
-                  {avatarUrl ? (
-                    <AvatarImage src={avatarUrl} className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-sm font-black text-white/88">{initials}</span>
-                  )}
-                </div>
-                <HealthRing
-                  score={healthScore}
-                  size={49}
-                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                />
+                    37px and clips the photo to a circle. */}
+                <AvatarFrame frameKey={cosmeticProfile?.profileFrame}>
+                  <div
+                    className="relative grid place-items-center overflow-hidden rounded-full border border-white/12 bg-white/[0.07] text-white"
+                    style={{ width: 37, height: 37 }}
+                  >
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-sm font-black text-white/88">{initials}</span>
+                    )}
+                  </div>
+                </AvatarFrame>
+                <AvatarSticker stickerKey={cosmeticProfile?.avatarSticker} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-2">
-                  <p className="min-w-0 truncate text-sm font-black tracking-[-0.02em] text-white [text-shadow:0_0_20px_rgba(251,191,36,0.18)]">
+                  <p
+                    className="min-w-0 truncate text-sm font-black tracking-[-0.02em] text-white [text-shadow:0_0_20px_rgba(251,191,36,0.18)]"
+                    style={nameColor ? { color: nameColor } : undefined}
+                  >
                     {identityName}
                   </p>
+                  <FounderMark />
                   <span
                     className="shrink-0 text-[10px] font-black tabular-nums leading-none tracking-[-0.03em] text-[#fcd34d] [text-shadow:0_0_12px_rgba(251,191,36,0.35)]"
                     aria-label={`Level ${accountLevel}`}
                   >
                     Lv.{accountLevel}
-                  </span>
-                  <span className="inline-flex shrink-0 items-center rounded-full border border-[#67e8f9]/22 bg-[#67e8f9]/12 px-1.5 py-[2px] text-[10px] font-black tabular-nums leading-none tracking-[-0.02em] text-[#7dd3fc]">
-                    {compactCPoints} cPoints
                   </span>
                 </div>
                 <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">

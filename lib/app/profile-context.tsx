@@ -17,11 +17,13 @@ import { PROFILE_QUERY_KEY } from "./query-keys";
 import { syncMobileData } from "@/lib/sync";
 import { LevelUpPopup, type LevelUpEvent } from "@/components/app/level-up-popup";
 import { UnlockRevealModal } from "@/components/app/journey/unlock-reveal-modal";
+import { SeasonCompleteGate } from "@/components/app/season/season-complete-gate";
 import { getUnlocksBetween, type AccountUnlock } from "@/config/account-unlocks";
+import { setThemeAccentKey } from "@/lib/theme/accent-store";
 import type { MobileLevelEvent } from "@/lib/mobile/action-result-types";
 import { fetchAccountCountryWithRetry } from "@/lib/auth/account-country";
 
-export interface AppProfile {
+interface AppProfile {
   username?: string;
   displayName?: string;
   avatarUrl?: string | null;
@@ -32,6 +34,17 @@ export interface AppProfile {
   country?: string | null;
   website?: string | null;
   bio?: string | null;
+  /** Name-color cosmetic palette key (account-level-4 unlock). null = no override. */
+  nameColor?: string | null;
+  /** Profile-frame cosmetic key (avatar-ring unlocks). null = no frame. */
+  profileFrame?: string | null;
+  /** Theme-accent cosmetic key (app accent override, L9+). null = brand accent. */
+  themeAccent?: string | null;
+  /** Profile-background cosmetic key (identity hero backdrop, L40). null = default. */
+  profileBg?: string | null;
+  /** Avatar-sticker cosmetic key (emoji on avatar corner, L14). null = none. */
+  avatarSticker?: string | null;
+  seal?: string | null;
   declaredMonthlyIncomeBand?: string | null;
   isAdmin?: boolean;
   honor: number;
@@ -39,6 +52,8 @@ export interface AppProfile {
   accountXp: number;
   seasonLevel: number;
   seasonXp: number;
+  /** bINT balance — the user-facing "points" total. */
+  pointsBalance: number;
   contributionPoints: {
     total: number;
     fromReceipts: number;
@@ -80,6 +95,12 @@ async function fetchProfileData(): Promise<AppProfile> {
     country: country ?? null,
     website: profile.website ?? null,
     bio: profile.bio ?? null,
+    nameColor: profile.nameColor ?? null,
+    profileFrame: profile.profileFrame ?? null,
+    themeAccent: profile.themeAccent ?? null,
+    profileBg: profile.profileBg ?? null,
+    avatarSticker: profile.avatarSticker ?? null,
+    seal: profile.seal ?? null,
     declaredMonthlyIncomeBand: profile.declaredMonthlyIncomeBand ?? null,
     isAdmin: profile.isAdmin === true,
     honor: Math.max(0, Math.min(100, Number(profile.honor ?? 50) || 0)),
@@ -87,6 +108,7 @@ async function fetchProfileData(): Promise<AppProfile> {
     accountXp: progress.accountXp ?? 0,
     seasonLevel: progress.seasonLevel ?? 1,
     seasonXp: progress.seasonXp ?? 0,
+    pointsBalance: Number(wallet.pointsBalance ?? 0) || 0,
     contributionPoints: {
       total: Number(wallet.contributionTotal ?? 0) || 0,
       fromReceipts: Number(wallet.contributionFromReceipts ?? 0) || 0,
@@ -157,6 +179,12 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
     enabled: !isPublicAuthPath,
   });
 
+  // Mirror the chosen theme accent into the external store so useTier (mounted
+  // above this provider) can override the app accent app-wide.
+  useEffect(() => {
+    setThemeAccentKey(profile?.themeAccent ?? null);
+  }, [profile?.themeAccent]);
+
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
     const params = new URLSearchParams(window.location.search);
@@ -165,7 +193,6 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
       setLevelUpEvent({
         id: Date.now(),
         account: { from: 6, to: 7 },
-        season: { from: 2, to: 3 },
       });
     }, 200);
   }, []);
@@ -184,16 +211,16 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
   // Removing the duplicate sync here cuts dashboard mount from 2 syncs → 1.
 
   const announceLevelUp = useCallback((event: MobileLevelEvent) => {
-    if (!event.account && !event.season) return;
-    const key = [
-      event.account ? `a:${event.account.from}-${event.account.to}` : "",
-      event.season ? `s:${event.season.from}-${event.season.to}` : "",
-    ].join("|");
+    // Season level-ups no longer interrupt with a center-screen popup — they
+    // flow into the season pass track ("Sezon Geçişi") instead. Only account
+    // level-ups, which are rare and permanent, keep the celebration popup.
+    if (!event.account) return;
+    const key = `a:${event.account.from}-${event.account.to}`;
     if (lastLevelEventKeyRef.current === key) return;
     lastLevelEventKeyRef.current = key;
     // The celebration (shockwave + glow + count-up + haptic) lives in LevelUpPopup
     // now — no confetti. Showing the event immediately IS the reward moment.
-    window.setTimeout(() => setLevelUpEvent(event), 0);
+    window.setTimeout(() => setLevelUpEvent({ id: event.id, account: event.account }), 0);
   }, []);
 
   useEffect(() => {
@@ -252,7 +279,11 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refresh = useCallback(async () => {
-    await syncMobileData().catch(() => {});
+    // force: bypass the 15s sync throttle — an explicit refresh (cosmetic equip,
+    // pull-to-refresh) must hit the server, or the cache stays stale and the UI
+    // shows the old value. fullProfile: pull the whole profile record, not a
+    // timestamp-delta that could omit it.
+    await syncMobileData({ force: true, fullProfile: true }).catch(() => {});
     await queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
   }, [queryClient]);
 
@@ -270,6 +301,9 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
           level={activeUnlockReveal.level}
           onDismiss={() => setActiveUnlockReveal(null)}
         />
+      ) : null}
+      {!isPublicAuthPath && !levelUpEvent && !activeUnlockReveal ? (
+        <SeasonCompleteGate />
       ) : null}
     </ProfileContext.Provider>
   );

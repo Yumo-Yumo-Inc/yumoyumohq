@@ -1,6 +1,6 @@
 import { sql } from "@/lib/db/client";
 
-export type ShoppingItemSource = "manual" | "suggestion" | "recent_purchase" | "favorite";
+type ShoppingItemSource = "manual" | "suggestion" | "recent_purchase" | "favorite";
 
 export type ShoppingListItem = {
   id: number;

@@ -21,4 +21,4 @@ Provider selection, routing order, thresholds, and rate-limit values are managed
 
 ## 8.13 Evolution
 
-As the pipeline matures, rule sets, canonical-product coverage, and quality-monitoring signals expand through versioned releases. As the localisation plan advances, pipeline configuration connects to the same governance discipline as treasury and authority migration.
+As the pipeline matures, rule sets, canonical-product coverage, and quality-monitoring signals expand through versioned releases. If authority transfer occurs in the future, decision rights for pipeline configuration are defined in the same transfer document.

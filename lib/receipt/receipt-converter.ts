@@ -139,11 +139,15 @@ export function convertReceiptAnalysisToReceipt(analysis: ReceiptAnalysis, image
 
   return {
     id: analysis.receiptId,
-    merchantName: analysis.merchant?.name || "Unknown Merchant",
+    // No fabricated fallbacks: when the backend returns nothing for a field we
+    // leave it empty so the UI shows an honest empty state (and the correction
+    // flow can prompt for it) instead of inventing a plausible-looking value —
+    // a hardcoded "TH"/"THB"/today would silently misstate the receipt.
+    merchantName: analysis.merchant?.name?.trim() || "",
     merchantPlaceId: analysis.merchant?.placeId,
-    country: analysis.merchant?.country || "TH",
-    currency: analysis.pricing?.currency || "THB",
-    date: analysis.extraction?.date?.value || new Date().toISOString().split("T")[0],
+    country: analysis.merchant?.country || "",
+    currency: analysis.pricing?.currency || "",
+    date: analysis.extraction?.date?.value || "",
     total: totalPaid,
     totalPaid, // Alias for compatibility
     vat: analysis.pricing?.vatAmount || 0,

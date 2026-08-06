@@ -115,3 +115,37 @@ export function isCategoryNameItem(name: string | null | undefined): boolean {
   // Single word and present in the category-name list.
   return CATEGORY_NAME_WORDS.has(f);
 }
+
+// Department/counter labels that small-market cash registers print instead of
+// a product name ("TEKEL 275", "PEYNİR 1000", "UNLU MAMUL 560"). Matched as
+// the whole folded name, so "peynirli borek" is untouched. Callers combine
+// this with a no-brand/no-pack-size guard: a bare department word without
+// product identity is a variable-amount bucket, not a comparable product.
+const DEPARTMENT_NAME_WORDS = new Set<string>([
+  "tekel", "sigara", "peynir", "zeytin", "boya",
+  "unlu mamul", "unlu mamuller",
+  "sarkuteri", "manav", "kasap", "baklava", "borek", "tatli", "pastane",
+  "kuruyemis", "meyve", "sebze", "et",
+  "et urunleri", "sut urunleri",
+  "temizlik", "kirtasiye", "zucaciye", "hirdavat",
+]);
+
+export function isDepartmentNameItem(name: string | null | undefined): boolean {
+  let f = fold(name);
+  if (!f) return false;
+  // Cash registers prefix department lines with a tax-group letter
+  // ("T GIDA", "A EKMEK") — drop a single-letter leading token before matching.
+  const tokens = f.split(" ");
+  if (tokens.length > 1 && tokens[0].length === 1) f = tokens.slice(1).join(" ");
+  return DEPARTMENT_NAME_WORDS.has(f) || CATEGORY_NAME_WORDS.has(f);
+}
+
+// Fuel fills ("K BENZIN95 SVP", "OTOGAZ") record an arbitrary refill amount,
+// not a unit-priced product; they never form a comparable price series.
+const FUEL_LINE = /\b(benzin\w*|motorin\w*|dizel|akaryakit\w*|otogaz|lpg)\b/;
+
+export function isFuelLineItem(name: string | null | undefined): boolean {
+  const f = fold(name);
+  if (!f) return false;
+  return FUEL_LINE.test(f);
+}

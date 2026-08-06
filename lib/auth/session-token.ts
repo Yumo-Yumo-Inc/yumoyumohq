@@ -125,7 +125,7 @@ export async function readRefreshToken(raw: string): Promise<VerifiedTokenPayloa
   return readAuthToken(raw, "refresh");
 }
 
-export async function verifySessionToken(raw: string): Promise<AppSessionPayload | null> {
+async function verifySessionToken(raw: string): Promise<AppSessionPayload | null> {
   const token = await readSessionToken(raw);
   return token
     ? {
@@ -135,7 +135,7 @@ export async function verifySessionToken(raw: string): Promise<AppSessionPayload
     : null;
 }
 
-export async function verifyRefreshToken(raw: string): Promise<AppSessionPayload | null> {
+async function verifyRefreshToken(raw: string): Promise<AppSessionPayload | null> {
   const token = await readRefreshToken(raw);
   return token
     ? {

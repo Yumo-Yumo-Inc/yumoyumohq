@@ -16,7 +16,7 @@ These frameworks can assign different compliance duties to the same technical me
 
 ## 8.3 Control model
 
-**Data minimisation.** Receipt content is held in the off-chain data layer (04 §4.16). The on-chain layer carries bINT mint events, INT settlements, and digest commitments. Integrity proof is produced while user spending history stays out of public chain data.
+**Data minimisation.** Receipt content is held in the off-chain data layer (04 §4.16). The on-chain layer carries INT claim transfers, epoch distribution roots, and digest commitments. Integrity proof is produced while user spending history stays out of public chain data.
 
 **Aggregate publication policy.** The B2B data product follows k-anonymity and aggregate publication rules (05 §5.8). Published data produces region / period / category level signals rather than individual receipt exposure.
 
@@ -26,4 +26,4 @@ These frameworks can assign different compliance duties to the same technical me
 
 ## 8.4 Evolution
 
-As progressive localisation advances, compliance responsibilities attach to the authority-migration plan (00 §0.2, 04 §4.10). Corporate structure, data custody, and token-service roles are designed to move across regional structures under the same architecture.
+If a future authority transfer is proposed, compliance responsibilities attach to the published authority-transfer plan (00 §0.2, 04 §4.10). Corporate structure, data custody, and token-service roles require separate regulatory assessment.

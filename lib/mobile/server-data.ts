@@ -1,5 +1,11 @@
 import { getAccountLevelFromXp } from "@/config/account-level-config";
 import { getSeasonLevelFromXp } from "@/config/season-level-config";
+import { normalizeNameColorKey } from "@/config/name-colors";
+import { normalizeProfileFrameKey } from "@/config/profile-frames";
+import { normalizeThemeAccentKey } from "@/config/theme-accents";
+import { normalizeProfileBgKey } from "@/config/profile-backgrounds";
+import { normalizeAvatarStickerKey } from "@/config/avatar-stickers";
+import { normalizeSealKey } from "@/config/proof-seals";
 import { getPrimaryAdmin, isAdminUser } from "@/lib/auth/admin-users";
 import { cacheRead } from "@/lib/cache/redis";
 import { sql, warmUpConnection } from "@/lib/db/client";
@@ -115,6 +121,12 @@ async function getProfileBundle(username: string, serverTime: string) {
       country: storedCountry ?? profile?.country ?? null,
       website: profile?.website ?? null,
       bio: profile?.bio ?? null,
+      nameColor: normalizeNameColorKey(profile?.nameColor ?? null),
+      profileFrame: normalizeProfileFrameKey(profile?.profileFrame ?? null),
+      themeAccent: normalizeThemeAccentKey(profile?.themeAccent ?? null),
+      profileBg: normalizeProfileBgKey(profile?.profileBg ?? null),
+      avatarSticker: normalizeAvatarStickerKey(profile?.avatarSticker ?? null),
+      seal: normalizeSealKey(profile?.seal ?? null),
       declaredMonthlyIncomeBand: null,
       honor: profile?.honor ?? 50,
       isAdmin: isAdminUser(username),
@@ -136,6 +148,7 @@ async function getProfileBundle(username: string, serverTime: string) {
     const fallbackWallet: CachedWalletRecord = {
       id: CURRENT_WALLET_ID,
       address: null,
+      pointsBalance: 0,
       contributionTotal: 0,
       contributionFromReceipts: 0,
       contributionFromQuests: 0,
@@ -155,7 +168,8 @@ async function getProfileBundle(username: string, serverTime: string) {
   const todayStr = getLocalDateStringForCountry(
     normalizeCountryCode(storedCountry) || normalizeCountryCode(profile?.country) || null
   );
-  const [profileRow, seasonRow, checkedInRow, walletRow, contributionRow] = await Promise.all([
+  const [profileRow, seasonRow, checkedInRow, walletRow, contributionRow] =
+    await Promise.all([
     sql`
       SELECT
         account_level,
@@ -172,8 +186,15 @@ async function getProfileBundle(username: string, serverTime: string) {
         country,
         website,
         bio,
+        name_color,
+        profile_frame,
+        theme_accent,
+        profile_bg,
+        avatar_sticker,
+        proof_seal,
         declared_monthly_income_band,
         honor,
+        bint_balance,
         updated_at
       FROM user_profiles
       WHERE username = ${username}
@@ -241,6 +262,12 @@ async function getProfileBundle(username: string, serverTime: string) {
     country: canonicalCountry,
     website: (profileRow?.website as string | null) ?? profile?.website ?? null,
     bio: (profileRow?.bio as string | null) ?? profile?.bio ?? null,
+    nameColor: normalizeNameColorKey((profileRow?.name_color as string | null) ?? profile?.nameColor ?? null),
+    profileFrame: normalizeProfileFrameKey((profileRow?.profile_frame as string | null) ?? profile?.profileFrame ?? null),
+    themeAccent: normalizeThemeAccentKey((profileRow?.theme_accent as string | null) ?? profile?.themeAccent ?? null),
+    profileBg: normalizeProfileBgKey((profileRow?.profile_bg as string | null) ?? profile?.profileBg ?? null),
+    avatarSticker: normalizeAvatarStickerKey((profileRow?.avatar_sticker as string | null) ?? profile?.avatarSticker ?? null),
+    seal: normalizeSealKey((profileRow?.proof_seal as string | null) ?? profile?.seal ?? null),
     declaredMonthlyIncomeBand: (profileRow?.declared_monthly_income_band as string | null) ?? null,
     honor: Number(profileRow?.honor ?? profile?.honor ?? 50) || 50,
     isAdmin: isAdminUser(username),
@@ -279,9 +306,17 @@ async function getProfileBundle(username: string, serverTime: string) {
     contribution_receipts?: number | string;
     last_contribution_at?: string | null;
   } | null;
+  // The balance is cPoints — the same figure the Wallet, the profile and the
+  // leaderboard show. It used to be quest bINT plus season receipt bINT, a
+  // separately-scaled ledger, so the header and the profile disagreed for the
+  // same account. bINT stays behind the scenes for audit and airdrop.
+  const pointsBalance = Math.round(
+    Number(contribution?.total_contribution_points ?? 0) || 0
+  );
   const walletRecord: CachedWalletRecord = {
     id: CURRENT_WALLET_ID,
     address: (walletRow?.wallet_address as string | null) ?? null,
+    pointsBalance,
     contributionTotal: Number(contribution?.total_contribution_points ?? 0) || 0,
     contributionFromReceipts: Number(contribution?.receipt_contribution_points ?? 0) || 0,
     contributionFromQuests: Number(contribution?.quest_contribution_points ?? 0) || 0,
@@ -1097,13 +1132,17 @@ async function fetchLeaderboardEntries(
         COALESCE(up.streak, 0)::int as streak,
         COALESCE(SUM(r.hidden_cost_core) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified'), 0) as hidden_cost_uncovered,
         COUNT(*) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified') as receipts_verified,
-        up.honor as honor
+        up.honor as honor,
+        up.name_color as name_color,
+        up.profile_frame as profile_frame,
+        COALESCE(up.account_xp, 0)::int as account_xp,
+        up.avatar_sticker as avatar_sticker
       FROM user_profiles up
       LEFT JOIN receipts r ON r.username = up.username
       WHERE up.username IS NOT NULL
         AND up.username != ${getPrimaryAdmin()}
         ${honorFilter}
-      GROUP BY up.username, up.display_name, up.avatar_url, up.season_xp, up.streak, up.honor
+      GROUP BY up.username, up.display_name, up.avatar_url, up.season_xp, up.streak, up.honor, up.name_color, up.profile_frame, up.account_xp, up.avatar_sticker
       HAVING COALESCE(up.season_xp, 0) > 0 OR COUNT(*) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified') > 0
       ORDER BY COALESCE(up.season_xp, 0) DESC, up.streak DESC, hidden_cost_uncovered DESC
       LIMIT 100
@@ -1117,7 +1156,11 @@ async function fetchLeaderboardEntries(
         COALESCE(SUM(r.hidden_cost_core) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified'), 0) as hidden_cost_uncovered,
         COALESCE(up.display_name, r.username) as display_name,
         up.avatar_url as avatar_url,
-        up.honor as honor
+        up.honor as honor,
+        up.name_color as name_color,
+        up.profile_frame as profile_frame,
+        COALESCE(up.account_xp, 0)::int as account_xp,
+        up.avatar_sticker as avatar_sticker
       FROM receipts r
       LEFT JOIN user_profiles up ON r.username = up.username
       WHERE r.username IS NOT NULL
@@ -1125,7 +1168,7 @@ async function fetchLeaderboardEntries(
         AND r.created_at >= ${cutoffDate.toISOString()}
         AND (r.status = 'analyzed' OR r.status = 'verified')
         ${honorFilter}
-      GROUP BY r.username, r.wallet_address, up.display_name, up.avatar_url, up.honor
+      GROUP BY r.username, r.wallet_address, up.display_name, up.avatar_url, up.honor, up.name_color, up.profile_frame, up.account_xp, up.avatar_sticker
       HAVING COUNT(*) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified') > 0
       ORDER BY hidden_cost_uncovered DESC, receipts_verified DESC
       LIMIT 100
@@ -1139,14 +1182,18 @@ async function fetchLeaderboardEntries(
         COALESCE(SUM(r.hidden_cost_core) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified'), 0) as hidden_cost_uncovered,
         COALESCE(up.display_name, r.username) as display_name,
         up.avatar_url as avatar_url,
-        up.honor as honor
+        up.honor as honor,
+        up.name_color as name_color,
+        up.profile_frame as profile_frame,
+        COALESCE(up.account_xp, 0)::int as account_xp,
+        up.avatar_sticker as avatar_sticker
       FROM receipts r
       LEFT JOIN user_profiles up ON r.username = up.username
       WHERE r.username IS NOT NULL
         AND r.username != ${getPrimaryAdmin()}
         AND (r.status = 'analyzed' OR r.status = 'verified')
         ${honorFilter}
-      GROUP BY r.username, r.wallet_address, up.display_name, up.avatar_url, up.honor
+      GROUP BY r.username, r.wallet_address, up.display_name, up.avatar_url, up.honor, up.name_color, up.profile_frame, up.account_xp, up.avatar_sticker
       HAVING COUNT(*) FILTER (WHERE r.status = 'analyzed' OR r.status = 'verified') > 0
       ORDER BY hidden_cost_uncovered DESC, receipts_verified DESC
       LIMIT 100
@@ -1210,6 +1257,10 @@ async function fetchLeaderboardEntries(
     address: String(row.address ?? ""),
     displayName: String(row.display_name ?? row.username ?? "Unknown"),
     avatarUrl: row.avatar_url != null ? String(row.avatar_url) : null,
+    nameColor: normalizeNameColorKey(row.name_color ?? null),
+    profileFrame: normalizeProfileFrameKey(row.profile_frame ?? null),
+    avatarSticker: normalizeAvatarStickerKey(row.avatar_sticker ?? null),
+    accountLevel: getAccountLevelFromXp(Number(row.account_xp ?? 0) || 0),
     receiptsVerified: Number(row.receipts_verified ?? 0) || 0,
     hiddenCostUncovered: Number(row.hidden_cost_uncovered ?? 0) || 0,
     streakDays:
@@ -1252,6 +1303,7 @@ async function fetchLeaderboardEntries(
       SELECT r.username, COALESCE(SUM(rr.bint_bonus_amount), 0)::float as val
       FROM receipts r
       LEFT JOIN receipt_rewards rr ON r.receipt_id = rr.receipt_id
+        AND NOT COALESCE(rr.is_backfill, false)
       WHERE r.username = ANY(${usernames}::text[])
         AND (r.status = 'analyzed' OR r.status = 'verified')
       GROUP BY r.username
@@ -1298,11 +1350,11 @@ async function fetchLeaderboardEntriesWithCache(
   );
 }
 
-// Leaderboards are disabled for now: no UI surface navigates to them, yet every
-// sync ran four full-table aggregate queries (season/global/weekly/daily) against
-// Neon — a large slice of per-sync compute. Flip to `true` to re-enable once a
-// leaderboard screen exists and the queries are cached.
-const LEADERBOARDS_ENABLED = false;
+// Leaderboards feed the /app/leaderboard screen. Re-enabled: the screen ships
+// in the bottom nav and the queries now run through the 45s read-through cache
+// (fetchLeaderboardEntriesWithCache), so a sync burst costs at most four
+// aggregate queries per TTL window instead of four per sync.
+const LEADERBOARDS_ENABLED = true;
 
 async function getLeaderboardRecords(
   username: string,

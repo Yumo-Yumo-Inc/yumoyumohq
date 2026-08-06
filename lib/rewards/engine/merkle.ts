@@ -34,7 +34,7 @@ export function hashLeaf(input: LeafInput): string {
 }
 
 /** keccak256 of two child hashes, sorted (commutative). */
-export function hashPair(a: string, b: string): string {
+function hashPair(a: string, b: string): string {
   const [lo, hi] = a <= b ? [a, b] : [b, a];
   const buf = new Uint8Array(64);
   buf.set(hexToBytes(lo), 0);

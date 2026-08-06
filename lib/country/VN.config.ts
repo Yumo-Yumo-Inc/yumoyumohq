@@ -101,4 +101,3 @@ export const VN_CONFIG: CountryConfig = {
   ]
 };
 
-export default VN_CONFIG;

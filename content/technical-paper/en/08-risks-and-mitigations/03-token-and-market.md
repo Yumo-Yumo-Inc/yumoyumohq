@@ -14,7 +14,7 @@ INT is an SPL token traded on public markets. Market risk is read through three 
 
 **Peak-based emission curve.** The daily user-reward pool follows the peak-based formula defined in 04 §4.3. MAU growth changes per-user contribution density through that formula.
 
-**Revenue-linked burn.** B2B data-product revenue creates the economic source for INT buy-back and burn through the BBB rail (4.9). Burn capacity scales with data-product revenue.
+**Treasury-funded burn.** Any buy-back-and-burn execution through the BBB rail (4.9) is subject to the published treasury policy, the applicable approvals, and legal review. It is not a commitment to buy back or burn INT.
 
 **Vesting and staking.** PoC distributions follow multi-year vesting schedules (4.13). Staking pools and lock durations make long-horizon holding economically legible (4.6).
 

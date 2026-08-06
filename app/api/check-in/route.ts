@@ -34,7 +34,11 @@ export async function POST() {
       );
     }
 
-    const afterLevels = await getMobileLevelSnapshot(username);
+    // A repeated check-in changes nothing, so the second (expensive) level
+    // snapshot is only rebuilt when the check-in actually recorded something.
+    const afterLevels = checkIn.alreadyCheckedIn
+      ? beforeLevels
+      : await getMobileLevelSnapshot(username);
     const levelEvent = createMobileLevelEvent(beforeLevels, afterLevels);
 
     return NextResponse.json({

@@ -14,7 +14,7 @@
 import { getSoftCapC } from "@/config/tokenomics";
 
 export type RawClaim = { username: string; walletAddress: string; rawAmount: number };
-export type ScaledClaim = RawClaim & { intAmount: number };
+type ScaledClaim = RawClaim & { intAmount: number };
 
 export type ComputeResult = {
   claims: ScaledClaim[];

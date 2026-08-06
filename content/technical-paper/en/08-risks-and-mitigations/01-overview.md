@@ -9,7 +9,7 @@ Internal runbooks, alert logic, signer arrangement, provider ordering, threshold
 | Class | Protocol surface | Public control principle |
 |---|---|---|
 | Regulatory | Data processing, token classification, tax, and regional registration | Data minimisation, aggregate publication policy, jurisdiction-specific legal process |
-| Token and market | Emission, vesting, staking, BBB, and secondary-market liquidity | Formula-based supply flow, public vesting, revenue-linked burn |
+| Token and market | Emission, vesting, staking, BBB, and secondary-market liquidity | Formula-based supply flow, public vesting, treasury policy |
 | Smart contract | Program authorities, token mint/burn, staking, and treasury movement | Versioned deployment, independent review, authority separation |
 | Product and pipeline | Document reading, structured extraction, rules layer, and record write | Schema validation, provider-agnostic adapters, state visibility |
 | Privacy and data | Receipt content, user history, aggregate data product | Off-chain content, k-anonymity, task-scoped access |
@@ -21,9 +21,9 @@ Internal runbooks, alert logic, signer arrangement, provider ordering, threshold
 
 ## Cross-references
 
-- Operational model and progressive localisation → 00 §0.2.
+- Operating model and any future authority transfer → 00 §0.2.
 - Pipeline state model → 02 §2.9.
 - Trust layer signal set → 03 Trust Layer.
 - Treasury governance and authority migration → 04 §4.10.
 - Data-product privacy model → 05 §5.8.
-- Glossary entries: MiCA, k-anonymity, health score → 09 Glossary.
+- Glossary entries: MiCA, k-anonymity, trust standing → 09 Glossary.

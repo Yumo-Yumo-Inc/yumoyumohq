@@ -69,10 +69,14 @@ export const GENESIS_SEASON: SeasonConfig = {
   name: "Genesis",
   durationDays: 28,
   tiers: [
-    { index: 1, key: "spark", minSeasonXp: 800, cpointsReward: 1000, badgeKey: "genesis_tier_spark" },
-    { index: 2, key: "ember", minSeasonXp: 3000, cpointsReward: 2500, badgeKey: "genesis_tier_ember" },
-    { index: 3, key: "flame", minSeasonXp: 7000, cpointsReward: 5000, badgeKey: "genesis_tier_flame" },
-    { index: 4, key: "forge", minSeasonXp: 12000, cpointsReward: 12000, badgeKey: "genesis_tier_forge" },
+    // minSeasonXp aligned to the season-level thresholds at L5/L10/L16/L21 so the
+    // pass tier node and its reward credit unlock at the same moment (karar
+    // 2026-07-09). Reward amounts unchanged — only the threshold moved slightly
+    // earlier, never reducing a reward (odul-asla-kisilmaz).
+    { index: 1, key: "spark", minSeasonXp: 700, cpointsReward: 1000, badgeKey: "genesis_tier_spark" },
+    { index: 2, key: "ember", minSeasonXp: 2700, cpointsReward: 2500, badgeKey: "genesis_tier_ember" },
+    { index: 3, key: "flame", minSeasonXp: 6750, cpointsReward: 5000, badgeKey: "genesis_tier_flame" },
+    { index: 4, key: "forge", minSeasonXp: 11500, cpointsReward: 12000, badgeKey: "genesis_tier_forge" },
   ],
   participationBadgeKey: "genesis_participant",
   titles: [
@@ -87,6 +91,14 @@ export const GENESIS_SEASON: SeasonConfig = {
 const SEASONS: Record<number, SeasonConfig> = {
   [GENESIS_SEASON.seasonNumber]: GENESIS_SEASON,
 };
+
+/**
+ * Every season config, all seasons. Cosmetic resolvers aggregate over this so a
+ * cosmetic earned in a past season still resolves (and stays equippable) after
+ * the season number advances — season rewards are permanent (karar 2026-07-14).
+ * Adding a new season = add it here; the resolvers pick it up automatically.
+ */
+export const ALL_SEASONS: readonly SeasonConfig[] = Object.values(SEASONS);
 
 export function getSeasonConfig(seasonNumber: number): SeasonConfig | null {
   return SEASONS[seasonNumber] ?? null;

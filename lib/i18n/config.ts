@@ -7,7 +7,7 @@ export function isValidLocale(locale: string): locale is Locale {
 }
 
 // Country code to locale mapping
-export const countryToLocale: Record<string, Locale> = {
+const countryToLocale: Record<string, Locale> = {
   // Russia and CIS
   RU: 'ru',
   BY: 'ru', // Belarus

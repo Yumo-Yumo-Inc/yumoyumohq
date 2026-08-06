@@ -21,7 +21,7 @@ export const localeFlags: Record<Locale, string> = {
 };
 
 // Country code to locale mapping for IP-based detection
-export const countryToLocale: Record<string, Locale> = {
+const countryToLocale: Record<string, Locale> = {
   // Russia and CIS
   RU: 'ru',
   BY: 'ru', // Belarus

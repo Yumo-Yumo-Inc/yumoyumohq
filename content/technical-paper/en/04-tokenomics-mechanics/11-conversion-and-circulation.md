@@ -8,9 +8,9 @@ A flat ratio keeps the conversion value predictable and removes any timing advan
 
 Settlement is off-chain (4.4): the engine converts eligible bINT each epoch and the user claims the resulting INT from the audited distributor. When the epoch's total eligible reward exceeds the global emission ceiling, every participant is scaled down by the same pro-rata factor, so the reward rate softens evenly for all rather than cutting off the last contributors. Both the ceiling value and the scaling computation are calibrated in the operations layer and are not published.
 
-## 4.25 Hold window and settlement controls
+## 4.25 Settlement controls
 
-bINT enters a minimum holding period before it is eligible for settlement. The hold window gives the trust layer (03) time to detect and respond to anomalous patterns before any INT is distributed.
+bINT earned before an epoch window closes settles in that epoch; eligibility follows the epoch boundary rather than a separate holding period. The trust layer (03) acts before accrual — quality assessment and duplicate detection run as each receipt is processed, so anomalous contributions are handled before they reach the ledger.
 
 A cumulative ceiling bounds the total INT the contribution layer can ever distribute (the User Rewards rail, 4.17); the independent verifier (4.17) enforces this invariant each epoch. These parameters are managed in the operations layer and are calibrated to balance user experience with protocol safety.
 

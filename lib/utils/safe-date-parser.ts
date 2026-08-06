@@ -3,7 +3,7 @@
  * Handles DD/MM/YYYY format common in receipts
  */
 
-export interface DateParseResult {
+interface DateParseResult {
   value: string;  // YYYY-MM-DD format
   confidence: number;
   sourceLine?: number;
@@ -102,7 +102,7 @@ export function parseDateString(dateStr: string): string | null {
  * Extract date from OCR lines (for Turkish receipts)
  * Searches for TARIH/TARİH/DATE keywords
  */
-export function extractDateFromLines(
+function extractDateFromLines(
   lines: string[]
 ): DateParseResult {
   const dateKeywords = [
@@ -170,7 +170,7 @@ export function extractDateFromLines(
 /**
  * Validate date is within reasonable range
  */
-export function isValidReceiptDate(dateStr: string): boolean {
+function isValidReceiptDate(dateStr: string): boolean {
   const date = new Date(dateStr);
   const now = new Date();
   const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());

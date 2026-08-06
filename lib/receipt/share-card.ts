@@ -318,39 +318,50 @@ export async function generateReceiptShareCard(receipt: Receipt, locale: string)
     by += rowH;
   });
 
-  // ===== reward sticker (never top-right) — gold rotated badge =====
+  // ===== reward sticker (never top-right) — gold rotated badge, the earnings
+  // hero of the card: label + a big flame value so "you earned X" reads first =====
   const reward = receipt.reward;
   if (reward && reward.amount > 0) {
     const unit = reward.symbol || "cPoints";
-    const valueText = `+${shortMoney(reward.amount, "", "")} ${unit}`;
+    const valueText = `+${shortMoney(reward.amount, "", "")}`;
     const label = isTr ? "KAZANDIN" : "YOU EARNED";
-    ctx.font = COND(46, 800);
+    const padX = 38;
+    const padTop = 44;
+    const valueSize = 62;
+    ctx.font = COND(valueSize, 800);
     const vW = ctx.measureText(valueText).width;
-    ctx.font = SANS(22, 800);
+    ctx.font = COND(27, 800);
+    const uW = ctx.measureText(unit).width + 12;
+    ctx.font = SANS(25, 800);
     const lW = ctx.measureText(label).width;
-    const padX = 30;
-    const stickerW = Math.max(vW, lW) + padX * 2;
-    const stickerH = 116;
+    const stickerW = Math.max(vW + uW, lW) + padX * 2;
+    const stickerH = 146;
     const stickerX = M;
-    const stickerY = by + 14;
+    const stickerY = by + 6;
     ctx.save();
     ctx.translate(stickerX + stickerW / 2, stickerY + stickerH / 2);
     ctx.rotate((-2.5 * Math.PI) / 180);
     ctx.translate(-stickerW / 2, -stickerH / 2);
-    ctx.shadowColor = "rgba(201,168,76,0.4)";
-    ctx.shadowBlur = 30;
-    ctx.shadowOffsetY = 10;
-    roundRectPath(ctx, 0, 0, stickerW, stickerH, 22);
+    // glowing gold badge
+    ctx.shadowColor = "rgba(201,168,76,0.5)";
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 12;
+    roundRectPath(ctx, 0, 0, stickerW, stickerH, 26);
     ctx.fillStyle = goldGrad(0, stickerH);
     ctx.fill();
     ctx.shadowColor = "transparent";
+    // label
     ctx.fillStyle = C.ink900;
-    ctx.font = SANS(22, 800);
+    ctx.font = SANS(26, 800);
     setLS(2);
-    ctx.fillText(label, padX, 42);
+    ctx.fillText(label, padX, padTop);
     setLS(0);
-    ctx.font = COND(46, 800);
-    ctx.fillText(valueText, padX, 92);
+    // big value + unit on the baseline
+    ctx.font = COND(valueSize, 800);
+    const valueBaseline = padTop + 74;
+    ctx.fillText(valueText, padX, valueBaseline);
+    ctx.font = COND(27, 800);
+    ctx.fillText(unit, padX + vW + 12, valueBaseline);
     ctx.restore();
   }
 

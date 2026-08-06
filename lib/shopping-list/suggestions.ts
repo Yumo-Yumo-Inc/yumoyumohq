@@ -13,7 +13,7 @@ import { sql } from "@/lib/db/client";
  * version is kept via dedup.
  */
 
-export type SuggestionSource = "recent_purchase" | "fuzzy_match";
+type SuggestionSource = "recent_purchase" | "fuzzy_match";
 
 export type ShoppingSuggestion = {
   canonicalId: string;
@@ -57,7 +57,7 @@ type FuzzyRow = {
  * frontend already debounces the same request; the full recent set is
  * returned and the frontend merges it.
  */
-export async function fetchRecentPurchases(
+async function fetchRecentPurchases(
   username: string,
   q: string,
 ): Promise<ShoppingSuggestion[]> {
@@ -118,7 +118,7 @@ export async function fetchRecentPurchases(
  * Search via trgm similarity over the canonical_products taxonomy.
  * `display_name_tr` is the primary column; `display_name_en` and aliases are fallbacks.
  */
-export async function fetchFuzzyMatches(
+async function fetchFuzzyMatches(
   q: string,
   excludeCanonicalIds: string[],
 ): Promise<ShoppingSuggestion[]> {

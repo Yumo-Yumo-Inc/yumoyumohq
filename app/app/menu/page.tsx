@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/app/app-shell";
 import { AvatarImage } from "@/components/app/avatar-image";
+import { Surface } from "@/components/ui/surface";
 import { MOD, SIDEBAR_MODS } from "@/lib/theme/modules";
 import { useTier } from "@/lib/theme/theme-context";
 import { useAppProfile } from "@/lib/app/profile-context";
 import { useAppLocale } from "@/lib/i18n/app-context";
+import { useCountUp } from "@/lib/hooks/use-count-up";
 import { useIsDesktop } from "@/lib/hooks/use-is-desktop";
 import { ThemeToggle } from "@/components/app/theme-toggle";
 import { Coins, CheckSquare, ChevronRight } from "lucide-react";
@@ -60,9 +62,31 @@ export default function MenuPage() {
   const name = profile?.displayName || profile?.username || t("sidebar.defaultUser");
   const initials = name.slice(0, 2).toUpperCase();
   const avatarUrl = profile?.avatarUrl ?? null;
-  const contributionTotal = profile?.contributionPoints?.total ?? 0;
-  const contributionFromReceipts = profile?.contributionPoints?.fromReceipts ?? 0;
-  const contributionFromQuests = profile?.contributionPoints?.fromQuests ?? 0;
+  // Points shown here must match the Wallet page exactly (season bINT), so we
+  // read the same source — /api/wallet/summary — instead of the contribution
+  // ledger. Falls back to profile.pointsBalance if the request fails; no
+  // fabricated values.
+  const [walletPoints, setWalletPoints] = useState<{ total: number; fromReceipts: number; fromQuests: number } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/wallet/summary", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive && d?.points)
+          setWalletPoints({
+            total: Number(d.points.total) || 0,
+            fromReceipts: Number(d.points.fromReceipts) || 0,
+            fromQuests: Number(d.points.fromQuests) || 0,
+          });
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  const pointsTotal = walletPoints?.total ?? profile?.pointsBalance ?? 0;
+  const pointsFromReceipts = walletPoints?.fromReceipts ?? 0;
+  const pointsFromQuests = walletPoints?.fromQuests ?? 0;
+  const cuTotal = useCountUp(Number(pointsTotal));
+  const cuReceipts = useCountUp(Number(pointsFromReceipts));
   const localeNumber = new Intl.NumberFormat(
     locale === "ru" ? "ru-RU" : locale === "th" ? "th-TH" : locale === "es" ? "es-ES" : locale === "zh" ? "zh-CN" : locale === "tr" ? "tr-TR" : "en-US",
     { maximumFractionDigits: 0 },
@@ -103,37 +127,39 @@ export default function MenuPage() {
     <AppShell>
       <div className="min-h-full flex flex-col bg-[var(--app-bg-shell)] text-[var(--app-text-primary)]">
       {/* Profile summary — header lives in AppShell Topbar (back + Menu) */}
-      <div className="px-4 py-4 border-b" style={{ borderColor: "var(--app-border)" }}>
-        <div className="flex items-center gap-3">
-          <div
-            className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden text-sm font-semibold"
-            style={{
-              background: `linear-gradient(135deg,${bg1},${bg2})`,
-              border: `1px solid ${acc}50`,
-              color: acc,
-            }}
-          >
-            {avatarUrl ? (
-              <AvatarImage src={avatarUrl} className="h-full w-full object-cover" />
-            ) : (
-              initials
-            )}
+      <div className="px-4 py-4">
+        <Surface variant="value" accent="tier" glow radius="lg" className="p-4">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-semibold"
+              style={{
+                background: `linear-gradient(135deg,${bg1},${bg2})`,
+                border: `1px solid ${acc}50`,
+                color: acc,
+              }}
+            >
+              {avatarUrl ? (
+                <AvatarImage src={avatarUrl} className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[15px] font-semibold" style={{ color: "var(--app-text-primary)" }}>{name}</p>
+              <p className="text-[11px]" style={{ color: "var(--app-text-muted)" }}>{tier.name} · Lv{accountLevel}</p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-semibold truncate" style={{ color: "var(--app-text-primary)" }}>{name}</p>
-            <p className="text-[11px]" style={{ color: "var(--app-text-muted)" }}>{tier.name} · Lv{accountLevel}</p>
+          <div className="mt-3 flex gap-2">
+            <div className="flex-1 rounded-lg px-3 py-2" style={{ background: "var(--app-bg-base)" }}>
+              <span className="font-mono text-sm font-semibold tabular-nums" style={{ color: acc }}>{localeNumber.format(Math.round(cuTotal))}</span>
+              <span className="ml-1 text-xs" style={{ color: "var(--app-text-muted)" }}>{pointsLabel}</span>
+            </div>
+            <div className="flex-1 rounded-lg px-3 py-2" style={{ background: "var(--app-bg-base)" }}>
+              <span className="font-mono text-sm font-semibold tabular-nums" style={{ color: tier.accent2 }}>{localeNumber.format(Math.round(cuReceipts))}</span>
+              <span className="ml-1 text-xs" style={{ color: "var(--app-text-muted)" }}>{receiptPointsLabel}</span>
+            </div>
           </div>
-        </div>
-        <div className="flex gap-2 mt-3">
-          <div className="flex-1 rounded-lg py-2 px-3 border" style={{ background: "var(--app-bg-elevated)", borderColor: "var(--app-border)" }}>
-            <span className="font-mono text-sm font-medium tabular-nums" style={{ color: acc }}>{localeNumber.format(Number(contributionTotal))}</span>
-            <span className="ml-1 text-xs" style={{ color: "var(--app-text-muted)" }}>{pointsLabel}</span>
-          </div>
-          <div className="flex-1 rounded-lg py-2 px-3 border" style={{ background: "var(--app-bg-elevated)", borderColor: "var(--app-border)" }}>
-            <span className="font-mono text-sm font-medium tabular-nums" style={{ color: tier.accent2 }}>{localeNumber.format(Number(contributionFromReceipts))}</span>
-            <span className="ml-1 text-xs" style={{ color: "var(--app-text-muted)" }}>{receiptPointsLabel}</span>
-          </div>
-        </div>
+        </Surface>
         <div className="mt-3">
           <ThemeToggle showLabel />
         </div>
@@ -156,12 +182,12 @@ export default function MenuPage() {
               <Coins className="w-5 h-5" style={{ color: "#00ff88" }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-medium text-white/95">{t("nav.rewards")}</p>
-              <p className="text-[12px] text-white/45 mt-0.5">
-                {localeNumber.format(Number(contributionTotal))} {pointsLabel} · {localeNumber.format(Number(contributionFromQuests))} {questLabel}
+              <p className="text-[15px] font-medium text-app-text-primary">{t("nav.rewards")}</p>
+              <p className="text-[12px] text-app-text-muted mt-0.5">
+                {localeNumber.format(Number(pointsTotal))} {pointsLabel} · {localeNumber.format(Number(pointsFromQuests))} {questLabel}
               </p>
             </div>
-            <ChevronRight className="w-5 h-5 shrink-0 text-white/30" />
+            <ChevronRight className="w-5 h-5 shrink-0 text-app-text-muted" />
           </Link>
           <Link
             href="/app/tasks"
@@ -177,10 +203,10 @@ export default function MenuPage() {
               <CheckSquare className="w-5 h-5" style={{ color: "#ff6b00" }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-medium text-white/95">{t("nav.tasks")}</p>
-              <p className="text-[12px] text-white/45 mt-0.5">{dailyQuestsLabel}</p>
+              <p className="text-[15px] font-medium text-app-text-primary">{t("nav.tasks")}</p>
+              <p className="text-[12px] text-app-text-muted mt-0.5">{dailyQuestsLabel}</p>
             </div>
-            <ChevronRight className="w-5 h-5 shrink-0 text-white/30" />
+            <ChevronRight className="w-5 h-5 shrink-0 text-app-text-muted" />
           </Link>
 
           {/* All modules */}
@@ -204,13 +230,13 @@ export default function MenuPage() {
                   <ModuleIcon name={mod.icon} size={20} color={mod.neon} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15px] font-medium text-white/95">{t(`nav.sidebar.${m.key}`)}</p>
-                  <p className="text-[12px] text-white/45 mt-0.5">{t(`nav.sidebar.${m.key}Sub`)}</p>
+                  <p className="text-[15px] font-medium text-app-text-primary">{t(`nav.sidebar.${m.key}`)}</p>
+                  <p className="text-[12px] text-app-text-muted mt-0.5">{t(`nav.sidebar.${m.key}Sub`)}</p>
                 </div>
                 {m.comingSoon ? (
                   <span className="text-[10px] font-medium px-2 py-1 rounded" style={{ background: "var(--app-bg-elevated)", color: "var(--app-text-muted)" }}>{t("comingSoon.short")}</span>
                 ) : (
-                  <svg width={18} height={18} className="shrink-0 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <svg width={18} height={18} className="shrink-0 text-app-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 18l6-6-6-6" />
                   </svg>
                 )}

@@ -27,10 +27,61 @@ import OpenAI from "openai";
 import crypto from "crypto";
 import { cacheGet, cacheSet } from "@/lib/cache/redis";
 import { CacheKeys, CacheTTL, CacheMode } from "./cache-config";
+import { getGeminiKey } from "./gemini-text";
 
-const client = process.env.OPENAI_API_KEY ? new OpenAI() : null;
-const MODEL = process.env.EMBEDDING_MODEL ?? "text-embedding-3-small";
-const DIMENSIONS = 1536; // text-embedding-3-small native size
+// Provider: Gemini is the default — the OpenAI account ran out of quota in
+// production, silently killing every embedding call. OpenAI stays selectable
+// via EMBEDDING_PROVIDER=openai. IMPORTANT: the two providers produce vectors
+// in DIFFERENT spaces; switching provider requires re-embedding every stored
+// vector (scripts/canonization/embed-existing-merchants.ts --force etc.).
+const PROVIDER = process.env.EMBEDDING_PROVIDER ?? "gemini";
+const client =
+  PROVIDER === "openai" && process.env.OPENAI_API_KEY ? new OpenAI() : null;
+const MODEL =
+  process.env.EMBEDDING_MODEL ??
+  (PROVIDER === "gemini" ? "gemini-embedding-001" : "text-embedding-3-small");
+const DIMENSIONS = 1536; // matches vector(1536) columns; Gemini via outputDimensionality
+
+/** L2-normalize: Gemini vectors truncated below 3072 dims are not unit-length. */
+function l2Normalize(vector: number[]): number[] {
+  let sum = 0;
+  for (const v of vector) sum += v * v;
+  const norm = Math.sqrt(sum);
+  if (!Number.isFinite(norm) || norm === 0) return vector;
+  return vector.map((v) => v / norm);
+}
+
+async function embedViaGemini(inputs: string[]): Promise<Array<number[] | null>> {
+  const apiKey = getGeminiKey();
+  if (!apiKey) return inputs.map(() => null);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:batchEmbedContents?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      requests: inputs.map((text) => ({
+        model: `models/${MODEL}`,
+        content: { parts: [{ text }] },
+        outputDimensionality: DIMENSIONS,
+      })),
+    }),
+  });
+  const data = (await res.json()) as {
+    embeddings?: Array<{ values?: number[] }>;
+    error?: { message?: string };
+  };
+  if (!res.ok) {
+    throw new Error(data.error?.message ?? `Gemini embed HTTP ${res.status}`);
+  }
+  return inputs.map((_, i) => {
+    const values = data.embeddings?.[i]?.values;
+    return values && values.length === DIMENSIONS ? l2Normalize(values) : null;
+  });
+}
+
+function providerAvailable(): boolean {
+  return PROVIDER === "gemini" ? Boolean(getGeminiKey()) : Boolean(client);
+}
 
 // ─── L1: in-process LRU ──────────────────────────────────────────────────────
 
@@ -66,7 +117,7 @@ function lookupRedisKey(text: string): string {
 
 export interface EmbedResult {
   vector: number[];
-  source: "memory" | "redis" | "openai";
+  source: "memory" | "redis" | "openai" | "gemini";
 }
 
 /**
@@ -81,7 +132,7 @@ export async function embedText(text: string): Promise<number[] | null> {
 export async function embedTextWithSource(
   text: string
 ): Promise<EmbedResult | null> {
-  if (!client) return null;
+  if (!providerAvailable()) return null;
   const norm = normalizeForCache(text);
   if (!norm) return null;
 
@@ -99,14 +150,20 @@ export async function embedTextWithSource(
     }
   }
 
-  // L3: OpenAI
+  // L3: provider call
   try {
-    const response = await client.embeddings.create({
-      model: MODEL,
-      input: norm,
-    });
-    const vector = response.data[0]?.embedding;
-    if (!vector || vector.length !== DIMENSIONS) return null;
+    let vector: number[] | null = null;
+    if (PROVIDER === "gemini") {
+      vector = (await embedViaGemini([norm]))[0];
+    } else if (client) {
+      const response = await client.embeddings.create({
+        model: MODEL,
+        input: norm,
+      });
+      const raw = response.data[0]?.embedding;
+      vector = raw && raw.length === DIMENSIONS ? raw : null;
+    }
+    if (!vector) return null;
 
     memCache.set(norm, vector);
     memEvictIfFull();
@@ -116,9 +173,9 @@ export async function embedTextWithSource(
       void cacheSet(embeddingRedisKey(text), vector, CacheTTL.embedding);
     }
 
-    return { vector, source: "openai" };
+    return { vector, source: PROVIDER === "gemini" ? "gemini" : "openai" };
   } catch (error) {
-    console.error("[embedding] OpenAI error:", (error as Error).message);
+    console.error(`[embedding] ${PROVIDER} error:`, (error as Error).message);
     return null;
   }
 }
@@ -131,14 +188,14 @@ export async function embedBatch(
   texts: string[]
 ): Promise<Map<string, number[]>> {
   const out = new Map<string, number[]>();
-  if (!client || texts.length === 0) return out;
+  if (!providerAvailable() || texts.length === 0) return out;
 
   const uniqueNormalized = Array.from(
     new Set(texts.map(normalizeForCache).filter(Boolean))
   );
   if (uniqueNormalized.length === 0) return out;
 
-  const needsOpenAI: string[] = [];
+  const needsProvider: string[] = [];
 
   // L1 + L2 lookups
   for (const norm of uniqueNormalized) {
@@ -160,24 +217,35 @@ export async function embedBatch(
         continue;
       }
     }
-    needsOpenAI.push(norm);
+    needsProvider.push(norm);
   }
 
-  if (needsOpenAI.length === 0) return out;
+  if (needsProvider.length === 0) return out;
 
-  // L3: OpenAI batched (max 100 per call to be safe; OpenAI limit is 2048)
+  // L3: provider batched (100/call; Gemini batchEmbedContents caps at 100)
   const BATCH_SIZE = 100;
-  for (let i = 0; i < needsOpenAI.length; i += BATCH_SIZE) {
-    const slice = needsOpenAI.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < needsProvider.length; i += BATCH_SIZE) {
+    const slice = needsProvider.slice(i, i + BATCH_SIZE);
     try {
-      const response = await client.embeddings.create({
-        model: MODEL,
-        input: slice,
-      });
-      for (let j = 0; j < response.data.length; j++) {
+      let vectors: Array<number[] | null>;
+      if (PROVIDER === "gemini") {
+        vectors = await embedViaGemini(slice);
+      } else if (client) {
+        const response = await client.embeddings.create({
+          model: MODEL,
+          input: slice,
+        });
+        vectors = slice.map((_, j) => {
+          const raw = response.data[j]?.embedding;
+          return raw && raw.length === DIMENSIONS ? raw : null;
+        });
+      } else {
+        vectors = slice.map(() => null);
+      }
+      for (let j = 0; j < slice.length; j++) {
         const norm = slice[j];
-        const vector = response.data[j]?.embedding;
-        if (!vector || vector.length !== DIMENSIONS) continue;
+        const vector = vectors[j];
+        if (!vector) continue;
 
         memCache.set(norm, vector);
         out.set(norm, vector);
@@ -189,7 +257,7 @@ export async function embedBatch(
       memEvictIfFull();
     } catch (error) {
       console.error(
-        "[embedding] OpenAI batch error:",
+        `[embedding] ${PROVIDER} batch error:`,
         (error as Error).message
       );
       // Continue with next batch — partial success is better than none
@@ -256,7 +324,7 @@ export function pgvectorToArray(text: string | null | undefined): number[] | nul
 
 // ─── Diagnostics ─────────────────────────────────────────────────────────────
 
-export function embeddingMemCacheStats(): { size: number; limit: number } {
+function embeddingMemCacheStats(): { size: number; limit: number } {
   return { size: memCache.size, limit: MEM_LIMIT };
 }
 

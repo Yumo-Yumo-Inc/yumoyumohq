@@ -8,9 +8,9 @@ Un ratio plano mantiene el valor de conversión predecible y elimina cualquier v
 
 La liquidación es off-chain (4.4): el motor convierte el bINT elegible en cada época y el usuario reclama el INT resultante del distribuidor auditado. Cuando la recompensa elegible total de la época supera el techo de emisión global, cada participante se reduce por el mismo factor pro-rata, de modo que la tasa de recompensa se suaviza de forma pareja para todos en lugar de cortar a los últimos contribuyentes. Tanto el valor del techo como el cálculo del escalado se calibran en la capa operativa y no se publican.
 
-## 4.25 Ventana de retención y controles de liquidación
+## 4.25 Controles de liquidación
 
-bINT entra en un periodo de retención mínimo antes de ser elegible para la liquidación. La ventana de retención da a la capa de confianza (03) tiempo para detectar y responder a patrones anómalos antes de que se distribuya cualquier INT.
+El bINT ganado antes del cierre de una ventana de época se liquida en esa época; la elegibilidad sigue el límite de la época, no un periodo de retención separado. La capa de confianza (03) actúa antes de la acumulación: la evaluación de calidad y la detección de duplicados se ejecutan al procesarse cada recibo, de modo que las contribuciones anómalas se gestionan antes de llegar al libro mayor.
 
 Un techo acumulado limita el total de INT que la capa de contribución puede distribuir jamás (el rail de User Rewards, 4.17); el verificador independiente (4.17) aplica esta invariante en cada época. Estos parámetros se gestionan en la capa operativa y se calibran para equilibrar la experiencia de usuario con la seguridad del protocolo.
 

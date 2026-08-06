@@ -4,38 +4,32 @@
 
 ### Lado del cliente
 
-El cliente redimensiona la imagen y aplica compresión con pérdida: suficiente resolución para OCR manteniendo tamaños de carga pequeños en teléfonos típicos. Los objetivos exactos de resolución y calidad se gestionan en la capa operativa interna. Los metadatos EXIF se eliminan antes de la carga; el enriquecimiento geográfico comienza solo con la aceptación explícita del usuario.
-
-El hash perceptual para la desduplicación se realiza en el lado del servidor una vez que se recibe la imagen (2.3.3).
+El cliente envía la imagen capturada o el PDF directamente al endpoint de carga de la aplicación como un POST multipart. El preprocesamiento es responsabilidad del servidor: mantener al cliente ligero significa que cada superficie de captura se beneficia de la misma normalización sin distribuir código de procesamiento de imágenes a cada plataforma.
 
 ### Lado del servidor
 
-```json
-// UploadRequest
-{
-  "user_id": "uuid",
-  "content_type": "image/jpeg",
-  "size_bytes": 524288,
-  "captured_at": "2026-05-17T14:23:00Z"
-}
+La ruta de carga valida la solicitud antes de cualquier trabajo de almacenamiento:
 
-// UploadResponse
-{
-  "receipt_id": "uuid",
-  "upload_url": "https://...",
-  "expires_at": "2026-05-17T14:24:00Z"
-}
-```
+- **Límite de tamaño** — el tamaño de la carga se compara con un límite definido en producción.
+- **Inspección de magic bytes** — el servidor inspecciona los primeros bytes del buffer para confirmar que la carga es realmente una imagen rasterizada (`JPEG`, `PNG`, `WEBP`, `HEIC` y otros formatos compatibles) o un PDF, sin importar el `Content-Type` proporcionado por el cliente. Esto bloquea scripts o marcado camuflados bajo un tipo `image/*`.
 
-El servidor valida el tamaño de carga contra un límite definido en producción, incluye el tipo de contenido en la lista de permitidos (`image/jpeg`, `image/png`, `application/pdf`) y emite una URL prefirmada de corta duración. Tras el éxito del PUT, el cliente llama a `POST /receipts/{id}/process` para entrar en la Etapa 1.
+Las cargas aceptadas pasan luego por un preprocesamiento del lado del servidor con `sharp`:
 
-### Desduplicación
+- **Orientación** — rotación automática basada en EXIF para que el recibo esté derecho antes de la etapa de lectura.
+- **Compresión** — la imagen se recodifica a un perfil de tamaño y calidad ajustado para la etapa de visión.
+- **Almacenamiento** — la imagen procesada se escribe en el almacenamiento de objetos Vercel Blob, con una ruta de respaldo en la base de datos cuando el almacenamiento Blob no está disponible. Las imágenes almacenadas se programan para su eliminación según la política de retención.
 
-Se ejecuta una comprobación de similitud perceptual de múltiples señales antes de cualquier trabajo costoso. Se distinguen dos casos:
+La respuesta devuelve un `receipt_id` y la referencia de la imagen almacenada. El cliente llama entonces a `POST /api/receipt/analyze` para entrar en la Etapa 1.
 
-1. **Duplicado del mismo usuario** — las cargas repetidas del mismo recibo por el mismo usuario se resuelven en el registro existente. Esto evita las cargas dobles accidentales.
-2. **Colisión entre usuarios** — los recibos que parecen compartirse entre cuentas se marcan para revisión de confianza (la Etapa 6 los degrada). Esto forma parte de la defensa contra la agricultura de recompensas.
+### Deduplicación
 
-Un duplicado del mismo usuario es un **éxito suave** — el usuario ve su resultado anterior. Una señal entre usuarios aún continúa por el canal; el puntaje de confianza decide. Los umbrales y señales de similitud exactos se ajustan en producción y se gestionan en la capa operativa interna.
+Una verificación de hash exacto del archivo se ejecuta antes de iniciar cualquier trabajo costoso: el SHA-256 de los bytes cargados se compara con los recibos almacenados previamente. Una verificación de similitud perceptual se difiere deliberadamente hasta después de la extracción de contenido, donde puede contrastarse con un hash de contenido; ejecutar la comparación visual temprano gastaría ese trabajo en cargas que la verificación exacta ya resuelve.
+
+Ambos casos de duplicado rechazan la carga con un error de duplicado:
+
+1. **Duplicado del mismo usuario** — se informa al usuario que ya cargó este recibo. Esto previene cargas dobles accidentales e intentos de recompensa repetida.
+2. **Colisión entre usuarios** — se informa al usuario que el recibo fue cargado por otra cuenta. Esto forma parte de la defensa contra el farming.
+
+Las señales exactas de similitud se calibran en producción y se gestionan en la capa de operaciones internas.
 
 ---

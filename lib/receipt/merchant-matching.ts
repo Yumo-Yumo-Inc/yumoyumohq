@@ -24,10 +24,13 @@ import { isDatabaseAvailable } from "@/lib/receipt/db/connection";
 import {
   isValidMerchantCandidate,
   merchantIdentityKey,
+  merchantLegalCoreKey,
+  stripMerchantGreetingPrefix,
   normalizeMerchantForDbLookup,
 } from "@/lib/receipt/merchant-validation";
 import { normalizeMerchantDisplayName } from "@/lib/receipt/name-normalization";
 import { loadVknMerchantMap, getMerchantIdByVkn } from "@/lib/receipt/vkn-map";
+import { validateTurkishTaxId } from "@/lib/receipt/tax-id-validation";
 import { distance } from "fastest-levenshtein";
 
 const CONFIDENCE_THRESHOLD = 0.75;
@@ -43,10 +46,20 @@ const RAC_LLM_MIN_CONFIDENCE = 0.84;
 const TIER_MATCHABLE = ["candidate", "verified"] as const;
 let racFallbackLogged = false;
 
-export type MerchantTier = "verified" | "candidate" | "unverified";
+type MerchantTier = "verified" | "candidate" | "unverified";
 
 export interface MatchInput {
   merchantName: string;
+  /**
+   * Chain the extraction model RECOGNISED the receipt as belonging to, in its official
+   * spelling — null when it recognised nothing. When present with sufficient confidence
+   * this is the identity we key on, because `merchantName` is a verbatim transcription
+   * and carries every OCR defect ("LCW WATKIKI"), which is what splits one chain into
+   * many merchants.
+   */
+  merchantBrand?: string | null;
+  /** Extraction model's confidence in `merchantBrand` (0-1). */
+  merchantBrandConfidence?: number | null;
   taxId?: string | null;
   category?: string | null;
   city?: string | null;
@@ -63,7 +76,45 @@ export interface MatchResult {
   category: string;
   tier: MerchantTier;
   confidence: number;
-  layerUsed: "vkn" | "pattern" | "location" | "fuzzy" | "rac" | "auto_create";
+  layerUsed: "vkn" | "brand" | "pattern" | "location" | "fuzzy" | "rac" | "auto_create";
+  /** Pattern layer only: the normalized merchant_patterns text that matched. */
+  matchedPattern?: string;
+}
+
+/**
+ * True when `pattern` (a learned merchant_patterns text) matches `sourceName`
+ * as a WHOLE-TOKEN sequence — "bim" anchors "BIM BIRLESIK MAGAZALAR A.S."
+ * but never "BIMEKS TEKNOLOJI". Single-token patterns must be the source's
+ * FIRST token (chain names lead the receipt header) AND the first token of
+ * the owning merchant's own name — a learned sub-brand token ("jet" for
+ * Migros Jet) must not claim "JET PIZZA". Multi-token patterns may sit
+ * anywhere. Comparison is Turkish-folded so "birleşik" matches "birlesik".
+ */
+export function isPatternAnchoredMatch(
+  sourceName: string,
+  pattern: string,
+  ownerName?: string | null
+): boolean {
+  const fold = (s: string) =>
+    normalizeForPattern(s)
+      .replace(/ı/g, "i").replace(/ş/g, "s").replace(/ğ/g, "g")
+      .replace(/ü/g, "u").replace(/ö/g, "o").replace(/ç/g, "c");
+  const sourceTokens = fold(sourceName).split(" ").filter(Boolean);
+  const patternTokens = fold(pattern).split(" ").filter(Boolean);
+  if (sourceTokens.length === 0 || patternTokens.length === 0) return false;
+  if (patternTokens.length === 1) {
+    const tok = patternTokens[0];
+    if (tok.length < 3 || sourceTokens[0] !== tok) return false;
+    if (ownerName != null) {
+      const ownerFirst = fold(ownerName).split(" ").filter(Boolean)[0] ?? "";
+      return ownerFirst === tok;
+    }
+    return true;
+  }
+  for (let i = 0; i + patternTokens.length <= sourceTokens.length; i++) {
+    if (patternTokens.every((t, j) => sourceTokens[i + j] === t)) return true;
+  }
+  return false;
 }
 
 interface MerchantRow {
@@ -100,11 +151,43 @@ function normalizeForPattern(name: string): string {
  * verified/candidate row. Blank key (pure CJK/Thai script) falls back to the
  * light exact match so keyless merchants are never collapsed together.
  */
+/**
+ * Minimum confidence before a recognised brand is allowed to define merchant identity.
+ * Below it the printed name is used, so a hesitant guess never renames a merchant.
+ */
+const BRAND_IDENTITY_MIN_CONFIDENCE = 0.7;
+
+/** The recognised chain name when the model was confident enough, else null. */
+function confidentBrandName(
+  brand: string | null | undefined,
+  confidence: number | null | undefined
+): string | null {
+  const name = brand?.trim();
+  if (!name) return null;
+  if (typeof confidence !== "number" || confidence < BRAND_IDENTITY_MIN_CONFIDENCE) return null;
+  return isValidMerchantCandidate(name) ? name : null;
+}
+
 async function findMerchantByIdentity(
   displayName: string,
   normalized: string,
-  countryCode: string | null
+  countryCode: string | null,
+  vkn?: string | null
 ): Promise<string | null> {
+  // 0. VKN is the registered legal identity — it dedups spelling variants the
+  //    text keys cannot (OCR even dropping the leading Ş of "ŞOK").
+  if (vkn) {
+    try {
+      const byVkn = await db.query<{ id: string }>(
+        "SELECT id FROM merchants WHERE vkn = $1 ORDER BY (tier = 'verified') DESC, (tier = 'candidate') DESC LIMIT 1",
+        [vkn]
+      );
+      if (byVkn.rows[0]?.id) return byVkn.rows[0].id;
+    } catch {
+      /* vkn column missing (old schema) — fall through to text keys */
+    }
+  }
+
   const key = merchantIdentityKey(displayName);
   const res = key
     ? await db.query<{ id: string }>(
@@ -115,7 +198,40 @@ async function findMerchantByIdentity(
         "SELECT id FROM merchants WHERE LOWER(TRIM(canonical_name)) = $1 AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL)) LIMIT 1",
         [normalized, countryCode]
       );
-  return res.rows[0]?.id ?? null;
+  if (res.rows[0]?.id) return res.rows[0].id;
+
+  // 2. Legal-core key: same registered company written with a different
+  //    abbreviation of the descriptor chain ("PAZ. VE MAR. A.Ş." vs
+  //    "PAZ VE MARA"). A name with no descriptor at all ("ŞOK MARKETLER")
+  //    probes with its full key instead, so it still meets the group whose
+  //    members carry the chain. Candidates share the probe as prefix; accept
+  //    only rows whose own core key (or full key) equals the probe — never
+  //    prefix-only.
+  const coreKey = merchantLegalCoreKey(displayName);
+  const probe = coreKey || key;
+  if (probe) {
+    try {
+      const candidates = await db.query<{ id: string; name: string }>(
+        `SELECT id, COALESCE(canonical_name, display_name, '') AS name
+           FROM merchants
+          WHERE regexp_replace(lower(COALESCE(canonical_name, display_name, '')), '[^a-z0-9]', '', 'g') LIKE $1 || '%'
+            AND (country_code = $2 OR (country_code IS NULL AND $2 IS NULL))
+          ORDER BY (tier = 'verified') DESC, (tier = 'candidate') DESC
+          LIMIT 10`,
+        [probe, countryCode]
+      );
+      for (const row of candidates.rows) {
+        const rowCore = merchantLegalCoreKey(row.name);
+        const rowKey = merchantIdentityKey(row.name);
+        if (rowCore === probe || (coreKey !== "" && rowKey === coreKey)) {
+          return row.id;
+        }
+      }
+    } catch {
+      /* non-fatal — identity falls back to exact key only */
+    }
+  }
+  return null;
 }
 
 function similarity(a: string, b: string): number {
@@ -187,13 +303,29 @@ async function insertMerchantPatternRecord(input: {
   const normalized = normalizeEntity(input.pattern);
   const source = input.patternType === "ocr" ? "ocr" : "fuzzy";
 
+  // Embed at write time so the pattern participates in embedding recall
+  // immediately (no batch backfill dependency). Embeds the normalized text —
+  // the same space the backfill and query side use. Failure degrades to
+  // text-only strategies.
+  let embVector: string | null = null;
+  try {
+    const { embedText, vecToPgvector } = await import("@/lib/canonical/embedding");
+    const { embedTextForMerchant } = await import("@/lib/canonical/preprocess");
+    const vec = await embedText(
+      embedTextForMerchant(input.pattern, normalized.legalStripped)
+    );
+    if (vec) embVector = vecToPgvector(vec);
+  } catch {
+    /* text strategies still cover this pattern */
+  }
+
   try {
     await db.query(
       `INSERT INTO merchant_patterns (
          merchant_id, pattern, normalized_pattern, pattern_type, confidence_score,
-         token_set, legal_stripped, phonetic_key, language, source
+         token_set, legal_stripped, phonetic_key, language, source, embedding
        )
-       VALUES ($1, $2, $3, $4, $5, $6::text[], $7, $8, $9, $10)`,
+       VALUES ($1, $2, $3, $4, $5, $6::text[], $7, $8, $9, $10, $11::vector)`,
       [
         input.merchantId,
         input.pattern,
@@ -205,6 +337,7 @@ async function insertMerchantPatternRecord(input: {
         phoneticKey(input.pattern),
         normalized.language === "unknown" ? null : normalized.language,
         source,
+        embVector,
       ]
     );
   } catch (error) {
@@ -426,7 +559,10 @@ async function layer2CanonicalRetrieve(
     normalized.contentTokens.length > 0 ? normalized.contentTokens : normalized.tokens;
   const primaryPhoneticKey = phoneticKey(input.merchantName);
 
+  // Pure CJK/Thai names carry no ASCII signals; embedding recall still
+  // resolves them from the raw text, so only an empty input bails out.
   if (
+    !input.merchantName.trim() &&
     contentTokens.length === 0 &&
     !primaryPhoneticKey &&
     !normalized.legalStripped.trim()
@@ -463,31 +599,49 @@ async function layer2CanonicalRetrieve(
     const containment = tokenContainment(contentTokens, candidateTokens);
     const anchorMatch = hasAnchorToken(contentTokens, candidateTokens);
 
-    if (!anchorMatch) return null;
-
+    // Auto-match (no LLM) stays strictly gated: anchor token required.
     const autoMatch =
-      (best.candidate.source === "token" &&
+      anchorMatch &&
+      ((best.candidate.source === "token" &&
         best.candidate.score >= RAC_AUTO_MATCH_MIN &&
         containment >= 0.9) ||
-      (best.candidate.source === "trgm" &&
-        best.candidate.score >= 0.95 &&
-        containment >= 0.8) ||
-      (best.candidate.source === "phonetic" &&
-        best.candidate.score >= 0.95 &&
-        containment >= 0.9);
+        (best.candidate.source === "trgm" &&
+          best.candidate.score >= 0.95 &&
+          containment >= 0.8) ||
+        (best.candidate.source === "phonetic" &&
+          best.candidate.score >= 0.95 &&
+          containment >= 0.9));
 
     if (autoMatch) {
       return hydrateCandidateToMaster(best.candidate);
     }
 
-    if (best.candidate.score >= RAC_LLM_MIN_SCORE) {
-      return maybeResolveRacWithLlm({
+    // LLM reasoning gate. The anchor requirement is NOT applied here: the
+    // pairs that need reasoning ("7-11" vs "7-Eleven", cross-script names)
+    // are exactly the ones that share no anchor token. Cost is bounded by
+    // the decision cache and by requiring a retrieval hit at all.
+    const llmEligible =
+      best.candidate.score >= RAC_LLM_MIN_SCORE ||
+      best.candidate.source === "embedding";
+
+    if (llmEligible) {
+      const resolved = await maybeResolveRacWithLlm({
         raw: input.merchantName,
         language: normalized.language,
         countryCode: input.country?.trim().toUpperCase().slice(0, 2) || null,
         category: input.category ?? null,
         candidates: ranked.map((entry) => entry.candidate),
       });
+      if (resolved) {
+        // Learn the raw spelling: the next "7-11" receipt resolves in the
+        // deterministic pattern layer without any LLM call.
+        await addPatternIfMissing(
+          resolved.merchantId,
+          input.merchantName.trim(),
+          normalizeForPattern(input.merchantName)
+        ).catch(() => {});
+        return resolved;
+      }
     }
 
     return null;
@@ -506,10 +660,15 @@ async function layer2CanonicalRetrieve(
  * env map (VKN_MERCHANT_MAP_JSON / VKN_MERCHANT_MAP_PATH) for backward compat.
  */
 async function layer1Vkn(
-  taxId: string | null | undefined
+  taxId: string | null | undefined,
+  countryCode?: string | null
 ): Promise<MatchResult | null> {
   if (!taxId?.trim()) return null;
-  const normalized = taxId.trim().replace(/\D/g, "");
+  // Reject a tax id whose check digit does not hold: matching on it would resolve
+  // to a phantom merchant created from a misread number (LC Waikiki under the
+  // invalid 8370071617). An unverifiable id falls through to the text layers.
+  const check = validateTurkishTaxId(taxId, countryCode);
+  const normalized = check.value;
   if (!normalized) return null;
 
   // 1a. DB lookup (primary – merchants.vkn column added in migration 034)
@@ -572,6 +731,7 @@ async function layer2Pattern(
   // Exact match OR pattern is substring of receipt (longer pattern = more specific, prefer it)
   const patternQuery = `
     SELECT mp.merchant_id, mp.confidence_score,
+           LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) AS pattern_text,
            LENGTH(LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern)))) AS pattern_len
     FROM merchant_patterns mp
     JOIN merchants m ON m.id = mp.merchant_id AND m.tier = ANY($3)
@@ -583,6 +743,7 @@ async function layer2Pattern(
     LIMIT 10
   `;
   interface PatternRowWithLen extends PatternRow {
+    pattern_text: string;
     pattern_len: string;
   }
   const patternRows = await db.query<PatternRowWithLen>(patternQuery, [
@@ -592,14 +753,14 @@ async function layer2Pattern(
   ]);
   if (patternRows.rows.length === 0) return [];
   // One result per merchant: keep highest pattern_len per merchant_id
-  const byMerchant = new Map<string, { confidence: number; patternLen: number }>();
+  const byMerchant = new Map<string, { confidence: number; patternLen: number; patternText: string }>();
   for (const r of patternRows.rows) {
     const id = r.merchant_id;
     const len = parseInt(r.pattern_len, 10) || 0;
     const conf = Number(r.confidence_score) ?? 0.85;
     const existing = byMerchant.get(id);
     if (!existing || len > existing.patternLen) {
-      byMerchant.set(id, { confidence: conf, patternLen: len });
+      byMerchant.set(id, { confidence: conf, patternLen: len, patternText: r.pattern_text });
     }
   }
   const ids = [...byMerchant.keys()];
@@ -613,6 +774,9 @@ async function layer2Pattern(
   const lenBy = Object.fromEntries(
     [...byMerchant.entries()].map(([id, v]) => [id, v.patternLen])
   );
+  const patternBy = Object.fromEntries(
+    [...byMerchant.entries()].map(([id, v]) => [id, v.patternText])
+  );
   // Prefer longest pattern (most specific match, e.g. "zus coffee" over "zus")
   const sorted = [...merchants.rows].sort(
     (a, b) => (lenBy[b.id] ?? 0) - (lenBy[a.id] ?? 0)
@@ -625,6 +789,7 @@ async function layer2Pattern(
     tier: m.tier as MerchantTier,
     confidence: scoreBy[m.id] ?? 0.85,
     layerUsed: "pattern" as const,
+    matchedPattern: patternBy[m.id],
   }));
 }
 
@@ -712,23 +877,38 @@ async function autoCreateMerchant(
     }
   }
 
-  const displayName = normalizeMerchantDisplayName(name) ?? name;
+  const cleanedName = stripMerchantGreetingPrefix(name);
+  // A recognised chain becomes the identity: the printed name is a transcription and
+  // every OCR defect in it would otherwise mint a separate merchant. The printed form
+  // is still recorded as a pattern below, so the receipt's own evidence is not lost.
+  const brandName = confidentBrandName(input.merchantBrand, input.merchantBrandConfidence);
+  const identityName = brandName ?? cleanedName;
+  const displayName = normalizeMerchantDisplayName(identityName) ?? identityName;
   const normalized = normalizeForPattern(displayName);
   const countryCode = input.country?.trim().toUpperCase().slice(0, 2) || null;
   const category = input.category?.trim() || "other";
 
-    // TR VKN = 10 digits, TCKN = 11 digits. Anything else (e.g. ECR/cash-register
-    // serial mislabeled as tax_number) is not a real tax id and must not be written
-    // to the merchants.vkn VARCHAR(11) column (would overflow → Postgres 22001).
-    const taxIdDigits = input.taxId?.trim().replace(/\D/g, "") || null;
-    const taxIdStr =
-      taxIdDigits && (taxIdDigits.length === 10 || taxIdDigits.length === 11)
-        ? taxIdDigits
-        : null;
+    // TR VKN = 10 digits, TCKN = 11 digits, both with a check digit. A length-only
+    // guard lets a misread digit through, and since merchant identity is keyed on the
+    // tax number that silently creates a phantom merchant nothing can merge away
+    // (observed: LC Waikiki stored under both 8370071817 and the invalid 8370071617).
+    // An unverifiable number is dropped — matching then falls back to the text keys.
+    const taxIdCheck = validateTurkishTaxId(input.taxId, countryCode);
+    const taxIdStr = taxIdCheck.value;
+    if (taxIdCheck.rejected) {
+      console.warn(
+        `[merchant-matching] tax id failed check-digit validation, ignored: "${input.taxId}" (${countryCode ?? "??"})`
+      );
+    }
 
-    const existingId = await findMerchantByIdentity(displayName, normalized, countryCode);
+    const existingId = await findMerchantByIdentity(displayName, normalized, countryCode, taxIdStr);
     if (existingId) {
       await addPatternIfMissing(existingId, displayName, normalized);
+      // When the brand supplied the identity, the printed form is also learned so the
+      // next receipt carrying that same OCR defect matches on the first, cheapest layer.
+      if (brandName && cleanedName !== displayName) {
+        await addPatternIfMissing(existingId, cleanedName, normalizeForPattern(cleanedName));
+      }
       const row = (await db.query<{ id: string, vkn: string | null, tier: string }>(
         "SELECT id, vkn, tier FROM merchants WHERE id = $1",
         [existingId]
@@ -829,20 +1009,27 @@ export async function ensureUnverifiedMerchantForApproval(
       console.warn("[ensureUnverifiedMerchantForApproval] Skipped: invalid candidate:", name?.substring(0, 50));
       return { created: false };
     }
-    const displayName = normalizeMerchantDisplayName(name) ?? name;
+    const cleanedName = stripMerchantGreetingPrefix(name);
+    const brandName = confidentBrandName(input.merchantBrand, input.merchantBrandConfidence);
+    const identityName = brandName ?? cleanedName;
+    const displayName = normalizeMerchantDisplayName(identityName) ?? identityName;
     const normalized = normalizeForPattern(displayName);
-    // TR VKN = 10 digits, TCKN = 11 digits. Anything else (e.g. ECR/cash-register
-    // serial mislabeled as tax_number) is not a real tax id and must not be written
-    // to the merchants.vkn VARCHAR(11) column (would overflow → Postgres 22001).
-    const taxIdDigits = input.taxId?.trim().replace(/\D/g, "") || null;
-    const taxIdStr =
-      taxIdDigits && (taxIdDigits.length === 10 || taxIdDigits.length === 11)
-        ? taxIdDigits
-        : null;
+    // TR VKN = 10 digits, TCKN = 11 digits, both with a check digit. A length-only
+    // guard lets a misread digit through, and since merchant identity is keyed on the
+    // tax number that silently creates a phantom merchant nothing can merge away
+    // (observed: LC Waikiki stored under both 8370071817 and the invalid 8370071617).
+    // An unverifiable number is dropped — matching then falls back to the text keys.
     const countryCode = input.country?.trim().toUpperCase().slice(0, 2) || null;
+    const taxIdCheck = validateTurkishTaxId(input.taxId, countryCode);
+    const taxIdStr = taxIdCheck.value;
+    if (taxIdCheck.rejected) {
+      console.warn(
+        `[merchant-matching] tax id failed check-digit validation, ignored: "${input.taxId}" (${countryCode ?? "??"})`
+      );
+    }
     const category = input.category?.trim() || "other";
 
-    const existingId = await findMerchantByIdentity(displayName, normalized, countryCode);
+    const existingId = await findMerchantByIdentity(displayName, normalized, countryCode, taxIdStr);
     if (existingId) {
       await addPatternIfMissing(existingId, displayName, normalized);
       if (taxIdStr) {
@@ -935,12 +1122,58 @@ export async function matchMerchant(
 ): Promise<MatchResult | null> {
   const { autoCreate = true } = options;
 
-  const layer1 = await layer1Vkn(input.taxId);
+  // Strip a greeting prefix ("Sayın Müşterimiz …") once, up front, so every read
+  // layer and the trust gate see the merchant name — the write path already did this,
+  // but the read path compared the greeting-laden raw name and rejected good matches.
+  const cleanedInputName = stripMerchantGreetingPrefix(input.merchantName ?? "");
+  input = { ...input, merchantName: cleanedInputName };
+
+  const countryCode = input.country?.trim().toUpperCase().slice(0, 2) || null;
+  const layer1 = await layer1Vkn(input.taxId, countryCode);
   if (layer1) return layer1;
 
-  const racResult = await layer2CanonicalRetrieve(input);
-  if (racResult) return racResult;
+  // Brand layer: when the extraction model recognised the chain, resolve identity on
+  // the brand instead of the verbatim printed name. This is what links "LCW WATKIKI"
+  // (printed) to the LC Waikiki merchant — the text layers below match the printed
+  // name and would miss it. Only a confident brand is used, and only an already
+  // matchable merchant is returned (read path never creates).
+  const brandForIdentity = confidentBrandName(input.merchantBrand, input.merchantBrandConfidence);
+  if (brandForIdentity) {
+    const brandNormalized = normalizeForPattern(
+      normalizeMerchantDisplayName(brandForIdentity) ?? brandForIdentity
+    );
+    const brandId = await findMerchantByIdentity(
+      normalizeMerchantDisplayName(brandForIdentity) ?? brandForIdentity,
+      brandNormalized,
+      countryCode,
+      null
+    );
+    if (brandId) {
+      const brandRow = await db.query<MerchantRow>(
+        "SELECT id, canonical_name, display_name, category, tier, country_code FROM merchants WHERE id = $1 AND tier = ANY($2)",
+        [brandId, TIER_MATCHABLE]
+      );
+      if (brandRow.rows[0]) {
+        const m = brandRow.rows[0];
+        // Learn the printed spelling so the next receipt with the same OCR defect
+        // resolves in the cheap pattern layer without re-consulting the brand.
+        await addPatternIfMissing(m.id, input.merchantName.trim(), normalizeForPattern(input.merchantName)).catch(() => {});
+        return {
+          merchantId: m.id,
+          displayName: m.display_name,
+          canonicalName: m.canonical_name,
+          category: m.category || "other",
+          tier: m.tier as MerchantTier,
+          confidence: LAYER1_CONFIDENCE,
+          layerUsed: "brand",
+        };
+      }
+    }
+  }
 
+  // Deterministic pattern layer BEFORE RAC: a known merchant (the common
+  // case) resolves with one DB query and zero Gemini calls. RAC — which
+  // embeds the query and may call the LLM — only runs on pattern misses.
   const layer2Results = await layer2Pattern(
     input.merchantName,
     input.country
@@ -953,6 +1186,9 @@ export async function matchMerchant(
       : null;
   if (bestFrom2 && bestFrom2.confidence >= CONFIDENCE_THRESHOLD)
     return bestFrom2;
+
+  const racResult = await layer2CanonicalRetrieve(input);
+  if (racResult) return racResult;
 
   let locationCandidates: MerchantRow[] = [];
   if (input.category || input.city) {
@@ -994,13 +1230,13 @@ export async function matchMerchant(
 }
 
 /** Tier multiplier for reward: verified up to 1.2 (only for first uploader, once), candidate 1.0, unverified 0.7 */
-export const MERCHANT_TIER_MULTIPLIERS: Record<MerchantTier, number> = {
+const MERCHANT_TIER_MULTIPLIERS: Record<MerchantTier, number> = {
   verified: 1.2,
   candidate: 1.0,
   unverified: 0.7,
 };
 
-export function getTierMultiplier(tier: MerchantTier): number {
+function getTierMultiplier(tier: MerchantTier): number {
   return MERCHANT_TIER_MULTIPLIERS[tier] ?? 1;
 }
 
@@ -1010,7 +1246,7 @@ const VERIFIED_BONUS_MULTIPLIER = 1.2;
  * For verified merchants: 1.2x only for the user who first uploaded (triggered unverified insert), and only once.
  * Other users or same user's 2nd+ upload get 1.0x.
  */
-export async function getVerifiedBonusMultiplier(
+async function getVerifiedBonusMultiplier(
   merchantId: string,
   username: string
 ): Promise<{ multiplier: number; isFirstTimeBonus: boolean }> {

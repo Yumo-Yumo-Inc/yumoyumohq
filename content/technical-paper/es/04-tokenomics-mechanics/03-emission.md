@@ -12,21 +12,20 @@ La función escalonada — las bandas de MAU, los valores del pool diario por ba
 
 ## 4.4 El ciclo de vida de conversión bINT → INT
 
-bINT se acumula off-chain cuando un recibo supera la capa de confianza (03). Se liquida a INT a través de una época periódica (semanal) en lugar de una llamada de conversión on-chain por usuario. El ciclo de vida:
+bINT se acumula off-chain cuando un recibo supera la capa de confianza (03). Se liquida a INT a través de una época periódica en lugar de una llamada de conversión on-chain por usuario. El ciclo de vida:
 
 ```
-acumular  →  retener  →  liquidar (época)  →  reclamar  →  INT en la billetera del usuario
+accrue  →  settle (epoch)  →  claim  →  INT in user wallet
 ```
 
-- **Acumular.** Por recibo, en la capa contable off-chain. La cantidad la fija la banda de confianza, el techo diario del usuario y el escalón de emisión actual.
-- **Retener.** bINT permanece en la capa contable durante una ventana de retención mínima antes de ser elegible para la liquidación. La ventana da a la capa de confianza (03) tiempo para responder a patrones anómalos antes de que se distribuya cualquier INT.
-- **Liquidar.** En cada época, el bINT elegible se convierte a INT a un ratio plano de 1:1 (4.24). El motor construye una lista de distribución, un verificador independiente la comprueba (4.17) y la raíz resultante se publica en el distribuidor auditado.
+- **Acumular.** Por recibo, en la capa contable off-chain. La cantidad la fijan la evaluación de calidad del recibo, la tasa de recompensa ajustada por la salud del usuario, el techo diario basado en nivel y el escalón de emisión actual.
+- **Liquidar.** En cada época, el motor suma el libro mayor de contribución sobre la ventana de la época y lo convierte a INT a un ratio plano de 1:1 (4.24). Los puntos ganados antes del cierre de la ventana de la época se liquidan en esa época. El motor construye una lista de distribución, un verificador independiente la comprueba (4.17) y la raíz resultante se publica en el distribuidor auditado.
 - **Reclamar.** El usuario reclama su INT directamente del distribuidor a una billetera SPL estándar, transferible. El tesoro retiene el INT hasta que se reclama; no hay un paso de vesting separado.
 
-Cuando la recompensa elegible total de una época supera el techo de emisión global, la cantidad de cada participante se reduce por el mismo factor (pro-rata de tope flexible (soft-cap), 4.24). La longitud de la ventana de retención y el valor del techo global se gestionan en la capa operativa y no se publican.
+Cuando la recompensa elegible total de una época supera el techo de emisión global, la cantidad de cada participante se reduce por el mismo factor (pro-rata de tope flexible (soft-cap), 4.24). El valor del techo global se gestiona en la capa operativa y no se publica.
 
 ## 4.5 Techo diario, en términos de tokenomics
 
-El techo diario efectivo de bINT es el producto de un techo base, un multiplicador de nivel (03 §3.6) y la salud actual del usuario (03 §3.5). La implementación actual del MVP utiliza tablas por nivel (4.22); la arquitectura objetivo utiliza un techo basado en fórmula (4.23). Los valores de multiplicador y salud son específicos del usuario y residen en la capa de confianza.
+El techo diario de bINT lo establece el nivel de cuenta del usuario (03 §3.6) mediante tablas por nivel (4.22). Dentro de ese techo, la posición de salud del usuario (03 §3.5) multiplica la tasa de recompensa por recibo. Los valores por nivel y el mapeo de salud residen en la capa de confianza y la configuración operativa.
 
-Esta descomposición importa porque permite al protocolo reajustar cualquiera de los tres factores preservando la tokenomics. Una expansión de mercado puede elevar la base; un reequilibrio del sistema de niveles puede desplazar el multiplicador; una ola de abuso puede comprimir la distribución de salud.
+Esta descomposición importa porque permite al protocolo reajustar cualquiera de los dos factores preservando la tokenomics. Una expansión de mercado o un reequilibrio del sistema de niveles puede desplazar las tablas de techos; una ola de abuso comprime la distribución de salud y, con ella, la tasa de recompensa efectiva.

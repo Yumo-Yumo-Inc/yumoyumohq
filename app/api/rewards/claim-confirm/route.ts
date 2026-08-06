@@ -77,10 +77,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Transaction is not signed by the allocation wallet" }, { status: 400 });
     }
 
-    await sql`
+    // Conditional update: a concurrent confirm loses the race and sees 0 rows.
+    const updated = await sql`
       UPDATE reward_epoch_leaves SET claimed = true, claim_tx = ${signature}
-      WHERE epoch_number = ${epoch} AND username = ${username}
+      WHERE epoch_number = ${epoch} AND username = ${username} AND claimed = false
+      RETURNING username
     `;
+    if ((updated as unknown[]).length === 0) {
+      return NextResponse.json({ ok: true, alreadyClaimed: true });
+    }
     return NextResponse.json({ ok: true, epoch, signature });
   } catch (e) {
     console.error("[rewards/claim-confirm] Error:", e);

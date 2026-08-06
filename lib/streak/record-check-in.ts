@@ -27,7 +27,7 @@ export type RecordCheckInResult = {
   alreadyCheckedIn: boolean;
 };
 
-export async function resolveUserCountryCode(
+async function resolveUserCountryCode(
   username: string,
   sql: NonNullable<ReturnType<typeof getSql>>,
   profileCountry?: string | null

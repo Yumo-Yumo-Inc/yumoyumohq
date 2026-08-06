@@ -6,8 +6,8 @@ The storage model separates data by purpose and privacy class. The public docume
 
 | Layer | Content | Placement | Retention principle | Privacy class |
 |---|---|---|---|---|
-| Hot record layer | Receipt records, line items, stage events | Application database | Active product window | Pseudonymous |
-| Analytics layer | Normalized observations and quality metrics | Separate analytics partition | Policy-defined rolling window | Pseudonymous or anonymous |
+| Record layer | Receipt records, line items, stage events | Application database (a single managed Postgres) | Active product window | Pseudonymous |
+| Analytics layer | Normalized observations and quality metrics | Dedicated tables in the application database | Policy-defined rolling window | Pseudonymous or anonymous |
 | Object layer | Encrypted receipt input and processing derivatives | Encrypted object store | Data-minimization policy | May contain personal data |
 | Anonymous aggregate layer | Aggregate output for the B2B data product | Separate aggregate store | Versioned publication window | Not linkable back to user |
 | On-chain summary | Token event, settlement commitment, program state | Public chain | Permanent | Token and commitment data |

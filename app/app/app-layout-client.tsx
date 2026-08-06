@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/theme/theme-context";
 import { AppQueryProvider } from "@/lib/app/app-query-client";
 import { SessionHeartbeat } from "@/components/app/session-heartbeat";
 import { OfflineBootstrapManager } from "@/components/app/offline-bootstrap-manager";
+import { AccountRestrictionNotice } from "@/components/app/account-restriction-notice";
 
 export function AppLayoutClient({
   children,
@@ -23,6 +24,7 @@ export function AppLayoutClient({
             <AppProfileProvider>
               <OfflineBootstrapManager />
               <SessionHeartbeat />
+              <AccountRestrictionNotice />
               {children}
             </AppProfileProvider>
           </SolanaWalletProvider>

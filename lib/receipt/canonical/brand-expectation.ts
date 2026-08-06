@@ -41,7 +41,7 @@ const GENERIC_PRODUCT_TERMS = new Set<string>([
 ]);
 
 /** True when a raw line label is a generic category/department word, not a product. */
-export function isGenericProductTerm(rawName: string | null | undefined): boolean {
+function isGenericProductTerm(rawName: string | null | undefined): boolean {
   if (!rawName) return false;
   const folded = foldForComparison(rawName)
     .replace(/[^a-z0-9 ]+/g, " ")
@@ -110,7 +110,7 @@ function matchesAnyPrefix(path: string, prefixes: readonly string[]): boolean {
  * branded ones when both could match (none currently overlap, but the order is
  * intentional and defensive).
  */
-export function brandExpectedForCategory(
+function brandExpectedForCategory(
   categoryPath: string | null | undefined
 ): boolean {
   if (!categoryPath) return false;

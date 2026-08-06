@@ -16,7 +16,7 @@
 
 import { OCRLine } from "./types";
 
-export interface Money {
+interface Money {
   value: number;
   currency?: string;
   confidence: number;

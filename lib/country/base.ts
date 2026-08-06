@@ -87,7 +87,7 @@ export interface CountryTemplateTotalsInput {
   vat: number;
 }
 
-export interface CountryExtractionStrategies {
+interface CountryExtractionStrategies {
   extractVat?: (context: ReceiptContext) => Promise<CountryVatResult> | CountryVatResult;
   extractServiceCharge?: (
     context: ReceiptContext

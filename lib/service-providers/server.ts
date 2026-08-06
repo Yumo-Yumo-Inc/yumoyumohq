@@ -1,6 +1,6 @@
 import { sql } from "@/lib/db/client";
 
-export const SERVICE_PROVIDER_CATEGORIES = [
+const SERVICE_PROVIDER_CATEGORIES = [
   "electricity",
   "water",
   "gas",

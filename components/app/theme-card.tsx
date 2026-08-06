@@ -1,6 +1,7 @@
 "use client";
 
 import { useTier } from "@/lib/theme/theme-context";
+import { Surface } from "@/components/ui/surface";
 import { cn } from "@/lib/utils";
 
 interface ThemeCardProps {
@@ -11,27 +12,29 @@ interface ThemeCardProps {
   style?: React.CSSProperties;
 }
 
+/**
+ * ThemeCard — tier-accented surface used across the app shell (dashboard cards,
+ * home widgets, …). Delegates its material to the shared <Surface> primitive
+ * (layered gradient ground + soft shadow + inner glow) while keeping its
+ * signature gold/tier top accent line. Same prop surface as before, so its ~35
+ * call sites are unchanged.
+ */
 export function ThemeCard({ accountLevel = 1, children, className, onClick, style }: ThemeCardProps) {
   const tier = useTier(accountLevel);
 
   return (
-    <div
+    <Surface
+      variant="elevated"
+      accent="tier"
+      radius="md"
+      hairline={false}
       onClick={onClick}
-      className={cn("relative overflow-hidden transition-all duration-[.6s]", className)}
-      style={{
-        ...style,
-        background: "var(--app-bg-elevated)",
-        border: `1px solid ${tier.cardBorder}`,
-        borderRadius: 12,
-        cursor: onClick ? "pointer" : "default",
-      }}
+      className={cn("transition-all duration-[.6s]", className)}
+      style={{ ...style, cursor: onClick ? "pointer" : "default" }}
     >
-      {/* Tier accent — thin top edge line */}
-      <div
-        className="absolute left-0 right-0 top-0 h-px"
-        style={{ background: tier.topLine }}
-      />
+      {/* Tier accent — signature thin top edge line (gold/tier tinted). */}
+      <div className="absolute left-0 right-0 top-0 h-px" style={{ background: tier.topLine }} />
       {children}
-    </div>
+    </Surface>
   );
 }

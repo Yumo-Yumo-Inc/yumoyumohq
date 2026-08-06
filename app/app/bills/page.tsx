@@ -1897,7 +1897,9 @@ function AddProviderSheet({
       return provider;
     },
     onSuccess: onSaved,
-    onError: (err: Error) => setError(err.message),
+    // Never surface the raw err.message (technical / JS text) — the display wraps
+    // this in "Kaydedilemedi: {error}", so keep it a short generic reason.
+    onError: () => setError(tx("bills.saveErrorReason", "beklenmeyen bir hata oluştu, lütfen tekrar deneyin")),
   });
 
   const canSubmit = category !== null && name.trim().length >= 1;

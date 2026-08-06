@@ -9,7 +9,7 @@ export const SUPPORTED_LANGS: { code: Lang; label: string; nativeLabel: string }
   { code: "th", label: "TH", nativeLabel: "ไทย" },
 ];
 
-export const LANG_TO_LOCALE: Record<Lang, string> = {
+const LANG_TO_LOCALE: Record<Lang, string> = {
   tr: "tr-TR",
   en: "en-US",
   es: "es-ES",
@@ -46,6 +46,8 @@ type TranslationShape = {
   genderOther: string;
   countryLabel: string;
   countryPlaceholder: string;
+  countryFromRegistrationHint: string;
+  countryOtherAccount: string;
 
   financialTitle: string;
   financialSubtitle: string;
@@ -113,6 +115,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     genderOther: "Diğer",
     countryLabel: "Ülke",
     countryPlaceholder: "Ülke seçin",
+    countryFromRegistrationHint: "Kayıt sırasında seçildi; değiştirilemez.",
+    countryOtherAccount: "Diğer",
 
     financialTitle: "Finansal Profil",
     financialSubtitle: "Hedeflerini ve beklentilerini anlamamıza yardımcı ol.",
@@ -177,6 +181,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     genderOther: "Other",
     countryLabel: "Country",
     countryPlaceholder: "Select a country",
+    countryFromRegistrationHint: "Chosen at registration and cannot be changed.",
+    countryOtherAccount: "Other",
 
     financialTitle: "Financial Profile",
     financialSubtitle: "Help us understand your goals and expectations.",
@@ -241,6 +247,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     genderOther: "Otro",
     countryLabel: "País",
     countryPlaceholder: "Selecciona un país",
+    countryFromRegistrationHint: "Elegido en el registro; no se puede cambiar.",
+    countryOtherAccount: "Otro",
 
     financialTitle: "Perfil financiero",
     financialSubtitle: "Ayúdanos a entender tus objetivos y expectativas.",
@@ -305,6 +313,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     genderOther: "Другой",
     countryLabel: "Страна",
     countryPlaceholder: "Выберите страну",
+    countryFromRegistrationHint: "Выбрано при регистрации; изменить нельзя.",
+    countryOtherAccount: "Другое",
 
     financialTitle: "Финансовый профиль",
     financialSubtitle: "Помогите нам понять ваши цели и ожидания.",
@@ -369,6 +379,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     genderOther: "其他",
     countryLabel: "国家",
     countryPlaceholder: "选择国家",
+    countryFromRegistrationHint: "注册时已选择，无法更改。",
+    countryOtherAccount: "其他",
 
     financialTitle: "财务概况",
     financialSubtitle: "帮助我们了解你的目标与期望。",
@@ -433,6 +445,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     genderOther: "อื่น ๆ",
     countryLabel: "ประเทศ",
     countryPlaceholder: "เลือกประเทศ",
+    countryFromRegistrationHint: "เลือกตอนลงทะเบียนแล้ว เปลี่ยนไม่ได้",
+    countryOtherAccount: "อื่นๆ",
 
     financialTitle: "ข้อมูลการเงิน",
     financialSubtitle: "ช่วยให้เราเข้าใจเป้าหมายและความคาดหวังของคุณ",

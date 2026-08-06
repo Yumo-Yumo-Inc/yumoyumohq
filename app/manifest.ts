@@ -13,7 +13,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Yumo Yumo",
     short_name: "Yumo",
-    description: "Upload receipts, track rewards, and use Yumo Yumo like an installable mobile app.",
+    description:
+      "Upload receipts, uncover hidden costs, and earn contribution rewards with Yumo Yumo.",
     start_url: "/app",
     scope: "/",
     display: "standalone",

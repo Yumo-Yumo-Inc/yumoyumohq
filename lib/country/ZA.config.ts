@@ -73,4 +73,3 @@ export const ZA_CONFIG: CountryConfig = {
   ]
 };
 
-export default ZA_CONFIG;

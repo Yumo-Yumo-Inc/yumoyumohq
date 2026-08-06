@@ -21,7 +21,7 @@ function escapeXml(text: string): string {
 
 export function StyledReceipt({
   analysis,
-  locale = "tr",
+  locale = "en",
   className
 }: StyledReceiptProps) {
   // Defensive check - if no analysis, show placeholder
@@ -120,7 +120,7 @@ export function StyledReceipt({
     }
   };
 
-  const t = texts[locale as keyof typeof texts] || texts.tr;
+  const t = texts[locale as keyof typeof texts] || texts.en;
 
   return (
     <motion.div

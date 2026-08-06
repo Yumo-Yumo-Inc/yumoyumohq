@@ -80,4 +80,3 @@ export const TW_CONFIG: CountryConfig = {
   }
 };
 
-export default TW_CONFIG;

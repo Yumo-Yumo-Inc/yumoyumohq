@@ -3,7 +3,7 @@
 
 export type Locale = 'en' | 'ru' | 'tr' | 'th' | 'zh' | 'es';
 
-export const translations = {
+const translations = {
   // Hero Section
   hero: {
     en: {
@@ -225,7 +225,7 @@ export const translations = {
 export type Messages = Record<string, any>;
 
 // Helper function to get translations for a specific locale (new format)
-export function getTranslations(locale: Locale) {
+function getTranslations(locale: Locale) {
   return {
     hero: translations.hero[locale] || translations.hero.en,
     footer: translations.footer[locale] || translations.footer.en,

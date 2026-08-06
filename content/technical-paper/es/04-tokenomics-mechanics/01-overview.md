@@ -1,8 +1,8 @@
 # 04 — Mecánicas de Tokenomics
 
-Esta sección traduce la intención económica del Vision Paper en mecánicas de implementación: los roles desempeñados por INT, bINT, ePoints y el Foundation NFT; el camino que sigue la contabilidad de recompensas; y cómo el staking, el tesoro y las mecánicas de recompra/quema se sitúan dentro del protocolo.
+Esta sección cubre las mecánicas económicas del protocolo Yumo Yumo: los roles desempeñados por INT, bINT y el SBT de proof-of-expense; el ciclo de vida de emisión y conversión; los techos de recompensa; las mecánicas de staking, tesoro y recompra/quema; la asignación de la oferta; las proyecciones de oferta circulante; y la utilidad de INT.
 
-El documento técnico público explica las relaciones mecánicas, el flujo contable y las responsabilidades on-chain. Los parámetros específicos de la curva de emisión, los techos a nivel de usuario, los ratios operativos del tesoro y los dictámenes legales por jurisdicción se gestionan en las capas operativas y legales.
+Los dictámenes legales por jurisdicción se gestionan en la capa legal.
 
 ## 4.0 Superficie mecánica
 
@@ -10,8 +10,7 @@ El documento técnico público explica las relaciones mecánicas, el flujo conta
 |---|---|
 | INT | Token principal on-chain y contabilidad de circulación |
 | bINT | Representación de recompensa pre-liquidación por contribución verificada |
-| ePoints | Capa de progreso en la aplicación y actividad estacional |
-| Foundation NFT | Representación de contribución temprana y nivel |
+| SBT de proof-of-expense | Marcador de contribuidor verificado |
 | Staking | Semántica de bloqueo, acumulación y participación en el protocolo |
 | Treasury | Relación entre entradas de ingresos, operaciones, reservas y economía del token |
 | Oferta y asignación | Oferta total, porcentajes por rail, cantidades de tokens (4.16–4.18) |

@@ -11,7 +11,7 @@ export function foldForComparison(value: string): string {
     .replace(/\u00e7/g, "c");
 }
 
-export function normalizeNameText(
+function normalizeNameText(
   value: string | null | undefined,
   options?: { maxLength?: number }
 ): string | null {

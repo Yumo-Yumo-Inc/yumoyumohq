@@ -17,12 +17,19 @@
 
 import { sql } from "@/lib/db/client";
 import { getEconomicIndexFromDB } from "@/lib/db/economicIndex";
+import { getCountryByCode, normalizeCountryCode } from "@/lib/shared/countries";
 import type { CountryCode } from "@/lib/mining/types";
 import {
   normalizeProductCategoryLvl1,
   type CanonicalProductCategory,
 } from "@/lib/receipt/category-taxonomy";
-import { fold, isNonProductLine, isCategoryNameItem } from "@/lib/insights/non-product-filter";
+import {
+  fold,
+  isNonProductLine,
+  isCategoryNameItem,
+  isDepartmentNameItem,
+  isFuelLineItem,
+} from "@/lib/insights/non-product-filter";
 import {
   filterOutlierValues,
   sanitizeObservations,
@@ -50,12 +57,12 @@ const TRACK_MIN_OBSERVATIONS = 3;
 const TRACK_MIN_SPAN_DAYS = 14;
 const TRACK_MIN_DISTINCT_WEEKS = 2;
 const PRICE_TRACK_LIMIT = 5;
-const MERCHANT_MIN_SHARED_ITEMS = 3;
-const MERCHANT_MIN_PURCHASES = 3;
+const MERCHANT_MIN_SHARED_ITEMS = 2;
+const MERCHANT_MIN_PURCHASES = 2;
 const MERCHANT_ROW_LIMIT = 12;
 const UNIT_TRAP_MIN_MARKUP = 0.1;
 const UNIT_TRAP_LIMIT = 5;
-const LOYALTY_MIN_PURCHASES = 6;
+const LOYALTY_MIN_PURCHASES = 3;
 const LOYALTY_LIMIT = 5;
 const INFLATION_MIN_WINDOW_DAYS = 90;
 const INFLATION_MIN_PRODUCTS = 3;
@@ -115,9 +122,12 @@ interface ProductSeries {
   packSize: number | null;
   unitType: string | null;
   category: CanonicalProductCategory | null;
-  observations: Observation[]; // sorted ascending by date
+  /** Deduplicated observations (exact duplicate rows dropped), sorted ascending. */
+  observations: Observation[];
   /** Observations surviving the price-sanity gate; null → not publishable as a price series. */
   clean: Observation[] | null;
+  /** Sanitised observations collapsed to one per day — the published series shape. */
+  daily: Observation[] | null;
 }
 
 // ── Small helpers ───────────────────────────────────────────────────────────
@@ -251,15 +261,19 @@ function cleanMerchantName(raw: string): string {
   const tokens = raw.replace(/\s+/g, " ").trim().split(" ");
   let cut = tokens.length;
   for (let i = 1; i < tokens.length; i++) {
-    const key = fold(tokens[i]).replace(/ /g, "");
-    if (MERCHANT_LEGAL_TOKENS.has(key)) {
+    // Legal forms often arrive glued with dots ("İNŞ..GİD.TUR.TİC.LTD.ŞTİ.") —
+    // check the compact fold ("A.Ş." → "as") and every dot-separated sub-token.
+    const folded = fold(tokens[i]);
+    const subKeys = folded.split(" ").filter(Boolean);
+    subKeys.push(folded.replace(/ /g, ""));
+    if (subKeys.some((k) => MERCHANT_LEGAL_TOKENS.has(k))) {
       cut = i;
       break;
     }
   }
   let kept = tokens.slice(0, cut);
   while (kept.length > 1 && /^(ve|and)$/i.test(fold(kept[kept.length - 1]))) kept.pop();
-  const cleaned = kept.join(" ").trim();
+  const cleaned = kept.join(" ").replace(/\./g, "").replace(/\s+/g, " ").trim();
   return titleCaseTr(cleaned || raw.trim());
 }
 
@@ -475,6 +489,7 @@ function buildSeries(items: ItemRow[]): Map<string, ProductSeries> {
         category: normalizeProductCategoryLvl1(item.categoryLvl1),
         observations: [],
         clean: null,
+        daily: null,
       };
       byKey.set(key, series);
     } else if (!series.name && item.displayName) {
@@ -499,21 +514,21 @@ function buildSeries(items: ItemRow[]): Map<string, ProductSeries> {
   }
   for (const series of byKey.values()) {
     series.observations.sort((a, b) => a.date.getTime() - b.date.getTime());
-    // Series hygiene: drop duplicate rows, collapse to one observation per day.
-    series.observations = collapseObservations(series.observations);
+    // Series hygiene 1: drop exact duplicate rows (duplicated uploads). Distinct
+    // receipts on the same day remain distinct observations — eligibility
+    // counts run on this set, BEFORE the day-collapse.
+    series.observations = dedupeObservations(series.observations);
     // Price-sanity gate (a)+(b): outlier removal + minimum valid observations.
     series.clean = sanitizeObservations(series.observations, (o) => o.unitPrice);
+    // Series hygiene 2: the published series collapses to one point per day
+    // (median price, summed spend) so same-day noise cannot dominate a chart.
+    series.daily = series.clean ? collapseByDay(series.clean) : null;
   }
   return byKey;
 }
 
-/**
- * Series hygiene: (1) exact duplicate rows (same receipt, day, price, qty —
- * duplicated uploads) are dropped; (2) remaining observations collapse to one
- * per day with the day's median unit price and summed spend/quantity, so a
- * receipt duplicated under two merchant spellings cannot inflate the series.
- */
-function collapseObservations(observations: Observation[]): Observation[] {
+/** Drops exact duplicate rows: same receipt, day, price and quantity. */
+function dedupeObservations(observations: Observation[]): Observation[] {
   const seen = new Set<string>();
   const unique: Observation[] = [];
   for (const o of observations) {
@@ -522,7 +537,11 @@ function collapseObservations(observations: Observation[]): Observation[] {
     seen.add(k);
     unique.push(o);
   }
+  return unique;
+}
 
+/** Collapses observations to one per day: median unit price, summed spend/qty. */
+function collapseByDay(unique: Observation[]): Observation[] {
   const byDay = new Map<string, Observation[]>();
   for (const o of unique) {
     const day = byDay.get(o.dateStr);
@@ -568,16 +587,21 @@ interface SeriesDrift {
  */
 function seriesDrift(series: ProductSeries): SeriesDrift | null {
   const obs = series.clean;
+  const daily = series.daily;
+  // Eligibility runs on the PRE-collapse sanitised set: observations from
+  // different receipts on the same day are valid evidence.
   if (!obs || obs.length < TRACK_MIN_OBSERVATIONS) return null;
-  const distinctWeeks = new Set(obs.map((o) => weekKey(o.date)));
+  if (!daily || daily.length < 2) return null;
+  const distinctWeeks = new Set(daily.map((o) => weekKey(o.date)));
   if (distinctWeeks.size < TRACK_MIN_DISTINCT_WEEKS) return null;
-  const spanDays = (obs[obs.length - 1].date.getTime() - obs[0].date.getTime()) / DAY_MS;
+  const spanDays = (daily[daily.length - 1].date.getTime() - daily[0].date.getTime()) / DAY_MS;
   if (spanDays < TRACK_MIN_SPAN_DAYS) return null;
-  // Recent set (median of the last up-to-3 observations) vs the prior baseline
-  // median — a single trailing observation cannot dictate the drift.
-  const recentCount = Math.max(1, Math.min(DRIFT_RECENT_OBSERVATIONS, obs.length - 2));
-  const recent = obs.slice(-recentCount);
-  const prior = obs.slice(0, obs.length - recentCount);
+  // Recent day-points (up to 3, always leaving a baseline) vs the prior median —
+  // a single trailing observation cannot dictate the drift because each daily
+  // point is already the median of that day's receipts.
+  const recentCount = Math.max(1, Math.min(DRIFT_RECENT_OBSERVATIONS, daily.length - 1));
+  const recent = daily.slice(-recentCount);
+  const prior = daily.slice(0, daily.length - recentCount);
   const latestPrice = median(recent.map((o) => o.unitPrice));
   const baseline = median(prior.map((o) => o.unitPrice));
   if (baseline <= 0 || latestPrice <= 0) return null;
@@ -634,11 +658,12 @@ function buildPriceTracks(seriesByKey: Map<string, ProductSeries>): PriceTrack[]
     const drift = seriesDrift(series);
     if (!drift || drift.deltaRatio === 0) continue;
     tracks.push({
+      productKey: series.key,
       name: series.name,
       brand: series.brand,
       packSize: series.packSize,
       unitType: series.unitType,
-      series: (series.clean ?? []).map((o) => ({
+      series: (series.daily ?? []).map((o) => ({
         date: o.dateStr,
         unitPrice: round(o.unitPrice),
       })),
@@ -663,6 +688,18 @@ const BILL_DOCUMENT_TYPES = new Set([
 ]);
 
 /**
+ * A brand only counts as product identity when it contains letters and adds
+ * information beyond the item name itself (the pipeline sometimes echoes the
+ * name into the brand field, or drops an OCR number there).
+ */
+function hasRealBrand(item: ItemRow): boolean {
+  const brand = fold(item.brand);
+  if (!brand || !/[a-z]/.test(brand)) return false;
+  const name = fold(item.name);
+  return !name.includes(brand);
+}
+
+/**
  * Non-product line items: utility/bill payments, tax/rounding lines, generic
  * category-word placeholders ("Yiyecek", "Giyim") and carry/packaging items
  * (bags). None of these may enter any product-facing computation.
@@ -677,6 +714,19 @@ function isBillLikeItem(item: ItemRow): boolean {
   if (isNonProductLine(item.name)) return true;
   // Generic single-word category names are placeholders, not products.
   if (isCategoryNameItem(item.name) || isCategoryNameItem(item.displayName)) return true;
+  // Department/counter lines ("TEKEL", "PEYNİR") without brand or pack size
+  // are variable-amount buckets, not comparable products. A brand echoing the
+  // department word ("Tekel"/"Tekel") or carrying no letters ("0.71") is a
+  // pipeline artefact, not product identity.
+  if (
+    !hasRealBrand(item) &&
+    item.packSize == null &&
+    (isDepartmentNameItem(item.name) || isDepartmentNameItem(item.displayName))
+  ) {
+    return true;
+  }
+  // Fuel fills record an arbitrary refill amount, never a unit price.
+  if (isFuelLineItem(item.name) || isFuelLineItem(item.displayName)) return true;
   const name = fold(item.name);
   const display = item.displayName ? fold(item.displayName) : "";
   // Carry/packaging items (bags in any phrasing).
@@ -714,6 +764,16 @@ function buildMerchantComparison(items: ItemRow[]): MerchantComparison | null {
   const itemDisplay = new Map<string, string>();
   const itemSpend = new Map<string, number>();
 
+  // Pass 1: collect entries so merchant keys can be unified before grouping.
+  interface Entry {
+    itemKey: string;
+    merchantKey: string;
+    display: string;
+    unitPrice: number;
+    spend: number;
+    itemName: string;
+  }
+  const entries: Entry[] = [];
   const seenRows = new Set<string>();
   for (const item of items) {
     if (!item.merchant || isPlaceholderMerchant(item.merchant)) continue;
@@ -724,34 +784,61 @@ function buildMerchantComparison(items: ItemRow[]): MerchantComparison | null {
     if (!name) continue;
     const unitPrice = normalisedUnitPrice(item);
     if (unitPrice === null) continue;
-    // Prefer the shortest spelling for the group ("Bim" over the legal name).
-    const existing = merchantDisplay.get(merchantKey);
-    if (!existing || cleanedMerchant.length < existing.length) {
-      merchantDisplay.set(merchantKey, cleanedMerchant);
-    }
-
     const itemKey = item.unitType ? `${name}:${item.unitType.slice(0, 4)}` : name;
     // Duplicate uploads (same receipt/day/price) must not double-count.
     const rowKey = `${itemKey}|${merchantKey}|${item.receiptId}|${item.date}|${unitPrice}`;
     if (seenRows.has(rowKey)) continue;
     seenRows.add(rowKey);
-    if (!itemDisplay.has(itemKey)) itemDisplay.set(itemKey, displayNameFor(item));
     const qty = item.quantity || 1;
-    const spend = item.lineTotalGross ?? unitPrice * qty;
-    itemSpend.set(itemKey, (itemSpend.get(itemKey) ?? 0) + Math.max(spend, 0));
+    const spend = Math.max(item.lineTotalGross ?? unitPrice * qty, 0);
+    entries.push({
+      itemKey,
+      merchantKey,
+      display: cleanedMerchant,
+      unitPrice,
+      spend,
+      itemName: displayNameFor(item),
+    });
+  }
+  if (entries.length === 0) return null;
 
-    let merchants = byItem.get(itemKey);
+  // Unify near-identical merchant keys: a key that extends another key
+  // ("tatlici" → "tatli", "carrefoursa" → "carrefour") aliases to the shorter
+  // one, so OCR spelling variants of the same business form one group.
+  const rawKeys = [...new Set(entries.map((e) => e.merchantKey))].sort();
+  const alias = new Map<string, string>();
+  for (const key of rawKeys) {
+    for (const shorter of rawKeys) {
+      if (shorter === key || shorter.length < 4) continue;
+      if (key.startsWith(shorter)) {
+        alias.set(key, alias.get(shorter) ?? shorter);
+        break;
+      }
+    }
+  }
+
+  for (const e of entries) {
+    const merchantKey = alias.get(e.merchantKey) ?? e.merchantKey;
+    // Prefer the shortest spelling for the group ("Bim" over the legal name).
+    const existing = merchantDisplay.get(merchantKey);
+    if (!existing || e.display.length < existing.length) {
+      merchantDisplay.set(merchantKey, e.display);
+    }
+    if (!itemDisplay.has(e.itemKey)) itemDisplay.set(e.itemKey, e.itemName);
+    itemSpend.set(e.itemKey, (itemSpend.get(e.itemKey) ?? 0) + e.spend);
+
+    let merchants = byItem.get(e.itemKey);
     if (!merchants) {
       merchants = new Map();
-      byItem.set(itemKey, merchants);
+      byItem.set(e.itemKey, merchants);
     }
     let cell = merchants.get(merchantKey);
     if (!cell) {
       cell = { prices: [], spend: 0 };
       merchants.set(merchantKey, cell);
     }
-    cell.prices.push(unitPrice);
-    cell.spend += Math.max(spend, 0);
+    cell.prices.push(e.unitPrice);
+    cell.spend += e.spend;
   }
 
   // Keep only items bought at 2+ merchants, with outlier-gated prices.
@@ -802,6 +889,14 @@ function buildMerchantComparison(items: ItemRow[]): MerchantComparison | null {
     }
   }
 
+  if (process.env.ANALYSIS_DEBUG_MC) {
+    console.error(
+      "[mc-debug] comparable items:", comparable.length,
+      "| merchants:", [...byMerchant.entries()]
+        .map(([k, a]) => `${k}(items=${a.itemCount},buys=${a.purchases})`)
+        .join(" ")
+    );
+  }
   const rows: MerchantPriceRow[] = [];
   for (const [merchantKey, agg] of byMerchant) {
     if (agg.itemCount < MERCHANT_MIN_SHARED_ITEMS) continue;
@@ -921,15 +1016,17 @@ function buildLoyalty(seriesByKey: Map<string, ProductSeries>, windowDays: numbe
   const items: Array<LoyaltyItem & { purchases: number }> = [];
   for (const series of seriesByKey.values()) {
     const obs = series.observations;
-    if (obs.length < LOYALTY_MIN_PURCHASES) continue;
+    // Purchases = distinct receipts (duplicated uploads already deduped).
+    const purchases = new Set(obs.map((o) => o.receiptId)).size;
+    if (purchases < LOYALTY_MIN_PURCHASES) continue;
     const spend = obs.reduce((acc, o) => acc + o.spend, 0);
     const drift = seriesDrift(series);
     items.push({
       name: series.name,
-      purchasesPerMonth: round(obs.length / (windowDays / 30.44), 2),
+      purchasesPerMonth: round(purchases / (windowDays / 30.44), 2),
       annualizedSpend: round(spend * (365 / windowDays), 2),
       deltaRatio: drift ? round(drift.deltaRatio) : null,
-      purchases: obs.length,
+      purchases,
     });
   }
   return items
@@ -1242,17 +1339,25 @@ export async function buildAnalysis(username: string): Promise<AnalysisPayload> 
     itemsRaw = [];
   }
 
-  // Dominant currency: mode across receipts; all monetary sections filter to it.
+  // Currency the analysis reads in. Prefer the account country's currency (e.g.
+  // THB for a Thailand account) so a user with a multi-currency history still
+  // sees their HOME currency, and every section stays consistent. Only fall back
+  // to the receipt mode when the home currency has no receipts on record.
   const currencyCounts = new Map<string, number>();
   for (const r of receiptsRaw) {
     if (r.currency) currencyCounts.set(r.currency, (currencyCounts.get(r.currency) ?? 0) + 1);
   }
+  const countryCurrency = getCountryByCode(normalizeCountryCode(profile?.country) ?? "")?.currency ?? null;
   let currency = "TRY";
-  let best = 0;
-  for (const [cur, count] of currencyCounts) {
-    if (count > best) {
-      currency = cur;
-      best = count;
+  if (countryCurrency && currencyCounts.has(countryCurrency)) {
+    currency = countryCurrency;
+  } else {
+    let best = 0;
+    for (const [cur, count] of currencyCounts) {
+      if (count > best) {
+        currency = cur;
+        best = count;
+      }
     }
   }
 

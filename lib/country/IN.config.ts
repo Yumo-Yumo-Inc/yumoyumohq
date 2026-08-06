@@ -87,4 +87,3 @@ export const IN_CONFIG: CountryConfig = {
   }
 };
 
-export default IN_CONFIG;

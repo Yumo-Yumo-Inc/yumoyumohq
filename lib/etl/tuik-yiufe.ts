@@ -67,7 +67,7 @@ type JsonStatDataset = {
   label: string;
 };
 
-export interface YiufeIndexRow {
+interface YiufeIndexRow {
   country: string;
   indexType: string;
   series: string;
@@ -273,4 +273,4 @@ export async function runYiufeEtl(
   };
 }
 
-export { SOURCE as YIUFE_SOURCE };
+;

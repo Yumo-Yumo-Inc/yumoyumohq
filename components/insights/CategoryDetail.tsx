@@ -7,10 +7,12 @@
 
 import { ChevronRight, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { getReceiptsForCategory } from "./mock-receipts";
+import type { InsightReceiptRow } from "./spending-sections";
 
 export interface CategoryDetailProps {
   categoryKey: string;
+  /** The user's real receipts in this category (newest first). */
+  receipts: InsightReceiptRow[];
   label: string;
   color: string;
   Icon: LucideIcon;
@@ -44,7 +46,7 @@ function formatDate(iso: string, locale: string): string {
 }
 
 export function CategoryDetail({
-  categoryKey,
+  receipts,
   label,
   color,
   Icon,
@@ -54,7 +56,6 @@ export function CategoryDetail({
   locale,
   onClose,
 }: CategoryDetailProps) {
-  const receipts = getReceiptsForCategory(categoryKey);
   return (
     <div
       className="overflow-hidden rounded-2xl border"

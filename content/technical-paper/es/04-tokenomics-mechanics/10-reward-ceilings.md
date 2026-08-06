@@ -14,9 +14,9 @@ Cada usuario tiene un presupuesto diario de bINT que limita la recompensa total 
 
 Una vez que el total diario de un usuario alcanza el techo, los recibos adicionales se procesan y registran pero producen cero bINT incremental para ese día. El techo se reinicia a la medianoche UTC. Estos valores son anulables a través de la configuración por nivel y se reajustan a medida que la base de usuarios crece y la distribución de niveles evoluciona.
 
-## 4.23 Arquitectura objetivo: techo basado en fórmula
+## 4.23 Arquitectura objetivo: techo basado en fórmula (planificado)
 
-El modelo de techo a largo plazo reemplaza la tabla plana por nivel con una fórmula continua:
+Este modelo está planificado y no está activo en la versión actual; hoy el techo diario lo establecen las tablas por nivel (4.22), y la salud actúa sobre la tasa de recompensa por recibo (03 §3.5). El modelo de techo a largo plazo reemplaza la tabla plana por nivel con una fórmula continua:
 
 ```
 effective_daily_ceiling = base_cap × level_multiplier × health_score
@@ -32,4 +32,4 @@ Bajo este modelo, un usuario de nivel bajo con salud neutra gana una fracción d
 
 ### Camino de transición
 
-La tabla del MVP y la fórmula objetivo coexisten durante las fases pre-TGE y post-TGE temprana. La tabla del MVP proporciona techos deterministas y fácilmente auditables durante el periodo en que el sistema de puntuación de salud y la distribución de niveles aún están madurando. El modelo basado en fórmula se activa cuando las señales de salud y nivel de la capa de confianza alcanzan suficiente profundidad de calibración. La transición es un cambio de configuración del protocolo, no una migración de contrato inteligente.
+La tabla del MVP es el modelo activo durante las fases pre-TGE y post-TGE temprana. La tabla del MVP proporciona techos deterministas y fácilmente auditables durante el periodo en que el sistema de puntuación de salud y la distribución de niveles aún están madurando. El modelo basado en fórmula se activa cuando las señales de salud y nivel de la capa de confianza alcanzan suficiente profundidad de calibración. La transición es un cambio de configuración del protocolo, no una migración de contrato inteligente.

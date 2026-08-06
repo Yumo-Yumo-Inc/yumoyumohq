@@ -20,4 +20,4 @@ Hazine yetkileri tek bir operasyonel cüzdanda yoğunlaşmaz. Yetki modeli çokl
 
 #### Yetki taşıma
 
-Program yetkileri, operasyonel model olgunlaştıkça daha bağımsız yönetişim yapılarına taşınabilecek şekilde tasarlanır. Her taşıma, açık zincir üstü olay olarak denetlenebilir; taşıma prosedürünün operasyonel ayrıntıları iç operasyon katmanında kalır.
+Herhangi bir program yetkisi devri, kapsamı ve karar kuralları yayımlanmış ayrı bir yönetişim değişikliğiyle yapılır. Uygulanmış devirler açık zincir üstü olaylardan denetlenebilir; taşıma prosedürünün operasyonel ayrıntıları iç operasyon katmanında kalır.

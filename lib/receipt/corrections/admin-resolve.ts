@@ -17,7 +17,7 @@ import {
   WRONG_CORRECTION_HONOR_PENALTY,
 } from "./policy";
 
-export interface CorrectionRow {
+interface CorrectionRow {
   id: string;
   receipt_id: string;
   username: string;

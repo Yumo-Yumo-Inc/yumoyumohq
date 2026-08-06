@@ -160,7 +160,7 @@
         "title": "阶段一 — 起源\n觉醒开始",
         "items": [
           "公平启动：社区驱动的流动性与价格发现",
-          "PoE 挖掘：收据转化为 cPoints 奖励",
+          "PoE 挖掘：收据转化为 points 奖励",
           "数字身份：领取 Foundation NFT，开启成长"
         ]
       },
@@ -237,7 +237,7 @@
       },
       {
         "question": "💰 我能得到什么奖励？",
-        "answer": "cPoints and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
+        "answer": "Points and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
       },
       {
         "question": "🪙 INT 是什么？",
@@ -455,7 +455,7 @@
       },
       {
         "title": "3. 在这里可以做什么？",
-        "content": "You can upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see spending insights, and collect non-transferable cPoints/bINT app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
+        "content": "You can upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see spending insights, and collect non-transferable points/bINT app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
       },
       {
         "title": "4. 收据与内容归属",
@@ -464,7 +464,7 @@
       {
         "title": "5. 奖励与 INT 代币",
         "content": [
-          "cPoints and bINT are non-transferable in-app records tied to eligible activity.",
+          "Points and bINT are non-transferable in-app records tied to eligible activity.",
           "They do not guarantee any token claim, airdrop, transfer, listing, cash value, profit, or exchangeability.",
           "INT is planned as a utility token for eligible app functionality, not investment advice, a security offering, or a get rich quick ticket.",
           "Eligibility rules may change. We may withhold, reverse, or suspend rewards for fraud, duplicate activity, sanctions risk, legal restrictions, or policy violations. Taxes are your responsibility."
@@ -840,7 +840,36 @@
       "quests": {
         "notActive": "⚠️ 未激活"
       },
-      "totalReceipts": "你总共上传了 {count} 张收据。"
+      "totalReceipts": "你总共上传了 {count} 张收据。",
+      "genesisPatchNotes": {
+        "badge": "新赛季",
+        "duration": "4 周",
+        "title": "Genesis 赛季已开始",
+        "subtitle": "所有人从 1 级、零余额同线起跑。此前的贡献记录保留。",
+        "rewardPointsLabel": "积分",
+        "rewardPointsHint": "每张收据即时奖励",
+        "rewardXpLabel": "经验",
+        "rewardXpHint": "攀登赛季阶梯",
+        "rule1Title": "过往贡献安全",
+        "rule1Desc": "赛季积分与经验重置。此前积累的 contribution points 不会删除。",
+        "rule2Title": "每张收据两项奖励",
+        "rule2Desc": "每次获奖扫描立即显示积分，以及通往赛季等级的经验。",
+        "rule4Title": "等级越高，单张越多",
+        "rule4Desc": "每日经验收据上限不变。等级提升后，每张收据可获得更多积分。",
+        "limitsTitle": "每日上限",
+        "limitXpValue": "5 张",
+        "limitXpDesc": "经验",
+        "limitPointsValue": "按等级",
+        "limitPointsDesc": "积分上限",
+        "limitFootnote": "第 6 张及之后仍会保存并分析；当天不再发放奖励。",
+        "tiersTitle": "赛季等级",
+        "tierSpark": "Spark",
+        "tierEmber": "Ember",
+        "tierFlame": "Flame",
+        "tierForge": "Forge",
+        "dontShowAgain": "不再显示",
+        "cta": "开始吧"
+      }
     },
     "receipts": {
       "title": "小票",
@@ -995,7 +1024,6 @@
         "registerLink": "立即创建"
       },
       "register": {
-        "badge": "安全引导",
         "headline": "创建你的Yumo Yumo账号，从可信的资料开始。",
         "subheadline": "你的账号将从安全验证、国家默认设置和清晰的应用路径开始。",
         "featureSecureTitle": "防止机器人攻击",
@@ -1031,11 +1059,13 @@
         "acceptPrivacyPrefix": "我已阅读",
         "acceptPrivacyLink": "隐私声明 / KVKK 披露",
         "acceptPrivacySuffix": "。",
-        "passwordHint": "至少8个字符，包括大写字母、小写字母、数字和特殊字符"
+        "passwordHint": "至少8个字符，包括大写字母、小写字母、数字和特殊字符",
+        "invitedBy": "邀请了你——首张小票通过验证后你们都将获得奖励。"
       },
       "verify": {
         "pendingTitle": "验证你的邮箱",
-        "pendingBody": "我们已将验证链接发送到你的收件箱。确认后即可解锁应用。",
+        "pendingBody": "我们已将验证链接发送至 {email}。确认后即可解锁应用。",
+        "pendingBodyFallback": "我们已将验证链接发送到你的收件箱。确认后即可解锁应用。",
         "pendingEmailFailedBody": "你的账号已创建，但我们无法自动发送验证邮件。请使用下面的重发按钮。",
         "verifiedTitle": "邮箱已验证",
         "verifiedBody": "你的账号已验证。你可以直接进入应用。",
@@ -1301,7 +1331,7 @@
         "reward": {
           "short": "奖励",
           "title": "计算你的奖励",
-          "sub": "我们将隐藏成本转换为cPoints，完成你的结果。"
+          "sub": "我们将隐藏成本转换为points，完成你的结果。"
         }
       }
     },
@@ -1484,8 +1514,8 @@
     "rewards": {
       "title": "奖励",
       "description": "账户余额和交易历史",
-      "cPointsTotal": "总 cPoints",
-      "cPointsBreakdown": "cPoints 细分",
+      "cPointsTotal": "总 points",
+      "cPointsBreakdown": "points 细分",
       "totalEarned": "总收入",
       "activity": "活动日志",
       "receiptVerified": "收据已验证",
@@ -1523,10 +1553,10 @@
       "days": "天",
       "badges": "徽章",
       "honor": "荣誉",
-      "totalAyumo": "总收据cPoints",
-      "totalRyumo": "总任务cPoints",
-      "totalAyumoAdminHint": "历史总收据cPoints（仅限管理员）",
-      "totalRyumoAdminHint": "历史总任务cPoints（仅限管理员）",
+      "totalAyumo": "总收据points",
+      "totalRyumo": "总任务points",
+      "totalAyumoAdminHint": "历史总收据points（仅限管理员）",
+      "totalRyumoAdminHint": "历史总任务points（仅限管理员）",
       "error": "排行榜加载失败",
       "empty": "暂无排行榜数据",
       "seasonLabel": "赛季"
@@ -2098,6 +2128,14 @@
     "deleteGoal": "删除目标",
     "goalTarget": "目标 {amount}",
     "addGoalButton": "添加财务目标",
+    "trustChecks": {
+      "image_quality": "清晰图像",
+      "date_time": "日期和时间",
+      "total": "总金额",
+      "merchant": "商家名称",
+      "verified_merchant": "已验证商家",
+      "ocr_confidence": "OCR 置信度"
+    },
     "trustCard": {
       "title": "收据质量",
       "desc": "清晰的收据可提高信任分数并解锁更好的奖励。",
@@ -2132,8 +2170,8 @@
     "totalProof": "你的已验证总贡献",
     "fromReceipts": "来自收据",
     "fromQuests": "来自任务",
-    "receiptCPoints": "收据 cPoints",
-    "bonusCPoints": "奖励 cPoints",
+    "receiptCPoints": "收据 points",
+    "bonusCPoints": "奖励 points",
     "earnedFromReceipts": "来自已验证收据",
     "earnedFromQuests": "来自已完成任务",
     "nextUnlocks": "下一个解锁",
@@ -2141,13 +2179,13 @@
     "reached": "✓ 已达成",
     "howYouEarn": "你的获得方式",
     "earnReceiptLabel": "上传收据",
-    "earnReceiptDesc": "Season XP · 账户 XP · 贡献值 · cPoints",
+    "earnReceiptDesc": "Season XP · 账户 XP · points",
     "earnVerifyLabel": "验证并赚取",
-    "earnVerifyDesc": "验证他人收据 → 获得 cPoints + Season XP",
+    "earnVerifyDesc": "验证他人收据 → 获得 points + Season XP",
     "earnDailyLabel": "每日任务",
-    "earnDailyDesc": "cPoints · Season XP",
+    "earnDailyDesc": "points · Season XP",
     "earnWeeklyLabel": "每周任务",
-    "earnWeeklyDesc": "更多 cPoints · Season XP",
+    "earnWeeklyDesc": "更多 points · Season XP",
     "earnQualityLabel": "高质量收据",
     "earnQualityDesc": "更好的奖励结果",
     "activity": "活动",
@@ -2155,12 +2193,10 @@
     "receipts": "收据",
     "quests": "任务",
     "noActivity": "暂无活动",
-    "invitesTitle": "你的邀请",
-    "invitesSubtitle": "你邀请的人的活动和收益",
     "seasonRecap": "本赛季目前",
     "receiptsVerified": "已验证收据",
     "questsCompleted": "已完成任务",
-    "cPointsEarned": "已获得 cPoints",
+    "cPointsEarned": "已获得 points",
     "seasonXp": "Season XP",
     "currentLevel": "当前等级",
     "rewardBoost": "奖励加成",
@@ -2177,7 +2213,15 @@
     "claiming": "领取中…",
     "claimDone": "已领取",
     "claimOpensAtTge": "领取将于 TGE 开放",
-    "claimWalletMismatch": "当前连接的钱包与该分配的钱包不同。请连接分配钱包以领取。"
+    "claimWalletMismatch": "当前连接的钱包与该分配的钱包不同。请连接分配钱包以领取。",
+    "supportLeaderboardTitle": "平台冠军榜",
+    "supportLeaderboardSubtitle": "按发现、修正和证明贡献排名——不仅看 points。",
+    "supportLeaderboardScore": "分数",
+    "supportLeaderboardYou": "你",
+    "alphaLeaderboardTitle": "Early Alpha",
+    "alphaLeaderboardSubtitle": "Alpha 阶段累计 points — 永久记录。",
+    "alphaLeaderboardScore": "points",
+    "alphaLeaderboardYou": "你"
   },
   "notificationsPage": {
     "eyebrow": "收件箱",
@@ -2343,6 +2387,7 @@
       "reward_pending_verification": "奖励尚未计算。行项目验证后可能会更新。",
       "duplicate_same_user": "你已经上传过这张小票。重复小票不会获得奖励。",
       "duplicate_other_user": "这张小票之前已上传。重复小票不会获得奖励。",
+      "cancelled_receipt": "这是一张已作废的小票，不是已完成的消费，因此不符合奖励条件。",
       "generic": "此文件已保存，但未获得奖励。"
     }
   },

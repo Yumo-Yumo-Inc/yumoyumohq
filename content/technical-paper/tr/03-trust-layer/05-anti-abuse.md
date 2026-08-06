@@ -12,22 +12,27 @@ Her sınıfın kendi sinyal ailesi vardır. Katman, istismarın yinelemeli oldu�
 
 ## 3.9 Sinyal kategorileri
 
-Üç sınıf genelinde, katman burada yüksek seviyede adlandırılan sinyal kategorilerinden yararlanır:
+Üç sınıf genelinde, katman burada yüksek seviyede adlandırılan sinyal kategorilerinden yararlanır.
+
+Mevcut sürümde aktif:
 
 - **Algısal benzerlik** — aynı fişin yüklemeler arası yeniden kullanımını tespit eder.
+
+Planlanan, mevcut sürümde aktif olmayan kategoriler:
+
 - **Cihaz ve oturum sürekliliği** — bir hesabın protokolle etkileşim biçimindeki olağandışı düzenleri tespit eder.
 - **Hesaplar arası korelasyon** — bağımsız hanelerle tutarsız düzenler paylaşan hesap kümelerini tespit eder.
 - **Sentetik medya özgünlüğü** — fiziksel fiş fotoğraflarını makine üretimi görsellerden ayırır. Sinyaller iç operasyon katmanında yönetilir.
 - **Davranışsal ritim** — hesap etkinliğini zaman içinde modeller. Bu kategoriyi oluşturan spesifik sinyaller iç operasyon katmanında yönetilir.
 
-Her kategori, fişin güven puanını ve uygun olduğunda kullanıcının sağlığını besleyen sinyaller üretir. Belirli sinyaller, eşikler ve küme inşa yöntemi iç operasyon katmanında yönetilir.
+Her kategori, fişin kalite değerlendirmesini ve uygun olduğunda kullanıcının sağlığını besleyen sinyaller üretir. Belirli sinyaller, eşikler ve küme inşa yöntemi iç operasyon katmanında yönetilir.
 
 ## 3.10 Muamele
 
 Muamele kademelidir:
 
-- Tek başına bir sinyal, etkilenen fiş için **güven bandını düşürür**.
-- Fişler arası bir sinyal kümesi, kullanıcının **sağlığını düşürür** ve günlük tavanı sıkıştırır.
-- Kullanıcılar arası kalıcı bir düzen, operasyonel kuyrukta **bir inceleme vakası açar**; çözüm insan incelemesi, ek doğrulama veya — tekrarlanan ve net durumlarda — hesap seviyesi eylem içerebilir.
+- Tek başına bir sinyal, etkilenen fiş için **kalite sonucunu düşürür**.
+- Fişler arası bir sinyal kümesi, kullanıcının **sağlığını düşürür**; bu da fiş başına ödül oranını azaltır.
+- Kullanıcılar arası kalıcı bir düzen, operasyonel kuyrukta **bir inceleme vakası açar** *(planlanan mekanizma; mevcut sürümde aktif değildir)*; çözüm insan incelemesi, ek doğrulama veya — tekrarlanan ve net durumlarda — hesap seviyesi eylem içerebilir.
 
 Kademeli muamele kasıtlıdır. Fişler ve kullanıcılar bir güven spektrumunda yer alır; protokolün ekonomik mantığı bu spektrumu okunabilir tutmaya bağlıdır.

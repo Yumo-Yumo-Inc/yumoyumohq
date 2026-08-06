@@ -2,43 +2,42 @@
 
 ## 5.3 Fiş kaydı (bağlayıcı)
 
-Tam yaşam döngüsü JSON'u. `/v1/receipts/{id}` okumalarının döndürdüğü budur.
+Fiş kaydı, uygulamanın kendi API'sinin döndürdüğü haliyle (`/api/receipts` altındaki oturum kimlikli okumalar). Gösterilen alan adları saklanan kaydı temsil eder.
 
 ```json
 // Receipt
 {
-  "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-  "user_id": "01HXY8K3F9A2QZ0M1B7N4PQR00",
-  "wallet_address": "5Hg2...8fpA",
+  "receipt_id": "6f2b8c1e-4a7d-4f2b-9c41-0e5d8a3b7f10",
+  "user": "yumo_user",
   "uploaded_at": "2026-05-17T14:23:11Z",
-  "captured_at": "2026-05-17T14:21:00Z",
+  "receipt_date": "2026-05-17",
   "currency": "TRY",
   "merchant": {
-    "merchant_id": "01HXY...",
-    "chain_id": "chain.migros",
-    "name_raw": "MIGROS T.A.S. ŞUBE 4521",
+    "merchant_id": "f3b1c2d4-...",
+    "display_name": "Migros",
     "city": "Istanbul",
-    "tax_id_hash": "sha256:7f3a..."
+    "tax_id": "6200278131"
   },
   "totals": {
-    "subtotal_minor": 23450,
-    "tax_total_minor": 4221,
-    "grand_total_minor": 27671,
+    "subtotal": "234.50",
+    "tax_total": "42.21",
+    "grand_total": "276.71",
     "currency": "TRY"
   },
   "tax_lines": [
-    { "rate_pct": 18.0, "base_minor": 20000, "amount_minor": 3600 },
-    { "rate_pct": 8.0,  "base_minor": 7750,  "amount_minor": 620  }
+    { "rate_pct": 18.0, "base": "200.00", "amount": "36.00" },
+    { "rate_pct": 8.0,  "base": "77.50",  "amount": "6.20"  }
   ],
   "payment_method": "credit_card",
+  "document_type": "receipt",
+  "is_payment_proof": true,
   "line_items": [
     {
-      "line_item_id": "01HXY...01",
       "raw_text": "SUT 1L PINAR",
-      "canonical_product_id": "cp.pinar.milk.1l",
+      "canonical_product_id": "3f6a...-...",
       "qty": 2.0,
-      "unit_price_minor": 2350,
-      "line_total_minor": 4700,
+      "unit_price": "23.50",
+      "line_total": "47.00",
       "tax_rate_pct": 8.0,
       "match_confidence": "0.XX"
     }
@@ -57,13 +56,12 @@ Tam yaşam döngüsü JSON'u. `/v1/receipts/{id}` okumalarının döndürdüğü
     "signals_present": ["total_reconciliation", "merchant_consistency"]
   },
   "rewards": {
-    "bint_minor_credited": 12500,
-    "bint_settled_at": null,
-    "epoints_minor_recorded": 845,
-    "statistics_only": false
+    "bint_credited": "125.00",
+    "reward_epoch": null
   },
   "status": "verified",
-  "schema_version": "1.0.0"
+  "proof_status": null,
+  "linked_receipt_id": null
 }
 ```
 
@@ -73,24 +71,27 @@ Güven değerleri ve güven puanı yer tutucu olarak gösterilir. Üretim aralı
 
 | Kural | Anlamı |
 |---|---|
-| ID'ler | ULID (Crockford base-32, 26 karakter). Zaman sıralı, sıralanabilir. |
-| Para tutarları | Minör birim (TRY için kuruş, USD için cent). Float kaymasını önler. |
+| ID'ler | Fişler ve satıcılar için UUID birincil anahtar; olay ve defter tablolarında seri tamsayı id. |
+| Para tutarları | Ondalık değerler, kanonik ondalık dize olarak serileştirilir (para için 2 basamak). |
 | Zaman damgaları | ISO 8601, `Z` soneki. Her zaman UTC. |
-| Hash'ler | `sha256:` öneki, ardından küçük harf hex. |
+| Hash'ler | Küçük harf hex; algoritma, alanın bağlamıyla adlandırılır. |
 | Boş değerler | Eksik alanlar açık `null` ile gösterilir. |
-| Durum enum | `pending`, `verified`, `rejected`, `statistics_only`, `under_review`. |
+| Durum enum | `verified`, `saved`, `analyzed`. |
 
-### Durum geçişleri
+### Durum ve ödeme kanıtı ele alınışı
+
+Canlı durum değerleri:
 
 ```
-pending
-   │
-   ├──► verified  (güven kapısını geçer)
-   ├──► statistics_only  (örn. ödeme kanıtı sınırlı sipariş sayfası fişi)
-   ├──► under_review  (sınır güven, itiraz kuyruğu)
-   └──► rejected  (sert ret: anti-istismar sinyali, el yazısı, yapay zeka üretimi)
+analyzed  — boru hattı çıktısı üretildi, henüz tutulan kayıt olarak kalıcılaşmadı
+saved     — kullanıcı tarafından tutuldu
+verified  — doğrulama kapılarını geçti; ödüle ve toplam katmana uygun
 ```
 
-bINT kazanımı `verified` durumunda gerçekleşir. `statistics_only` fiş, kullanıcının fiyat hafızasında ve hane istatistiklerinde sayılır; aggregate ve ödül işlemi 5.8 kurallarını izler.
+Ödeme kanıtı sınırlı belgeler (örneğin bir sipariş sayfası) bir durum değeriyle değil, **ayrı bir alan çiftiyle** ele alınır: `proof_status` kaydı ödeme kanıtı bekliyor olarak işaretler, `linked_receipt_id` ise kullanıcı bir tane yüklediğinde bu bekleyişi çözen ödeme kanıtı belgesine işaret eder. Bu kayıtlar kullanıcının kendi istatistiklerine hesaplanır ancak ödül kazanmaz ve anonimleştirilmiş toplamın dışında kalır.
+
+Sınır durumlar için manuel inceleme akışı planlanmıştır; canlı durum kümesinin parçası değildir.
+
+`verified` bir fiş bINT kazanır. Doğrulanmamış kayıtların toplam katmanındaki ele alınışı 5.8 kurallarını izler.
 
 ---

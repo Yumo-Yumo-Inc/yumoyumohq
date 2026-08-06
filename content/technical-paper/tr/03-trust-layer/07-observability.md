@@ -4,15 +4,15 @@
 
 Katmandan geçen her fiş, dahili bir gözlemlenebilirlik akışına bir kayıt yayınlar. Kayıt şunları içerir:
 
-- Atanan güven bandı ve katkıda bulunan sinyal ailelerinin listesi.
-- Fişin tutulup tutulmadığı, reddedilip reddedilmediği veya kredilendirilip kredilendirilmediği (tam / azaltılmış).
-- Tutulan fişler için, inceleyenin nihai eylemi ve karar süresi.
+- Atanan kalite kademesi ve katkıda bulunan sinyal ailelerinin listesi.
+- Fişin reddedilip reddedilmediği veya kredilendirilip kredilendirilmediği (tam / azaltılmış).
+- Planlanan inceleme kuyruğu devreye girdiğinde: tutulan fişler için inceleyenin nihai eylemi ve karar süresi.
 - Kredilendirilen fişler için, kredi anındaki kullanıcının sağlığı ve seviyesi.
 
 Bu akış üç görünümü besler:
 
 1. **Katman sağlık panosu** — zaman içinde bant dağılımı, tut-kuyruk derinliği, karar süresi, inceleyen geçersiz kılma oranı.
-2. **Kalibrasyon görünümü** — güven bandı ve gözlemlenen aşağı akış sonucunun eşli dağılımları (örn. "yüksek" bantlı bir fiş daha sonra farklı bir sinyalle işaretlendi mi?).
+2. **Kalibrasyon görünümü** — kalite kademesi ve gözlemlenen aşağı akış sonucunun eşli dağılımları (örn. "yüksek" bantlı bir fiş daha sonra farklı bir sinyalle işaretlendi mi?).
 3. **İstismar nabzı** — küme boyutu dağılımı, yeni düzen ortaya çıkma oranı, tutulan vakaların coğrafyası.
 
 ## 3.15 Kalibrasyon kadansı
@@ -27,7 +27,7 @@ Kalibrasyon mevcut fazda protokol ekibinin sorumluluğundadır. Operasyonel mode
 
 ## 3.16 Panoda yer almayan
 
-Panolar dahilidir. Bireysel kullanıcı tanımlayıcılarını açığa çıkarmazlar; bant, sinyal ailesi, coğrafya ve zamana göre toplarlar. Tanımlanabilir veri fiş deposunda (05 §5.3) yaşar ve orada anlatılan operasyonel kontrollerle erişilir.
+Panolar dahilidir. Bant, sinyal ailesi, coğrafya ve zamana göre toplarlar. Tanımlanabilir veri fiş deposunda (05 §5.3) yaşar ve orada anlatılan operasyonel kontrollerle erişilir.
 
 Kalibrasyon parametreleri — her kalibrasyon adımının ürettiği ağırlıklar — üretim yapılandırma deposunda yaşar ve katman yeniden ayarlandıkça rotasyona girer.
 

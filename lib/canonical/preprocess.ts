@@ -286,3 +286,16 @@ export function hasAnchorToken(queryTokens: string[], candidateTokens: string[])
   const longestQueryToken = [...queryTokens].sort((a, b) => b.length - a.length)[0];
   return candidateTokens.includes(longestQueryToken);
 }
+
+/**
+ * Text to embed for a merchant name. Non-Latin scripts (Thai/CJK/Arabic/
+ * Cyrillic) must be embedded RAW — transliteration turns "เซเว่น อีเลฟเว่น"
+ * into meaningless ASCII and the embedding model already matches across
+ * languages natively. Latin names embed their normalized (legal-stripped)
+ * form so query and stored pattern share one text space.
+ */
+export function embedTextForMerchant(raw: string, legalStripped: string): string {
+  const nonLatin = /[Ѐ-ӿ؀-ۿ฀-๿぀-ヿ一-鿿가-힯]/;
+  if (nonLatin.test(raw)) return raw.trim();
+  return legalStripped.trim() || raw.trim();
+}

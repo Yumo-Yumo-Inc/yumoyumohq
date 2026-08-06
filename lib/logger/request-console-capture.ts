@@ -31,7 +31,7 @@ function pushCapturedLine(args: unknown[]): void {
   store.logBuffer.push(args.map(stringifyConsoleArg).join(" "));
 }
 
-export function installRequestConsoleCapture(): void {
+function installRequestConsoleCapture(): void {
   if (globalState[installKey]) return;
 
   const originalLog = console.log.bind(console);

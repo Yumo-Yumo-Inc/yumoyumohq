@@ -2,6 +2,8 @@
 
 ## 5.14 SDK roadmap
 
+SDKs follow the planned public REST API (5.10); the indicative sequence below starts once that surface ships.
+
 | Quarter indicative | SDK |
 |---|---|
 | Q+1 | TypeScript SDK (public API) |
@@ -10,7 +12,7 @@
 | Q+3 | Python SDK for B2B |
 | Q+4 | R / Stata SDK for research |
 
-The B2B Python SDK is the highest-leverage developer surface — most B2B buyers' data teams default to Python.
+The B2B Python SDK carries particular weight — most B2B buyers' data teams default to Python.
 
 ---
 

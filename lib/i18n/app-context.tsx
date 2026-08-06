@@ -232,6 +232,26 @@ const API_ERROR_KEY_MAP: Record<string, string> = {
   'No background detected - receipt fills frame (screenshot-like)': 'errors.rejection.noBackground',
 };
 
+/**
+ * Detects raw technical / JavaScript error text that must NEVER reach the user
+ * (network failures, JS runtime errors, stack traces, chunk-load failures, JSON
+ * parse errors, raw URLs). Such a message is always replaced with the localized
+ * generic error, regardless of the unknownFallback flag — a `Failed to fetch` or
+ * `TypeError: …` string reads to the user as an app crash. Meaningful, human
+ * server messages (which don't match these patterns) still pass through when
+ * unknownFallback is not requested, preserving backward-compatible behaviour.
+ */
+function looksLikeTechnicalError(message: string): boolean {
+  return (
+    /failed to fetch|networkerror|network request failed|load failed|err_[a-z_]+/i.test(message) ||
+    /\b(?:type|reference|syntax|range|eval|internal)error\b/i.test(message) ||
+    /cannot read propert|cannot access|is not a function|is not defined|is not iterable|undefined is not|null is not/i.test(message) ||
+    /minified react error|loading chunk|failed to load (?:chunk|script|module)|chunkloaderror|dynamically imported module|importing a module script failed/i.test(message) ||
+    /unexpected token|json\.parse|unexpected end of (?:json|input)/i.test(message) ||
+    /\bat\b.*:\d+:\d+|https?:\/\/|<anonymous>/i.test(message)
+  );
+}
+
 /** When unknownFallback is true, unknown API messages are shown as locale-aware generic error instead of raw English. */
 export function translateApiError(
   message: string | undefined | null,
@@ -250,5 +270,7 @@ export function translateApiError(
   if (trimmed.startsWith('Please wait ') && trimmed.includes('before requesting another email')) {
     return t('errors.api.verificationCooldown');
   }
+  // A raw technical / JS error never reaches the user, even without unknownFallback.
+  if (looksLikeTechnicalError(trimmed)) return t('errors.api.unknown');
   return unknownFallback ? t('errors.api.unknown') : message;
 }

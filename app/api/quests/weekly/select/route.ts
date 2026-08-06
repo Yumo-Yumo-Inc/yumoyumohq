@@ -47,7 +47,21 @@ export async function POST(req: Request) {
     const now = new Date();
     const todayStr = now.toISOString().slice(0, 10);
     const { endTimestamp } = getWeekBounds(todayStr);
-    const selectionState = await getWeeklyQuestSelectionState(username, todayStr);
+    // Independent reads run in parallel; only the "existing" check depends on
+    // the selection state's week bounds.
+    const [selectionState, templateRow, beforeLevels, seasonRow] = await Promise.all([
+      getWeeklyQuestSelectionState(username, todayStr),
+      sql`
+        SELECT id, reward_bint, reward_season_xp
+        FROM quest_templates
+        WHERE type = ${selectedType}
+        LIMIT 1
+      `,
+      getMobileLevelSnapshot(username),
+      sql`
+        SELECT season_number FROM seasons WHERE status = 'active' ORDER BY start_at DESC LIMIT 1
+      `,
+    ]);
 
     const existing = await sql`
       SELECT 1 FROM user_quests uq
@@ -63,12 +77,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Already selected weekly quest for this week" }, { status: 400 });
     }
 
-    const templateRow = await sql`
-      SELECT id, reward_bint, reward_season_xp
-      FROM quest_templates
-      WHERE type = ${selectedType}
-      LIMIT 1
-    `;
     const template = toRows<Record<string, unknown>>(templateRow)[0] ?? null;
     if (!template) {
       return NextResponse.json({ error: "Quest template not found" }, { status: 404 });
@@ -79,11 +87,6 @@ export async function POST(req: Request) {
     const rewardAccountXp = getWeeklyQuestRewardAccountXp(selectedType);
     const target = selectionState.targetsByType[selectedType];
     const currentProgress = Math.min(selectionState.progressByType[selectedType], target);
-    const beforeLevels = await getMobileLevelSnapshot(username);
-
-    const seasonRow = await sql`
-      SELECT season_number FROM seasons WHERE status = 'active' ORDER BY start_at DESC LIMIT 1
-    `;
     const seasonNumber =
       Number((toRows<Record<string, unknown>>(seasonRow)[0] ?? {}).season_number ?? 1) || 1;
 
@@ -109,10 +112,9 @@ export async function POST(req: Request) {
       actionResult: await buildMobileActionResultForUser(username, { levelEvent }),
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
     console.error("[api/quests/weekly/select] error:", error);
     return NextResponse.json(
-      { error: "Failed to select weekly quest", details: message },
+      { error: "Failed to select weekly quest" },
       { status: 500 }
     );
   }

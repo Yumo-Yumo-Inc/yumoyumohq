@@ -14,8 +14,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export interface TrustCheck {
+  // Stable identifier; the client resolves the display label via i18n
+  // (messages.*.goals.trustChecks[key]). The server sends no localized text.
   key: string;
-  label: string;
   pass: boolean;
   warn: boolean;
 }
@@ -131,37 +132,31 @@ export async function GET() {
     const checks: TrustCheck[] = [
       {
         key: "image_quality",
-        label: "Net görüntü",
         pass: ratio(hasGoodOcr) >= PASS_THRESHOLD,
         warn: ratio(hasGoodOcr) >= WARN_THRESHOLD && ratio(hasGoodOcr) < PASS_THRESHOLD,
       },
       {
         key: "date_time",
-        label: "Tarih & saat",
         pass: ratio(hasDate) >= PASS_THRESHOLD && ratio(hasTime) >= PASS_THRESHOLD,
         warn: ratio(hasDate) >= WARN_THRESHOLD,
       },
       {
         key: "total",
-        label: "Toplam tutar",
         pass: ratio(hasTotal) >= PASS_THRESHOLD,
         warn: ratio(hasTotal) >= WARN_THRESHOLD && ratio(hasTotal) < PASS_THRESHOLD,
       },
       {
         key: "merchant",
-        label: "İşyeri adı",
         pass: ratio(hasMerchant) >= PASS_THRESHOLD,
         warn: ratio(hasMerchant) >= WARN_THRESHOLD && ratio(hasMerchant) < PASS_THRESHOLD,
       },
       {
         key: "verified_merchant",
-        label: "Onaylı işyeri",
         pass: ratio(hasVerified) >= PASS_THRESHOLD,
         warn: ratio(hasVerified) >= WARN_THRESHOLD && ratio(hasVerified) < PASS_THRESHOLD,
       },
       {
         key: "ocr_confidence",
-        label: "OCR güveni",
         pass: ratio(hasGoodOcr) >= PASS_THRESHOLD,
         warn: ratio(hasGoodOcr) >= WARN_THRESHOLD && ratio(hasGoodOcr) < PASS_THRESHOLD,
       },

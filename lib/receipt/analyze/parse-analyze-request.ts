@@ -1,6 +1,6 @@
 import type { ReceiptContext } from "@/app/api/receipt/analyze/types";
 
-export type AnalyzeRequestBody = {
+type AnalyzeRequestBody = {
   receiptId?: unknown;
   hash?: unknown;
   perceptualHash?: unknown;
@@ -15,7 +15,7 @@ export type AnalyzeRequestBody = {
   completeSlipReceiptId?: unknown;
 };
 
-export type ReceiptExpenseType = "personal" | "other";
+type ReceiptExpenseType = "personal" | "other";
 
 export type ParsedAnalyzeRequest = {
   receiptId: string;

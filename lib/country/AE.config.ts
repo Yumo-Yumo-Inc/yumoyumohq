@@ -80,4 +80,3 @@ export const AE_CONFIG: CountryConfig = {
   }
 };
 
-export default AE_CONFIG;

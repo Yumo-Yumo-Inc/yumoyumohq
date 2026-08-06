@@ -97,4 +97,3 @@ export const CN_CONFIG: CountryConfig = {
   ]
 };
 
-export default CN_CONFIG;

@@ -204,7 +204,7 @@ The app expects environment variables for database access, OCR, AI providers, st
 - Token Mechanics: `content/technical-paper/en/04-tokenomics-mechanics/02-token-classes.md`
 - Data Layers: `content/technical-paper/en/05-data-schema-and-api/02-data-layers.md`
 - Privacy and Data Risk: `content/technical-paper/en/08-risks-and-mitigations/06-privacy-and-data.md`
-- Behavioral research notes: `docs/pattern-research/`
+- Patterns research notes: `docs/pattern-research/` (topic briefs; see folder README)
 
 ## Product Principles
 

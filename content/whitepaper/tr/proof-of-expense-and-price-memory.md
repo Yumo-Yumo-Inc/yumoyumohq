@@ -14,11 +14,11 @@ flowchart TD
     B --> E["Yumbie bağlamı"]
     B --> F["Kalite ve güven puanı"]
     F --> G["bINT üretimi"]
-    F --> H["ePoints kaydı (dolar bazlı saklı maliyet)"]
+    F --> H["Saklı maliyet içgörüsü"]
     F --> I["Yumbie seviye ve sağlık güncellemesi"]
 ```
 
-Kalite katmanı burada belirleyici rol oynar. Okunabilirlik, toplam ile satırların uyumu, mağaza ve zaman ilişkisinin doğallığı, tekrar örüntüsü ve genel güven sinyalleri birlikte değerlendirilir. Güçlü kayıt hem hafızaya hem fiyat serisine hem de ekonomik hatta daha yüksek değer taşır. Böylece ağ, dikkat toplamaya dayalı yüzeysel hareketlerden çok, tarihsel değeri olan düzenli katkıyı öne çıkarır.
+Kalite katmanı burada belirleyici rol oynar. Okunabilirlik, toplam ile satırların uyumu, mağaza ve zaman ilişkisinin doğallığı, tekrarlama sinyali ve genel güven sinyalleri birlikte değerlendirilir. Güçlü kayıt hem hafızaya hem fiyat serisine hem de ekonomik hatta daha yüksek değer taşır. Böylece ağ, dikkat toplamaya dayalı yüzeysel hareketlerden çok, tarihsel değeri olan düzenli katkıyı öne çıkarır.
 
 ## Teknik Mimari
 
@@ -34,7 +34,7 @@ Fiyat hafızası, Harcama Kanıtı’nın kullanıcı tarafındaki en güçlü k
 | Ürün ve mağaza zaman serisi | Fiyat değişimini daha rahat izleme | Daha güçlü kolektif fiyat hafızası |
 | Yumbie bağlamı | Zamanlaması doğru yönlendirme | Daha iyi kişiselleştirme |
 | Katkı sinyali (bINT) | INT dönüşümüne yumuşak kredi | Açık ekonominin büyümesi |
-| Saklı maliyet kaydı (ePoints) | Harcama baskısının dolar bazlı izi | İleride token dağıtımlarında ağırlık |
+| Saklı maliyet içgörüsü | Harcama baskısını ve fiyat hareketini görme | Katkı kalitesi değerlendirmesini güçlendirir |
 | Kimlik ilerlemesi | Yumbie seviyesi ve sağlığı ilerler | Daha güçlü uzun vadeli katkıcı tabanı |
 
 Örneğin aynı aile üç ay boyunca aynı marketten süt, kahve ve çocuk bezi aldığında sistem her yeni fişle yalnızca yeni satırlar eklemez. Çocuk bezindeki artışı fark eder, kahvede mağaza değişiminin etkisini ölçer, sepet içindeki birlikte alınan kalıpları güçlendirir ve hane ritmini daha net okur. Bu süreç sonunda kullanıcı daha doğru rehberlik alırken, ağ da tarihsel değeri olan daha kaliteli veriyle büyür.

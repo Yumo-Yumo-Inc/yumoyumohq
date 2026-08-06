@@ -30,13 +30,13 @@ sequenceDiagram
     participant L as Libro mayor de recompensas
 
     U->>C: Seleccionar o capturar recibo
-    C->>C: Preprocesamiento local
-    C->>API: Solicitar sesión de carga
-    API-->>C: Destino de carga + receipt_id
-    C->>S: Cargar entrada del recibo
+    C->>API: Cargar archivo del recibo
+    API->>API: Preprocesamiento del lado del servidor
+    API->>S: Guardar entrada procesada
+    API-->>C: receipt_id
     C->>API: Iniciar procesamiento
     API->>P: Extraer texto y campos
-    P-->>API: ReceiptExtraction
+    P-->>API: Campos de extracción etiquetados
     API->>V: Verificar fecha, total, moneda y consistencia
     V-->>API: ValidationResult
     API->>M: Resolver referencias de comerciante y producto

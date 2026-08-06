@@ -6,21 +6,19 @@ Bir fişin yolculuğu iki fazda işler.
 
 **Faz A — Eşzamanlı (kullanıcı bekliyor):**
 
-1. İstemci görseli sıkıştırır, EXIF'i siler ve önceden imzalı yükleme URL'si ister.
-2. Görsel nesne depolamaya iner. Sunucu, algısal-hash tabanlı kopya kontrolüne bakar.
-3. OCR katmanı (02 Aşama 1) metni ve sınırlayıcı kutuları çıkarır.
-4. LLM yönlendiricisi (02 Aşama 2) yapılandırılmış bir `ReceiptExtraction` JSON çıkarır.
-5. Regex/kural katmanı (02 Aşama 3) toplamları mutabık kılar ve tarihleri doğrular.
-6. Kanonik eşleştirici (02 Aşama 4) her satırı bir kanonik ürün kimliğine çözer.
-7. Satıcı çözümleyici (02 Aşama 5) bir satıcı kimliği iliştirir.
-8. Güven puanlayıcı (03) [0, 1] aralığında bir puan üretir ve sistem kullanıcıya doğrulanmış önizlemeyi gösterir.
+1. İstemci dosyayı yükleme uç noktasına gönderir. Sunucu görseli sıkıştırır, EXIF üstverisini siler ve sonucu nesne depolamaya yazar. Analizden önce algısal-hash tabanlı kopya indeksi kontrol edilir.
+2. Görsel girdide vision LLM (02 Aşama 2) fişi tek çağrıda doğrudan görselden okur. PDF girdide önce bir OCR katmanı (02 Aşama 1) metni çıkarır; bu metin aynı LLM aşamasını besler.
+3. LLM **etiketli düz metin** döndürür: satıcı, tarih, toplamlar ve ödeme alanları için `FIELD: value` satırlarından oluşan bir blok, kalemler için pipe ile ayrılmış bir tablo. Parse defansiftir — eksik ya da bozuk bir satır o alanı `null` bırakır ve boru hattı devam eder.
+4. Regex/kural katmanı (02 Aşama 3) toplamları mutabık kılar ve tarihleri doğrular.
+5. Satıcı çözümleyici (02 Aşama 5) bir satıcı kimliği iliştirir.
+6. Güven katmanı (03) fişin kalitesini sınıflandırır ve ödül aynı istek içinde hesaplanır; kullanıcı doğrulanmış önizlemeyi ve ödülü birlikte görür.
 
 **Faz B — Eşzamansız (arka plan mutabakatı):**
 
-9. Güven puanı eşiği geçtiyse deftere bir `bINT.pending` satırı yazılır.
-10. Mutabakat işçisi saatlik grup bekleyen kredileri toplar, günlük tavanları hesaplar (03) ve Solana'da kullanıcının dondurulmuş ATA'sına bINT basar.
-11. İndeksleyici zincir üstü mint olayını alıp zincir dışı deftere geri onaylar.
+7. Arka plandaki post-process işçisi, her kalemi veritabanı tarafında bulanık eşleştirme ve LLM yedeğiyle bir kanonik ürün kimliğine çözer (02 Aşama 4) ve fişin kalite sınıflandırmasını kullanıcının kümülatif güven puanına katar.
+8. Mutabakat işçisi uygun bINT kredilerini toplar, günlük tavanları uygular ve karşılık gelen INT talepleri için bir epoch dağıtım kökü üretir.
+9. Dağıtım kökü zincire taahhüt edilir. İndeksleyici, dağıtıcıdan yapılan INT talep transferlerini zincir dışı deftere geri onaylar.
 
-Kullanıcı Faz A'yı saniyeler içinde görür. Faz B görünmez biçimde sonuçlanır. İki faz arasındaki sözleşme şudur: **zincir üstü mutabakata kadar zincir dışı defter doğruluk kaynağıdır**; mutabakattan sonra zincir üstü durum doğruluk kaynağıdır ve defter hızlı-okuma aynasına döner.
+Kullanıcı Faz A'yı saniyeler içinde görür. Faz B eşzamansız olarak sonuçlanır. Zincir dışı bINT defteri katkı kredileri için doğruluk kaynağı olarak kalır; zincir üstü kök ve talep transferleri, karşılık gelen INT dağıtımını kayda geçirir.
 
 ---

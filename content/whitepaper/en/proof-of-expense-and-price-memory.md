@@ -14,7 +14,7 @@ flowchart TD
     B --> E["Yumbie context"]
     B --> F["Quality and trust score"]
     F --> G["bINT generation"]
-    F --> H["ePoints record (USD-denominated hidden cost)"]
+    F --> H["Hidden-cost insight"]
     F --> I["Yumbie level and health update"]
 ```
 
@@ -28,7 +28,7 @@ Price memory is one of the clearest user-side gains of Proof of Expense. As a us
 | Product and merchant time series | Easier tracking of price change | Stronger collective price memory |
 | Yumbie context | Better-timed guidance | Better personalization |
 | Contribution signal (bINT) | Soft credit toward INT conversion | Open economy growth |
-| Hidden-cost record (ePoints) | USD-denominated trace of spending pressure | Future weight in token distributions |
+| Hidden-cost insight | Visibility into spending pressure and price movement | Strengthens contribution quality assessment |
 | Identity progression | Yumbie level and health move forward | Stronger long-range contributor base |
 
 Imagine a household buying milk, coffee, and diapers from the same grocery chain for three months. The system appends new line items while also noticing the rise in diaper prices, measuring the effect of a merchant switch on coffee, strengthening basket-level co-purchase patterns, and reading household rhythm with greater accuracy. The user receives better guidance, while the network grows through cleaner and more historically valuable data.

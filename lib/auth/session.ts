@@ -121,4 +121,4 @@ export function clearSessionCookies(response: NextResponse): void {
   response.cookies.set({ ...buildRefreshCookieOptions(isProduction), value: "", maxAge: 0 });
 }
 
-export { buildCookieOptions, buildRefreshCookieOptions };
+;

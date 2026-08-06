@@ -43,7 +43,7 @@ export function Stamp({ label, color }: { label: string; color: string }) {
 
 /* ───────────────────────────────────────────────────────────── Panel */
 
-export function Panel({ children, glow, className, style }: { children: ReactNode; glow?: boolean; className?: string; style?: CSSProperties }) {
+function Panel({ children, glow, className, style }: { children: ReactNode; glow?: boolean; className?: string; style?: CSSProperties }) {
   return (
     <div
       className={cx("relative overflow-hidden rounded-[20px]", className)}
@@ -64,7 +64,7 @@ export function Panel({ children, glow, className, style }: { children: ReactNod
 
 /* ──────────────────────────────────────────────────────── SectionHead */
 
-export function SectionHead({ eyebrow, title, right }: { eyebrow: string; title: string; right?: ReactNode }) {
+function SectionHead({ eyebrow, title, right }: { eyebrow: string; title: string; right?: ReactNode }) {
   return (
     <div className="flex items-end justify-between gap-3">
       <div className="min-w-0">
@@ -83,7 +83,7 @@ export function SectionHead({ eyebrow, title, right }: { eyebrow: string; title:
 
 /* ─────────────────────────────────────────────────────────── StatCell */
 
-export function StatCell({ label, value, sub, color }: { label: string; value: ReactNode; sub?: string; color?: string }) {
+function StatCell({ label, value, sub, color }: { label: string; value: ReactNode; sub?: string; color?: string }) {
   return (
     <div className="min-w-0 px-3 py-2.5">
       <div className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{ color: "var(--pf-mute)", fontFamily: MONO }}>{label}</div>
@@ -95,7 +95,7 @@ export function StatCell({ label, value, sub, color }: { label: string; value: R
 
 /* ──────────────────────────────────────────────────────────────── KV */
 
-export function KV({ label, value, accent }: { label: string; value: string; accent?: string }) {
+function KV({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b py-2.5" style={{ borderColor: "var(--pf-line)" }}>
       <span className="text-[11px] uppercase tracking-wide" style={{ color: "var(--pf-mute)", fontFamily: MONO }}>{label}</span>
@@ -106,7 +106,7 @@ export function KV({ label, value, accent }: { label: string; value: string; acc
 
 /* ───────────────────────────────────────────────────────────── Bar */
 
-export function Bar({ pct, color, progress, reduce, delay = 0, height = 8 }: { pct: number; color: string; progress: boolean; reduce: boolean | null; delay?: number; height?: number }) {
+function Bar({ pct, color, progress, reduce, delay = 0, height = 8 }: { pct: number; color: string; progress: boolean; reduce: boolean | null; delay?: number; height?: number }) {
   return (
     <div className="overflow-hidden rounded-full" style={{ height, background: "rgba(0,0,0,0.38)", border: "1px solid var(--pf-line)" }}>
       <motion.div

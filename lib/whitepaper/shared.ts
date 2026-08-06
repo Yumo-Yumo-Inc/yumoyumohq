@@ -21,7 +21,7 @@ export const whitepaperLocaleLabels: Record<WhitepaperLocale, string> = {
   zh: "简体中文",
 };
 
-export type WhitepaperUiStrings = {
+type WhitepaperUiStrings = {
   documentation: string;
   whitepaper: string;
   previous: string;
@@ -44,7 +44,7 @@ export type WhitepaperUiStrings = {
   chapterAtmosphere: string;
 };
 
-export const whitepaperUiStrings: Record<WhitepaperLocale, WhitepaperUiStrings> = {
+const whitepaperUiStrings: Record<WhitepaperLocale, WhitepaperUiStrings> = {
   tr: {
     documentation: "Belgeler",
     whitepaper: "Whitepaper",

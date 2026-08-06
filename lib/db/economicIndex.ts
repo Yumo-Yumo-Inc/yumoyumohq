@@ -8,7 +8,7 @@ import { db, withConnectionRetry } from "./client";
 import { CountryCode } from "@/lib/mining/types";
 import { EconomicIndexType } from "@/lib/mining/economicIndex";
 
-export interface EconomicIndexRow {
+interface EconomicIndexRow {
   country: string;
   index_type: string;
   year_month: string;
@@ -109,7 +109,7 @@ export async function getEconomicIndexFromDB(
 /**
  * For test/debug use: clears the cache. Not called in production.
  */
-export function clearEconomicIndexCache(): void {
+function clearEconomicIndexCache(): void {
   economicIndexCache.clear();
 }
 

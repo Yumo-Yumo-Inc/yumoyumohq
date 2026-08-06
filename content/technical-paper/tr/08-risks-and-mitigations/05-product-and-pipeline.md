@@ -21,4 +21,4 @@ Sağlayıcı seçimi, yönlendirme sırası, eşikler ve hız sınırı değerle
 
 ## 8.13 Evrim
 
-Boru hattı olgunlaştıkça kural setleri, kanonik ürün kapsamı ve kalite izleme sinyalleri sürümlü olarak genişler. Yerelleşme planı ilerledikçe boru hattı konfigürasyonu, hazine ve yetki taşıma modeliyle aynı yönetim disiplinine bağlanır.
+Boru hattı olgunlaştıkça kural setleri, kanonik ürün kapsamı ve kalite izleme sinyalleri sürümlü olarak genişler. Gelecekte yetki devri yapılırsa, boru hattı yapılandırmasına ilişkin karar hakları aynı devir belgesinde tanımlanır.

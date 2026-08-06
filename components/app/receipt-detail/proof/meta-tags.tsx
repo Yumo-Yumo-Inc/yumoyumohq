@@ -76,7 +76,7 @@ export function MetaTags({ receipt, onReportBug }: { receipt: Receipt; onReportB
         {receipt.country && <Tag label={isTr ? "Ülke" : "Country"} value={receipt.country} />}
         <Tag label={isTr ? "Yüklendi" : "Uploaded"} value={uploaded} />
         {category && <Tag label={isTr ? "Kategori" : "Category"} value={category} />}
-        <Tag label="Fiş #" value={receipt.id.slice(0, 10)} />
+        <Tag label={isTr ? "Fiş #" : "Receipt #"} value={receipt.id.slice(0, 10)} />
       </div>
 
       <button type="button" onClick={onReportBug} className="inline-flex items-center gap-2 px-3.5 py-2 text-[11px] font-bold uppercase tracking-wide" style={{ background: "var(--pf-inset)", borderLeft: "2px solid var(--pf-line-strong)", clipPath: SLANT, color: "var(--pf-mute)", fontFamily: MONO }}>

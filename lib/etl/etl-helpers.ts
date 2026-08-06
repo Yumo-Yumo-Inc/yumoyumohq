@@ -58,7 +58,7 @@ export function normalizeToBaseline(
  * `quarterByYm` keys must be the quarter's last month ("YYYY-03", "-06", "-09", "-12").
  * All returned values must be marked is_interpolated=true (the caller's responsibility).
  */
-export function forwardFillQuarterly(quarterByYm: Map<string, number>): Map<string, number> {
+function forwardFillQuarterly(quarterByYm: Map<string, number>): Map<string, number> {
   const out = new Map<string, number>();
   for (const [ym, v] of quarterByYm) {
     const [y, m] = ym.split("-").map(Number);

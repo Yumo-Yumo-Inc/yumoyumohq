@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import type { ReceiptContext } from "@/app/api/receipt/analyze/types";
 import {
+  DailyLimitError,
   DuplicateError,
   PipelineError,
   RejectionError,
@@ -20,6 +21,14 @@ import {
 
 export async function mapAnalyzeError(error: unknown, context?: ReceiptContext): Promise<NextResponse> {
   console.error("[Pipeline] âŒ Error:", error);
+
+  if (error instanceof DailyLimitError) {
+    // No OCR/AI cost was incurred — this is thrown before the Vision call.
+    return NextResponse.json(
+      { error: error.message, code: error.errorCode, quota: error.quota },
+      { status: error.statusCode }
+    );
+  }
 
   if (error instanceof ValidationError) {
     return NextResponse.json(

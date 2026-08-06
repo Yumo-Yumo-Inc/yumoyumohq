@@ -1,6 +1,14 @@
 /**
- * Referral bonus calculation and reward-log persistence.
- * Called from post-process after receipt_rewards is written.
+ * Referral milestone rewards.
+ *
+ * Both the referrer and the referee earn a fixed cPoints bonus as the referee
+ * climbs the milestone ladder (karar 2026-07-15). Rewards are written to the
+ * canonical contribution-points ledger (`contribution_point_events`), so they:
+ *   - land in the user's visible cPoints balance (`user_contribution_totals`),
+ *   - are idempotent via the existing UNIQUE (username, source_type, reference_id),
+ *   - sit OUTSIDE the daily receipt-earning cap (that cap is enforced on receipt
+ *     `bint_bonus_amount`, not on other-source contribution events).
+ *
  * SERVER-ONLY.
  */
 
@@ -9,108 +17,128 @@ if (typeof window !== "undefined") {
 }
 
 import { getSql } from "@/lib/db/client";
-import { REFERRAL_BONUS_PCT } from "./referral-config";
+import {
+  REFERRAL_MILESTONE_REWARD,
+  REFERRAL_M2_RECEIPT_COUNT,
+  type ReferralMilestone,
+} from "./referral-config";
+import { getRefereeMilestoneFacts, markMilestoneReached } from "./referral-storage";
 
-let ensuredRewardLog = false;
+const MILESTONE_COLUMN: Record<
+  ReferralMilestone,
+  "m1_first_receipt_at" | "m2_three_in_7d_at" | "m3_retained_30d_at"
+> = {
+  first_receipt: "m1_first_receipt_at",
+  three_in_7d: "m2_three_in_7d_at",
+  retained_30d: "m3_retained_30d_at",
+};
 
-async function ensureRewardLogTable() {
-  const sql = getSql();
-  if (!sql || ensuredRewardLog) return;
-
-  const exists = await sql`
-    SELECT EXISTS (
-      SELECT FROM information_schema.tables
-      WHERE table_schema = 'public' AND table_name = 'referral_reward_log'
-    )
-  `;
-  if (!exists[0]?.exists) {
-    await sql`
-      CREATE TABLE referral_reward_log (
-        id SERIAL PRIMARY KEY,
-        receipt_id VARCHAR(255) NOT NULL,
-        referral_relationship_id INT NOT NULL,
-        amount_bint_referee NUMERIC(20,6) DEFAULT 0,
-        amount_bint_referrer NUMERIC(20,6) DEFAULT 0,
-        created_at TIMESTAMP DEFAULT now()
-      )
-    `;
-  }
-
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS receipt_id VARCHAR(255)`;
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS referral_relationship_id INT`;
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS amount_bint_referee NUMERIC(20,6) DEFAULT 0`;
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS amount_bint_referrer NUMERIC(20,6) DEFAULT 0`;
-  await sql`ALTER TABLE referral_reward_log ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT now()`;
-
-  await sql`CREATE INDEX IF NOT EXISTS idx_rrl_receipt ON referral_reward_log(receipt_id)`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_rrl_relationship ON referral_reward_log(referral_relationship_id)`;
-  // One bonus per (receipt, relationship) — the DB constraint backs the
-  // idempotency check so a concurrent post-process re-run can't double-credit.
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_rrl_receipt_rel ON referral_reward_log(receipt_id, referral_relationship_id)`;
-
-  ensuredRewardLog = true;
+export interface ReferralMilestoneGrant {
+  milestone: ReferralMilestone;
+  amount: number;
+  referrerUsername: string;
+  refereeUsername: string;
 }
 
-export interface ReferralBonusResult {
-  applied: boolean;
-  referrerUsername: string | null;
-  bonusAmount: number;
+// sql tipi: neon() tarafından döndürülen template tag function
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SqlClient = (...args: any[]) => any;
+
+async function resolveActiveSeasonNumber(sql: SqlClient): Promise<number | null> {
+  try {
+    const rows = await sql`
+      SELECT season_number FROM seasons WHERE status = 'active' ORDER BY start_at DESC LIMIT 1
+    `;
+    return (rows as { season_number?: number }[])[0]?.season_number ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Calculate and persist referral bonus for a verified receipt.
- *
- * @param receiptId     - The verified receipt id
- * @param refereeUsername - The receipt owner (referee)
- * @param bintBonusAmount - The bINT bonus amount from receipt_rewards
- * @returns Whether a bonus was applied and its amount
+ * Credit `amount` cPoints to `username` for a referral milestone. Idempotent:
+ * the UNIQUE (username, source_type, reference_id) skips a second credit.
+ * Returns true only when this call inserted the row.
  */
-export async function applyReferralBonus(
-  receiptId: string,
-  refereeUsername: string,
-  bintBonusAmount: number,
-): Promise<ReferralBonusResult> {
-  const noBonus: ReferralBonusResult = { applied: false, referrerUsername: null, bonusAmount: 0 };
-
-  if (!bintBonusAmount || bintBonusAmount <= 0) return noBonus;
-
-  const sql = getSql();
-  if (!sql) return noBonus;
-
-  await ensureRewardLogTable();
-
-  // Find active, non-expired referral relationship
-  const relRows = await sql`
-    SELECT id, referrer_username FROM referral_relationships
-    WHERE referee_username = ${refereeUsername}
-      AND status = 'activated'
-      AND bonus_expires_at > now()
-    LIMIT 1
-  `;
-  if (!relRows.length) return noBonus;
-
-  const rel = relRows[0] as { id: number; referrer_username: string };
-  const bonusAmount = Math.round(bintBonusAmount * REFERRAL_BONUS_PCT * 100) / 100;
-  if (bonusAmount <= 0) return noBonus;
-
-  // Idempotency is enforced atomically by the unique index: the INSERT only
-  // succeeds for the first writer; a concurrent re-run gets 0 rows back and
-  // skips the credit, so the referrer can't be double-credited.
+async function creditMilestonePoints(
+  sql: SqlClient,
+  username: string,
+  amount: number,
+  relationshipId: number,
+  milestone: ReferralMilestone,
+  role: "referrer" | "referee",
+  seasonNumber: number | null,
+): Promise<boolean> {
+  const referenceId = `${relationshipId}:${milestone}:${role}`;
+  const metadata = { relationshipId, milestone, role, amount };
   const inserted = await sql`
-    INSERT INTO referral_reward_log (receipt_id, referral_relationship_id, amount_bint_referee, amount_bint_referrer)
-    VALUES (${receiptId}, ${rel.id}, 0, ${bonusAmount})
-    ON CONFLICT (receipt_id, referral_relationship_id) DO NOTHING
+    INSERT INTO contribution_point_events (
+      username, points_delta, source_type, reference_id, season_number, metadata, contribution_version
+    )
+    VALUES (
+      ${username}, ${amount}, 'referral_milestone', ${referenceId}, ${seasonNumber},
+      ${JSON.stringify(metadata)}::jsonb, 1
+    )
+    ON CONFLICT (username, source_type, reference_id) DO NOTHING
     RETURNING id
   `;
-  if (!inserted.length) return noBonus;
+  return (inserted as unknown[]).length > 0;
+}
 
-  // Credit the referrer's balance
-  await sql`
-    UPDATE user_profiles
-    SET bint_balance = COALESCE(bint_balance, 0) + ${bonusAmount},
-        updated_at = now()
-    WHERE username = ${rel.referrer_username}
-  `;
+/**
+ * Evaluate the referee's milestone ladder and grant any newly-reached milestones
+ * to BOTH the referrer and the referee. Safe to call on every verified receipt
+ * (and after email verification) — idempotent at the ledger level.
+ *
+ * @returns One entry per milestone that was granted by *this* call (empty if none).
+ */
+export async function grantReferralMilestones(
+  refereeUsername: string,
+): Promise<ReferralMilestoneGrant[]> {
+  const sql = getSql();
+  if (!sql) return [];
 
-  return { applied: true, referrerUsername: rel.referrer_username, bonusAmount };
+  const facts = await getRefereeMilestoneFacts(refereeUsername);
+  if (!facts) return [];
+
+  const { relationship: rel, emailVerified } = facts;
+  // Email verification gates every grant — an unverified referee earns nothing.
+  if (!emailVerified) return [];
+
+  const referrer = rel.referrer_username;
+  const seasonNumber = await resolveActiveSeasonNumber(sql);
+
+  const reached: ReferralMilestone[] = [];
+  if (!rel.m1_first_receipt_at && facts.verifiedCount >= 1) {
+    reached.push("first_receipt");
+  }
+  if (!rel.m2_three_in_7d_at && facts.countWithinM2Window >= REFERRAL_M2_RECEIPT_COUNT) {
+    reached.push("three_in_7d");
+  }
+  if (!rel.m3_retained_30d_at && facts.retainedAtDay30) {
+    reached.push("retained_30d");
+  }
+  if (!reached.length) return [];
+
+  const grants: ReferralMilestoneGrant[] = [];
+  for (const milestone of reached) {
+    const amount = REFERRAL_MILESTONE_REWARD[milestone];
+
+    // Credit both sides. The ledger unique index is the real idempotency guard;
+    // the relationship column is only marked after at least one side was credited.
+    const refereeInserted = await creditMilestonePoints(
+      sql, refereeUsername, amount, rel.id, milestone, "referee", seasonNumber,
+    );
+    const referrerInserted = await creditMilestonePoints(
+      sql, referrer, amount, rel.id, milestone, "referrer", seasonNumber,
+    );
+
+    await markMilestoneReached(rel.id, MILESTONE_COLUMN[milestone]).catch(() => {});
+
+    if (refereeInserted || referrerInserted) {
+      grants.push({ milestone, amount, referrerUsername: referrer, refereeUsername });
+    }
+  }
+
+  return grants;
 }

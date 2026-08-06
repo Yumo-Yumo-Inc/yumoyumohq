@@ -10,7 +10,7 @@ The public contract of the layer is which decision categories exist and how they
 |---|---|
 | Full accept | The receipt enters the reward ledger with the normal coefficient |
 | Reduced accept | The receipt is valid, but quality or behavior signals reduce the reward coefficient |
-| Review | The receipt or user behavior enters manual decisioning |
+| Review | The receipt or user behavior enters manual decisioning *(planned mechanism; not active in the current release)* |
 | Reject | The receipt enters rejected record state |
 
 This surface gives users understandable feedback while defense parameters stay in the internal operations layer.

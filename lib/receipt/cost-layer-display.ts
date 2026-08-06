@@ -255,8 +255,10 @@ export function getCostLayerCopy(args: {
 
 export type HiddenCostProvenance =
   | "item_derived"
+  | "retail_margin"
   | "category_derived"
   | "sector_average"
+  | "category_inflation_premium"
   | "inflation_premium";
 
 /**
@@ -269,6 +271,19 @@ export function getProvenanceNotice(
   provenance: HiddenCostProvenance | null | undefined,
   locale?: LocaleLike
 ): { label: string; detail: string; tone: "success" | "info" } {
+  if (provenance === "category_inflation_premium") {
+    // Each line was priced against its own COICOP division's inflation (food,
+    // transport, clothing …) rather than one headline number for the whole receipt.
+    return {
+      label: pick(locale, "Kategori bazlı enflasyona dayalı", "Based on category inflation"),
+      detail: pick(
+        locale,
+        "Her kalem kendi harcama grubunun resmî enflasyonuyla (gıda, ulaştırma, giyim gibi) karşılaştırıldı; tek bir genel enflasyon oranı kullanılmadı. Üretici maliyetinden hesaplanmadı.",
+        "Each line was compared against its own official spending-group inflation (food, transport, clothing and so on) rather than one headline rate. Not computed from producer cost."
+      ),
+      tone: "info",
+    };
+  }
   if (provenance === "inflation_premium") {
     // For countries without detailed producer-gap data, hidden cost is estimated from
     // general inflation (CPI). No misleading precision (producer margin) is claimed.
@@ -278,6 +293,20 @@ export function getProvenanceNotice(
         locale,
         "Ülkeniz için ürün bazlı maliyet verisi henüz yok; bu rakam resmî genel enflasyon (TÜFE/CPI) endeksine dayalı tahminî bir paydır — kalem bazında üretici maliyetinden hesaplanmadı.",
         "Product-level cost data is not available yet for your country, so this figure is an estimate based on the official general inflation (CPI) index — not computed from per-item producer cost."
+      ),
+      tone: "info",
+    };
+  }
+  if (provenance === "retail_margin") {
+    // Items were recognised and priced one by one, but the reference is a
+    // verified retail/distribution margin multiple — not a producer cost gap.
+    // Saying "computed from your items" alone would overstate the precision.
+    return {
+      label: pick(locale, "Onaylı perakende marjına dayalı", "Based on verified retail margins"),
+      detail: pick(
+        locale,
+        "Fişinizdeki kalemler tanındı ve tek tek fiyatlandı. Referans fiyat, ülkeniz için doğrulanmış perakende/dağıtım marjı katsayısına dayanır — üretici maliyetinden hesaplanmadı.",
+        "This receipt's items were recognised and priced individually. The reference price is based on a verified retail/distribution margin for your country — it was not computed from producer cost."
       ),
       tone: "info",
     };
@@ -319,7 +348,7 @@ export function getEvidenceBadge(args: {
   return { label: pick(args.locale, "Tahmini", "Estimated"), tone: "warning" };
 }
 
-export function isReceiptVerified(status?: ReceiptStatus | string | null): boolean {
+function isReceiptVerified(status?: ReceiptStatus | string | null): boolean {
   const normalized = String(status || "").toLowerCase();
   return normalized === "verified" || normalized === "saved";
 }

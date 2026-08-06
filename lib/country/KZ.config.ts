@@ -80,4 +80,3 @@ export const KZ_CONFIG: CountryConfig = {
   ]
 };
 
-export default KZ_CONFIG;

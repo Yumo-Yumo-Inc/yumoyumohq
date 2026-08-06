@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, DM_Mono, Orbitron, JetBrains_Mono, Barlow_Condensed, Space_Grotesk } from "next/font/google";
+import "./fonts/local-fonts.css";
 import { RootBodyShell } from "@/components/root-body-shell";
 import { DOMErrorHandler } from "@/components/dom-error-handler";
 import { GoogleTranslateBlocker } from "@/components/google-translate-blocker";
@@ -15,7 +15,8 @@ export const metadata: Metadata = {
     default: "Yumo Yumo",
     template: "%s | Yumo Yumo",
   },
-  description: "Upload receipts, track rewards, and use Yumo Yumo like an installable mobile app.",
+  description:
+    "Upload receipts, uncover hidden costs, and earn contribution rewards with Yumo Yumo.",
   // NOTE: manifest link is rendered manually in <head> below with
   // crossOrigin="use-credentials" so the auth/WAF cookie is sent.
   // Without it, the WAF rejects the cookieless manifest fetch with 403
@@ -47,49 +48,6 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const dmSans = DM_Sans({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
-
-const dmMono = DM_Mono({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
-  variable: "--font-dm-mono",
-  display: "swap",
-});
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  weight: ["500"],
-  variable: "--font-orbitron",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
-
-// Condensed grotesk — boarding-pass display type for the receipt detail surface.
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin", "latin-ext"],
-  weight: ["500", "600", "700"],
-  variable: "--font-barlow-condensed",
-  display: "swap",
-});
-
-// Display grotesk — the scan-analysis story surface (new-scanning-page.html).
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
 
 // Blocking inline script: reads localStorage before React hydration to prevent theme flash.
 // Defined outside JSX to avoid TypeScript 5.9 template-literal-in-JSX parse issue.
@@ -102,7 +60,7 @@ export default function RootLayout({
   children: ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${dmSans.variable} ${dmMono.variable} ${orbitron.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         {/*
           Manifest must be fetched WITH credentials so the WAF/auth cookie
@@ -116,7 +74,7 @@ export default function RootLayout({
           crossOrigin="use-credentials"
         />
       </head>
-      <body suppressHydrationWarning className={dmSans.className}>
+      <body suppressHydrationWarning className="font-dm-sans">
         <ThemeInitScript />
         <PwaInit />
         <GoogleTranslateBlocker />

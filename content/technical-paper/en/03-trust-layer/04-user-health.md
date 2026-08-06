@@ -2,24 +2,24 @@
 
 ## 3.5 User-level health
 
-Every user has a **health** value in `[0, 1]` that reflects recent contribution quality. Health changes slowly: a long sequence of clean receipts pushes it up; a sequence of held or rejected receipts pulls it down. Health acts as a multiplier on the user's daily contribution ceiling, so it directly affects how much bINT the same receipt can earn for different users.
+Every user carries a **health** standing that reflects the quality of their contributions. Health moves gradually: a sequence of clean, complete receipts pushes it up; a sequence of low-quality or inconsistent receipts pulls it down. Health acts as a multiplier on the **per-receipt reward rate**, so the same receipt can earn different bINT amounts for users with different standing.
 
 Health has three properties worth naming:
 
 - **Bounded.** It stays inside a configured range that lets a recovering user climb back. New users start at a neutral mid-point.
-- **Lagged.** It is recomputed in the daily batch tier. Individual receipt effects spread over time.
-- **Decayed.** Older contributions matter less than recent ones through the contribution window.
+- **Synchronous.** It is updated as each receipt is processed, in the same pass that assesses receipt quality (3.3).
+- **Decayed** *(planned)*. A time-decay component, under which older contributions matter less than recent ones, is planned and not active in the current release.
 
-The decay window, floor and ceiling values, and band boundaries that map health into daily caps are managed in the internal operations layer.
+The health range, the rate bands, and the mapping from health into the reward rate are managed in the internal operations layer.
 
 ## 3.6 Level
 
-Health is short-horizon; **level** is long-horizon. Level is an integer that grows with cumulative high-quality contribution. Levels unlock product surfaces and, at the milestone defined in *Vision Paper — Yumbie Product Surface*, the user's Foundation NFT evolves into the Smart Agent (a one-way mint event).
+Health is behaviour-horizon; **level** is contribution-horizon. Level is an integer that grows with cumulative high-quality contribution. Levels unlock product surfaces.
 
 Level is monotonic. A user who pauses contribution keeps their level while health drifts toward the neutral mid-point.
 
-Level and health together set the effective daily bINT ceiling. The current MVP implementation uses per-level tables (04 §4.22); the target architecture uses a formula-based ceiling with `base_cap × level_multiplier × health_score` (04 §4.23).
+Level and health act on different parts of the reward computation: **level sets the daily bINT ceiling** (04 §4.22), and **health multiplies the per-receipt reward rate** within that ceiling.
 
 ## 3.7 The daily ceiling, in plain terms
 
-A user can earn bINT every day up to a ceiling that reflects (a) how active they have been on the protocol and (b) how clean their recent contributions are. New users get a modest ceiling that grows with level. The ceiling is communicated to the user in the product surface as a progress indicator; the value is re-tuned over time and across markets.
+A user can earn bINT every day up to a ceiling set by their account level, which reflects how active they have been on the protocol. Within that ceiling, the amount each individual receipt earns is shaped by the user's health standing. New users get a modest ceiling that grows with level. The ceiling is communicated to the user in the product surface as a progress indicator; the values are re-tuned over time and across markets.

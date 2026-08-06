@@ -66,7 +66,6 @@ interface CreateUserInput {
 type SeedUser = { username: string; password: string };
 
 let memoryUsers: PersistedUserAuthRecord[] = [];
-let ensuredUsersTable = false;
 
 function isDatabaseAvailable(): boolean {
   return typeof window === "undefined" && !!(process.env.NEW_DB_DATABASE_URL || process.env.DATABASE_URL);
@@ -154,72 +153,26 @@ async function writeUsersToFile(users: PersistedUserAuthRecord[]): Promise<void>
   await fs.writeFile(AUTH_USERS_FILE, JSON.stringify(users, null, 2), "utf-8");
 }
 
-async function withUsersTable(): Promise<NonNullable<ReturnType<typeof getSql>> | null> {
+function withUsersTable(): NonNullable<ReturnType<typeof getSql>> | null {
+  // Schema is owned by lib/db/migrations/138_users_schema_baseline.sql — no
+  // request-path DDL. Verified live on DEV and PROD (2026-07-23) before the
+  // former self-heal ladder (~16 serial round-trips per cold start) was
+  // removed.
   const sql = getSql();
   if (!isDatabaseAvailable() || !sql) {
     return null;
   }
-
-  if (ensuredUsersTable) {
-    return sql;
-  }
-
-  const tableExists = await sql`
-    SELECT EXISTS (
-      SELECT FROM information_schema.tables
-      WHERE table_schema = 'public'
-        AND table_name = 'users'
-    )
-  `;
-
-  if (!tableExists[0]?.exists) {
-    await sql`
-      CREATE TABLE users (
-        username VARCHAR(255) PRIMARY KEY,
-        email VARCHAR(255),
-        country VARCHAR(2),
-        password_hash VARCHAR(255) NOT NULL,
-        email_verified_at TIMESTAMP,
-        terms_accepted_at TIMESTAMP,
-        terms_version VARCHAR(64),
-        privacy_accepted_at TIMESTAMP,
-        privacy_version VARCHAR(64),
-        signup_ip VARCHAR(255),
-        signup_user_agent TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-  }
-
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255)`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(2)`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP`;
-  // Stamped on every password change; sessions issued before this are rejected.
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_changed_at TIMESTAMP`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_version VARCHAR(64)`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMP`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_version VARCHAR(64)`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS signup_ip VARCHAR(255)`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS signup_user_agent TEXT`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_users_updated_at ON users(updated_at)`;
-
-  try {
-    await sql`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
-      ON users(email)
-      WHERE email IS NOT NULL
-    `;
-  } catch (error) {
-    console.warn("[user-auth-storage] Failed to ensure unique email index:", error);
-  }
-
-  ensuredUsersTable = true;
   return sql;
+}
+
+/**
+ * Ensure the `users` table (and its columns, incl. telegram_id/source_channel)
+ * exist, returning the sql handle or null when no DB is configured. Exported so
+ * the Telegram identity module can bootstrap the schema before its first write
+ * on a fresh database.
+ */
+export async function ensureUsersSchema(): Promise<NonNullable<ReturnType<typeof getSql>> | null> {
+  return withUsersTable();
 }
 
 function getSeedUsersFromEnv(): SeedUser[] {
@@ -704,7 +657,7 @@ export async function getPasswordChangedAtEpoch(username: string): Promise<numbe
   }
 }
 
-export async function initializeDefaultUsers(): Promise<void> {
+async function initializeDefaultUsers(): Promise<void> {
   const seeds = getSeedUsersFromEnv();
   if (seeds.length === 0) return;
 
@@ -739,7 +692,7 @@ export async function initializeDefaultUsers(): Promise<void> {
   }
 }
 
-export async function isUserEmailVerified(username: string): Promise<boolean> {
+async function isUserEmailVerified(username: string): Promise<boolean> {
   const user = await getUserByUsernameInternal(username);
   return isEffectivelyVerified(user);
 }

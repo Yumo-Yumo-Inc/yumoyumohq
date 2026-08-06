@@ -9,8 +9,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-export type SeasonTierRef = { index: number; key: string; cpointsReward: number };
-export type SeasonNextTier = SeasonTierRef & { minSeasonXp: number };
+type SeasonTierRef = { index: number; key: string; cpointsReward: number };
+type SeasonNextTier = SeasonTierRef & { minSeasonXp: number };
 
 export type SeasonStatus = {
   active: {
@@ -29,7 +29,7 @@ export type SeasonStatus = {
   };
 };
 
-export type EarnedBadge = {
+type EarnedBadge = {
   key: string;
   title: string | null;
   description: string | null;
@@ -37,10 +37,13 @@ export type EarnedBadge = {
   earned_at: string;
 };
 
+type BadgeShowcase = { badges: string[]; unlocked: boolean; max: number };
+
 export type BadgesData = {
   earnedBadges: EarnedBadge[];
   catalog: Array<{ key: string; title: string | null; description: string | null; icon_url: string | null }>;
   titles: { earned: string[]; active: string | null };
+  showcase: BadgeShowcase;
 };
 
 const EMPTY_SEASON: SeasonStatus = {
@@ -86,6 +89,11 @@ export function useBadges() {
         earnedBadges: Array.isArray(d.earnedBadges) ? d.earnedBadges : [],
         catalog: Array.isArray(d.catalog) ? d.catalog : [],
         titles: { earned: d.titles?.earned ?? [], active: d.titles?.active ?? null },
+        showcase: {
+          badges: Array.isArray(d.showcase?.badges) ? d.showcase.badges : [],
+          unlocked: d.showcase?.unlocked === true,
+          max: typeof d.showcase?.max === "number" ? d.showcase.max : 3,
+        },
       });
     } catch {
       setError(true);
@@ -128,5 +136,32 @@ export function useBadges() {
     [data],
   );
 
-  return { data, loading, error, saving, selectTitle, reload: load };
+  /** Persist the pinned showcase badges; optimistic, reverts on failure. */
+  const setShowcase = useCallback(
+    async (nextBadges: string[]): Promise<boolean> => {
+      if (!data) return false;
+      const previous = data.showcase.badges;
+      const capped = nextBadges.slice(0, data.showcase.max);
+      setData({ ...data, showcase: { ...data.showcase, badges: capped } });
+      setSaving(true);
+      try {
+        const r = await fetch("/api/user/badges", {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ showcasedBadges: capped }),
+        });
+        if (!r.ok) throw new Error(String(r.status));
+        return true;
+      } catch {
+        setData((cur) => (cur ? { ...cur, showcase: { ...cur.showcase, badges: previous } } : cur));
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    },
+    [data],
+  );
+
+  return { data, loading, error, saving, selectTitle, setShowcase, reload: load };
 }

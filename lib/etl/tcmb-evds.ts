@@ -10,11 +10,11 @@ const EVDS_BASE = "https://evds2.tcmb.gov.tr/service/evds";
 /** TRY per 1 USD (sell rate). Series: TP.DK.USD.S.YTL */
 const SERIES_USD_TRY = "TP.DK.USD.S.YTL";
 
-export interface EvdsObservation {
+interface EvdsObservation {
   [key: string]: string; // e.g. Tarih: "01.01.2025", TP_DK_USD_S_YTL: "34.5678"
 }
 
-export interface EvdsResponse {
+interface EvdsResponse {
   items?: EvdsObservation[];
   message?: string;
 }
@@ -26,7 +26,7 @@ export interface EvdsResponse {
  * @param endDate dd-mm-yyyy
  * @param frequency 5=monthly, 1=daily
  */
-export async function fetchEvdsSeries(
+async function fetchEvdsSeries(
   series: string,
   startDate: string,
   endDate: string,

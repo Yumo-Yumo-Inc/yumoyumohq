@@ -4,8 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, ScanLine, TrendingUp, Wallet, Settings } from "lucide-react";
+import { Home, ScanLine, TrendingUp, Award, Flame, Settings } from "lucide-react";
 import { AvatarImage } from "@/components/app/avatar-image";
+import { AvatarFrame } from "@/components/app/avatar-frame";
+import { AvatarSticker } from "@/components/app/avatar-sticker";
+import { useOwnNameColor } from "@/lib/app/use-name-color";
 import yumoYellowLogo from "@/assets/yumo-yellow-mark-transparent.png";
 import { useAppProfile } from "@/lib/app/profile-context";
 import { useAppLocale } from "@/lib/i18n/app-context";
@@ -24,8 +27,9 @@ const ARCHETYPES: UserFacingText[] = [
 const NAV_ITEMS: readonly { href: string; label: UserFacingText; icon: React.ElementType }[] = [
   { href: "/app/dashboard", label: { tr: "Bugün", en: "Today", ru: "Сегодня", th: "วันนี้", es: "Hoy", zh: "今天" }, icon: Home },
   { href: "/app/mine", label: { tr: "Tara", en: "Scan", ru: "Скан", th: "สแกน", es: "Escanear", zh: "扫描" }, icon: ScanLine },
+  { href: "/app/season", label: { tr: "Sezon", en: "Season", ru: "Сезон", th: "ซีซัน", es: "Temporada", zh: "赛季" }, icon: Flame },
   { href: "/app/patterns", label: { tr: "Yaşam", en: "Life", ru: "Жизнь", th: "ชีวิต", es: "Vida", zh: "生活" }, icon: TrendingUp },
-  { href: "/app/insights", label: { tr: "Cüzdan", en: "Wallet", ru: "Кошелёк", th: "กระเป๋าเงิน", es: "Cartera", zh: "钱包" }, icon: Wallet },
+  { href: "/app/achievements", label: { tr: "Başarımlar", en: "Achievements", ru: "Достижения", th: "ความสำเร็จ", es: "Logros", zh: "成就" }, icon: Award },
 ];
 
 export function DesktopSidebar() {
@@ -46,10 +50,13 @@ export function DesktopSidebar() {
   const accountLevel = safeProfile?.accountLevel ?? 1;
   const accountXp = safeProfile?.accountXp ?? 0;
   const profileName = safeProfile?.displayName || safeProfile?.username || (mounted ? l("Kullanıcı", "User", "Пользователь", "ผู้ใช้", "Usuario", "用户") : "User");
+  const ownNameColor = useOwnNameColor();
+  // Gate cosmetics on `mounted` to avoid an SSR/first-paint hydration mismatch.
+  const nameColor = mounted ? ownNameColor : null;
+  const frameKey = mounted ? safeProfile?.profileFrame : null;
   const initials = mounted ? profileName.slice(0, 2).toUpperCase() : "";
   const avatarUrl = safeProfile?.avatarUrl ?? null;
   const archetype = pickText(ARCHETYPES[(accountLevel - 1) % ARCHETYPES.length], safeLocale as YumoLocale);
-  const cPoints = safeProfile?.contributionPoints?.total ?? 0;
   const seasonXp = safeProfile?.seasonXp ?? 0;
   const honor = Math.max(0, Math.min(100, safeProfile?.honor ?? 50));
 
@@ -93,11 +100,16 @@ export function DesktopSidebar() {
           className="block rounded-[26px] border border-white/10 bg-white/[0.06] p-4 shadow-[0_18px_44px_rgba(0,0,0,0.25)] transition hover:bg-white/[0.08]"
         >
           <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#ff7a1a,#ec4899,#3b82f6)] text-sm font-black text-white">
-              {avatarUrl ? <AvatarImage src={avatarUrl} className="h-full w-full object-cover" /> : initials}
+            <div className="relative shrink-0">
+              <AvatarFrame frameKey={frameKey}>
+                <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#ff7a1a,#ec4899,#3b82f6)] text-sm font-black text-white">
+                  {avatarUrl ? <AvatarImage src={avatarUrl} className="h-full w-full object-cover" /> : initials}
+                </div>
+              </AvatarFrame>
+              <AvatarSticker stickerKey={mounted ? safeProfile?.avatarSticker : null} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-black text-white">{profileName}</p>
+              <p className="truncate text-sm font-black text-white" style={nameColor ? { color: nameColor } : undefined}>{profileName}</p>
               <div className="flex items-center gap-1.5">
                 <p className="text-[10px] font-bold text-[#ffb347]">{archetype}</p>
                 <span className="text-[9px] font-black text-[#fcd34d]">Lv.{accountLevel}</span>
@@ -120,13 +132,7 @@ export function DesktopSidebar() {
           </div>
 
           {/* Tokens row */}
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-[14px] bg-white/[0.05] px-2.5 py-1.5">
-              <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-white/36">cPoints</p>
-              <p className="mt-0.5 text-[11px] font-black text-[#fcd34d]">
-                ◈ {cPoints >= 1000 ? `${(cPoints / 1000).toFixed(1)}K` : cPoints}
-              </p>
-            </div>
+          <div className="mt-3 grid grid-cols-1 gap-2">
             <div className="rounded-[14px] bg-white/[0.05] px-2.5 py-1.5">
               <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-white/36">Season XP</p>
               <p className="mt-0.5 text-[11px] font-black text-[#c4b5fd]">

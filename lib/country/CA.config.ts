@@ -70,4 +70,3 @@ export const CA_CONFIG: CountryConfig = {
   ]
 };
 
-export default CA_CONFIG;

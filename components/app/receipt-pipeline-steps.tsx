@@ -8,6 +8,7 @@
 import { useMemo, useState, useEffect, useRef, type CSSProperties } from "react";
 import { useTier } from "@/lib/theme/theme-context";
 import { useAppLocale } from "@/lib/i18n/app-context";
+import { useCountUp } from "@/lib/hooks/use-count-up";
 import { ThemeCard } from "@/components/app/theme-card";
 import type { Receipt } from "@/lib/mock/types";
 import { displayHiddenCost, displayHiddenPercent } from "@/lib/receipt/display-hidden-cost";
@@ -24,8 +25,10 @@ import {
   Loader2,
   Pencil,
   Info,
+  Share2,
 } from "lucide-react";
 import { VectorReceipt } from "@/components/app/vector-receipt";
+import { ReceiptShareDialog } from "@/components/app/share/receipt-share-dialog";
 import { FieldCorrectionModal } from "@/components/app/field-correction-modal";
 import { BrandPrompt } from "@/components/app/brand-prompt";
 import {
@@ -56,34 +59,6 @@ const SCANUI_GOLD = "var(--scanui-gold-text)";
  * category → distinct colour, assigned by position not semantics).
  */
 const LAYER_PALETTE = ["#9B8FF0", "#3FD9A0", "#FFC65A", "#F2A03C", "#7CA0FF", "#E879A8"];
-
-/** Count a number up from 0 → target over `duration` ms (ease-out cubic). */
-function useCountUp(target: number, duration = 900): number {
-  const [value, setValue] = useState(0);
-  useEffect(() => {
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || target <= 0) {
-      setValue(target);
-      return;
-    }
-    const steps = 36;
-    let step = 0;
-    setValue(0);
-    const timer = setInterval(() => {
-      step++;
-      const p = 1 - Math.pow(1 - step / steps, 3);
-      setValue(target * p);
-      if (step >= steps) {
-        setValue(target);
-        clearInterval(timer);
-      }
-    }, duration / steps);
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  return value;
-}
 
 function noRewardOptionsForReceipt(
   receipt: Receipt,
@@ -151,7 +126,7 @@ const BUCKET_KEYS: Record<string, string> = {
 };
 
 /** Basic receipt fields streamed mid-analysis (after Vision, before pricing). */
-export interface ScanPartial {
+interface ScanPartial {
   merchantName: string | null;
   date: string | null;
   total: number;
@@ -183,24 +158,30 @@ interface AnalyzingStepProps {
 }
 
 /**
- * Story segments (Instagram-story progress bars). Every segment fills at the
- * SAME steady, constant rate over `SEG_MS` — linear, never gated, never
- * creeping. The bars are a pure time clock: each one fills evenly in ~2.8s, so
- * six bars span ~16.8s, which comfortably covers an analysis that lands within
- * that window. Receipt/value/hidden data streams in underneath and populates
- * each card as it arrives (a brief shimmer stands in until then). Only the
- * final segment may wait — held full at 100% with a live pulse — if the
- * hidden-cost result has not landed by the time it completes.
+ * Story segments (Instagram-story progress bars). Each segment fills at a
+ * steady, constant rate over its own duration — linear, never gated, never
+ * creeping. The bars are a pure time clock. The three data-bearing cards
+ * (receipt/value/layers) run longer than the rest: while the photo is still
+ * uploading the API has not answered yet, so short segments race through empty
+ * cards and dump the whole remaining wait onto the final card. Spending that
+ * time under the cards that actually have something to show keeps the last
+ * segment's hold short. Receipt/value/hidden data streams in underneath and
+ * populates each card as it arrives (a brief shimmer stands in until then).
+ * Only the final segment may wait — held full at 100% with a live pulse — if
+ * the hidden-cost result has not landed by the time it completes.
  */
 const SEG_MS = 2800;
-const SCAN_SEGMENTS: { key: string }[] = [
-  { key: "upload" },
-  { key: "reading" },
-  { key: "receipt" },
-  { key: "value" },
-  { key: "layers" },
-  { key: "hidden" },
+const SCAN_SEGMENTS: { key: string; ms: number }[] = [
+  { key: "upload", ms: SEG_MS },
+  { key: "reading", ms: SEG_MS },
+  { key: "receipt", ms: SEG_MS + 2000 },
+  { key: "value", ms: SEG_MS + 2000 },
+  { key: "layers", ms: SEG_MS + 2000 },
+  { key: "hidden", ms: SEG_MS },
 ];
+
+/** Duration of a segment by index, with a safe fallback. */
+const segMs = (i: number): number => SCAN_SEGMENTS[i]?.ms ?? SEG_MS;
 
 /** Inline CSS custom property (entry-animation delay). */
 const delay = (v: string): CSSProperties => ({ ["--d"]: v } as CSSProperties);
@@ -270,9 +251,9 @@ export function ReceiptAnalyzingStep({
 
   // Numbers fill via smooth count-ups once their card is on screen and the full
   // result is ready (a shimmer stands in until then — never a frozen "0").
-  const cuValue = useCountUp(seg === 3 && fullReady ? value : 0, 900);
-  const cuPaid = useCountUp(seg === 3 && fullReady ? total : 0, 900);
-  const cuHidden = useCountUp(seg === 5 && fullReady ? hidden : 0, 900);
+  const cuValue = useCountUp(seg === 3 && fullReady ? value : 0);
+  const cuPaid = useCountUp(seg === 3 && fullReady ? total : 0);
+  const cuHidden = useCountUp(seg === 5 && fullReady ? hidden : 0);
 
   // The bars run on TIME like an Instagram story: each segment fills LINEARLY at
   // the same steady rate over SEG_MS — no gates, no creep, no freeze. Only the
@@ -317,14 +298,32 @@ export function ReceiptAnalyzingStep({
       return () => { cancelAnimationFrame(raf); timers.forEach(clearTimeout); };
     }
 
+    // Segments 3 (value) and 4 (layers) render numbers that only exist in the
+    // full result. Letting the clock walk past them while the API is still
+    // answering shows an empty shimmer card for their whole duration — so they
+    // hold full (pulsing) like the final segment until the data lands.
+    const dataGated = (i: number) => (i === 3 || i === 4) && !fullReadyRef.current;
+    // When a held segment's gate opens after its clock already ran out, grant a
+    // short window so the freshly landed numbers are actually seen.
+    const HOLD_SHOW_MS = 1600;
+    let heldOut = false;
+
     const frame = (now: number) => {
       if (segStartRef.current === null) segStartRef.current = now;
-      // Advance through every segment whose steady SEG_MS has fully elapsed —
-      // purely on the clock, never waiting on data (the last segment aside).
+      const cur = segRef.current;
+      if (dataGated(cur) && now - (segStartRef.current as number) >= segMs(cur)) {
+        heldOut = true;
+      } else if (heldOut && !dataGated(cur)) {
+        heldOut = false;
+        segStartRef.current = now - segMs(cur) + HOLD_SHOW_MS;
+      }
+      // Advance through every segment whose own steady duration has fully
+      // elapsed — on the clock, except data-bearing segments hold for the result.
       let guard = 0;
       while (
         segRef.current < last &&
-        now - (segStartRef.current as number) >= SEG_MS &&
+        now - (segStartRef.current as number) >= segMs(segRef.current) &&
+        !dataGated(segRef.current) &&
         guard < N
       ) {
         setBar(segRef.current, 100);
@@ -337,13 +336,13 @@ export function ReceiptAnalyzingStep({
 
       const i = segRef.current;
       const e = now - (segStartRef.current as number);
-      const p = Math.min(1, e / SEG_MS); // linear = constant rate, the Instagram look
+      const p = Math.min(1, e / segMs(i)); // linear = constant rate, the Instagram look
 
       if (i >= last) {
         // Final segment: fill steadily to 100%, then hold full (pulsing) until
         // the hidden-cost result lands — only the end ever waits, never mid-fill.
         paintBars(last, p);
-        if (e >= SEG_MS && fullReadyRef.current) { finish(); return; }
+        if (e >= segMs(last) && fullReadyRef.current) { finish(); return; }
       } else {
         paintBars(i, p);
       }
@@ -580,7 +579,7 @@ interface ResultStepProps {
   accountLevel?: number;
 }
 
-export function ReceiptResultStep({ receipt, onContinue, onCancel, accountLevel = 1 }: ResultStepProps) {
+function ReceiptResultStep({ receipt, onContinue, onCancel, accountLevel = 1 }: ResultStepProps) {
   const tier = useTier(accountLevel);
   const { t } = useAppLocale();
   const hiddenCost = displayHiddenCost(receipt);
@@ -653,6 +652,7 @@ interface ResultWithBreakdownStepProps {
 
 export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, locale: localeProp, accountLevel = 1, editableReceiptId, onFieldApplied, primaryLabel, isSaving = false }: ResultWithBreakdownStepProps) {
   const [correctionOpen, setCorrectionOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [pendingFields, setPendingFields] = useState<Set<string>>(new Set());
   const { t, locale } = useAppLocale();
   const activeLocale = localeProp || locale;
@@ -671,7 +671,7 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
   const hiddenPercent = totalPaid > 0 ? Math.min(100, (hiddenCost / totalPaid) * 100) : 0;
   const schemaLabel = getCategorySchemaLabel(receipt.category, activeLocale, receipt.merchantChannel);
   const productValue = Math.max(0, receipt.hiddenCost.productValue ?? totalPaid - hiddenCost);
-  const animatedHidden = useCountUp(hiddenCost, 900);
+  const animatedHidden = useCountUp(hiddenCost);
 
   // Behavioural read (deterministic, no LLM). Shown as an "estimated read".
   const xray = computeReceiptXRay(receipt);
@@ -748,7 +748,7 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
             {animatedHidden.toFixed(2)} <span className="text-[18px] font-semibold" style={{ color: SCANUI_GOLD }}>{receipt.currency}</span>
           </p>
           <p className="mt-2 text-[12.5px] text-white/60">
-            {receipt.merchantName}{pendingBadge("merchant_name")} · {receipt.date}{pendingBadge("date")}
+            {receipt.merchantName || "—"}{pendingBadge("merchant_name")} · {receipt.date || "—"}{pendingBadge("date")}
             {(receipt as { time?: string }).time ? <> · {(receipt as { time?: string }).time}</> : null}{pendingBadge("time")}
           </p>
           <div className="mt-3.5 h-2 overflow-hidden rounded-full" style={{ background: "var(--scanui-track)" }}>
@@ -788,7 +788,7 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
             </div>
             <div className="space-y-2">
               {receipt.lineItems.map((it, i) => {
-                const name = it.displayName || it.rawName || "—";
+                const name = (it.rawName && it.rawName.trim()) || it.displayName || "—";
                 const qty = it.quantity && it.quantity > 1 ? `${it.quantity}× ` : "";
                 const amt = typeof it.lineTotal === "number" ? `${it.lineTotal.toFixed(2)} ${receipt.currency}` : "—";
                 const needsBrand = it.brandStatus === "needs_user" && typeof it.id === "number";
@@ -940,7 +940,7 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] text-white/55">{copy.rewardEstimate}</p>
-              <p className="mt-0.5 text-[22px] font-bold tabular-nums" style={{ color: rewardAmount > 0 ? SCANUI_GOLD : "var(--scanui-ink-2)" }}>{rewardAmount.toFixed(2)} cPoints</p>
+              <p className="mt-0.5 text-[22px] font-bold tabular-nums" style={{ color: rewardAmount > 0 ? SCANUI_GOLD : "var(--scanui-ink-2)" }}>{rewardAmount.toFixed(2)} {t("rewardCard.pointsUnit")}</p>
               {rewardAmount <= 0 && !noRewardMessage && (
                 <span className="mt-1 inline-block whitespace-nowrap rounded-full px-1.5 py-0.5 text-[10px]" style={badgeStyle("warning")}>{t("correctionModal.underReview")}</span>
               )}
@@ -971,10 +971,21 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
             {labels.cancel}
           </button>
         )}
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
+          aria-label={activeLocale === "tr" ? "Paylaş" : "Share"}
+          className="flex flex-none items-center justify-center rounded-xl border px-4 py-3 text-white/85 transition-transform hover:scale-[1.03] active:scale-95"
+          style={{ borderColor: "var(--scanui-card-border)", background: "var(--scanui-soft-bg)" }}
+        >
+          <Share2 className="h-[18px] w-[18px]" />
+        </button>
         <button type="button" onClick={onContinue} disabled={isSaving} className="scanui-gold flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold disabled:opacity-60">
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>{primaryLabel ?? labels.viewNext}<ChevronRight className="h-4 w-4" /></>)}
         </button>
       </div>
+
+      <ReceiptShareDialog open={shareOpen} onOpenChange={setShareOpen} receipt={receipt} locale={activeLocale} />
 
       {editableReceiptId && (
         <FieldCorrectionModal
@@ -1010,7 +1021,7 @@ interface BreakdownStepProps {
   isAdmin?: boolean;
 }
 
-export function ReceiptBreakdownStep({ receipt, onBack, onContinue, accountLevel = 1 }: BreakdownStepProps) {
+function ReceiptBreakdownStep({ receipt, onBack, onContinue, accountLevel = 1 }: BreakdownStepProps) {
   const tier = useTier(accountLevel);
   const { t } = useAppLocale();
   const items = (receipt.hiddenCost.breakdownItems || []).filter((i) => i.bucket !== "government");
@@ -1097,7 +1108,7 @@ export function ReceiptVectorReceiptStep({ receipt, onBack, onSave, isSaving = f
             {isTr ? "Fişi kaydetmeden kontrol et" : "Review before saving"}
           </h2>
           <p className="text-xs mt-1" style={{ color: "var(--app-text-muted)" }}>
-            {receipt.merchantName} · {receipt.date}
+            {receipt.merchantName || "—"} · {receipt.date || "—"}
           </p>
         </div>
         <span
@@ -1210,7 +1221,7 @@ interface RewardStepProps {
   isAdmin?: boolean;
 }
 
-export function ReceiptRewardStep({ receipt, onBack, onClaim, isSaving = false, accountLevel = 1 }: RewardStepProps) {
+function ReceiptRewardStep({ receipt, onBack, onClaim, isSaving = false, accountLevel = 1 }: RewardStepProps) {
   const tier = useTier(accountLevel);
   const { t } = useAppLocale();
   const amount = receipt.reward?.amount ?? receipt.hiddenCost.totalHidden;
@@ -1220,7 +1231,7 @@ export function ReceiptRewardStep({ receipt, onBack, onClaim, isSaving = false, 
       <h2 className="text-lg font-semibold mb-2" style={{ color: "var(--app-text-primary)" }}>{t("pipeline.potentialReward")}</h2>
       <div className="flex items-baseline gap-2 mb-5">
         <span className="text-2xl font-bold tabular-nums" style={{ color: tier.accent }}>{amount.toFixed(2)}</span>
-        <span className="text-sm" style={{ color: "var(--app-text-muted)" }}>cPoints</span>
+        <span className="text-sm" style={{ color: "var(--app-text-muted)" }}>{t("rewardCard.pointsUnit")}</span>
       </div>
       <div className="flex gap-3">
         <button type="button" onClick={onBack} className="flex-1 py-2.5 rounded-xl text-sm font-medium border" style={{ borderColor: "var(--app-border)", color: "var(--app-text-secondary)" }}>
@@ -1242,9 +1253,13 @@ interface DoneStepProps {
   onViewReceipts: () => void;
   locale?: string;
   accountLevel?: number;
+  /** Real outcome of the background save; drives whether the screen claims success. */
+  saveStatus?: "saving" | "saved" | "error" | "duplicate";
+  /** Retry the save when it failed. */
+  onRetrySave?: () => void;
 }
 
-export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts }: DoneStepProps) {
+export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts, saveStatus = "saved", onRetrySave }: DoneStepProps) {
   const { t, locale } = useAppLocale();
   const copy = getMvpCopy(locale);
   const schemaLabel = getCategorySchemaLabel(receipt.category, locale, receipt.merchantChannel);
@@ -1263,10 +1278,38 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts }: Done
   const flagColor = (tone: "success" | "warning" | "muted") =>
     tone === "success" ? "var(--scanui-badge-success-text)" : tone === "warning" ? SCANUI_GOLD : "var(--scanui-ink-muted)";
 
+  // Honest save outcome — the header and summary reflect what actually happened
+  // to the write, never a blanket "saved".
+  const isSaved = saveStatus === "saved";
+  const isSaving = saveStatus === "saving";
+  const isError = saveStatus === "error";
+  const isDuplicate = saveStatus === "duplicate";
+  const summaryLabel = isSaved
+    ? (isTr ? "Analiz kaydedildi" : "Analysis saved")
+    : isSaving
+      ? (isTr ? "Kaydediliyor…" : "Saving…")
+      : isDuplicate
+        ? (isTr ? "Bu fiş zaten kayıtlı" : "Already recorded")
+        : (isTr ? "Kaydedilemedi" : "Couldn't save");
+  const headerTitle = isSaved
+    ? t("pipeline.doneTitle")
+    : isSaving
+      ? (isTr ? "Kaydediliyor…" : "Saving…")
+      : isDuplicate
+        ? (isTr ? "Bu fiş zaten kayıtlı" : "Receipt already recorded")
+        : (isTr ? "Kaydedilemedi" : "Couldn't save");
+  const headerSub = isSaved
+    ? t("pipeline.doneSub")
+    : isSaving
+      ? (isTr ? "Fişin kaydediliyor…" : "Saving your receipt…")
+      : isDuplicate
+        ? (isTr ? "Aynı fiş daha önce yüklenmiş, yeniden kaydedilmedi." : "This receipt was uploaded before; it wasn't saved again.")
+        : (isTr ? "Bağlantını kontrol edip tekrar dene." : "Check your connection and try again.");
+
   const cells: { label: string; value: string; badge: string; tone: "success" | "warning" | "muted"; gold?: boolean }[] = [
     { label: t("receiptDetail.total"), value: `${totalPaid.toFixed(2)} ${receipt.currency}`, badge: copy.receiptRead, tone: "success" },
     { label: copy.hiddenEstimate, value: `${hiddenCost.toFixed(2)} ${receipt.currency}`, badge: copy.estimated, tone: "warning" },
-    { label: copy.rewardEstimate, value: `${totalReward.toFixed(2)} cPoints`, badge: copy.verifying, tone: "warning", gold: true },
+    { label: copy.rewardEstimate, value: `${totalReward.toFixed(2)} ${t("rewardCard.pointsUnit")}`, badge: copy.verifying, tone: "warning", gold: true },
     { label: copy.taxRead, value: `${taxAmount.toFixed(2)} ${receipt.currency}`, badge: taxAmount > 0 ? copy.receiptRead : copy.noTaxConfidence, tone: taxAmount > 0 ? "success" : "muted" },
   ];
 
@@ -1276,17 +1319,27 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts }: Done
       <div className="scanui-blob scanui-blob-g" aria-hidden />
 
       <div className="relative z-[1] flex-1 overflow-y-auto px-4 pt-6 pb-4">
-        {/* Success tick */}
+        {/* Status header — icon reflects the real save outcome */}
         <div className="scanui-rise flex flex-col items-center text-center" style={{ animationDelay: "0.04s" }}>
-          <div className="relative mb-3 h-16 w-16">
-            <span className="scanui-tick-glow" aria-hidden />
-            <svg width="64" height="64" viewBox="0 0 78 78" fill="none" className="relative">
-              <circle cx="39" cy="39" r="35" style={{ stroke: SCANUI_GOLD }} strokeWidth="3" opacity="0.5" />
-              <path className="scanui-tick-ck" d="M27 40l8 8 16-17" style={{ stroke: SCANUI_GOLD }} strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <div className="relative mb-3 flex h-16 w-16 items-center justify-center">
+            {isSaved ? (
+              <>
+                <span className="scanui-tick-glow" aria-hidden />
+                <svg width="64" height="64" viewBox="0 0 78 78" fill="none" className="relative">
+                  <circle cx="39" cy="39" r="35" style={{ stroke: SCANUI_GOLD }} strokeWidth="3" opacity="0.5" />
+                  <path className="scanui-tick-ck" d="M27 40l8 8 16-17" style={{ stroke: SCANUI_GOLD }} strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </>
+            ) : isSaving ? (
+              <Loader2 className="h-11 w-11 animate-spin" style={{ color: SCANUI_GOLD }} strokeWidth={2} />
+            ) : isDuplicate ? (
+              <Info className="h-11 w-11 text-white/70" strokeWidth={2} />
+            ) : (
+              <AlertTriangle className="h-11 w-11" style={{ color: "#F5B450" }} strokeWidth={2} />
+            )}
           </div>
-          <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-white">{t("pipeline.doneTitle")}</h2>
-          <p className="mt-1 text-[13px] text-white/60">{t("pipeline.doneSub")}</p>
+          <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-white">{headerTitle}</h2>
+          <p className="mt-1 text-[13px] text-white/60">{headerSub}</p>
         </div>
 
         {/* Summary card */}
@@ -1294,7 +1347,7 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts }: Done
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-[0.13em] text-white/40">{schemaLabel}</p>
-              <p className="mt-1 text-[16px] font-semibold text-white">{isTr ? "Analiz kaydedildi" : "Analysis saved"}</p>
+              <p className="mt-1 text-[16px] font-semibold text-white">{summaryLabel}</p>
             </div>
             <span className="shrink-0 rounded-md px-2 py-1 text-[9.5px] font-semibold" style={{ background: "linear-gradient(140deg,#FFD37A,#FFB23E)", color: "#1c1638" }}>
               {copy.distributionConfidence}
@@ -1330,14 +1383,29 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts }: Done
 
       {/* Action footer */}
       <div className="relative z-[1] flex gap-3 px-4 pb-4 pt-2">
-        <button type="button" onClick={onViewReceipts} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-3 text-sm font-medium text-white/85" style={{ borderColor: "var(--scanui-card-border)", background: "var(--scanui-soft-bg)" }}>
-          <FileText className="h-4 w-4" />
-          {t("pipeline.viewReceipts")}
-        </button>
-        <button type="button" onClick={onMineAnother} className="scanui-gold flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold">
-          <RotateCcw className="h-4 w-4" />
-          {t("pipeline.scanAgain")}
-        </button>
+        {isError && onRetrySave ? (
+          <>
+            <button type="button" onClick={onMineAnother} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-3 text-sm font-medium text-white/85" style={{ borderColor: "var(--scanui-card-border)", background: "var(--scanui-soft-bg)" }}>
+              <RotateCcw className="h-4 w-4" />
+              {t("pipeline.scanAgain")}
+            </button>
+            <button type="button" onClick={onRetrySave} className="scanui-gold flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold">
+              <RotateCcw className="h-4 w-4" />
+              {isTr ? "Tekrar dene" : "Try again"}
+            </button>
+          </>
+        ) : (
+          <>
+            <button type="button" onClick={onViewReceipts} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-3 text-sm font-medium text-white/85" style={{ borderColor: "var(--scanui-card-border)", background: "var(--scanui-soft-bg)" }}>
+              <FileText className="h-4 w-4" />
+              {t("pipeline.viewReceipts")}
+            </button>
+            <button type="button" onClick={onMineAnother} className="scanui-gold flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold">
+              <RotateCcw className="h-4 w-4" />
+              {t("pipeline.scanAgain")}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

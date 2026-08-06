@@ -1,7 +1,78 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
+import { getSql, warmUpConnection } from "@/lib/db/client";
+import { rateLimit, getRateLimitKey } from "@/lib/auth/rate-limit";
+
+let schemaReady = false;
+
+async function ensureSchema(): Promise<void> {
+  if (schemaReady) return;
+  const sql = getSql();
+  if (!sql) return;
+  await warmUpConnection();
+  await sql`
+    CREATE TABLE IF NOT EXISTS support_requests (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      message TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  schemaReady = true;
+}
+
+/**
+ * Best-effort email notification via the Resend REST API. The DB row is the
+ * source of truth; a failed or unconfigured send never fails the request.
+ */
+async function notifySupportInbox(input: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const to = process.env.SUPPORT_INBOX_EMAIL;
+  if (!apiKey || !to) return;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.SUPPORT_FROM_EMAIL ?? "noreply@yumoyumo.com",
+        to,
+        reply_to: input.email,
+        subject: `Support Request: ${input.subject}`,
+        text: `From: ${input.name} <${input.email}>\n\n${input.message}`,
+      }),
+    });
+    if (!res.ok) {
+      console.error("[support] email notify failed:", res.status, await res.text());
+    }
+  } catch (error) {
+    console.error("[support] email notify failed:", error);
+  }
+}
 
 export async function POST(req: Request) {
   try {
+    // Public form: throttle by IP against spam / DB bloat.
+    const rl = await rateLimit({
+      key: getRateLimitKey(req, "anon"),
+      endpoint: "support-form",
+      maxHits: 5,
+      windowMs: 60 * 1000,
+    });
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const body = await req.json();
     const { name, email, subject, message } = body;
     const nameText = typeof name === "string" ? name.trim() : "";
@@ -38,33 +109,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // In production, you would use an email service like:
-    // - Resend (recommended for Next.js)
-    // - SendGrid
-    // - Nodemailer with SMTP
-    // - AWS SES
-    
-    // For now, log only non-sensitive metadata and return success.
-    console.log("Support form submission received:", {
-      to: "support@yumoyumo.com",
-      subject: `Support Request: ${subjectText}`,
-      emailDomain: emailText.split("@")[1] ?? "unknown",
-      messageLength: messageText.length,
+    // Persist first — success is only returned once the request is stored.
+    const sql = getSql();
+    if (!sql) {
+      return NextResponse.json(
+        { error: "Support is temporarily unavailable. Please try again later." },
+        { status: 503 }
+      );
+    }
+    await ensureSchema();
+    const id = randomUUID();
+    await sql`
+      INSERT INTO support_requests (id, name, email, subject, message)
+      VALUES (${id}, ${nameText}, ${emailText}, ${subjectText}, ${messageText})
+    `;
+
+    await notifySupportInbox({
+      name: nameText,
+      email: emailText,
+      subject: subjectText,
+      message: messageText,
     });
-
-    // TODO: Implement actual email sending
-    // Example with Resend:
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({
-    //   from: 'noreply@yumoyumo.com',
-    //   to: 'support@yumoyumo.com',
-    //   subject: `Support Request: ${subject}`,
-    //   text: emailContent,
-    //   replyTo: email,
-    // });
-
-    // For development, you can use a service like Mailtrap or just log it
-    // In production, configure your email service and uncomment the code above
 
     return NextResponse.json({
       success: true,

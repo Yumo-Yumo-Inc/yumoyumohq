@@ -52,7 +52,7 @@ export function isTechnicalPaperLocale(value: string): value is TechnicalPaperLo
   return technicalPaperLocales.includes(value as TechnicalPaperLocale);
 }
 
-export function getTechnicalPaperLocaleRoot(locale: TechnicalPaperLocale) {
+function getTechnicalPaperLocaleRoot(locale: TechnicalPaperLocale) {
   return path.join(CONTENT_ROOT, locale);
 }
 

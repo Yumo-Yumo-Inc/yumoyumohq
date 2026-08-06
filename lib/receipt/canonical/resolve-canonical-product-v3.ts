@@ -11,6 +11,12 @@
  */
 
 import { db } from "@/lib/db/client";
+import {
+  buildCanonicalProductSlug,
+  isSizeOnlyProductSlug,
+  productNormKey,
+} from "@/lib/canonical/product-slug";
+import { normalizeBrandName } from "../name-normalization";
 import type { CanonicalObservation } from "../canonical-types";
 import type { LlmProductNormalization } from "./normalize-product-llm";
 import { normalizeReceiptLinesWithLLM } from "./normalize-product-llm";
@@ -21,6 +27,51 @@ const FUZZY_THRESHOLD = 0.75; // slightly lower than legacy v1 (0.85) because al
 
 function normQuery(s: string): string {
   return s.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+/**
+ * Does this raw string look like a supermarket abbreviation rather than a real name?
+ *
+ * The distinction decides whether an alias learned at ANOTHER merchant may be reused
+ * here. "PINAR SÜT TAM YAĞLI 1L" means the same product in every store, so reusing it
+ * is free accuracy. "K.GOFRET" is one merchant's private shorthand — reusing it across
+ * merchants is how two different products get merged under one canonical, which then
+ * pollutes the price median and, through price_epochs, the chain.
+ *
+ * Deliberately conservative: when in doubt we say "abbreviation" and fall through to
+ * the LLM / a contribution task, because a missed alias costs one LLM call while a
+ * wrong cross-merchant alias is written to every receipt carrying that string.
+ */
+export function isAbbreviationLike(raw: string): boolean {
+  const LETTER = "A-Za-zÇĞİıÖŞÜçğöşü";
+  const s = raw.trim();
+  if (s.length < 8) return true;
+
+  // "K.GOFRET", "KRM.SNT.150GDORBI" — a dot glued between two letters is a cut word.
+  // Digit dots ("0.5L") are prices/sizes, not abbreviations, so the class excludes them.
+  if (new RegExp(`[${LETTER}]\\.[${LETTER}]`).test(s)) return true;
+
+  // "GOFRET KAK. KREM142G", "UNLU MAM." — a dot closing a word is a truncation mark.
+  if (new RegExp(`[${LETTER}]\\.(\\s|$)`).test(s)) return true;
+
+  // Size tokens ("350G", "0", "5L", "15Lİ") say nothing about how abbreviated the
+  // NAME is — judge only the word tokens.
+  const words = s
+    .split(/[\s./-]+/)
+    .filter(Boolean)
+    .filter((t) => new RegExp(`[${LETTER}]`).test(t) && !/\d/.test(t));
+
+  if (words.length === 0) return true;
+
+  // One short word is too little to identify a product across stores.
+  if (words.length === 1 && words[0].length < 10) return true;
+
+  // Mostly stubs: "MAK YAJ SUNG LIONE" (3 of 4) is shorthand, while "ERİKLİ SU"
+  // (1 of 2) is a real name. Strict majority, so a brand + short noun still passes.
+  const stubs = words.filter((t) => t.length <= 4).length;
+  if (stubs * 2 > words.length) return true;
+
+  return false;
 }
 
 function safeStringArray(v: unknown): string[] {
@@ -55,12 +106,25 @@ interface RichMatch {
 }
 
 async function fuzzyMatchAliasesBulk(
-  rawNames: string[]
+  rawNames: string[],
+  merchantId?: string | null
 ): Promise<Map<string, RichMatch>> {
   const map = new Map<string, RichMatch>();
   const uniq = [...new Set(rawNames.map(normQuery).filter((q) => q.length > 0))];
   if (uniq.length === 0) return map;
 
+  // The `%` predicate is what lets the GIN index (idx_alias_norm, gin_trgm_ops) run.
+  // Ordering by similarity() alone never used it, so every raw string cost a full
+  // sequential scan of the alias table — which grows forever.
+  //
+  // Merchant relation is three-valued, not two:
+  //   same    — this merchant taught it. Best possible evidence.
+  //   unknown — merchant_id IS NULL: learned before scoping existed, so it is not a
+  //             claim about any store. Every one of PROD's 7.104 aliases is in this
+  //             state today; treating them as "some other merchant's" would drop 39% of
+  //             the alias table on deploy day.
+  //   other   — a DIFFERENT merchant taught it. Only this one is a cross-store claim,
+  //             and only this one is unsafe for shorthand.
   const query = `
 WITH wanted AS (
   SELECT DISTINCT trim(lower(x)) AS q
@@ -71,14 +135,34 @@ best AS (
   SELECT
     w.q,
     a.canonical_id,
-    similarity(a.raw_text_norm, w.q) AS sim,
+    a.sim,
     a.match_type,
-    a.confidence
+    a.confidence,
+    a.merchant_rel
   FROM wanted w
   CROSS JOIN LATERAL (
-    SELECT canonical_id, raw_text_norm, match_type, confidence
+    SELECT
+      canonical_id,
+      match_type,
+      confidence,
+      similarity(raw_text_norm, w.q) AS sim,
+      CASE
+        WHEN merchant_id IS NULL THEN 'unknown'
+        WHEN merchant_id = $3::uuid THEN 'same'
+        ELSE 'other'
+      END AS merchant_rel
     FROM receipt_product_aliases
-    ORDER BY similarity(raw_text_norm, w.q) DESC
+    WHERE canonical_id IS NOT NULL
+      AND raw_text_norm % w.q
+    ORDER BY
+      -- same > unknown > other: prefer this store's own lesson, fall back to the
+      -- unscoped history, and only reach for another store's alias last.
+      CASE
+        WHEN merchant_id = $3::uuid THEN 0
+        WHEN merchant_id IS NULL THEN 1
+        ELSE 2
+      END,
+      similarity(raw_text_norm, w.q) DESC
     LIMIT 1
   ) a
 )
@@ -92,7 +176,8 @@ SELECT * FROM best WHERE sim >= $2::float
       sim: string | number;
       match_type: string;
       confidence: string | number;
-    }>(query, [uniq, FUZZY_THRESHOLD]);
+      merchant_rel: "same" | "unknown" | "other";
+    }>(query, [uniq, FUZZY_THRESHOLD, merchantId ?? null]);
 
     // Collect canonical_ids to fetch rich context in one query
     const ids = rows.map((r) => r.canonical_id).filter(Boolean);
@@ -141,6 +226,21 @@ WHERE id = ANY($1::uuid[])
     for (const row of rows) {
       const rich = richById.get(row.canonical_id);
       if (!rich) continue;
+
+      // An alias taught by a DIFFERENT merchant only generalises when the string is
+      // specific enough to mean the same thing everywhere. For shorthand it does not:
+      // that is the K.GOFRET failure — one store's abbreviation silently claiming
+      // another store's product. Drop the hit and let the LLM / a contribution task
+      // decide instead of writing a confident wrong link.
+      //
+      // 'unknown' (merchant_id IS NULL) is NOT rejected. Those aliases predate scoping,
+      // so they make no claim about which store they came from — they are simply what
+      // the system has learned so far, and every alias in PROD is one of them today.
+      // Rejecting them would have dropped 39% of the alias table (41% of all matches)
+      // the moment this deployed, sending strings like "karpuz" and "lokum" back to the
+      // LLM on every receipt. They age out naturally as merchant-scoped rows are written.
+      if (row.merchant_rel === "other" && isAbbreviationLike(row.q)) continue;
+
       map.set(row.q, {
         canonical_id: rich.id,
         canonical_name: rich.canonical_name,
@@ -184,7 +284,9 @@ async function upsertBrandRegistry(
   defaultOccasions?: string[],
   defaultLifestyleTags?: string[]
 ): Promise<string | null> {
-  if (!brandName) return null;
+  // A brand is a name: no numbers ("1.0"), min 2 chars. Every caller path
+  // (legacy LLM, RAC decision, decision cache) funnels through here.
+  if (!brandName || !normalizeBrandName(brandName)) return null;
   const slug = brandName
     .toLowerCase()
     .trim()
@@ -355,13 +457,29 @@ async function ensureCostWeights(
       [internalCat]
     );
     if (rows.length > 0) {
-      weights = {
+      // production_cost_weights stores fractions (0-1) and some category rows
+      // are partial (sum < 1). canonical_product_cost_weights requires the five
+      // pcts to sum to ~100 (pct_sum_check). Normalize proportionally to 100 so
+      // the ratios are preserved and the CHECK is always satisfied.
+      const src = {
         raw_material_pct: Number(rows[0].raw_material_pct),
         labor_pct: Number(rows[0].labor_pct),
         rent_pct: Number(rows[0].rent_pct),
         energy_pct: Number(rows[0].energy_pct),
         other_pct: Number(rows[0].other_pct),
       };
+      const sum =
+        src.raw_material_pct + src.labor_pct + src.rent_pct + src.energy_pct + src.other_pct;
+      if (sum > 0 && Number.isFinite(sum)) {
+        const k = 100 / sum;
+        weights = {
+          raw_material_pct: src.raw_material_pct * k,
+          labor_pct: src.labor_pct * k,
+          rent_pct: src.rent_pct * k,
+          energy_pct: src.energy_pct * k,
+          other_pct: src.other_pct * k,
+        };
+      }
     }
   } catch {
     /* ignore */
@@ -435,18 +553,90 @@ ON CONFLICT (category_path, attr_key) DO NOTHING
 }
 
 // ─── 3. Upsert canonical_products + receipt_product_aliases from LLM result ────
+// Exported for the canonical backfill script (scripts/backfill-canonical-*.ts):
+// every backfill decision goes through the same slug/brand/size-only gates.
 
-async function upsertCanonicalProductFromLlmV3(
-  llm: LlmProductNormalization
+export async function upsertCanonicalProductFromLlmV3(
+  llm: LlmProductNormalization,
+  merchantId?: string | null
 ): Promise<RichMatch | null> {
-  if (!llm.canonical_name) return null;
+  if (!llm.canonical_name && !llm.display_name_tr) return null;
+
+  // Brand gate: numbers/junk from column-misaligned parses never reach the
+  // slug, brand_registry, or canonical_products.brand_slug.
+  const cleanBrand = normalizeBrandName(llm.brand, llm.raw_name);
+
+  // 0. Canonical slug is built in code, never taken from the LLM: the model's
+  //    free-form snake_case produced duplicates ("su_05l" vs "su_0_5_l").
+  const canonicalName = buildCanonicalProductSlug({
+    brand: cleanBrand,
+    name: llm.display_name_tr ?? llm.canonical_name,
+    unitSize: llm.unit_size,
+    unitType: llm.unit_type,
+  });
+
+  // 0a. Size-only names ("1_5_l", "75_g") identify no product — the brand or
+  //     product noun got lost upstream. Creating a canonical row here would
+  //     pool unrelated products under one size bucket, so skip persistence;
+  //     the caller keeps the observation without a canonical_id.
+  if (isSizeOnlyProductSlug(canonicalName)) {
+    console.warn(
+      `[resolve-canonical-product-v3] size-only canonical rejected: "${canonicalName}" (raw: "${llm.raw_name}")`
+    );
+    return null;
+  }
+
+  // 0b. Normalized-key lookup: if a punctuation-variant of this product
+  //     already exists, link to it instead of inserting a sibling.
+  try {
+    const { rows } = await db.query<{ id: string }>(
+      `SELECT id FROM canonical_products
+        WHERE regexp_replace(translate(lower(canonical_name), 'şğüöçı', 'sguoci'), '[^a-z0-9]', '', 'g') = $1
+        LIMIT 1`,
+      [productNormKey(canonicalName)]
+    );
+    if (rows[0]?.id) {
+      const existing = await fetchCanonicalById(rows[0].id);
+      if (existing) {
+        await upsertAliasMapping(
+          llm.raw_name,
+          existing.canonical_id,
+          llm.confidence,
+          merchantId
+        );
+        return {
+          canonical_id: existing.canonical_id,
+          canonical_name: existing.canonical_name,
+          display_name_tr: existing.display_name_tr,
+          category_path: existing.category_path,
+          brand_slug: null,
+          brand_name: existing.brand_name,
+          attributes: existing.attributes,
+          lifestyle_tags: existing.lifestyle_tags,
+          consumption_occasions: existing.consumption_occasions,
+          allergens: existing.allergens,
+          price_tier: existing.price_tier,
+          cultural_context_tr: null,
+          category_cultural_context: null,
+          llm_one_liner: null,
+          confidence: llm.confidence,
+          match_type: "norm_key",
+        };
+      }
+    }
+  } catch (e) {
+    console.warn(
+      "[resolve-canonical-product-v3] norm-key lookup failed:",
+      (e as Error)?.message
+    );
+  }
 
   // 1. Ensure category hierarchy exists (auto-create missing L1-L4)
   await ensureCategoryPath(llm.category_path);
 
   // 2. Compute brand slug for enrichment (before DB write)
-  const brandSlug = llm.brand
-    ? llm.brand
+  const brandSlug = cleanBrand
+    ? cleanBrand
         .toLowerCase()
         .trim()
         .replace(/ı/g, "i")
@@ -471,13 +661,13 @@ async function upsertCanonicalProductFromLlmV3(
       price_tier: llm.price_tier,
     },
     llm.raw_name,
-    llm.canonical_name
+    canonicalName
   );
 
   // 4. Upsert brand registry with enriched defaults
-  if (llm.brand && brandSlug) {
+  if (cleanBrand && brandSlug) {
     await upsertBrandRegistry(
-      llm.brand,
+      cleanBrand,
       llm.category_path,
       enriched.price_tier,
       enriched.consumption_occasions,
@@ -523,10 +713,10 @@ RETURNING id
   let canonicalId: string | null = null;
   try {
     const { rows } = await db.query<{ id: string }>(upsertCp, [
-      llm.canonical_name,
+      canonicalName,
       llm.category_path,
       brandSlug,
-      llm.display_name_tr ?? llm.canonical_name.replace(/_/g, " "),
+      llm.display_name_tr ?? canonicalName.replace(/_/g, " "),
       JSON.stringify(safeRecord(llm.attributes)),
       enriched.lifestyle_tags,
       enriched.consumption_occasions,
@@ -539,33 +729,52 @@ RETURNING id
     ]);
     canonicalId = rows[0]?.id ?? null;
   } catch (e) {
-    console.warn(
-      "[resolve-canonical-product-v3] upsertCanonicalProduct failed:",
-      (e as Error)?.message
-    );
-    return null;
+    // Unique norm-key violation → a concurrent request created the row; link to it.
+    try {
+      const { rows } = await db.query<{ id: string }>(
+        `SELECT id FROM canonical_products
+          WHERE regexp_replace(translate(lower(canonical_name), 'şğüöçı', 'sguoci'), '[^a-z0-9]', '', 'g') = $1
+          LIMIT 1`,
+        [productNormKey(canonicalName)]
+      );
+      canonicalId = rows[0]?.id ?? null;
+    } catch {
+      /* fall through to warn */
+    }
+    if (!canonicalId) {
+      console.warn(
+        "[resolve-canonical-product-v3] upsertCanonicalProduct failed:",
+        (e as Error)?.message
+      );
+      return null;
+    }
   }
 
   if (!canonicalId) return null;
 
   // 6. Ensure cost weights exist for hidden-cost calculation
-  await ensureCostWeights(llm.canonical_name, llm.category_path);
+  await ensureCostWeights(canonicalName, llm.category_path);
 
   // 7. Stub attribute schema for new categories
   await upsertCategoryAttributeSchema(llm.category_path, llm.attributes);
 
-  // 8. Insert alias mapping
+  // 8. Insert alias mapping. Must target the merchant-scoped unique index
+  //    (uq_rpa_raw_merchant_canonical, migration 133) with the COALESCE expression
+  //    verbatim — the old (raw_text, canonical_id) index is being retired, and an
+  //    ON CONFLICT that does not match a live unique index raises 42P10 (silently, via
+  //    the catch below). This is the same third alias writer that the DROP-INDEX check
+  //    surfaced; upsertAliasMapping was already migrated.
   try {
     await db.query(
       `
-INSERT INTO receipt_product_aliases (raw_text, canonical_id, match_type, confidence, times_seen, last_seen)
-VALUES ($1, $2, 'llm', $3, 1, now())
-ON CONFLICT (raw_text, canonical_id) DO UPDATE SET
+INSERT INTO receipt_product_aliases (raw_text, canonical_id, merchant_id, match_type, confidence, times_seen, last_seen)
+VALUES ($1, $2, $4, 'llm', $3, 1, now())
+ON CONFLICT (raw_text, COALESCE(merchant_id, '00000000-0000-0000-0000-000000000000'::uuid), canonical_id) DO UPDATE SET
   confidence = GREATEST(EXCLUDED.confidence, receipt_product_aliases.confidence),
   times_seen = receipt_product_aliases.times_seen + 1,
   last_seen  = now()
 `,
-      [llm.raw_name.trim(), canonicalId, llm.confidence]
+      [llm.raw_name.trim(), canonicalId, llm.confidence, merchantId ?? null]
     );
   } catch (e) {
     console.warn("[resolve-canonical-product-v3] upsert alias failed:", (e as Error)?.message);
@@ -574,11 +783,11 @@ ON CONFLICT (raw_text, canonical_id) DO UPDATE SET
   // Build a lightweight RichMatch from enriched LLM result (no DB re-query)
   return {
     canonical_id: canonicalId,
-    canonical_name: llm.canonical_name,
+    canonical_name: canonicalName,
     display_name_tr: llm.display_name_tr,
     category_path: llm.category_path,
     brand_slug: brandSlug,
-    brand_name: llm.brand,
+    brand_name: cleanBrand,
     attributes: safeRecord(llm.attributes),
     lifestyle_tags: enriched.lifestyle_tags,
     consumption_occasions: enriched.consumption_occasions,
@@ -594,7 +803,9 @@ ON CONFLICT (raw_text, canonical_id) DO UPDATE SET
 
 // ─── 4. Main resolver (mutates observations in place) ─────────────────────────
 
-const LLM_BATCH = 18;
+// Cost lever: the large system prompt is re-sent on EVERY call, so bigger
+// batches cut Gemini spend almost linearly (18→40 ≈ half the prompt overhead).
+const LLM_BATCH = Number(process.env.PRODUCT_NORMALIZE_BATCH ?? 40);
 
 export interface ResolveContext {
   /** The merchant id the receipt came from — used as a hint in RAC retrieval */
@@ -610,7 +821,7 @@ export async function resolveCanonicalObservationsV3(
   if (!observations.length) return;
 
   const rawNames = observations.map((o) => o.raw_name).filter(Boolean);
-  const fuzzyByNorm = await fuzzyMatchAliasesBulk(rawNames);
+  const fuzzyByNorm = await fuzzyMatchAliasesBulk(rawNames, context.merchantId);
 
   const fuzzyResolvedNorm = new Set<string>();
   for (const obs of observations) {
@@ -696,10 +907,13 @@ export async function resolveCanonicalObservationsV3(
         finalCategoryPath = "transport.fuel";
       }
 
-      const enriched = await upsertCanonicalProductFromLlmV3({
-        ...llm,
-        category_path: finalCategoryPath,
-      });
+      const enriched = await upsertCanonicalProductFromLlmV3(
+        {
+          ...llm,
+          category_path: finalCategoryPath,
+        },
+        context.merchantId
+      );
 
       if (enriched) {
         obs.canonical_name = enriched.canonical_name;
@@ -779,16 +993,36 @@ async function applyRacFlow(
   >();
   const needLlmRaw: string[] = [];
 
+  // The observed price is the cheapest discriminator we have for a cryptic string:
+  // "K.GOFRET @ 12,50" is a 47g wafer, not a 500g box. It was sitting unused on the
+  // observation; feed it to retrieval so candidates get re-ranked against their
+  // reference median, and to the LLM so it can reason about it.
+  const priceByRaw = new Map<string, { unitPrice: number | null; unitType: string | null }>();
+  for (const obs of observations) {
+    const raw = obs.raw_name?.trim();
+    if (!raw || priceByRaw.has(raw)) continue;
+    const unitPrice =
+      obs.unit_price_gross ??
+      (obs.quantity > 0 ? obs.line_total_gross / obs.quantity : null);
+    priceByRaw.set(raw, {
+      unitPrice: Number.isFinite(unitPrice as number) ? (unitPrice as number) : null,
+      unitType: obs.unit_type ?? null,
+    });
+  }
+
   for (const raw of uniqueLlm) {
     const cached = await getCachedProductDecision(raw, context.merchantId);
     if (cached) {
       cachedByRaw.set(raw, cached);
       continue;
     }
+    const price = priceByRaw.get(raw);
     const candidates = await retrieveProductCandidates({
       rawName: raw,
       merchantId: context.merchantId,
       limit: 3,
+      unitPrice: price?.unitPrice ?? null,
+      unitType: price?.unitType ?? null,
     });
     candidatesByRaw.set(raw, candidates);
     needLlmRaw.push(raw);
@@ -802,6 +1036,7 @@ async function applyRacFlow(
           candidatesByRaw,
           merchantId: context.merchantId,
           language: context.language,
+          priceByRaw,
         })
       : new Map();
 
@@ -829,7 +1064,12 @@ async function applyRacFlow(
       if (existing) {
         applyExistingToObservation(obs, existing, decision.confidence);
         // Save the alias (learning — resolved directly via fuzzy hit next time)
-        await upsertAliasMapping(raw, decision.matched_id, decision.confidence);
+        await upsertAliasMapping(
+          raw,
+          decision.matched_id,
+          decision.confidence,
+          context.merchantId
+        );
 
         // Cache (if not already cached)
         if (!cachedByRaw.has(raw)) {
@@ -857,24 +1097,27 @@ async function applyRacFlow(
       finalCategoryPath = "transport.fuel";
     }
 
-    const enriched = await upsertCanonicalProductFromLlmV3({
-      raw_name: raw,
-      canonical_name: decision.canonical_name ?? "",
-      display_name_tr: decision.display_name_tr,
-      brand: decision.brand,
-      brand_verdict: decision.brand ? "BRAND" : "UNKNOWN",
-      category_path: finalCategoryPath,
-      category_lvl1: finalCategoryPath?.split(".")[0] ?? null,
-      category_lvl2: finalCategoryPath?.split(".")[1] ?? null,
-      unit_size: decision.unit_size,
-      unit_type: decision.unit_type,
-      attributes: decision.attributes,
-      lifestyle_tags: decision.lifestyle_tags,
-      consumption_occasions: decision.consumption_occasions,
-      allergens: decision.allergens,
-      price_tier: decision.price_tier,
-      confidence: decision.confidence,
-    });
+    const enriched = await upsertCanonicalProductFromLlmV3(
+      {
+        raw_name: raw,
+        canonical_name: decision.canonical_name ?? "",
+        display_name_tr: decision.display_name_tr,
+        brand: decision.brand,
+        brand_verdict: decision.brand ? "BRAND" : "UNKNOWN",
+        category_path: finalCategoryPath,
+        category_lvl1: finalCategoryPath?.split(".")[0] ?? null,
+        category_lvl2: finalCategoryPath?.split(".")[1] ?? null,
+        unit_size: decision.unit_size,
+        unit_type: decision.unit_type,
+        attributes: decision.attributes,
+        lifestyle_tags: decision.lifestyle_tags,
+        consumption_occasions: decision.consumption_occasions,
+        allergens: decision.allergens,
+        price_tier: decision.price_tier,
+        confidence: decision.confidence,
+      },
+      context.merchantId
+    );
 
     if (enriched) {
       obs.canonical_name = enriched.canonical_name;
@@ -1011,18 +1254,23 @@ function applyExistingToObservation(
 async function upsertAliasMapping(
   rawText: string,
   canonicalId: string,
-  confidence: number
+  confidence: number,
+  merchantId?: string | null
 ): Promise<void> {
   try {
+    // The ON CONFLICT target must mirror uq_rpa_raw_merchant_canonical (migration 133)
+    // expression-for-expression, COALESCE included, or the upsert silently turns into
+    // a failing insert — which is exactly how alias writing was broken before 119.
     await db.query(
       `INSERT INTO receipt_product_aliases
-         (raw_text, canonical_id, match_type, confidence, times_seen, last_seen)
-       VALUES ($1, $2, 'llm', $3, 1, now())
-       ON CONFLICT (raw_text, canonical_id) DO UPDATE SET
+         (raw_text, canonical_id, merchant_id, match_type, confidence, times_seen, last_seen)
+       VALUES ($1, $2, $4, 'llm', $3, 1, now())
+       ON CONFLICT (raw_text, COALESCE(merchant_id, '00000000-0000-0000-0000-000000000000'::uuid), canonical_id)
+       DO UPDATE SET
          confidence = GREATEST(EXCLUDED.confidence, receipt_product_aliases.confidence),
          times_seen = receipt_product_aliases.times_seen + 1,
          last_seen  = now()`,
-      [rawText.trim(), canonicalId, confidence]
+      [rawText.trim(), canonicalId, confidence, merchantId ?? null]
     );
   } catch (e) {
     console.warn(

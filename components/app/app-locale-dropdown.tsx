@@ -34,7 +34,7 @@ interface AppLocaleDropdownProps {
   accentHex?: string;
 }
 
-export function AppLocaleDropdown({ variant, accentHex }: AppLocaleDropdownProps) {
+function AppLocaleDropdown({ variant, accentHex }: AppLocaleDropdownProps) {
   const { locale, setLocale, t } = useAppLocale();
 
   const current = APP_LOCALES.find((x) => x.value === locale) ?? APP_LOCALES[0];

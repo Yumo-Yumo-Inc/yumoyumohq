@@ -3,21 +3,21 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app/app-shell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Surface, SurfaceHeader, SurfaceTitle, SurfaceBody } from "@/components/ui/surface";
+import { StaggerReveal, Reveal } from "@/components/ui/stagger-reveal";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { useCountUp } from "@/lib/hooks/use-count-up";
 import {
   Trophy, ReceiptText, CheckCircle2, Zap, Target,
-  TrendingUp, Flame, ArrowRight, Sparkles, ShieldCheck, Users,
+  TrendingUp, Flame, ArrowRight, Sparkles, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ReferralShareCard } from "@/components/app/referral-share-card";
 import { ClaimButton } from "@/components/rewards/claim-button";
-import { ReferralList } from "@/components/app/referral-list";
+import { AlphaPeriodLeaderboard } from "@/components/rewards/alpha-period-leaderboard";
+import { ReferralEarningsCard } from "@/components/app/referral-earnings-card";
 import { loadBootstrapSnapshot } from "@/lib/bootstrap";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import { getQuestTitle } from "@/lib/quests/quest-pools";
-import { questXpToCPoints } from "@/config/contribution-config";
 import { useAppProfile } from "@/lib/app/profile-context";
 import { subscribeLocalDbChanges } from "@/lib/local-db";
 import { readCachedReceipts, readCachedQuests } from "@/lib/offline/cache";
@@ -94,20 +94,19 @@ export default function RewardsPage() {
   const multiplier = getSeasonLevelMultiplier(seasonLevel);
   const daysLeft = getDaysLeft(profile?.currentSeason?.endAt);
   const seasonName = profile?.currentSeason?.name ?? `Season ${profile?.currentSeason?.seasonNumber ?? 1}`;
+  const cuLevel = useCountUp(seasonLevel);
 
-  const totalContrib = profile?.contributionPoints?.total ?? 0;
-  const fromReceipts = profile?.contributionPoints?.fromReceipts ?? 0;
-  const fromQuests = profile?.contributionPoints?.fromQuests ?? 0;
   // Best move today: first incomplete daily, then weekly
   const pendingDaily = quests.find((q) => q.questKind === "daily" && q.status !== "completed");
   const pendingWeekly = !pendingDaily ? quests.find((q) => q.questKind === "weekly" && q.status !== "completed") : undefined;
   const bestMove = pendingDaily ?? pendingWeekly ?? null;
 
   // Season recap
-  const verifiedReceipts = receipts.filter((r) => r.status === "VERIFIED" || r.status === "analyzed");
+  const verifiedReceipts = receipts.filter((r) => {
+    const status = String(r.status || "").toLowerCase();
+    return status === "verified" || status === "analyzed";
+  });
   const completedQuests = quests.filter((q) => q.status === "completed");
-  // Single source of truth: the user's total contribution points (cPoints).
-  const totalCPointsEarned = totalContrib;
 
   const nextUnlocks = getNextUnlocks(seasonLevel);
 
@@ -161,65 +160,71 @@ export default function RewardsPage() {
           <h1 className="text-xl font-bold">{t("rewardsPage.title")}</h1>
         </div>
 
+        {/* ── Points leaderboard (Genesis + Alpha tabs) ───────────────── */}
+        <AlphaPeriodLeaderboard viewerUsername={profile?.username} />
+
         {/* ── 1. Season Progress ───────────────────────────────────────── */}
-        <Card className="card-cinematic card-secondary border-primary/40 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent pointer-events-none" />
-          <CardContent className="pt-5 pb-5 relative">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{seasonName}</p>
-                <p className="text-3xl font-black tabular-nums mt-0.5">
-                  Lv.<span className="text-primary">{seasonLevel}</span>
-                </p>
-              </div>
-              <div className="text-right space-y-1">
-                {daysLeft !== null && (
-                  <p className="text-xs text-muted-foreground">{t("rewardsPage.daysLeft", { count: daysLeft })}</p>
-                )}
-                <p className="text-xs font-semibold text-primary/80">Boost {multiplier.toFixed(2)}x</p>
-              </div>
+        <Surface variant="value" accent="gold" glow radius="lg" className="p-5">
+          <div className="relative mb-4 flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--app-text-muted)" }}>
+                {seasonName}
+              </p>
+              <p className="mt-1.5 flex items-baseline gap-1.5">
+                <span className="text-base font-semibold" style={{ color: "var(--app-text-secondary)" }}>Lv.</span>
+                <span className="scanui-hero-num text-[46px] tabular-nums">{Math.round(cuLevel)}</span>
+              </p>
             </div>
-            <div className="space-y-2">
-              <Progress value={xpPct} className="h-2.5 rounded-full" />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span className="tabular-nums">{fmt(xpCurrent)} XP</span>
-                <span className="font-medium text-foreground/70">
-                  {fmt(xpTotal - xpCurrent)} XP → Lv.{seasonLevel + 1}
-                </span>
-                <span className="tabular-nums">{fmt(xpTotal)} XP</span>
-              </div>
+            <div className="space-y-1 text-right">
+              {daysLeft !== null && (
+                <p className="text-[11px]" style={{ color: "var(--app-text-muted)" }}>{t("rewardsPage.daysLeft", { count: daysLeft })}</p>
+              )}
+              <p className="text-[11px] font-semibold" style={{ color: "var(--app-gold)" }}>Boost {multiplier.toFixed(2)}x</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="space-y-2">
+            <div className="h-2.5 overflow-hidden rounded-full" style={{ background: "var(--app-border)" }}>
+              <div
+                className="h-full rounded-full transition-[width] duration-700 ease-out"
+                style={{
+                  width: `${xpPct}%`,
+                  background: "linear-gradient(90deg, var(--app-gold-dim), var(--app-gold-light))",
+                  boxShadow: "0 0 12px var(--app-gold-glow)",
+                }}
+              />
+            </div>
+            <div className="flex justify-between text-[11px]" style={{ color: "var(--app-text-muted)" }}>
+              <span className="tabular-nums">{fmt(xpCurrent)} XP</span>
+              <span className="font-medium" style={{ color: "var(--app-text-secondary)" }}>
+                {fmt(xpTotal - xpCurrent)} XP → Lv.{seasonLevel + 1}
+              </span>
+              <span className="tabular-nums">{fmt(xpTotal)} XP</span>
+            </div>
+          </div>
+        </Surface>
 
         {/* ── 1b. Unlock Journey entry (permanent account ladder) ──────── */}
-        <Link href="/app/rewards/journey" className="block group">
-          <div
-            className="relative flex items-center gap-3 overflow-hidden border px-4 py-3.5 transition-transform group-hover:scale-[1.01] group-active:scale-[0.99]"
-            style={{
-              borderColor: "rgba(245,166,35,0.3)",
-              borderRadius: "var(--app-radius-md, 10px)",
-              background: "linear-gradient(135deg, rgba(245,166,35,0.08), var(--app-bg-surface, transparent))",
-            }}
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px"
-              style={{ background: "linear-gradient(90deg, transparent, rgba(245,166,35,0.5), transparent)" }}
-            />
-            <div className="p-2 rounded-xl flex-shrink-0" style={{ background: "rgba(245,166,35,0.14)" }}>
-              <Sparkles className="h-4 w-4" style={{ color: "#F5A623" }} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">{t("rewardsPage.journeyLink")}</p>
-              <p className="text-xs text-muted-foreground leading-snug">{t("rewardsPage.journeyLinkDesc")}</p>
-            </div>
-            <span className="font-mono text-sm font-bold tabular-nums flex-shrink-0" style={{ color: "#F5A623" }}>
-              Lv.{profile?.accountLevel ?? 1}
-            </span>
-            <ArrowRight className="h-4 w-4 flex-shrink-0" style={{ color: "rgba(245,166,35,0.7)" }} />
+        <Surface
+          as={Link}
+          href="/app/rewards/journey"
+          variant="value"
+          accent="gold"
+          radius="md"
+          interactive
+          className="flex items-center gap-3 px-4 py-3.5"
+        >
+          <div className="flex-shrink-0 rounded-xl p-2" style={{ background: "var(--app-gold-glow)" }}>
+            <Sparkles className="h-4 w-4" style={{ color: "var(--app-gold)" }} />
           </div>
-        </Link>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold" style={{ color: "var(--app-text-primary)" }}>{t("rewardsPage.journeyLink")}</p>
+            <p className="text-xs leading-snug" style={{ color: "var(--app-text-muted)" }}>{t("rewardsPage.journeyLinkDesc")}</p>
+          </div>
+          <span className="flex-shrink-0 font-mono text-sm font-bold tabular-nums" style={{ color: "var(--app-gold)" }}>
+            Lv.{profile?.accountLevel ?? 1}
+          </span>
+          <ArrowRight className="h-4 w-4 flex-shrink-0" style={{ color: "var(--app-gold-dim)" }} />
+        </Surface>
 
         {/* ── 1c. On-chain claim (ships dark; renders only when the
                claim-proof API returns an allocation) ─────────────────── */}
@@ -227,194 +232,125 @@ export default function RewardsPage() {
 
         {/* ── 2. Today's Best Move ─────────────────────────────────────── */}
         {bestMove && (
-          <Card className="card-cinematic border-amber-500/30 bg-amber-500/5">
-            <CardContent className="pt-4 pb-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-amber-500/15 mt-0.5 flex-shrink-0">
-                  <Flame className="h-4 w-4 text-amber-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">
-                    {t("rewardsPage.bestMove")}
-                  </p>
-                  <p className="text-sm font-medium leading-snug">{getQuestTitle(bestMove.type, locale, bestMove.title)}</p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {bestMove.rewardSeasonXp > 0 && (
-                      <span className="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full font-semibold">
-                        +{bestMove.rewardSeasonXp} Season XP
-                      </span>
-                    )}
-                    {questXpToCPoints(bestMove.rewardSeasonXp) > 0 && (
-                      <span className="text-xs bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-full font-semibold">
-                        +{fmt(questXpToCPoints(bestMove.rewardSeasonXp))} cPoints
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Link href="/app/tasks">
-                  <Button size="sm" variant="outline" className="flex-shrink-0 border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
-                    <span className="text-xs">{t("rewardsPage.go")}</span>
-                    <ArrowRight className="h-3 w-3 ml-1" />
-                  </Button>
-                </Link>
+          <Surface variant="glass" accent="gold" glow radius="lg" className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex-shrink-0 rounded-xl p-2" style={{ background: "var(--app-gold-glow)" }}>
+                <Flame className="h-4 w-4" style={{ color: "var(--app-gold)" }} />
               </div>
-            </CardContent>
-          </Card>
+              <div className="min-w-0 flex-1">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--app-gold)" }}>
+                  {t("rewardsPage.bestMove")}
+                </p>
+                <p className="text-sm font-medium leading-snug" style={{ color: "var(--app-text-primary)" }}>{getQuestTitle(bestMove.type, locale, bestMove.title)}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {bestMove.rewardSeasonXp > 0 && (
+                    <span className="rounded-full px-2 py-0.5 text-xs font-semibold" style={{ background: "var(--app-gold-glow)", color: "var(--app-gold)" }}>
+                      +{bestMove.rewardSeasonXp} Season XP
+                    </span>
+                  )}
+                </div>
+              </div>
+              <Link href="/app/tasks">
+                <Button size="sm" variant="outline" className="flex-shrink-0 border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
+                  <span className="text-xs">{t("rewardsPage.go")}</span>
+                  <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          </Surface>
         )}
 
-        {/* ── 3. Your Rewards ──────────────────────────────────────────── */}
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            {t("rewardsPage.yourRewards")}
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="card-cinematic card-secondary col-span-2">
-              <CardContent className="pt-4 pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="text-xs text-muted-foreground">{t("rewardsPage.contributionBalance")}</p>
-                    <p className="text-2xl font-black tabular-nums text-primary mt-0.5">{fmt(Math.round(totalContrib))}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{t("rewardsPage.totalProof")}</p>
-                  </div>
-                  <Target className="h-7 w-7 text-primary/25 mt-0.5 flex-shrink-0" />
-                </div>
-                <div className="flex gap-6 mt-3 pt-3 border-t border-border/50">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t("rewardsPage.fromReceipts")}</p>
-                    <p className="text-sm font-semibold tabular-nums">{fmt(Math.round(fromReceipts))}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t("rewardsPage.fromQuests")}</p>
-                    <p className="text-sm font-semibold tabular-nums">{fmt(Math.round(fromQuests))}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="card-cinematic card-secondary border-violet-500/25">
-              <CardContent className="pt-4 pb-4">
-                <Sparkles className="h-4 w-4 text-violet-400 mb-2" />
-                <p className="text-xl font-black tabular-nums text-violet-400">{fmt(Math.round(fromReceipts))}</p>
-                <p className="text-xs font-semibold mt-0.5">{t("rewardsPage.receiptCPoints")}</p>
-                <p className="text-xs text-muted-foreground mt-1 leading-snug">{t("rewardsPage.earnedFromReceipts")}</p>
-              </CardContent>
-            </Card>
-
-            <Card className="card-cinematic card-secondary border-emerald-500/25">
-              <CardContent className="pt-4 pb-4">
-                <Zap className="h-4 w-4 text-emerald-400 mb-2" />
-                <p className="text-xl font-black tabular-nums text-emerald-400">{fmt(Math.round(fromQuests))}</p>
-                <p className="text-xs font-semibold mt-0.5">{t("rewardsPage.bonusCPoints")}</p>
-                <p className="text-xs text-muted-foreground mt-1 leading-snug">{t("rewardsPage.earnedFromQuests")}</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
         {/* ── 4. Season Recap (user's own stats) ───────────────────────── */}
-        <Card className="card-cinematic card-secondary">
-          <CardHeader className="pb-2 pt-4">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-amber-400" />
+        <Surface variant="elevated" radius="lg">
+          <SurfaceHeader>
+            <SurfaceTitle className="flex items-center gap-2">
+              <Trophy className="h-4 w-4" style={{ color: "var(--app-gold)" }} />
               {t("rewardsPage.seasonRecap")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            </SurfaceTitle>
+          </SurfaceHeader>
+          <SurfaceBody>
+            <StaggerReveal className="grid grid-cols-2 gap-x-6 gap-y-4">
               {[
                 { label: t("rewardsPage.receiptsVerified"), value: fmt(verifiedReceipts.length) },
                 { label: t("rewardsPage.questsCompleted"), value: fmt(completedQuests.length) },
-                { label: t("rewardsPage.cPointsEarned"), value: fmt(Math.round(totalCPointsEarned)) },
                 { label: t("rewardsPage.seasonXp"), value: fmt(seasonXp) },
                 { label: t("rewardsPage.currentLevel"), value: `Lv.${seasonLevel}` },
                 { label: t("rewardsPage.rewardBoost"), value: `${multiplier.toFixed(2)}x` },
               ].map(({ label, value }) => (
-                <div key={label}>
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="text-base font-bold tabular-nums mt-0.5">{value}</p>
-                </div>
+                <Reveal key={label}>
+                  <p className="text-xs" style={{ color: "var(--app-text-muted)" }}>{label}</p>
+                  <p className="mt-0.5 text-base font-bold tabular-nums" style={{ color: "var(--app-text-primary)" }}>{value}</p>
+                </Reveal>
               ))}
-            </div>
-          </CardContent>
-        </Card>
+            </StaggerReveal>
+          </SurfaceBody>
+        </Surface>
 
         {/* ── 5. Next Unlocks ──────────────────────────────────────────── */}
-        <Card className="card-cinematic card-secondary">
-          <CardHeader className="pb-1 pt-4">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
+        <Surface variant="elevated" radius="lg">
+          <SurfaceHeader>
+            <SurfaceTitle className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" style={{ color: "var(--app-gold)" }} />
               {t("rewardsPage.nextUnlocks")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4 space-y-0 divide-y divide-border/40">
-            {nextUnlocks.map(({ level, kind, multiplier: m }) => {
-              const xpNeeded = Math.max(0, (SEASON_LEVEL_XP_THRESHOLDS[level - 1] ?? 0) - seasonXp);
-              const label = kind === "boost"
-                ? t("rewardsPage.rewardBoostArrow", { multiplier: (m ?? 1).toFixed(2) })
-                : t("rewardsPage.milestoneChallenge");
-              return (
-                <div key={level} className="flex items-center justify-between py-2.5 first:pt-2">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-lg bg-primary/10 flex-shrink-0">
-                      {kind === "boost"
-                        ? <Zap className="h-3.5 w-3.5 text-primary" />
-                        : <Trophy className="h-3.5 w-3.5 text-primary" />}
+            </SurfaceTitle>
+          </SurfaceHeader>
+          <SurfaceBody className="pt-1">
+            <div className="divide-y" style={{ borderColor: "var(--app-border)" }}>
+              {nextUnlocks.map(({ level, kind, multiplier: m }) => {
+                const xpNeeded = Math.max(0, (SEASON_LEVEL_XP_THRESHOLDS[level - 1] ?? 0) - seasonXp);
+                const label = kind === "boost"
+                  ? t("rewardsPage.rewardBoostArrow", { multiplier: (m ?? 1).toFixed(2) })
+                  : t("rewardsPage.milestoneChallenge");
+                return (
+                  <div key={level} className="flex items-center justify-between py-2.5 first:pt-0">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex-shrink-0 rounded-lg p-1.5" style={{ background: "var(--app-gold-glow)" }}>
+                        {kind === "boost"
+                          ? <Zap className="h-3.5 w-3.5" style={{ color: "var(--app-gold)" }} />
+                          : <Trophy className="h-3.5 w-3.5" style={{ color: "var(--app-gold)" }} />}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold" style={{ color: "var(--app-text-primary)" }}>Lv.{level}</p>
+                        <p className="text-xs" style={{ color: "var(--app-text-muted)" }}>{label}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold">Lv.{level}</p>
-                      <p className="text-xs text-muted-foreground">{label}</p>
-                    </div>
+                    <span className="ml-4 flex-shrink-0 text-xs tabular-nums" style={{ color: "var(--app-text-muted)" }}>
+                      {xpNeeded > 0 ? `${fmt(xpNeeded)} XP` : t("rewardsPage.reached")}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground tabular-nums flex-shrink-0 ml-4">
-                    {xpNeeded > 0 ? `${fmt(xpNeeded)} XP` : t("rewardsPage.reached")}
-                  </span>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+                );
+              })}
+            </div>
+          </SurfaceBody>
+        </Surface>
 
         {/* ── 6. How You Earn ──────────────────────────────────────────── */}
-        <Card className="card-cinematic card-secondary">
-          <CardHeader className="pb-2 pt-4">
-            <CardTitle className="text-sm font-semibold">
-              {t("rewardsPage.howYouEarn")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4 space-y-3.5">
+        <Surface variant="elevated" radius="lg">
+          <SurfaceHeader>
+            <SurfaceTitle>{t("rewardsPage.howYouEarn")}</SurfaceTitle>
+          </SurfaceHeader>
+          <SurfaceBody className="space-y-3.5">
             {earnSources.map(({ icon: Icon, color, bg, label, desc }) => (
               <div key={label} className="flex items-start gap-2.5">
-                <div className={cn("p-1.5 rounded-lg flex-shrink-0 mt-0.5", bg)}>
+                <div className={cn("mt-0.5 flex-shrink-0 rounded-lg p-1.5", bg)}>
                   <Icon className={cn("h-3.5 w-3.5", color)} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold">{label}</p>
-                  <p className="text-xs text-muted-foreground">{desc}</p>
+                  <p className="text-xs font-semibold" style={{ color: "var(--app-text-primary)" }}>{label}</p>
+                  <p className="text-xs" style={{ color: "var(--app-text-muted)" }}>{desc}</p>
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </SurfaceBody>
+        </Surface>
 
-        {/* ── 7. Invites (affiliate) — its own zone, other people's data ── */}
+        {/* ── 7. Referral earnings — the full network hub lives in Friends → My Network ── */}
         <div className="pt-3">
           <div
             className="mb-5 h-px w-full"
             style={{ background: "linear-gradient(90deg, transparent, var(--app-border-strong), transparent)" }}
           />
-          <div className="flex items-start gap-2.5 mb-3">
-            <div className="p-1.5 rounded-lg bg-primary/10 mt-0.5 flex-shrink-0">
-              <Users className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">{t("rewardsPage.invitesTitle")}</p>
-              <p className="text-xs text-muted-foreground leading-snug">{t("rewardsPage.invitesSubtitle")}</p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <ReferralShareCard accountLevel={profile?.accountLevel ?? 1} />
-            <ReferralList />
-          </div>
+          <ReferralEarningsCard />
         </div>
 
       </div>

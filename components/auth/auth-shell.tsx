@@ -7,10 +7,11 @@ interface AuthShellFeature {
 }
 
 interface AuthShellProps {
-  badge: string;
+  /** Optional header pill; omitting it hides the pill (icon included). */
+  badge?: string;
   headline: string;
   subheadline: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   title: string;
   description: string;
   features: AuthShellFeature[];
@@ -34,12 +35,16 @@ export function AuthShell({
         <div className="w-full max-w-xl">
           <Card className="border-white/10 bg-[#121725]/95 text-white shadow-2xl shadow-black/30">
             <CardHeader className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-app-gold/25 bg-app-gold/10 px-3 py-1.5 text-xs font-medium text-app-gold-light">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-lg bg-app-gold/15 text-app-gold">
-                  {icon}
-                </span>
-                <span>{badge}</span>
-              </div>
+              {badge ? (
+                <div className="inline-flex items-center gap-2 rounded-full border border-app-gold/25 bg-app-gold/10 px-3 py-1.5 text-xs font-medium text-app-gold-light">
+                  {icon ? (
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-lg bg-app-gold/15 text-app-gold">
+                      {icon}
+                    </span>
+                  ) : null}
+                  <span>{badge}</span>
+                </div>
+              ) : null}
               <CardTitle className="text-3xl">{title}</CardTitle>
               <CardDescription className="text-sm leading-6 text-white/60">
                 {description}

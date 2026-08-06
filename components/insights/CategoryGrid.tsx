@@ -11,7 +11,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { CATEGORY_GLYPHS } from "./CategoryGlyphs";
 
-export interface CategoryItem {
+interface CategoryItem {
   key: string;
   label: string;
   amount: number;

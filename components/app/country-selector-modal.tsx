@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getEnabledCountries } from "@/lib/shared/countries";
 import { translateApiError, useAppLocale } from "@/lib/i18n/app-context";
 import { useAppProfile } from "@/lib/app/profile-context";
+import { setSessionAccountCountry } from "@/lib/auth/account-country";
 import { toast } from "sonner";
 
 const countries = getEnabledCountries();
@@ -58,6 +59,7 @@ export function CountrySelectorModal({
         throw new Error(data.error || "Failed to save user country");
       }
 
+      setSessionAccountCountry(country);
       await refresh();
       await onSaved?.(country);
       onOpenChange(false);

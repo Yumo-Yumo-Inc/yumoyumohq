@@ -13,6 +13,11 @@ const ADMIN_TABS = [
   },
   { label: "Merchants", href: "/app/admin/merchants", match: ["/app/admin/merchants"] },
   {
+    label: "Market",
+    href: "/app/admin/market",
+    match: ["/app/admin/market"],
+  },
+  {
     label: "Data & OCR",
     href: "/app/admin/receipt-line-items",
     match: ["/app/admin/receipt-line-items", "/app/admin/scraped-products"],

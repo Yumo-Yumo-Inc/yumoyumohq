@@ -28,7 +28,7 @@ flowchart LR
     B --> C["Yaşayan fiyat hafızası"]
     B --> D["Yumbie rehberliği + Kuruluş NFT kimliği"]
     B --> E["Katkı ekonomisi"]
-    E --> F["bINT ve ePoints"]
+    E --> F["bINT"]
     F --> G["INT, varlık kilitleme ve yönetişim"]
 ```
 

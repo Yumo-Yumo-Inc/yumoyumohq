@@ -1,56 +1,54 @@
 # Aşama 4 — Kanonik
 
-## 2.7 Aşama 4 — Kanonik ürün eşleşmesi
+## 2.7 Aşama 4 — Kanonik ürün eşleştirme
 
-Bu aşama, aynı ürünün farklı satıcı/fiş üzerinde farklı şekillerde yazıldığı durumları tek bir kanonik kimliğe indirir. Örnek:
+Bu aşama, aynı ürünün farklı yüzey biçimlerini tek bir kanonik kimliğe indirger. Örneğin:
 
 - `COCA COLA 330ML KUTU`
 - `C.COLA 33CL TENEKE`
 - `COCA-COLA 0.33 L`
 - `COKA 330 ML`
 
-Dördü de aynı `canonical_product_id` değerine çözülür. Bu çözümleme, fiyat hafızasının ve B2B veri ürününün ön koşuludur.
+Dördü de aynı `canonical_product_id` değerine çözülür. Bu çözümleme, fiyat hafızası ve B2B veri ürünü için ön koşuldur.
 
 ### Yaklaşım
 
-Kanonik çözümleme çok aşamalı *embedding* tabanlı bir çözücüdür; güven katmanlı disambiguasyon ve belirsiz durumlar için bir insan inceleme kuyruğu içerir.
+Kanonik çözümleme, eşzamanlı akış doğrulanmış önizlemeyi kullanıcıya döndürdükten sonra, arka plandaki post-process işçisinde **eşzamansız** çalışır. Bu, ürün çözümlemesini gecikmeye duyarlı yolun dışında tutar: kullanıcı fişini hemen görür; kanonik kimlikler kayda kısa süre sonra iliştirilir.
+
+Çözümleyici, ham fiş satırı metnini kanonik ürünlere eşleyen bir alias tablosu üzerinde çalışır:
 
 ```mermaid
 flowchart TD
-    A["Ham satır metni"] --> B["Normalleştir"]
-    B --> C["Vektör sorgu"]
-    C --> D{"Yüksek güven?"}
-    D -- evet --> E["Eşleşme · canonical_product_id yaz"]
-    D -- hayır --> F{"Orta güven?"}
-    F -- evet --> G["LLM disambiguasyon"]
-    F -- hayır --> H["İnceleme kuyruğu"]
-    G --> I{"Doğrulandı mı?"}
-    I -- evet --> E
-    I -- hayır --> H
+    A[Ham satır metni] --> B[Metin normalizasyonu]
+    B --> C[Alias araması · pg_trgm bulanık eşleşme]
+    C --> D{Alias isabeti?}
+    D -- evet --> E[canonical_product_id · zenginleştirilmiş bağlam]
+    D -- hayır --> F[LLM normalizasyonu]
+    F --> G[Kanonik ürün + alias + marka kaydını upsert et]
+    G --> E
 ```
 
-Tam benzerlik eşikleri, *embedding* modeli ve disambiguasyon istemi iç operasyon katmanında yönetilir.
+- **Bulanık alias araması** — normalleştirilmiş satır metni, daha önce öğrenilmiş fiş alias'larına karşı PostgreSQL trigram benzerliğiyle (`pg_trgm`) eşleştirilir. İsabet doğrudan kanonik ürüne çözülür. Bir satıcıda öğrenilen alias'lar, metin mağazaya özgü bir kısaltma değil de gerçek bir ürün adı gibi okunduğunda satıcılar arasında yeniden kullanılır; bu, farklı ürünlerin tek kanonik altında birleşmesini engeller.
+- **LLM yedeği** — isabet olmadığında bir dil modeli ham metni marka, ürün ve boyut niteliklerine normalleştirir. Sonuç, yeni bir alias satırıyla birlikte yeni bir kanonik ürün olarak upsert edilir (veya mevcut birine eşlenir); böylece aynı yüzey biçimi bir sonraki sefer model çağrısı olmadan çözülür.
 
-Çözülemeyen bir kalem null kanonik referans ile kaydedilir; o satır için bINT, kuyruktan kanonikleştirme tamamlandıktan sonra hesaplanır.
+Benzerlik ayarları ve normalizasyon istemi iç operasyon katmanında yönetilir.
+
+Çözülemeyen kalem, boş kanonik referansla kaydedilir; alias tablosu büyüdükçe çözümleme sonraki bir geçişte tamamlanabilir.
 
 ### Taksonomi yapısı
 
 ```
-kategori > alt kategori > marka > ürün > varyant
+category > subcategory > brand > product > variant
 ```
 
 Örnek:
 
 ```
-İçecek > Gazlı İçecekler > Coca-Cola > Coca-Cola Klasik > 330 ml kutu
+Beverages > Carbonated Soft Drinks > Coca-Cola > Coca-Cola Classic > 330 ml can
 ```
 
-Her kanonik ürün normalleştirilmiş öznitelikler taşır: `size_value`, `size_unit`, `package_type`, `brand_id`, `is_private_label`, `barcode_gtin` (mevcut olduğunda).
+Her kanonik ürün normalleştirilmiş nitelikler taşır: `size_value`, `size_unit`, `package_type`, `brand_id`, `is_private_label`, `barcode_gtin` (mevcutsa).
 
-### Soğuk başlangıç
+### Büyüme modeli
 
-Kanonik indeks açık ürün veri setlerinden, lisanslı katalog ortaklıklarından ve kapalı betadan tohumlanmış kullanıcı yüklemelerinden önyüklenir. İndeks, kanoniklik kuyruğu boşaltıldıkça organik olarak büyür.
-
-### Bekleyen kanoniklik kuyruğu
-
-Belirsiz kalemler bir inceleme kuyruğuna girer. İnceleyen (başlangıçta Yumo Yumo ekibi, sonra PoC kazanan topluluk havuzu) ya yeni bir kanonik ürün yaratır ya da ham metni mevcut bir ürüne eşler. Bu kuyruk, boru hattı ölçeklendikçe birincil maliyet kaldıracıdır — 08 bunu temel operasyonel risk olarak listeler.
+Kanonik indeks fiş trafiğinin kendisinden büyür: LLM ile normalleştirilen her satır bir kanonik ürün ve bir alias ekler; o yüzey biçiminin sonraki her tekrarı alias tablosundan model maliyeti olmadan çözülür. Belirsiz veya düşük kaliteli girdiler yönetici katalog araçlarıyla incelenir.

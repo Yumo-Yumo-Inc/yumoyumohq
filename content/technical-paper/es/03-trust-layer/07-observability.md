@@ -4,15 +4,15 @@
 
 Cada recibo que pasa por la capa emite un registro en un flujo interno de observabilidad. El registro contiene:
 
-- La banda de confianza asignada y la lista de familias de señales que contribuyeron.
-- Si el recibo fue retenido, rechazado o acreditado (completo / reducido).
-- Para recibos retenidos, la acción final del revisor y el tiempo hasta la decisión.
+- El nivel de calidad asignado y la lista de familias de señales que contribuyeron.
+- Si el recibo fue rechazado o acreditado (completo / reducido).
+- Una vez que la cola de revisión planificada se active: para recibos retenidos, la acción final del revisor y el tiempo hasta la decisión.
 - Para recibos acreditados, la salud y el nivel del usuario en el momento del crédito.
 
 Este flujo alimenta tres vistas:
 
 1. **Panel de salud de la capa** — distribución de bandas a lo largo del tiempo, profundidad de la cola de retención, tiempo hasta decisión, tasa de anulación del revisor.
-2. **Vista de calibración** — distribuciones emparejadas de banda de confianza y resultado descendente observado (por ejemplo, ¿un recibo de banda "alta" fue marcado posteriormente por una señal diferente?).
+2. **Vista de calibración** — distribuciones emparejadas de nivel de calidad y resultado descendente observado (por ejemplo, ¿un recibo de nivel alto fue marcado posteriormente por una señal diferente?).
 3. **Pulso de abuso** — distribución de tamaños de clúster, tasa de emergencia de nuevos patrones, geografía de casos retenidos.
 
 ## 3.15 Cadencia de calibración

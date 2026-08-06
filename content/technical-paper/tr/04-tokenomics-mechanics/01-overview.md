@@ -1,6 +1,6 @@
 # 04 — Tokenomik Mekanikleri
 
-Bu bölüm Yumo Yumo protokolünün ekonomik mekaniklerini kapsar: INT, bINT, ePoints ve Foundation NFT'nin taşıdığı roller; emisyon ve dönüşüm yaşam döngüsü; ödül tavanları; staking, hazine ve geri al/yak mekanikleri; arz tahsisi; dolaşımdaki arz projeksiyonları ve INT kullanım alanları.
+Bu bölüm Yumo Yumo protokolünün ekonomik mekaniklerini kapsar: INT, bINT ve proof-of-expense SBT'nin taşıdığı roller; emisyon ve dönüşüm yaşam döngüsü; ödül tavanları; staking, hazine ve geri al/yak mekanikleri; arz tahsisi; dolaşımdaki arz projeksiyonları ve INT kullanım alanları.
 
 Yargı yetkisine özgü hukuki görüşler hukuk katmanında yönetilir.
 
@@ -10,8 +10,7 @@ Yargı yetkisine özgü hukuki görüşler hukuk katmanında yönetilir.
 |---|---|
 | INT | Zincir üstü ana token ve dolaşım muhasebesi |
 | bINT | Doğrulanmış katkının mutabakat öncesi ödül temsili |
-| ePoints | Uygulama içi ilerleme ve sezonluk aktivite katmanı |
-| Foundation NFT | Erken katkı ve seviye temsili |
+| Proof-of-expense SBT | Doğrulanmış katkıcı işareti |
 | Staking | Kilit, birikim ve protokol katılım semantiği |
 | Hazine | Gelir girişlerinin operasyon, rezerv ve token ekonomisiyle ilişkisi |
 | Arz ve tahsis | Toplam arz, ray yüzdeleri, token miktarları (4.16–4.18) |

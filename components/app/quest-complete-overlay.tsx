@@ -347,7 +347,7 @@ export function QuestCompleteOverlay({ data, onDismiss }: Props) {
 
             {/* Rewards */}
             <div className="qco-rewards flex w-full gap-3">
-              {/* cPoints */}
+              {/* points */}
               <div
                 className="flex flex-1 flex-col items-center gap-1.5 rounded-xl py-3.5"
                 style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.18)" }}
@@ -361,7 +361,7 @@ export function QuestCompleteOverlay({ data, onDismiss }: Props) {
                   +0
                 </span>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--app-text-muted)" }}>
-                  cPoints
+                  {l("puan", "points", "поинты", "แต้ม", "puntos", "积分")}
                 </span>
               </div>
 

@@ -76,7 +76,7 @@ export const ACCOUNT_UNLOCKS: readonly AccountUnlock[] = [
     description: { tr: "Uygulama aksan rengine yeni bir seçenek.", en: "A new accent color option for the app." },
   },
   {
-    level: 10, key: "deep_insights", kind: ["feature", "economic"], reveal: true, capStep: true, phase: 2,
+    level: 10, key: "deep_insights", kind: ["feature", "economic"], reveal: true, capStep: true, phase: 1,
     title: { tr: "Derin Insights", en: "Deep Insights" },
     description: { tr: "Harcama geçmişinde derin analiz katmanı. Günlük kazanç tavanın ve sezon çarpanın yükselir.", en: "A deeper analysis layer on your spending history. Your daily earning ceiling and season multiplier rise." },
   },
@@ -91,7 +91,7 @@ export const ACCOUNT_UNLOCKS: readonly AccountUnlock[] = [
     description: { tr: "Avatarına kenarlık ve ilk sticker paketi.", en: "A border for your avatar and your first sticker pack." },
   },
   {
-    level: 15, key: "weekly_report_theme_set", kind: ["feature", "cosmetic"], reveal: true, phase: 2,
+    level: 15, key: "weekly_report_theme_set", kind: ["feature", "cosmetic"], reveal: true, phase: 1,
     title: { tr: "Haftalık özet raporu + tam tema seti", en: "Weekly summary report + full theme set" },
     description: { tr: "Haftalık harcama özeti ve tema setinin tamamı.", en: "A weekly spending summary and the complete theme set." },
   },
@@ -176,6 +176,33 @@ export const ACCOUNT_UNLOCKS: readonly AccountUnlock[] = [
     description: { tr: "Efsane rozet, kalıcı ödül boost'u ve prestij döngüsünün açılışı. Günlük kazanç tavanın en üst kademeye çıkar.", en: "The legend badge, a permanent reward boost and the opening of the prestige cycle. Your daily earning ceiling reaches the top tier." },
   },
 ];
+
+/** Account level at which the Deep Insights analysis layer opens. */
+export const DEEP_INSIGHTS_LEVEL =
+  ACCOUNT_UNLOCKS.find((u) => u.key === "deep_insights")?.level ?? 10;
+
+/** Account level at which the weekly spending report opens. */
+export const WEEKLY_REPORT_LEVEL =
+  ACCOUNT_UNLOCKS.find((u) => u.key === "weekly_report_theme_set")?.level ?? 15;
+
+/** Account level at which the badge showcase (pin badges to profile) opens. */
+export const BADGE_SHOWCASE_LEVEL =
+  ACCOUNT_UNLOCKS.find((u) => u.key === "badge_showcase")?.level ?? 12;
+
+/** Max badges a user can pin to their profile showcase. */
+export const MAX_SHOWCASED_BADGES = 3;
+
+/** Account level at which the custom profile background opens. */
+export const PROFILE_BG_LEVEL =
+  ACCOUNT_UNLOCKS.find((u) => u.key === "profile_bg_early_access")?.level ?? 40;
+
+/** Account level at which a user starts being highlighted on the leaderboard. */
+export const LEADERBOARD_HIGHLIGHT_LEVEL =
+  ACCOUNT_UNLOCKS.find((u) => u.key === "leaderboard_highlight_prestige_intro")?.level ?? 20;
+
+/** Account level at which a user earns the special leaderboard badge. */
+export const LEADERBOARD_BADGE_LEVEL =
+  ACCOUNT_UNLOCKS.find((u) => u.key === "leaderboard_badge_special")?.level ?? 28;
 
 /** Unlocks at exactly this level. */
 export function getUnlocksForLevel(level: number): AccountUnlock[] {

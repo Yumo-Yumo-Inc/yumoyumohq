@@ -61,6 +61,9 @@ export function YumbieWorkspace({ sceneId }: { sceneId: SceneId }) {
   const tourActive = useYumbieTour((s) => s.active);
   const insightPending = useYumbieInsight((s) => s.pending);
   const chatOpen = useYumbieChatStore((s) => s.open);
+  // Yumbie chat is grounded in the user's real spending (server-built context in
+  // /api/yumbie/chat). Companion character + ambient bubble also stay.
+  const YUMBIE_CHAT_ENABLED = true;
   // Yumbie's current message — drives the "!" head badge and the popup bubble.
   const message = useYumbieMessage((s) => s.message);
   const [bubbleOpen, setBubbleOpen] = useState(false);
@@ -515,7 +518,7 @@ export function YumbieWorkspace({ sceneId }: { sceneId: SceneId }) {
     <div className="relative w-full border-b border-[var(--app-border)] bg-[var(--yb-room)]">
       {/* Insight/tour cue is shown as a "!" above Yumbie's head (in the SVG),
           not as a pill. Tapping it opens the bottom sheet. */}
-      {!chatOpen && (
+      {YUMBIE_CHAT_ENABLED && !chatOpen && (
         <button
           type="button"
           aria-label="Yumbie ile konuş"
@@ -629,7 +632,7 @@ export function YumbieWorkspace({ sceneId }: { sceneId: SceneId }) {
           </div>
         </div>
       )}
-      <YumbieChat />
+      {YUMBIE_CHAT_ENABLED && <YumbieChat />}
     </div>
   );
 }

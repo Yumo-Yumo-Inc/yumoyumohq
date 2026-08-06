@@ -42,8 +42,18 @@ export function getWhatsAppExemptUsernames(): string[] {
 }
 
 /** Users who can upload from any country without country selection */
-export function getMultiCountryUsernames(): string[] {
+function getMultiCountryUsernames(): string[] {
   return parseUserList("MULTI_COUNTRY_USERNAMES");
+}
+
+/**
+ * Whether a user may upload receipts from any country (receipt country is
+ * detected per upload instead of matched against a fixed home country).
+ * Telegram bot accounts have no country-picker step and users can be anywhere,
+ * so they are always multi-country; plus any explicitly configured usernames.
+ */
+export function isMultiCountryUsername(username: string): boolean {
+  return username.startsWith("telegram_") || getMultiCountryUsernames().includes(username);
 }
 
 /** Users exempt from small-file (<600KB) penalty */

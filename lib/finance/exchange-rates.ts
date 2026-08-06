@@ -35,7 +35,7 @@ function parseEcbRates(xml: string): EcbRatesSnapshot {
   return { asOf, rates };
 }
 
-export async function getLatestEcbRates(): Promise<EcbRatesSnapshot> {
+async function getLatestEcbRates(): Promise<EcbRatesSnapshot> {
   const now = Date.now();
   if (cachedSnapshot && now - cachedAt < CACHE_TTL_MS) {
     return cachedSnapshot;

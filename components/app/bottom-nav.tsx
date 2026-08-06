@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ScanLine, TrendingUp, LineChart, Wallet } from "lucide-react";
+import { Home, ScanLine, Flame, LineChart, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import { type UserFacingText } from "@/lib/product-architecture/dashboard-contract";
@@ -15,18 +15,18 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/app/dashboard", label: { tr: "Bugün", en: "Today", ru: "Сегодня", th: "วันนี้", es: "Hoy", zh: "今天" }, icon: Home },
   { href: "/app/analysis", label: { tr: "Analiz", en: "Analysis", ru: "Анализ", th: "วิเคราะห์", es: "Análisis", zh: "分析" }, icon: LineChart },
   { href: "/app/mine", label: { tr: "Tara", en: "Scan", ru: "Скан", th: "สแกน", es: "Escanear", zh: "扫描" }, icon: ScanLine, scan: true },
-  { href: "/app/patterns", label: { tr: "Yaşam", en: "Life", ru: "Жизнь", th: "ชีวิต", es: "Vida", zh: "生活" }, icon: TrendingUp },
+  { href: "/app/season", label: { tr: "Sezon", en: "Season", ru: "Сезон", th: "ซีซัน", es: "Temporada", zh: "赛季" }, icon: Flame },
   {
-    href: "/app/insights",
+    href: "/app/achievements",
     label: {
-      tr: "Cüzdan",
-      en: "Wallet",
-      ru: "Кошелёк",
-      th: "กระเป๋าเงิน",
-      es: "Cartera",
-      zh: "钱包",
+      tr: "Başarımlar",
+      en: "Achievements",
+      ru: "Достижения",
+      th: "ความสำเร็จ",
+      es: "Logros",
+      zh: "成就",
     },
-    icon: Wallet,
+    icon: Award,
   },
 ];
 
@@ -56,9 +56,7 @@ export function BottomNav({ className }: BottomNavProps) {
           const isActive =
             item.href === "/app/dashboard"
               ? pathname === "/app" || pathname === "/app/dashboard"
-              : item.href === "/app/insights"
-                ? pathname === "/app/insights" || pathname.startsWith("/app/insights/")
-                : pathname.startsWith(item.href);
+              : pathname.startsWith(item.href);
           const Icon = item.icon;
 
           if (item.scan) {

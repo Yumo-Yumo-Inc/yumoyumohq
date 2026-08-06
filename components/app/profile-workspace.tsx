@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Camera, ChevronRight, Coins, Diamond, Flame, Globe2, Gift, Heart, KeyRound, Link2, Loader2, Lock, LogOut, Mail, MapPin, MessageSquareText, Save, Shield, Trash2, UserRound, Users, Volume2, Wallet } from "lucide-react";
+import { CalendarDays, Camera, ChevronRight, Coins, Flame, Globe2, Gift, Heart, KeyRound, Link2, Loader2, Lock, LogOut, Mail, MapPin, MessageSquareText, Palette, Save, Shield, Trash2, UserRound, Users, Volume2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { AvatarImage } from "@/components/app/avatar-image";
 import { APP_LOCALES } from "@/components/app/app-locale-dropdown";
@@ -20,9 +20,18 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ACCOUNT_LEVEL_XP_THRESHOLDS } from "@/config/account-level-config";
+import { availableNameColors, isNameColorUnlocked, resolveNameColorHex } from "@/config/name-colors";
+import { PROFILE_FRAMES, availableProfileFrames, isProfileFrameUnlocked } from "@/config/profile-frames";
+import { availableThemeAccents, isThemeAccentUnlocked, resolveThemeAccentHex } from "@/config/theme-accents";
+import { availableProfileBackgrounds, isProfileBgUnlocked } from "@/config/profile-backgrounds";
+import { availableAvatarStickers, isAvatarStickerUnlocked } from "@/config/avatar-stickers";
+import { availableSeals, isSealUnlocked } from "@/config/proof-seals";
+import { RewardArt, rewardArtFor } from "@/components/app/season/reward-art";
+import { AvatarFrame } from "@/components/app/avatar-frame";
 import { useAppProfile } from "@/lib/app/profile-context";
+import { useTheme } from "@/lib/theme/theme-context";
 import { useSound } from "@/lib/audio/sound-context";
-import { useAppLocale, type AppLocale } from "@/lib/i18n/app-context";
+import { useAppLocale, translateApiError, type AppLocale } from "@/lib/i18n/app-context";
 import { openCookiePreferences } from "@/lib/legal/cookie-consent";
 import { patchCachedProfileAvatar, patchCachedProfileFields } from "@/lib/offline/cache";
 import { clearAuthenticatedSessionCache } from "@/lib/auth/session-cache";
@@ -71,6 +80,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     locale === "tr" ? tr : locale === "ru" ? ru : locale === "th" ? th : locale === "es" ? es : locale === "zh" ? zh : en;
   const numLocale = locale === "ru" ? "ru-RU" : locale === "th" ? "th-TH" : locale === "es" ? "es-ES" : locale === "zh" ? "zh-CN" : locale === "tr" ? "tr-TR" : "en-US";
   const { profile, refresh } = useAppProfile();
+  const { theme } = useTheme();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState("");
@@ -82,6 +92,13 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
   const [city, setCity] = useState("");
   const [website, setWebsite] = useState("");
   const [bio, setBio] = useState("");
+  const [nameColor, setNameColor] = useState<string | null>(null);
+  const [profileFrame, setProfileFrame] = useState<string | null>(null);
+  const [themeAccent, setThemeAccent] = useState<string | null>(null);
+  const [profileBg, setProfileBg] = useState<string | null>(null);
+  const [avatarSticker, setAvatarSticker] = useState<string | null>(null);
+  const [seal, setSeal] = useState<string | null>(null);
+  const [cosmeticGrants, setCosmeticGrants] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isRemovingAvatar, setIsRemovingAvatar] = useState(false);
@@ -258,11 +275,39 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
     setCity(profile?.city ?? "");
     setWebsite(profile?.website ?? "");
     setBio(profile?.bio ?? "");
+    setNameColor(profile?.nameColor ?? null);
+    setProfileFrame(profile?.profileFrame ?? null);
+    setThemeAccent(profile?.themeAccent ?? null);
+    setProfileBg(profile?.profileBg ?? null);
+    setAvatarSticker(profile?.avatarSticker ?? null);
+    setSeal(profile?.seal ?? null);
   }, [profile]);
 
+  // Owned season-pass cosmetics — ORed into every cosmetic gate so granted season
+  // items become selectable even below the account level that opens the base set.
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/user/cosmetic-grants", { cache: "no-store", credentials: "include" })
+      .then((r) => (r.ok ? r.json() : { grants: [] }))
+      .then((d) => {
+        if (alive) setCosmeticGrants(Array.isArray(d?.grants) ? d.grants : []);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const accountCountry = normalizeCountryCode(profile?.country) ?? "";
+  const themeAccentPreviewHex = resolveThemeAccentHex(themeAccent, theme);
 
   const accountLevel = profile?.accountLevel ?? 1;
+  const nameColorUnlocked = isNameColorUnlocked(accountLevel, cosmeticGrants);
+  const frameUnlocked = isProfileFrameUnlocked(accountLevel, cosmeticGrants);
+  const accentUnlocked = isThemeAccentUnlocked(accountLevel, cosmeticGrants);
+  const bgUnlocked = isProfileBgUnlocked(accountLevel, cosmeticGrants);
+  const stickerUnlocked = isAvatarStickerUnlocked(cosmeticGrants);
+  const sealUnlocked = isSealUnlocked(accountLevel, cosmeticGrants);
   const accountXp = profile?.accountXp ?? 0;
   const levelPrev = ACCOUNT_LEVEL_XP_THRESHOLDS[accountLevel - 1] ?? 0;
   const levelNext =
@@ -277,12 +322,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       {
         label: l("Hesap seviyesi", "Account level", "Уровень аккаунта", "ระดับบัญชี", "Nivel de cuenta", "账号等级"),
         value: `Lv ${accountLevel}`,
-      },
-      {
-        label: "cPoints",
-        value: (profile?.contributionPoints?.total ?? 0).toLocaleString(numLocale, {
-          maximumFractionDigits: 0,
-        }),
       },
       {
         label: l("Seri", "Streak", "Серия", "สตรีค", "Racha", "连续记录"),
@@ -318,7 +357,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       toast.success(l("Profil fotoğrafı güncellendi.", "Profile photo updated.", "Фото профиля обновлено.", "อัปเดตรูปโปรไฟล์แล้ว", "Foto de perfil actualizada.", "头像已更新。"));
     } catch (error) {
       console.error("[profile-workspace] avatar upload failed", error);
-      toast.error(error instanceof Error ? error.message : l("Profil fotoğrafı yüklenemedi.", "Profile photo could not be uploaded.", "Не удалось загрузить фото профиля.", "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ", "No se pudo subir la foto de perfil.", "无法上传头像。"));
+      toast.error(error instanceof Error ? translateApiError(error.message, t, true) :l("Profil fotoğrafı yüklenemedi.", "Profile photo could not be uploaded.", "Не удалось загрузить фото профиля.", "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ", "No se pudo subir la foto de perfil.", "无法上传头像。"));
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -343,7 +382,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       toast.success(l("Profil fotoğrafı kaldırıldı.", "Profile photo removed.", "Фото профиля удалено.", "ลบรูปโปรไฟล์แล้ว", "Foto de perfil eliminada.", "头像已移除。"));
     } catch (error) {
       console.error("[profile-workspace] avatar remove failed", error);
-      toast.error(error instanceof Error ? error.message : l("Profil fotoğrafı kaldırılamadı.", "Profile photo could not be removed.", "Не удалось удалить фото профиля.", "ลบรูปโปรไฟล์ไม่สำเร็จ", "No se pudo eliminar la foto de perfil.", "无法删除头像。"));
+      toast.error(error instanceof Error ? translateApiError(error.message, t, true) :l("Profil fotoğrafı kaldırılamadı.", "Profile photo could not be removed.", "Не удалось удалить фото профиля.", "ลบรูปโปรไฟล์ไม่สำเร็จ", "No se pudo eliminar la foto de perfil.", "无法删除头像。"));
     } finally {
       setIsRemovingAvatar(false);
     }
@@ -400,6 +439,11 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
           country: accountCountry || null,
           website: website.trim() || null,
           bio: bio.trim() || null,
+          nameColor: nameColor,
+          profileFrame: profileFrame,
+          themeAccent: themeAccent,
+          profileBg: profileBg,
+          avatarSticker: avatarSticker,
         }),
       });
 
@@ -420,6 +464,15 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         country: accountCountry || null,
         website: website.trim() || null,
         bio: bio.trim() || null,
+        // Cosmetics are grandfathered: send the raw loaded value so a legacy
+        // account-earned cosmetic isn't wiped from the local cache when its picker
+        // is now season-locked (the server likewise keeps it — karar 2026-07-14).
+        nameColor: nameColor,
+        profileFrame: profileFrame,
+        themeAccent: themeAccent,
+        profileBg: profileBg,
+        avatarSticker: stickerUnlocked ? avatarSticker : null,
+        seal: sealUnlocked ? seal : null,
         declaredMonthlyIncomeBand: incomeBand || null,
       });
       if (savedBirthDate) {
@@ -432,7 +485,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       onDone?.();
     } catch (error) {
       console.error("[profile-workspace] save failed", error);
-      toast.error(error instanceof Error ? error.message : t("settings.error.saveAccount"));
+      toast.error(error instanceof Error ? translateApiError(error.message, t, true) :t("settings.error.saveAccount"));
     } finally {
       setIsSaving(false);
     }
@@ -490,7 +543,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       }
     } catch (error: unknown) {
       console.error("[profile-workspace] save email failed", error);
-      toast.error(error instanceof Error ? error.message : t("settings.error.emailSave"));
+      toast.error(error instanceof Error ? translateApiError(error.message, t, true) :t("settings.error.emailSave"));
     } finally {
       setIsSavingEmail(false);
     }
@@ -550,7 +603,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
       toast.success(l("Şifre başarıyla değiştirildi.", "Password changed successfully.", "Пароль успешно изменен.", "เปลี่ยนรหัสผ่านสำเร็จ", "Contraseña cambiada con éxito.", "密码修改成功。"));
     } catch (error) {
       console.error("[profile-workspace] change password failed", error);
-      toast.error(error instanceof Error ? error.message : l("Şifre değiştirilemedi.", "Failed to change password.", "Не удалось изменить пароль.", "เปลี่ยนรหัสผ่านไม่สำเร็จ", "No se pudo cambiar la contraseña.", "修改密码失败。"));
+      toast.error(error instanceof Error ? translateApiError(error.message, t, true) :l("Şifre değiştirilemedi.", "Failed to change password.", "Не удалось изменить пароль.", "เปลี่ยนรหัสผ่านไม่สำเร็จ", "No se pudo cambiar la contraseña.", "修改密码失败。"));
     } finally {
       setIsChangingPassword(false);
     }
@@ -564,9 +617,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
   if (isPageVariant) {
     const displayLabel = displayName.trim() || profile?.username || "User";
     const avatarLabel = displayLabel.slice(0, 2).toUpperCase();
-    const contributionTotal = Math.round(profile?.contributionPoints?.total ?? 0);
-    const seasonXp = Math.round(profile?.seasonXp ?? 0);
-    const heroLocation = [city.trim(), accountCountry ? getCountryByCode(accountCountry)?.name ?? accountCountry : ""]
+    const heroLocation =[city.trim(), accountCountry ? getCountryByCode(accountCountry)?.name ?? accountCountry : ""]
       .filter(Boolean)
       .join(", ");
     const healthValue = Math.max(0, Math.min(100, Number(profile?.honor ?? 50) || 0));
@@ -598,18 +649,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         progress: streakBarFilled > 0 ? Math.max(14, (streakBarFilled / 7) * 100) : 12,
         streakBarFilled,
       },
-      {
-        key: "cpoints",
-        label: "cPoints",
-        value: contributionTotal.toLocaleString(numLocale, { maximumFractionDigits: 0 }),
-        suffix: "",
-        meta: `Season XP: ${seasonXp.toLocaleString(numLocale, { maximumFractionDigits: 0 })}`,
-        icon: <Diamond className="h-4 w-4 text-[#ff63b4]" />,
-        tint: "rgba(255, 95, 177, 0.10)",
-        border: "rgba(255, 95, 177, 0.18)",
-        text: "var(--app-text-primary, #ffffff)",
-        progress: 0,
-      },
     ];
 
     const pageQuickStats = [
@@ -636,18 +675,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         progress: streakBarFilled > 0 ? Math.max(14, (streakBarFilled / 7) * 100) : 12,
         streakBarFilled,
       },
-      {
-        key: "cpoints",
-        label: "cPoints",
-        value: contributionTotal.toLocaleString(numLocale, { maximumFractionDigits: 0 }),
-        suffix: "",
-        meta: `Season XP: ${seasonXp.toLocaleString(numLocale, { maximumFractionDigits: 0 })}`,
-        icon: <Diamond className="h-4 w-4 text-[#ff63b4]" />,
-        tint: "rgba(255, 95, 177, 0.10)",
-        border: "rgba(255, 95, 177, 0.18)",
-        text: "var(--app-text-primary, #ffffff)",
-        progress: 0,
-      },
     ];
 
     const pageUtilityRows = [
@@ -669,12 +696,12 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
         icon: <Gift className="h-[18px] w-[18px] text-[#ff729b]" />,
         title: l("Davetler", "Referrals", "Рефералы", "การชวนเพื่อน", "Referidos", "邀请"),
         description: l(
-          "Arkadaşlarını davet et ve cPoints kazan",
-          "Invite friends and earn cPoints",
-          "Приглашай друзей и получай cPoints",
-          "ชวนเพื่อนและรับ cPoints",
-          "Invita amigos y gana cPoints",
-          "邀请好友并赚取 cPoints",
+          "Arkadaşlarını davet et ve puan kazan",
+          "Invite friends and earn points",
+          "Приглашай друзей и получай баллы",
+          "ชวนเพื่อนและรับแต้ม",
+          "Invita amigos y gana puntos",
+          "邀请好友并赚取积分",
         ),
       },
       {
@@ -760,16 +787,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                     {`Lv.${accountLevel}`}
                   </span>
                 </div>
-                <div
-                  className="mt-3 inline-flex items-center rounded-full border px-4 py-2 text-[14px] font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
-                  style={{
-                    background: "var(--profile-chip-bg, rgba(21,51,65,0.72))",
-                    borderColor: "var(--profile-chip-border, rgba(79,185,215,0.35))",
-                    color: "var(--profile-chip-text, #54d8fb)",
-                  }}
-                >
-                  {`${contributionTotal.toLocaleString(numLocale, { maximumFractionDigits: 0 })} cPoints`}
-                </div>
                 <div className="mt-4 flex items-center gap-2 text-[15px] text-white/72">
                   <MapPin className="h-4 w-4 text-white/60" />
                   <span>{heroLocation || "Istanbul, TR"}</span>
@@ -811,7 +828,7 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
           </div>
         </ThemeCard>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {pageQuickStats.map((item) => (
             <ThemeCard
               key={item.key}
@@ -838,7 +855,6 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
                     </span>
                     {item.suffix ? <span className="pb-1 text-[12px] text-white/72">{item.suffix}</span> : null}
                   </div>
-                  {item.meta ? <p className="mt-2 text-[12px] text-white/58">{item.meta}</p> : null}
                 </div>
                 {item.key === "streak" && "streakBarFilled" in item ? (
                   <div className="mt-4 flex gap-[3px]">
@@ -1326,6 +1342,460 @@ export function ProfileWorkspace({ variant = "page", onDone }: ProfileWorkspaceP
             </div>
           </div>
         </ThemeCard>
+
+        <ThemeCard accountLevel={accountLevel} className="rounded-[22px]" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className="p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#a78bfa]/30 bg-[#a78bfa]/10">
+                  <Palette className="h-5 w-5 text-[#a78bfa]" />
+                </span>
+                <div>
+                  <h3 className="text-[15px] font-semibold uppercase tracking-[0.03em] text-white">
+                    {l("İsim rengi", "Name color", "Name color", "Name color", "Color del nombre", "Name color")}
+                  </h3>
+                  <p className="text-[12px] text-white/52">
+                    {l("Adını renkle öne çıkar.", "Highlight your name with color.", "Highlight your name with color.", "Highlight your name with color.", "Resalta tu nombre con color.", "Highlight your name with color.")}
+                  </p>
+                </div>
+              </div>
+              {!nameColorUnlocked && (
+                <span className="flex items-center gap-1 rounded-full border border-white/12 px-2 py-1 text-[11px] font-semibold text-white/60">
+                  <Lock className="h-3 w-3" />
+                  {l("Sezon", "Season", "Season", "Season", "Temporada", "Season")}
+                </span>
+              )}
+            </div>
+
+            {nameColorUnlocked ? (
+              <div className="space-y-4">
+                {/* Live preview of the chosen color on the current display name. */}
+                <div className="rounded-[16px] border border-white/10 bg-white/[0.03] px-4 py-3">
+                  <span
+                    className="text-[22px] font-bold tracking-[-0.01em]"
+                    style={{ color: resolveNameColorHex(nameColor, theme) ?? "#ffffff" }}
+                  >
+                    {displayName.trim() || profile?.username || l("Kullanıcı", "User", "User", "User", "Usuario", "User")}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2.5">
+                  {/* Default — no override. */}
+                  <button
+                    type="button"
+                    onClick={() => setNameColor(null)}
+                    aria-label={l("Varsayılan", "Default", "Default", "Default", "Predeterminado", "Default")}
+                    aria-pressed={nameColor === null}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border text-[11px] font-bold text-white/70 transition-transform hover:scale-[1.06] active:scale-95"
+                    style={{
+                      borderColor: nameColor === null ? "#ffffff" : "rgba(255,255,255,0.18)",
+                      boxShadow: nameColor === null ? "0 0 0 2px rgba(255,255,255,0.25)" : "none",
+                      background: "rgba(255,255,255,0.05)",
+                    }}
+                  >
+                    A
+                  </button>
+                  {availableNameColors(accountLevel, cosmeticGrants).map((swatch) => {
+                    const hex = theme === "light" ? swatch.light : swatch.dark;
+                    const selected = nameColor === swatch.key;
+                    return (
+                      <button
+                        key={swatch.key}
+                        type="button"
+                        onClick={() => setNameColor(swatch.key)}
+                        aria-label={l(swatch.label.tr, swatch.label.en, swatch.label.en, swatch.label.en, swatch.label.en, swatch.label.en)}
+                        aria-pressed={selected}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:scale-[1.06] active:scale-95"
+                        style={{
+                          background: hex,
+                          borderColor: selected ? "#ffffff" : "transparent",
+                          boxShadow: selected ? `0 0 0 2px ${hex}66` : "none",
+                        }}
+                      >
+                        <span className="text-[13px] font-black" style={{ color: "rgba(0,0,0,0.55)" }}>A</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <p className="text-[13px] leading-6 text-white/60">
+                {l(
+                  "İsim renkleri sezon geçişinden kazanılır — sezon seviyeni yükselttikçe açılır.",
+                  "Name colors are earned from the season pass — they unlock as you raise your season level.",
+                  "Name colors are earned from the season pass — they unlock as you raise your season level.",
+                  "Name colors are earned from the season pass — they unlock as you raise your season level.",
+                  "Los colores de nombre se ganan en el pase de temporada; se desbloquean al subir tu nivel de temporada.",
+                  "Name colors are earned from the season pass — they unlock as you raise your season level.",
+                )}
+              </p>
+            )}
+          </div>
+        </ThemeCard>
+
+        <ThemeCard accountLevel={accountLevel} className="rounded-[22px]" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className="p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#F5A623]/30 bg-[#F5A623]/10">
+                  <Shield className="h-5 w-5 text-[#F5A623]" />
+                </span>
+                <div>
+                  <h3 className="text-[15px] font-semibold uppercase tracking-[0.03em] text-white">
+                    {l("Profil çerçevesi", "Profile frame", "Profile frame", "Profile frame", "Marco de perfil", "Profile frame")}
+                  </h3>
+                  <p className="text-[12px] text-white/52">
+                    {l("Avatarını çevreleyen çerçeve.", "A ring around your avatar.", "A ring around your avatar.", "A ring around your avatar.", "Un anillo alrededor de tu avatar.", "A ring around your avatar.")}
+                  </p>
+                </div>
+              </div>
+              {!frameUnlocked && (
+                <span className="flex items-center gap-1 rounded-full border border-white/12 px-2 py-1 text-[11px] font-semibold text-white/60">
+                  <Lock className="h-3 w-3" />
+                  {l("Sezon", "Season", "Season", "Season", "Temporada", "Season")}
+                </span>
+              )}
+            </div>
+
+            {frameUnlocked ? (
+              <div className="flex flex-wrap items-center gap-3">
+                {/* None — no frame. */}
+                <button
+                  type="button"
+                  onClick={() => setProfileFrame(null)}
+                  aria-label={l("Yok", "None", "None", "None", "Ninguno", "None")}
+                  aria-pressed={profileFrame === null}
+                  className="flex flex-col items-center gap-1.5"
+                >
+                  <span
+                    className="flex h-14 w-14 items-center justify-center rounded-full border text-[11px] font-bold text-white/60"
+                    style={{
+                      borderColor: profileFrame === null ? "#ffffff" : "rgba(255,255,255,0.18)",
+                      boxShadow: profileFrame === null ? "0 0 0 2px rgba(255,255,255,0.25)" : "none",
+                      background: "rgba(255,255,255,0.05)",
+                    }}
+                  >
+                    {l("Yok", "None", "None", "None", "—", "None")}
+                  </span>
+                </button>
+                {availableProfileFrames(accountLevel, cosmeticGrants).map((frame) => {
+                  const selected = profileFrame === frame.key;
+                  return (
+                    <button
+                      key={frame.key}
+                      type="button"
+                      onClick={() => setProfileFrame(frame.key)}
+                      aria-label={l(frame.label.tr, frame.label.en, frame.label.en, frame.label.en, frame.label.en, frame.label.en)}
+                      aria-pressed={selected}
+                      className="flex flex-col items-center gap-1.5"
+                    >
+                      <AvatarFrame frameKey={frame.key}>
+                        <span
+                          className="flex h-14 w-14 items-center justify-center rounded-full text-[13px] font-bold text-white/85"
+                          style={{
+                            background: "rgba(255,255,255,0.08)",
+                            outline: selected ? "2px solid #ffffff" : "none",
+                            outlineOffset: 2,
+                          }}
+                        >
+                          {(displayName.trim() || profile?.username || "Y").slice(0, 1).toUpperCase()}
+                        </span>
+                      </AvatarFrame>
+                      <span className="text-[10px] font-medium text-white/55">
+                        {l(frame.label.tr, frame.label.en, frame.label.en, frame.label.en, frame.label.en, frame.label.en)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[13px] leading-6 text-white/60">
+                {l(
+                  "Çerçeveler sezon geçişinden kazanılır — sezon seviyeni yükselttikçe yeni çerçeveler açılır.",
+                  "Frames are earned from the season pass — new frames unlock as you raise your season level.",
+                  "Frames are earned from the season pass — new frames unlock as you raise your season level.",
+                  "Frames are earned from the season pass — new frames unlock as you raise your season level.",
+                  "Los marcos se ganan en el pase de temporada; se desbloquean al subir tu nivel de temporada.",
+                  "Frames are earned from the season pass — new frames unlock as you raise your season level.",
+                )}
+              </p>
+            )}
+          </div>
+        </ThemeCard>
+
+        <ThemeCard accountLevel={accountLevel} className="rounded-[22px]" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className="p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span
+                  className="flex h-10 w-10 items-center justify-center rounded-full border"
+                  style={{ borderColor: `${themeAccentPreviewHex ?? "#F5A623"}55`, background: `${themeAccentPreviewHex ?? "#F5A623"}1a` }}
+                >
+                  <Palette className="h-5 w-5" style={{ color: themeAccentPreviewHex ?? "#F5A623" }} />
+                </span>
+                <div>
+                  <h3 className="text-[15px] font-semibold uppercase tracking-[0.03em] text-white">
+                    {l("Tema aksanı", "Theme accent", "Theme accent", "Theme accent", "Acento del tema", "Theme accent")}
+                  </h3>
+                  <p className="text-[12px] text-white/52">
+                    {l("Uygulamanın vurgu rengini seç.", "Pick the app's highlight color.", "Pick the app's highlight color.", "Pick the app's highlight color.", "Elige el color de acento de la app.", "Pick the app's highlight color.")}
+                  </p>
+                </div>
+              </div>
+              {!accentUnlocked && (
+                <span className="flex items-center gap-1 rounded-full border border-white/12 px-2 py-1 text-[11px] font-semibold text-white/60">
+                  <Lock className="h-3 w-3" />
+                  {l("Sezon", "Season", "Season", "Season", "Temporada", "Season")}
+                </span>
+              )}
+            </div>
+
+            {accentUnlocked ? (
+              <div className="flex flex-wrap gap-2.5">
+                {/* Default — brand accent. */}
+                <button
+                  type="button"
+                  onClick={() => setThemeAccent(null)}
+                  aria-label={l("Varsayılan", "Default", "Default", "Default", "Predeterminado", "Default")}
+                  aria-pressed={themeAccent === null}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:scale-[1.06] active:scale-95"
+                  style={{
+                    background: "#F5A623",
+                    borderColor: themeAccent === null ? "#ffffff" : "transparent",
+                    boxShadow: themeAccent === null ? "0 0 0 2px #F5A62366" : "none",
+                  }}
+                >
+                  <span className="text-[13px] font-black" style={{ color: "rgba(0,0,0,0.55)" }}>A</span>
+                </button>
+                {availableThemeAccents(accountLevel, cosmeticGrants).map((sw) => {
+                  const hex = theme === "light" ? sw.light : sw.dark;
+                  const selected = themeAccent === sw.key;
+                  return (
+                    <button
+                      key={sw.key}
+                      type="button"
+                      onClick={() => setThemeAccent(sw.key)}
+                      aria-label={l(sw.label.tr, sw.label.en, sw.label.en, sw.label.en, sw.label.en, sw.label.en)}
+                      aria-pressed={selected}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:scale-[1.06] active:scale-95"
+                      style={{
+                        background: hex,
+                        borderColor: selected ? "#ffffff" : "transparent",
+                        boxShadow: selected ? `0 0 0 2px ${hex}66` : "none",
+                      }}
+                    >
+                      <span className="text-[13px] font-black" style={{ color: "rgba(0,0,0,0.55)" }}>A</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[13px] leading-6 text-white/60">
+                {l(
+                  "Tema aksanları sezon geçişinden kazanılır — sezon seviyeni yükselttikçe açılır.",
+                  "Theme accents are earned from the season pass — they unlock as you raise your season level.",
+                  "Theme accents are earned from the season pass — they unlock as you raise your season level.",
+                  "Theme accents are earned from the season pass — they unlock as you raise your season level.",
+                  "Los acentos de tema se ganan en el pase de temporada; se desbloquean al subir tu nivel de temporada.",
+                  "Theme accents are earned from the season pass — they unlock as you raise your season level.",
+                )}
+              </p>
+            )}
+          </div>
+        </ThemeCard>
+
+        <ThemeCard accountLevel={accountLevel} className="rounded-[22px]" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className="p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#38bdf8]/30 bg-[#38bdf8]/10">
+                  <UserRound className="h-5 w-5 text-[#38bdf8]" />
+                </span>
+                <div>
+                  <h3 className="text-[15px] font-semibold uppercase tracking-[0.03em] text-white">
+                    {l("Profil arka planı", "Profile background", "Profile background", "Profile background", "Fondo de perfil", "Profile background")}
+                  </h3>
+                  <p className="text-[12px] text-white/52">
+                    {l("Profil kartının arka planını seç.", "Pick your profile card backdrop.", "Pick your profile card backdrop.", "Pick your profile card backdrop.", "Elige el fondo de tu tarjeta de perfil.", "Pick your profile card backdrop.")}
+                  </p>
+                </div>
+              </div>
+              {!bgUnlocked && (
+                <span className="flex items-center gap-1 rounded-full border border-white/12 px-2 py-1 text-[11px] font-semibold text-white/60">
+                  <Lock className="h-3 w-3" />
+                  {l("Sezon", "Season", "Season", "Season", "Temporada", "Season")}
+                </span>
+              )}
+            </div>
+
+            {bgUnlocked ? (
+              <div className="flex flex-wrap gap-2.5">
+                {/* Default — no background. */}
+                <button
+                  type="button"
+                  onClick={() => setProfileBg(null)}
+                  aria-label={l("Varsayılan", "Default", "Default", "Default", "Predeterminado", "Default")}
+                  aria-pressed={profileBg === null}
+                  className="flex h-12 w-16 items-center justify-center rounded-[10px] border text-[10px] font-bold text-white/60 transition-transform hover:scale-[1.04] active:scale-95"
+                  style={{
+                    borderColor: profileBg === null ? "#ffffff" : "rgba(255,255,255,0.18)",
+                    background: "rgba(255,255,255,0.05)",
+                  }}
+                >
+                  {l("Yok", "None", "None", "None", "—", "None")}
+                </button>
+                {availableProfileBackgrounds(accountLevel, cosmeticGrants).map((bg) => {
+                  const css = theme === "light" ? bg.light : bg.dark;
+                  const selected = profileBg === bg.key;
+                  return (
+                    <button
+                      key={bg.key}
+                      type="button"
+                      onClick={() => setProfileBg(bg.key)}
+                      aria-label={l(bg.label.tr, bg.label.en, bg.label.en, bg.label.en, bg.label.en, bg.label.en)}
+                      aria-pressed={selected}
+                      className="h-12 w-16 rounded-[10px] border transition-transform hover:scale-[1.04] active:scale-95"
+                      style={{
+                        background: css,
+                        borderColor: selected ? "#ffffff" : "rgba(255,255,255,0.14)",
+                        boxShadow: selected ? "0 0 0 2px rgba(255,255,255,0.3)" : "none",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[13px] leading-6 text-white/60">
+                {l(
+                  "Profil arka planı sezon geçişinden kazanılır — sezon seviyeni yükselttikçe açılır.",
+                  "The profile background is earned from the season pass — it unlocks as you raise your season level.",
+                  "The profile background is earned from the season pass — it unlocks as you raise your season level.",
+                  "The profile background is earned from the season pass — it unlocks as you raise your season level.",
+                  "El fondo de perfil se gana en el pase de temporada; se desbloquea al subir tu nivel de temporada.",
+                  "The profile background is earned from the season pass — it unlocks as you raise your season level.",
+                )}
+              </p>
+            )}
+          </div>
+        </ThemeCard>
+
+        <ThemeCard accountLevel={accountLevel} className="rounded-[22px]" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className="p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#fb7185]/30 bg-[#fb7185]/10 text-lg">
+                  {"✨"}
+                </span>
+                <div>
+                  <h3 className="text-[15px] font-semibold uppercase tracking-[0.03em] text-white">
+                    {l("Avatar rozeti", "Avatar sticker", "Avatar sticker", "Avatar sticker", "Sticker de avatar", "Avatar sticker")}
+                  </h3>
+                  <p className="text-[12px] text-white/52">
+                    {l("Avatarının köşesine küçük bir simge.", "A small icon on your avatar's corner.", "A small icon on your avatar's corner.", "A small icon on your avatar's corner.", "Un pequeño ícono en la esquina de tu avatar.", "A small icon on your avatar's corner.")}
+                  </p>
+                </div>
+              </div>
+              {!stickerUnlocked && (
+                <span className="flex items-center gap-1 rounded-full border border-white/12 px-2 py-1 text-[11px] font-semibold text-white/60">
+                  <Lock className="h-3 w-3" />
+                  {l("Sezon", "Season", "Season", "Season", "Temporada", "Season")}
+                </span>
+              )}
+            </div>
+
+            {stickerUnlocked ? (
+              <div className="flex flex-wrap gap-2.5">
+                {/* None — no sticker. */}
+                <button
+                  type="button"
+                  onClick={() => setAvatarSticker(null)}
+                  aria-label={l("Yok", "None", "None", "None", "Ninguno", "None")}
+                  aria-pressed={avatarSticker === null}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border text-[10px] font-bold text-white/60 transition-transform hover:scale-[1.06] active:scale-95"
+                  style={{
+                    borderColor: avatarSticker === null ? "#ffffff" : "rgba(255,255,255,0.18)",
+                    background: "rgba(255,255,255,0.05)",
+                  }}
+                >
+                  {l("Yok", "None", "None", "None", "—", "None")}
+                </button>
+                {availableAvatarStickers(cosmeticGrants).map((st) => {
+                  const selected = avatarSticker === st.key;
+                  return (
+                    <button
+                      key={st.key}
+                      type="button"
+                      onClick={() => setAvatarSticker(st.key)}
+                      aria-label={l(st.label.tr, st.label.en, st.label.en, st.label.en, st.label.en, st.label.en)}
+                      aria-pressed={selected}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border text-lg transition-transform hover:scale-[1.06] active:scale-95"
+                      style={{
+                        borderColor: selected ? "#ffffff" : "rgba(255,255,255,0.14)",
+                        boxShadow: selected ? "0 0 0 2px rgba(255,255,255,0.28)" : "none",
+                        background: "rgba(255,255,255,0.05)",
+                      }}
+                    >
+                      {st.emoji}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[13px] leading-6 text-white/60">
+                {l(
+                  "Avatar rozetleri sezon geçişinden kazanılır — sezon seviyeni yükselttikçe açılır.",
+                  "Avatar stickers are earned from the season pass — they unlock as you raise your season level.",
+                  "Avatar stickers are earned from the season pass — they unlock as you raise your season level.",
+                  "Avatar stickers are earned from the season pass — they unlock as you raise your season level.",
+                  "Los stickers de avatar se ganan en el pase de temporada; se desbloquean al subir tu nivel de temporada.",
+                  "Avatar stickers are earned from the season pass — they unlock as you raise your season level.",
+                )}
+              </p>
+            )}
+          </div>
+        </ThemeCard>
+
+        {sealUnlocked && (
+          <ThemeCard accountLevel={accountLevel} className="rounded-[22px]" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+            <div className="p-5">
+              <div className="mb-4">
+                <h3 className="text-[15px] font-semibold uppercase tracking-[0.03em] text-white">
+                  {l("Sezon Mührü", "Season Seal", "Season Seal", "Season Seal", "Sello de temporada", "Season Seal")}
+                </h3>
+                <p className="text-[12px] text-white/52">
+                  {l("Doğrulanmış fişlerine basılır — harcaman kanıtlı.", "Stamped on your verified receipts.", "Stamped on your verified receipts.", "Stamped on your verified receipts.", "Se sella en tus recibos verificados.", "Stamped on your verified receipts.")}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSeal(null)}
+                  aria-pressed={seal === null}
+                  className="flex h-14 w-14 items-center justify-center rounded-full border text-[11px] font-bold text-white/60"
+                  style={{ borderColor: seal === null ? "#ffffff" : "rgba(255,255,255,0.18)", boxShadow: seal === null ? "0 0 0 2px rgba(255,255,255,0.25)" : "none", background: "rgba(255,255,255,0.05)" }}
+                >
+                  {l("Yok", "None", "None", "None", "—", "None")}
+                </button>
+                {availableSeals(accountLevel, cosmeticGrants).map((s) => {
+                  const selected = seal === s.key;
+                  return (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => setSeal(s.key)}
+                      aria-pressed={selected}
+                      aria-label={l(s.label.tr, s.label.en, s.label.en, s.label.en, s.label.en, s.label.en)}
+                      className="grid h-14 w-14 place-items-center rounded-full border"
+                      style={{ borderColor: selected ? "#ffffff" : "rgba(255,255,255,0.18)", boxShadow: selected ? "0 0 0 2px rgba(255,255,255,0.25)" : "none", background: "rgba(255,255,255,0.05)" }}
+                    >
+                      <RewardArt name={rewardArtFor(s.glyph, "seal")} tint={s.dark} size={40} />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </ThemeCard>
+        )}
 
         <div className="space-y-3">
           {pageUtilityRows.map((row) => (

@@ -19,8 +19,9 @@
   "health_at_credit": "0.XX",
   "daily_cap_band": "<band>",
   "created_at": "2026-05-17T14:23:12Z",
-  "settled_to_chain_at": null,
-  "onchain_tx_signature": null,
+  "settlement_epoch": null,
+  "distribution_root": null,
+  "int_claim_tx_signature": null,
   "previous_entry_hash": "sha256:9a01...",
   "entry_hash": "sha256:b3f8..."
 }
@@ -28,10 +29,10 @@
 
 ### เหตุใดจึงมีโซ่เข้ารหัส
 
-`previous_entry_hash` + `entry_hash` สร้างโซ่แฮชผ่านบัญชีแยกประเภท สิ่งนี้ให้ **บันทึกการตรวจสอบที่สามารถตรวจสอบได้** แก่ Yumo Yumo: แม้ว่าบัญชีแยกประเภทจะเป็นตาราง Postgres ในเชิงปฏิบัติการ โซ่แฮชหมายความว่าความพยายามแก้ไขสามารถตรวจจับได้ `entry_hash` ล่าสุดถูกเผยแพร่บนเชนเป็นระยะ (คำมั่นสัญญารูท Merkle) เพื่อให้ฝ่ายภายนอกสามารถตรวจสอบความสมบูรณ์ของบัญชีแยกประเภท
+`previous_entry_hash` + `entry_hash` สร้างโซ่แฮชของบัญชีแยกประเภท เมื่อเผยแพร่บันทึกและรากหลังปิด epoch แล้ว โซ่นี้ช่วยตรวจพบการแก้ไขที่เกิดขึ้นภายหลังได้ แต่ไม่ทดแทนการตรวจสอบการคำนวณหรือข้อมูลต้นทางโดยอิสระ
 
 ### การชำระเงิน
 
-ตัวประมวลผลการชำระรวมแถว `BintLedgerEntry` ที่มี `settled_to_chain_at IS NULL` และ mint bINT ที่รวมบน Solana หลังจากยืนยัน `settled_to_chain_at` และ `onchain_tx_signature` จะถูกเติม ตั้งแต่จุดนั้นเป็นต้นไป สถานะบนเชนคือที่มาของความจริงสำหรับรายการนั้น
+ตัวประมวลผลการชำระรวมแถว `BintLedgerEntry` ที่เข้าเกณฑ์และมี `settlement_epoch IS NULL` คำนวณจำนวนสิทธิ์เคลม INT และสร้างรากการแจกจ่ายของ epoch หลังจากผูกรากไว้บนเชน แถวที่เกี่ยวข้องจะได้รับ `settlement_epoch` และ `distribution_root` บัญชีแยกประเภท bINT ยังคงเป็นที่มาของความจริงนอกเชน และเมื่อผู้ใช้เคลม INT จะบันทึก `int_claim_tx_signature`
 
 ---

@@ -51,7 +51,7 @@ export async function loadVknMerchantMap(): Promise<Record<string, string>> {
  * Sync version: use after loadVknMerchantMap() has been called (e.g. at startup).
  * Otherwise returns empty object.
  */
-export function getVknMerchantMap(): Record<string, string> {
+function getVknMerchantMap(): Record<string, string> {
   if (cachedMap !== null) return cachedMap;
   return {};
 }
@@ -77,6 +77,6 @@ function normalizeVknMap(raw: Record<string, string>): Record<string, string> {
 /**
  * Clear cached map (e.g. for tests or reload).
  */
-export function clearVknMapCache(): void {
+function clearVknMapCache(): void {
   cachedMap = null;
 }

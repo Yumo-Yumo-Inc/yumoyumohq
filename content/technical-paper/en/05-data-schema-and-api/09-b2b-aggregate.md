@@ -2,11 +2,11 @@
 
 ## 5.8 Anonymised aggregate and the B2B data product
 
-This is the surface that generates B2B revenue and operates under strict privacy guarantees.
+This is the surface that will produce the B2B data product. The transformation rules below govern any aggregate publication; the commercial product and its API (5.11) are planned future work.
 
 ### Transformation rules
 
-Going from `receipts + line_items + price_observations` to anonymised aggregate is a **one-way, destructive** transformation:
+Going from `receipts + line_items + price observations` to anonymised aggregate is a **one-way, destructive** transformation:
 
 1. **Replace user_id and wallet_address.** Use a session-scoped hash separated from user identifiers.
 2. **Coarsen geography.** City-level granularity only; coordinates are dropped if they were ever recorded.
@@ -15,7 +15,7 @@ Going from `receipts + line_items + price_observations` to anonymised aggregate 
 5. **Add calibrated differential-privacy noise** to count-based outputs.
 6. **Build aggregate scope from verified PoE.** Order-page receipts and other pending-verification records stay in the memory layer.
 
-### Available products
+### Planned products
 
 | Product | Granularity | Refresh | Indicative price |
 |---|---|---|---|
@@ -26,10 +26,10 @@ Going from `receipts + line_items + price_observations` to anonymised aggregate 
 
 Prices and exact granularities are placeholder; the production catalogue will be finalised before commercial launch.
 
-### Sample B2B response
+### Sample B2B response (planned shape)
 
 ```json
-// GET /b2b/v1/inflation-pulse?region=istanbul&category=food.dairy&from=2026-05-01&to=2026-05-17
+// GET /inflation-pulse?region=istanbul&category=food.dairy&from=2026-05-01&to=2026-05-17
 {
   "region": "istanbul",
   "category": "food.dairy",
@@ -51,16 +51,5 @@ Every B2B response carries `n_distinct_contributors` so the buyer can audit that
 - Coordinates, addresses, phone numbers.
 - Payment instrument metadata.
 - Anonymised but linkable IDs across queries (every query rolls a new session hash).
-
-### Comparison against existing panels
-
-Yumo Yumo's B2B data product competes against Nielsen, GfK, Kantar, and SimilarWeb for the same buyers. Compared with those panels:
-
-- **Receipt-level**, not survey-recall — fewer measurement-error artifacts.
-- **Higher refresh frequency** — daily vs. weekly/monthly.
-- **Emerging-market coverage** — TR-first; TR coverage is thinnest among the incumbents.
-- **Lower per-record cost** — the panel is built from existing user activity, not paid panellists.
-
-The trade-off: Yumo Yumo's panel is smaller at launch and skews toward the early-adopter demographic.
 
 ---

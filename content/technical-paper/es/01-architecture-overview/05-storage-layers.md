@@ -6,8 +6,8 @@ El modelo de almacenamiento separa los datos por propósito y clase de privacida
 
 | Capa | Contenido | Ubicación | Principio de retención | Clase de privacidad |
 |---|---|---|---|---|
-| Capa de registros activos | Registros de recibos, líneas, eventos de etapa | Base de datos de la aplicación | Ventana activa del producto | Seudónimo |
-| Capa de análisis | Observaciones normalizadas y métricas de calidad | Partición de análisis separada | Ventana rodante definida por política | Seudónimo o anónimo |
+| Capa de registros | Registros de recibos, líneas, eventos de etapa | Base de datos de la aplicación (un único Postgres gestionado) | Ventana activa del producto | Seudónimo |
+| Capa de análisis | Observaciones normalizadas y métricas de calidad | Tablas dedicadas en la base de datos de la aplicación | Ventana rodante definida por política | Seudónimo o anónimo |
 | Capa de objetos | Entrada de recibo cifrada y derivados de procesamiento | Almacenamiento de objetos cifrado | Política de minimización de datos | Puede contener datos personales |
 | Capa de agregados anónimos | Salida agregada para el producto de datos B2B | Almacenamiento de agregados separado | Ventana de publicación versionada | No vinculable al usuario |
 | Resumen en cadena | Evento de token, compromiso de liquidación, estado del programa | Cadena pública | Permanente | Datos de token y compromiso |

@@ -13,25 +13,27 @@ All four resolve to the same `canonical_product_id`. This resolution is a precon
 
 ### Approach
 
-Canonical resolution is a multi-stage embedding-based resolver with confidence-tiered disambiguation and a human review queue for ambiguous cases.
+Canonical resolution runs **asynchronously** in a background post-process worker, after the synchronous flow has already returned the verified preview to the user. This keeps product resolution off the latency-sensitive path: the user sees their receipt immediately, while canonical identifiers attach to the record moments later.
+
+The resolver works on an alias table that maps raw receipt-line text to canonical products:
 
 ```mermaid
 flowchart TD
-    A[Raw line text] --> B[Normalise]
-    B --> C[Vector retrieval]
-    C --> D{High confidence?}
-    D -- yes --> E[Match · write canonical_product_id]
-    D -- no --> F{Mid confidence?}
-    F -- yes --> G[LLM disambiguation]
-    F -- no --> H[Review queue]
-    G --> I{Verified?}
-    I -- yes --> E
-    I -- no --> H
+    A[Raw line text] --> B[Text normalisation]
+    B --> C[Alias lookup · pg_trgm fuzzy match]
+    C --> D{Alias hit?}
+    D -- yes --> E[canonical_product_id · enriched context]
+    D -- no --> F[LLM normalisation]
+    F --> G[Upsert canonical product + alias + brand registry]
+    G --> E
 ```
 
-The exact similarity thresholds, embedding model, and disambiguation prompt are managed in the internal operations layer.
+- **Fuzzy alias lookup** — the normalized line text is matched against previously learned receipt aliases using PostgreSQL trigram similarity (`pg_trgm`). A hit resolves directly to the canonical product. Aliases learned at one merchant are reused across merchants only when the text reads as a real product name rather than a store-private abbreviation, which keeps distinct products from merging under one canonical.
+- **LLM fallback** — on a miss, a language model normalizes the raw text into brand, product, and size attributes. The result is upserted as a new canonical product (or mapped to an existing one) together with a new alias row, so the same surface form resolves without a model call next time.
 
-An unresolved line item is recorded with a null canonical reference. bINT for that line is calculated after queue canonicalisation.
+The similarity settings and the normalization prompt are managed in the internal operations layer.
+
+An unresolved line item is recorded with a null canonical reference; resolution can complete on a later pass as the alias table grows.
 
 ### Taxonomy structure
 
@@ -47,12 +49,6 @@ Beverages > Carbonated Soft Drinks > Coca-Cola > Coca-Cola Classic > 330 ml can
 
 Each canonical product carries normalised attributes: `size_value`, `size_unit`, `package_type`, `brand_id`, `is_private_label`, `barcode_gtin` (when available).
 
-### Cold start
+### Growth model
 
-The canonical index is bootstrapped from open product datasets, licensed catalog partnerships, and seeded user uploads from the closed beta. The index grows organically as the canonicalisation queue is drained.
-
-### Pending canonicalisation queue
-
-Ambiguous line items enter a review queue. The reviewer (initially the Yumo Yumo team, later a community pool earning PoC) either creates a new canonical product or maps the raw text to an existing one. This queue is a primary cost lever for the pipeline as it scales — 08 lists it as a core operational risk.
-
----
+The canonical index grows from receipt traffic itself: every LLM-normalized line adds a canonical product and an alias, and every repeat of that surface form afterwards resolves from the alias table without model cost. Ambiguous or low-quality entries are reviewed through the admin catalog tooling.

@@ -12,7 +12,7 @@ export const SERVICE_CATEGORY_LABELS: Record<string, UserFacingText> = {
   other: { tr: "Diğer", en: "Other", ru: "Другое", th: "อื่นๆ", es: "Otros", zh: "其他" },
 };
 
-export const SERVICE_CATEGORY_ORDER = [
+const SERVICE_CATEGORY_ORDER = [
   "electricity",
   "water",
   "gas",
@@ -24,7 +24,7 @@ export const SERVICE_CATEGORY_ORDER = [
   "other",
 ] as const;
 
-export const SERVICE_CATEGORY_COLOR: Record<string, string> = {
+const SERVICE_CATEGORY_COLOR: Record<string, string> = {
   electricity: "text-[#fbbf24] bg-[#d97706]/14",
   water: "text-[#93c5fd] bg-[#3b82f6]/14",
   gas: "text-[#fb923c] bg-[#ea580c]/14",
@@ -36,7 +36,7 @@ export const SERVICE_CATEGORY_COLOR: Record<string, string> = {
   other: "text-white/70 bg-white/[0.06]",
 };
 
-export function categoryLabel(category: string, locale: YumoLocale): string {
+function categoryLabel(category: string, locale: YumoLocale): string {
   const label = SERVICE_CATEGORY_LABELS[category];
   if (!label) return category;
   return label[locale] || label.en || label.tr;

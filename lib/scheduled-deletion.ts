@@ -24,8 +24,8 @@ import { getReceiptUploadDir } from "@/lib/receipt/upload-dir";
 // Default deletion delay: 48 hours
 const DEFAULT_DELETION_DELAY_MS = 48 * 60 * 60 * 1000;
 
-export const NEON_FALLBACK_URL_PREFIX = "neon-fallback://";
-export const LOCAL_DISK_URL_PREFIX = "local-disk://";
+const NEON_FALLBACK_URL_PREFIX = "neon-fallback://";
+const LOCAL_DISK_URL_PREFIX = "local-disk://";
 
 /** Sentinel `blob_url` for images stored in receipt_upload_fallback. */
 export function neonFallbackDeletionUrl(receiptId: string): string {
@@ -37,7 +37,7 @@ export function localDiskDeletionUrl(receiptId: string): string {
   return `${LOCAL_DISK_URL_PREFIX}${receiptId}`;
 }
 
-export interface ScheduledDeletion {
+interface ScheduledDeletion {
   id: number;
   receipt_id: string;
   blob_url: string;
@@ -93,7 +93,7 @@ export async function scheduleDeletion(
  * Cancel a scheduled deletion (e.g., if user deletes receipt manually)
  * @param receiptId - The receipt ID to cancel deletion for
  */
-export async function cancelScheduledDeletion(receiptId: string): Promise<boolean> {
+async function cancelScheduledDeletion(receiptId: string): Promise<boolean> {
   const sql = getSql();
   if (!sql) return false;
 
@@ -115,7 +115,7 @@ export async function cancelScheduledDeletion(receiptId: string): Promise<boolea
  * Get all pending deletions that are due
  * @param limit - Maximum number of records to fetch
  */
-export async function getPendingDeletions(limit: number = 100): Promise<ScheduledDeletion[]> {
+async function getPendingDeletions(limit: number = 100): Promise<ScheduledDeletion[]> {
   const sql = getSql();
   if (!sql) return [];
 
@@ -136,7 +136,7 @@ export async function getPendingDeletions(limit: number = 100): Promise<Schedule
 /**
  * Mark a deletion as processing (to prevent duplicate processing)
  */
-export async function markAsProcessing(id: number): Promise<boolean> {
+async function markAsProcessing(id: number): Promise<boolean> {
   const sql = getSql();
   if (!sql) return false;
 
@@ -157,7 +157,7 @@ export async function markAsProcessing(id: number): Promise<boolean> {
 /**
  * Mark a deletion as completed
  */
-export async function markAsDeleted(id: number): Promise<void> {
+async function markAsDeleted(id: number): Promise<void> {
   const sql = getSql();
   if (!sql) return;
 
@@ -175,7 +175,7 @@ export async function markAsDeleted(id: number): Promise<void> {
 /**
  * Mark a deletion as failed with error message
  */
-export async function markAsFailed(id: number, errorMessage: string): Promise<void> {
+async function markAsFailed(id: number, errorMessage: string): Promise<void> {
   const sql = getSql();
   if (!sql) return;
 
@@ -258,7 +258,7 @@ async function deleteImageArtifacts(receiptId: string, blobUrl: string | null): 
  * OCR lines. Structured receipt_data, line items, rewards and fraud records
  * stay. Each statement is guarded so missing tables/columns are ignored.
  */
-export async function purgeRawExtraction(receiptId: string): Promise<void> {
+async function purgeRawExtraction(receiptId: string): Promise<void> {
   const sql = getSql();
   if (!sql) return;
 

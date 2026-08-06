@@ -8,7 +8,7 @@
 import type { YumoLocale, UserFacingText } from "@/lib/product-architecture/dashboard-contract";
 import { SERVICE_CATEGORY_LABELS } from "@/lib/service-providers/categories";
 
-export { SERVICE_CATEGORY_LABELS };
+;
 
 /* ------------------------------------------------------------------
  * Budget category labels (flat receipt category slugs)
@@ -104,6 +104,35 @@ export const BUDGET_CATEGORY_LABELS: Record<string, UserFacingText> = {
  * ------------------------------------------------------------------ */
 
 export const CANONICAL_CATEGORY_LABELS: Record<string, UserFacingText> = {
+  // ── L1 / L2 roof labels ──
+  // Coarse-mapped products (priced at an L1/L2 prefix rather than a precise leaf)
+  // resolve their user-facing label here instead of falling through to a bare
+  // English slug. Keep these first so exact-match wins for roof paths.
+  "groceries": { en: "Groceries", tr: "Market" },
+  "groceries.beverages": { en: "Beverages", tr: "İçecekler" },
+  "groceries.dairy_eggs": { en: "Dairy & eggs", tr: "Süt & yumurta" },
+  "groceries.meat_fish": { en: "Meat & fish", tr: "Et & balık" },
+  "groceries.produce": { en: "Fresh produce", tr: "Meyve & sebze" },
+  "groceries.dry_goods": { en: "Dry goods", tr: "Bakliyat & temel gıda" },
+  "groceries.bakery": { en: "Bakery", tr: "Fırın & unlu mamul" },
+  "groceries.snacks_nuts": { en: "Snacks & nuts", tr: "Atıştırmalık & kuruyemiş" },
+  "groceries.cleaning": { en: "Cleaning", tr: "Temizlik" },
+  "groceries.personal_care": { en: "Personal care", tr: "Kişisel bakım" },
+  "food_service": { en: "Food service", tr: "Yeme & içme" },
+  "food_service.cafe": { en: "Cafe", tr: "Kafe" },
+  "food_service.fast_food": { en: "Fast food", tr: "Fast food" },
+  "fashion": { en: "Fashion", tr: "Giyim" },
+  "home_living": { en: "Home & living", tr: "Ev & yaşam" },
+  "electronics": { en: "Electronics", tr: "Elektronik" },
+  "health": { en: "Health", tr: "Sağlık" },
+  "services": { en: "Services", tr: "Hizmetler" },
+  "transport": { en: "Transport", tr: "Ulaşım" },
+  "transport.fuel": { en: "Fuel", tr: "Akaryakıt" },
+  "finance": { en: "Finance", tr: "Finans" },
+  "education": { en: "Education", tr: "Eğitim" },
+  "entertainment": { en: "Entertainment", tr: "Eğlence" },
+  "tourism": { en: "Tourism", tr: "Turizm" },
+
   // ── groceries ──
   "groceries.beverages.still_water": { en: "Still water", tr: "Gazsız içme suyu" },
   "groceries.beverages.sparkling_water": { en: "Sparkling water", tr: "Maden suyu" },

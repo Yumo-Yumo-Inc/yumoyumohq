@@ -1,19 +1,18 @@
 # Contribution Economy and Token Design
 
-Yumo Yumo's economic backbone builds a layered bridge between everyday use and open coordination. Proof of Expense, merchant verification, product improvements, and community tasks first settle into the bINT layer. That layer makes the quality, trust, and continuity of contribution visible. The INT layer carries broader economic coordination, staking, and the governance surfaces that mature over time. Alongside these, ePoints record the dollar-denominated hidden-cost footprint of each verified receipt, and the Foundation NFT — Yumbie — anchors the user's portable digital identity inside the system.
+Yumo Yumo's economic backbone builds a layered bridge between everyday use and open coordination. Proof of Expense, merchant verification, product improvements, and community tasks first settle into the bINT layer. That layer makes the quality, trust, and continuity of contribution visible. The INT layer carries broader economic coordination, staking, and the governance surfaces that mature over time. The Foundation NFT — Yumbie — anchors the user's portable digital identity inside the system, while each receipt surfaces hidden-cost insights as an analytics result visible to the user.
 
-This separation matters because contribution, value, and identity move through distinct gates. A user who adds value to the system first accumulates bINT. Time, holding behavior, and trust shape how that balance moves into INT. Each verified receipt also writes an ePoints record that captures the dollar measure of hidden cost surfaced. The user's Yumbie carries the visible history of that journey. The result is an economy that rewards steady, credible participation while keeping value aligned with long-range contribution.
+This separation matters because contribution, value, and identity move through distinct gates. A user who adds value to the system first accumulates bINT. Time, holding behavior, and trust shape how that balance moves into INT. Each verified receipt surfaces hidden-cost insight, showing the user the pressures hidden inside their spending. The user's Yumbie carries the visible history of that journey. The result is an economy that rewards steady, credible participation while keeping value aligned with long-range contribution.
 
 ## Token layers
 
 | Layer | Form | Transferable | Purpose |
 | --- | --- | --- | --- |
 | **INT** | On-chain SPL token | Yes | Economic coordination, staking, ecosystem incentives |
-| **bINT** | On-chain, soulbound (frozen ATA) | No — converts to INT on user action | Contribution accounting; the soft layer between work and reward |
-| **ePoints** | On-chain, soulbound (frozen ATA) | No | USD-denominated record of hidden cost surfaced per verified receipt |
+| **bINT** | Off-chain accounting unit (operations layer) | No — settles to INT through a defined lifecycle | Contribution accounting; the soft layer between work and reward |
 | **Foundation NFT (Yumbie)** | Token-2022 NonTransferable | No | Persistent digital identity; visual companion that evolves with the user |
 
-bINT and ePoints capture two different signals from the same receipt. bINT measures contribution intensity inside the Yumo economy. ePoints measure the dollar value of hidden-cost insight returned to the user. They never overwrite each other and they convert through distinct logic.
+bINT is the contribution signal that emerges from each verified receipt. It measures contribution intensity inside the Yumo Yumo economy and converts through defined logic tied to time, holding behavior, and trust.
 
 ## INT distribution
 
@@ -95,21 +94,20 @@ When the user reaches Level 30, the Yumbie evolves from its Foundation form into
 
 ## Pre-TGE accounting
 
-Before the Token Generation Event, the platform tracks contribution through cPoints, a closed-system reputation measure. cPoints exist only in the pre-TGE phase. They inform initial airdrop and onboarding weights at TGE and are then deprecated. From TGE onward, the bINT and ePoints layers replace the role of cPoints, with stronger contribution semantics and on-chain accounting.
+Before the Token Generation Event, the platform tracks contribution through cPoints, a closed-system reputation measure. cPoints exist only in the pre-TGE phase. They inform initial airdrop and onboarding weights at TGE and are then deprecated. From TGE onward, the bINT layer replaces the role of cPoints with stronger contribution semantics; bINT remains an off-chain accounting unit that settles to INT through the defined lifecycle.
 
 ## How the layers connect
 
 ```mermaid
 flowchart LR
     A[Verified PoE] --> B[bINT credit]
-    A --> C[ePoints record]
-    A --> D[Yumbie level + health update]
-    B -->|year-indexed ratio| E[INT conversion]
-    E --> F[Stake / hold / transfer]
-    D -->|Level 30| G[Smart Agent evolution]
-    F --> H[Buy-back & burn from treasury]
+    A --> C[Yumbie level + health update]
+    B -->|year-indexed ratio| D[INT conversion]
+    D --> E[Stake / hold / transfer]
+    C -->|Level 30| F[Smart Agent evolution]
+    E --> G[Buy-back & burn from treasury]
 ```
 
-Each verified receipt simultaneously writes contribution to bINT, hidden-cost insight to ePoints, and identity progression to the user's Yumbie. Conversion from bINT to INT moves value from the contribution layer to the economic layer at a ratio that favors early participation and balances over time. Staking returns value to long-term holders. Treasury-managed buy-back-and-burn closes the loop by tying real platform revenue back to token scarcity.
+Each verified receipt simultaneously writes contribution to bINT, surfaces hidden-cost insight to the user, and updates identity progression in the user's Yumbie. Conversion from bINT to INT moves value from the contribution layer to the economic layer at a ratio that favors early participation and balances over time. Staking returns value to long-term holders. Treasury-managed buy-back-and-burn closes the loop by tying real platform revenue back to token scarcity.
 
 This structure weakens spam pressure because contribution becomes more valuable when quality, trust, and time move together. It favors strong users and steady contributors because the network grows through historically valuable participation instead of superficial volume. Token design therefore stays inseparable from the product thesis; it is the economic expression of Yumo's memory, price, and guidance engine.

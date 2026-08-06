@@ -2,15 +2,24 @@
 
 import { cn } from "@/lib/utils";
 import type { YumbieMood, YumbieExpression } from "@/lib/app/use-yumbie-mood";
+import { useCosmeticGrants } from "@/lib/app/use-cosmetic-grants";
+import { hasCapability } from "@/config/season-capabilities";
 
 interface YumbieCompanionProps {
   className?: string;
+  /** Inline style for the container — use px width/height for critical sizing
+   *  (immune to stale service-worker CSS, unlike arbitrary Tailwind classes). */
+  style?: React.CSSProperties;
   /** Extra class passed to the SVG — for size/aspect overrides. */
   imageClassName?: string;
   /** Persistent state (derived from long-term user behavior). */
   mood?: YumbieMood;
   /** Transient reaction (plays for 1-2s on mount or when the prop changes). */
   expression?: YumbieExpression;
+  /** Glow strength behind the character (0..1). */
+  auraOpacity?: number;
+  /** "round" keeps the big round eyes even in the happy mood (no ^_^ curves). */
+  eyeStyle?: "default" | "round";
 }
 
 /**
@@ -40,16 +49,24 @@ interface YumbieCompanionProps {
  */
 export function YumbieCompanion({
   className,
+  style,
   imageClassName,
   mood = "idle",
   expression = null,
+  auraOpacity = 0.55,
+  eyeStyle = "default",
 }: YumbieCompanionProps) {
   const visual: YumbieMood | "celebrate" =
     expression === "celebrate" ? "celebrate" : mood;
 
-  const palette = getPalette(visual);
+  const basePalette = getPalette(visual);
   const auraClass = getAuraClass(visual);
   const moodId = visual; // unique gradient ids per mood
+  // Yumbie Ember Persona (season pass L17): a molten forge aura when owned.
+  const emberPersona = hasCapability(useCosmeticGrants(), "yumbie_persona");
+  const palette = emberPersona
+    ? { ...basePalette, auraInner: "#FF9D47", auraOuter: "#FF5D3B" }
+    : basePalette;
 
   return (
     <div
@@ -57,6 +74,7 @@ export function YumbieCompanion({
         "relative flex h-44 w-44 items-center justify-center overflow-visible sm:h-48 sm:w-48",
         className
       )}
+      style={style}
       data-mood={mood}
       data-expression={expression ?? undefined}
     >
@@ -69,7 +87,7 @@ export function YumbieCompanion({
           auraClass
         )}
         style={{
-          opacity: 0.55,
+          opacity: auraOpacity,
           background: `radial-gradient(circle at 50% 50%, ${palette.auraInner} 0%, ${palette.auraOuter} 48%, transparent 74%)`,
         }}
       />
@@ -106,7 +124,7 @@ export function YumbieCompanion({
         <BlackTie />
 
         {/* ── Face: eyes + cheeks + cat mouth per mood ────────────── */}
-        <YumbieFace mood={visual} />
+        <YumbieFace mood={visual} eyeStyle={eyeStyle} />
 
         {/* Mood-specific ambient effects — from the sides/below the body */}
         {visual === "celebrate" && <CelebrateParticles />}
@@ -151,9 +169,15 @@ function BlackTie() {
  * Face — eye shape + cheeks + cat mouth per mood
  * ───────────────────────────────────────────────────────────────── */
 
-function YumbieFace({ mood }: { mood: YumbieMood | "celebrate" }) {
+function YumbieFace({
+  mood,
+  eyeStyle = "default",
+}: {
+  mood: YumbieMood | "celebrate";
+  eyeStyle?: "default" | "round";
+}) {
   if (mood === "celebrate") return <CelebrateFace />;
-  if (mood === "happy") return <HappyFace />;
+  if (mood === "happy") return <HappyFace round={eyeStyle === "round"} />;
   if (mood === "worried") return <WorriedFace />;
   if (mood === "asleep") return <SleepFace />;
   return <IdleFace />;
@@ -270,12 +294,12 @@ function IdleFace() {
   );
 }
 
-/* Happy — ^_^ smiling eyes + wide cat mouth. */
-function HappyFace() {
+/* Happy — ^_^ smiling eyes + wide cat mouth; round keeps the open eyes. */
+function HappyFace({ round = false }: { round?: boolean }) {
   return (
     <g>
-      <HappyEye cx={EYE_L} />
-      <HappyEye cx={EYE_R} />
+      {round ? <OpenEye cx={EYE_L} /> : <HappyEye cx={EYE_L} />}
+      {round ? <OpenEye cx={EYE_R} /> : <HappyEye cx={EYE_R} />}
       <Cheeks />
       <CatMouth variant="big" />
     </g>

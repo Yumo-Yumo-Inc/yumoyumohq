@@ -85,7 +85,7 @@ export class SeededRNG {
  * Sample from Dirichlet distribution deterministically
  * Returns normalized weights that sum to 1
  */
-export function sampleDirichlet(
+function sampleDirichlet(
   alphas: number[],
   seed: string | number
 ): number[] {
@@ -111,7 +111,7 @@ export function sampleDirichlet(
  * Apply soft min/max constraints to weights
  * If constraints are violated, re-normalize deterministically
  */
-export function applyConstraints(
+function applyConstraints(
   weights: number[],
   minShares: number[],
   maxShares: number[]

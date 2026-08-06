@@ -1,45 +1,25 @@
-# REST API สาธารณะ
+# API surface
 
-## 5.10 REST API สาธารณะ
+## 5.10 API surface
 
-```
-Base: https://api.yumo.io/v1
-Auth: OAuth 2.0 PKCE (public client) · Bearer token
-Rate limit: จำกัดตามผู้ใช้และตามแอปพลิเคชัน; โควต้าปัจจุบันดูได้จากเอกสารอ้างอิง SDK
-```
+### Current: application routes
 
-| Method | Path | วัตถุประสงค์ | Auth |
+API ที่ใช้งานอยู่คือพื้นผิวเส้นทางของแอปพลิเคชัน: **เส้นทางที่ยืนยันเซสชันภายใต้ `/api/*` บน `yumoyumo.com`** ใช้งานโดยปรับใช้ Next.js เดียวกับผลิตภัณฑ์ การตรวจสอบสิทธิ์คือเซสชันของผู้ใช้ ไม่มีข้อมูลรับรองผู้พัฒนาแยกต่างหากในปัจจุบัน
+
+| Method | Path | Purpose | Auth |
 |---|---|---|---|
-| POST | `/receipts/upload` | รับ URL อัปโหลดที่ลงนามล่วงหน้า | User |
-| POST | `/receipts/{id}/process` | เริ่มการประมวลผลไปป์ไลน์ | User |
-| GET  | `/receipts/{id}` | ดึงบันทึกใบเสร็จ | User (ของตนเองเท่านั้น) |
-| GET  | `/receipts` | แสดงรายการใบเสร็จของผู้ใช้ | User (เฉพาะของตนเอง) |
-| GET  | `/users/me/price-memory` | ความจำราคาส่วนบุคคล | User |
-| GET  | `/users/me/bint` | ยอดคงเหลือและประวัติ bINT | User |
-| POST | `/conversions/bint-to-int` | แปลง bINT → INT (เตรียม TX) | User |
-| GET  | `/users/me/level` | ระดับ + สแน็ปช็อตสุขภาพ | User |
-| GET  | `/canonical-products/{id}` | รายละเอียดสาธารณะของสินค้ามาตรฐาน | Public |
-| GET  | `/merchants/{id}` | รายละเอียดสาธารณะของผู้ค้า | Public |
+| POST | `/api/receipt/upload` | Upload a receipt image | Session |
+| POST | `/api/receipt/analyze` | Run the pipeline on an upload | Session |
+| GET  | `/api/receipts` | List the user's receipts | Session (own only) |
+| GET  | `/api/receipts/{id}` | Fetch a receipt record | Session (own only) |
+| GET  | `/api/wallet/summary` | Points balance and history | Session |
+| GET  | `/api/prices/epoch/{epoch}` | Public price-epoch data: epoch metadata, observation pages, and Merkle inclusion proofs (`?proof=<leaf_hash>`) | Public |
+| GET  | `/api/prices/product/{productId}` | Public price history for a catalog product | Public |
 
-### Webhooks
+เส้นทาง price-ledger เป็นพื้นผิวการอ่านสาธารณะในปัจจุบัน: ใครก็ได้สามารถดึงช่วงที่ปิดกั้น ดึงการสังเกต และขอหลักฐานการรวมที่พับไปยังรูท on-chain แมนิเฟสต์ Arweave ที่เผยแพร่จัดเตรียมข้อมูลเดียวกันโดยไม่ขึ้นอยู่กับเส้นทางเหล่านี้
 
-แอปพลิเคชันสามารถสมัครรับเหตุการณ์ที่ผูกกับขอบเขตของผู้ใช้ได้:
+### Planned: versioned public REST API
 
-```json
-// receipt.verified
-{
-  "event_type": "receipt.verified",
-  "event_id": "01HXY...",
-  "occurred_at": "2026-05-17T14:23:13Z",
-  "data": {
-    "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-    "user_id": "01HXY...",
-    "trust_score": "0.XX",
-    "bint_credited_minor": 12500
-  }
-}
-```
-
-ประเภทเหตุการณ์ที่ v1: `receipt.verified`, `receipt.rejected`, `bint.credited`, `bint.settled`, `conversion.completed`, `level.advanced`.
+API REST สาธารณะเวอร์ชันสำหรับแอปพลิเคชันบุคคลที่สามเป็น**งานในอนาคต** ร่างการออกแบบ: ฐาน `/v1` บน `yumoyumo.com` การให้อำนาจตามมาตรฐานสำหรับไคลเอนต์บุคคลที่สาม เส้นทางเรียบร้อยสไตล์ทรัพยากรสำหรับใบเสร็จและรางวัล และการสมัครสมาชิกเหตุการณ์สำหรับการเปลี่ยนแปลงสถานะ (ใบเสร็จได้รับการตรวจสอบ รางวัลที่ได้รับอนุมัติ epoch ปิดกั้น) พื้นผิวที่เฉพาะเจาะจงจะถูกระบุเมื่อโปรแกรมผู้พัฒนาเปิด เส้นทางแอปพลิเคชันข้างต้นคือสัญญาจนกว่าจะถึงเวลานั้น
 
 ---

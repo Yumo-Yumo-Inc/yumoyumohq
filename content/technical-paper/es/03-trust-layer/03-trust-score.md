@@ -1,35 +1,28 @@
 # Puntuación de confianza
 
-## 3.3 Puntuación de confianza por recibo
+## 3.3 Calidad por recibo y confianza por usuario
 
-La puntuación de confianza de un recibo es un número en `[0, 1]` derivado de una combinación ponderada de señales. Más alto es mejor. La puntuación se escribe en el registro del recibo (véase 05 §5.3) junto con la lista de señales que contribuyeron.
+La confianza se registra en dos capas conectadas. Cada recibo que sale de la canalización recibe una **evaluación de calidad**: la capa comprueba qué tan completo es el registro extraído (comerciante, fecha, hora, totales, líneas de detalle) y si los importes del recibo se reconcilian internamente. La evaluación se resuelve en un nivel de calidad para el recibo. Ese nivel alimenta después una **posición de confianza acumulativa por usuario**, actualizada de forma sincrónica en la misma pasada de procesamiento: un flujo de recibos limpios y completos eleva la posición con el tiempo; las cargas de baja calidad o inconsistentes la frenan o la revierten. Los sistemas posteriores consumen la posición como niveles en lugar de valores brutos.
 
 ### Familias de señales
 
-La puntuación se basa en cuatro familias de señales. Cada familia produce una o más señales individuales; la capa las compone en la puntuación final.
+La evaluación de calidad en la versión actual se basa en la **completitud del registro** y la **reconciliación de importes**, junto con la detección de duplicados (3.9). Las siguientes familias de señales extienden el modelo y son **planificadas**; no están activas en la versión actual:
 
-| Familia | Qué observa |
+| Familia (planificada) | Qué observa |
 |---|---|
 | **Confianza de la canalización** | Qué tan confiado estaba el canal ascendente en la extracción (confianza OCR, confianza LLM, reconciliación de la capa de reglas). |
 | **Consistencia del comerciante** | Si el comerciante, la sucursal y la plantilla del recibo coinciden con lo que hemos visto antes de este comerciante. |
 | **Plausibilidad temporal** | Si la fecha, hora del recibo y el patrón de carga del usuario son consistentes con el comportamiento normal. |
 | **Historial del usuario** | La calidad reciente de las contribuciones del usuario, limitada a una ventana móvil. |
 
-Dentro de cada familia, las señales individuales se registran con su valor observado y una bandera de contribución (`signal_used` / `signal_skipped`). La ponderación exacta, los umbrales de familia y las reglas de omisión se gestionan en la capa de operaciones internas.
+La composición exacta de la puntuación, los límites entre niveles y los efectos por nivel se gestionan en la capa de operaciones internas.
 
-### Bandas de puntuación
+### Niveles de calidad
 
-La puntuación final se agrupa en bandas para uso posterior:
-
-- **Alta** — el recibo se liquida con crédito bINT completo.
-- **Media** — el recibo se liquida con crédito bINT reducido. El usuario ve la vista previa verificada y la cantidad de bINT; sin fricción.
-- **Baja** — el recibo se retiene para revisión (véase 3.7). Se le informa al usuario que se está verificando.
-- **Rechazo** — el recibo ingresa al estado rechazado. El usuario ve una categoría de motivo en lenguaje sencillo.
-
-Los límites de las bandas se calibran periódicamente contra los resultados observados y se gestionan en la capa de operaciones internas.
+La evaluación por recibo se resuelve en un conjunto ordenado de niveles de calidad. Los niveles superiores reflejan recibos completos e internamente consistentes y refuerzan más la posición de confianza del usuario; los niveles inferiores reflejan registros escasos o inconsistentes y contribuyen menos. Las definiciones de los niveles y sus efectos exactos se calibran en producción y no se publican.
 
 ## 3.4 Qué lleva el registro del recibo
 
-El bloque de confianza del recibo enumera las familias de señales que contribuyeron y la banda resultante. Los valores de señal individuales, los pesos y la puntuación residen en la configuración interna de confianza. La superficie orientada al usuario comunica el **resultado** (cantidad de bINT, retención, rechazo) y la **categoría de motivo** cuando sea relevante.
+El bloque de calidad del recibo registra el nivel evaluado y las observaciones de completitud que lo produjeron. Los límites entre niveles y los efectos por nivel residen en la configuración interna de confianza. La superficie orientada al usuario comunica el **resultado** (cantidad de bINT, rechazo) y la **categoría de motivo** cuando sea relevante.
 
-Esto es intencional: las bandas públicas proporcionan claridad sobre el resultado, mientras que las puntuaciones internas preservan la superficie de calibración.
+Esto es intencional: los resultados públicos proporcionan claridad, mientras que los valores internos de calibración preservan la superficie de calibración.

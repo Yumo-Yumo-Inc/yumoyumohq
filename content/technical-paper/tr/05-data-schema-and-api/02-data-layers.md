@@ -2,16 +2,17 @@
 
 ## 5.1 Veri katmanları (Vision özet)
 
-Vision Paper dört veri katmanı tanımlar; bu bölüm her birini somut depolamaya eşler ve hangisinin neyi sorgulayabileceğini gösterir.
+Vision Paper veri katmanlarını tanımlar; bu bölüm her birini somut depolamaya eşler ve hangisinin neyi sorgulayabileceğini gösterir.
 
 | Katman | Burada ne yaşar | Kullanıcı erişimi | Operasyon erişimi | B2B erişimi |
 |---|---|---|---|---|
 | **Cihaz** | Orijinal fiş görseli | Kendi verisi | Cihaz kapsamı | Cihaz kapsamı |
-| **Sıcak sistem** | Fiş kayıtları, kalemler, son 90 gün | Kendi verisi | Operasyonel | Toplam katman |
-| **Ilık sistem** | Sıcakla aynı, 91 gün-3 yıl | Kendi verisi | Operasyonel | Toplam katman |
+| **Kayıt sistemi** | Fiş kayıtları, kalemler, ödül olayları — tek yönetilen Postgres (Neon) | Kendi verisi | Operasyonel | Toplam katman |
 | **Anonimleştirilmiş toplam** | k-anonim paneller ve indeksler | Toplam görünüm | Operasyonel | Toplam görünüm |
-| **Zincir üstü özet** | bINT kredi hash'leri, INT olayları, NFT seviyeleri | Açık | Açık | Açık |
+| **Zincir üstü özet** | Epoch Merkle kökleri (ödül + fiyat), INT olayları | Açık | Açık | Açık |
 
-Katı kural: **anonimleştirilmiş toplam, kullanıcıdan ayrıştırılmış toplam katmandır.** 5.8 dönüşümü belirler.
+Kayıt sisteminin yaşa dayalı sıcak/ılık katmanlaması bir **ölçekleme seçeneğidir**; hacim gerektirdiğinde devreye alınmak üzere planlanmıştır. Bugün tek bir Postgres örneği tüm geçmişi tutar.
+
+Katı kural: **anonimleştirilmiş toplam, tek kullanıcı kayıtlarından ayrıştırılmıştır.** 5.8 dönüşümü belirler.
 
 ---

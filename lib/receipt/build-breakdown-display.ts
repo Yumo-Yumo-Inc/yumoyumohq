@@ -9,7 +9,7 @@ import { displayHiddenCost } from "@/lib/receipt/display-hidden-cost";
 // Producing an estimate via a fixed percentage (0.35/0.45/0.20) of totalPaid is FORBIDDEN.
 // If the backend sends 0/empty, the breakdown is not shown — an empty-state message is displayed instead.
 
-export type BreakdownDisplayItem = {
+type BreakdownDisplayItem = {
   label: string;
   description: string;
   amount: number;

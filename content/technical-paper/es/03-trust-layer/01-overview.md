@@ -10,7 +10,7 @@ El contrato público de la capa define qué categorías de decisión existen y c
 |---|---|
 | Aceptación completa | El recibo ingresa al libro mayor de recompensas con el coeficiente normal |
 | Aceptación reducida | El recibo es válido, pero las señales de calidad o comportamiento reducen el coeficiente de recompensa |
-| Revisión | El recibo o el comportamiento del usuario ingresan a la decisión manual |
+| Revisión | El recibo o el comportamiento del usuario ingresan a la decisión manual *(mecanismo planificado; no activo en la versión actual)* |
 | Rechazo | El recibo ingresa al estado de registro rechazado |
 
 Esta superficie brinda retroalimentación comprensible al usuario mientras los parámetros de defensa permanecen en la capa de operaciones internas.

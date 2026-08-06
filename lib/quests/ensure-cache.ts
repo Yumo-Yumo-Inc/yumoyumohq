@@ -89,7 +89,7 @@ export async function withWeeklyEnsureCache(
 }
 
 /** Test/admin hook to force a fresh ensure on next call. */
-export function invalidateEnsureCache(username: string, dateStr?: string): void {
+function invalidateEnsureCache(username: string, dateStr?: string): void {
   if (!dateStr) {
     // Drop all entries for this user
     for (const k of dailyCache.keys()) {

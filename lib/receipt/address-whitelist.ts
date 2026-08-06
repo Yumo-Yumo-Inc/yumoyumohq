@@ -38,7 +38,7 @@ function normalizeForMatch(text: string): string {
 }
 
 /** Turkish address terms — street, neighborhood, avenue, etc. */
-export const ADDRESS_TERMS = new Set([
+const ADDRESS_TERMS = new Set([
   "mah", "mah.", "mahalle", "mahallesi", "mh", "mh.",
   "sok", "sok.", "sokak", "sokağı", "sokagi", "sk", "sk.",
   "cad", "cad.", "cadde", "caddesi", "cd", "cd.",
@@ -52,7 +52,7 @@ export const ADDRESS_TERMS = new Set([
 ]);
 
 /** Malaysia address terms — not valid as merchant name alone (Jalan, No, Lot, etc.) */
-export const MY_ADDRESS_TERMS = new Set([
+const MY_ADDRESS_TERMS = new Set([
   "jalan", "jl", "jl.", "lorong", "lg", "lot", "taman", "persiaran", "no", "no.",
   "bangunan", "blok", "tingkat", "floor", "kompleks", "pusat", "wisma",
 ]);
@@ -67,11 +67,11 @@ for (const city of Object.keys(data)) {
     _districtSet.add(normalizeForMatch(district));
   }
 }
-export const TURKEY_CITIES = _citySet;
-export const TURKEY_DISTRICTS = _districtSet;
+const TURKEY_CITIES = _citySet;
+const TURKEY_DISTRICTS = _districtSet;
 
 /** Primary address terms — mah, sok, cad, il/ilçe, etc. Without at least one of these, "no"/"numara"/"apt" alone does not count as an address. */
-export const PRIMARY_ADDRESS_TERMS = new Set([
+const PRIMARY_ADDRESS_TERMS = new Set([
   "mah", "mah.", "mahalle", "mahallesi", "mh", "mh.",
   "sok", "sok.", "sokak", "sokağı", "sokagi", "sk", "sk.",
   "cad", "cad.", "cadde", "caddesi", "cd", "cd.",
@@ -82,7 +82,7 @@ export const PRIMARY_ADDRESS_TERMS = new Set([
 ]);
 
 /** Secondary address terms — these alone do not count as an address; a primary term (mah/sok/il/ilçe, etc.) is also required. */
-export const SECONDARY_ADDRESS_TERMS = new Set([
+const SECONDARY_ADDRESS_TERMS = new Set([
   "no", "no.", "numara", "num", "apt", "apartman", "kat", "daire", "d",
   "blok", "bina", "site", "merkez", "avm", "plaza", "konak",
 ]);
@@ -148,7 +148,7 @@ export function looksLikeAddress(text: string): boolean {
  * Malaysia: merchant name candidate looks like address (Jalan, No, Lot, etc.).
  * Use when detectedCountry === "MY" to avoid accepting address-only text as merchant.
  */
-export function looksLikeAddressMY(text: string): boolean {
+function looksLikeAddressMY(text: string): boolean {
   if (!text || text.trim().length < 5) return false;
   const normalized = text.toLowerCase().replace(/[^a-z0-9\s]/g, "");
 

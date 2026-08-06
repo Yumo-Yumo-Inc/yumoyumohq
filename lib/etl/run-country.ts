@@ -11,6 +11,11 @@
 import { getSql } from "@/lib/db/client";
 import { runEurostatEtl } from "./eurostat-prices";
 import { runImfIfsEtl } from "./imf-ifs-prices";
+import { runDosmCpiEtl } from "./dosm-cpi";
+import { runIndecCpiEtl } from "./indec-cpi";
+import { runIbgeSidraCpiEtl } from "./ibge-sidra-cpi";
+import { runPbsCpiEtl } from "./pbs-cpi";
+import { runPsaCpiEtl } from "./psa-cpi";
 import { runEvdsCpiEtl } from "./tcmb-evds-cpi";
 import { runYiufeEtl } from "./tuik-yiufe";
 import type { EtlResult } from "./etl-helpers";
@@ -36,6 +41,11 @@ function notImplemented(name: string, source: string): AdapterFn {
 const ADAPTERS: Record<string, AdapterFn> = {
   eurostat: (o) => runEurostatEtl(o),
   imf_ifs: (o) => runImfIfsEtl(o),
+  dosm_cpi: (o) => runDosmCpiEtl(o),
+  indec_cpi: (o) => runIndecCpiEtl(o),
+  ibge_sidra_cpi: (o) => runIbgeSidraCpiEtl(o),
+  pbs_cpi: (o) => runPbsCpiEtl(o),
+  psa_cpi: (o) => runPsaCpiEtl(o),
   tcmb_evds: (o) => runEvdsCpiEtl({ since: o.since, end: currentYearMonth(), dryRun: o.dryRun }) as Promise<EtlResult>,
   tuik_yiufe: (o) => runYiufeEtl({ since: o.since, dryRun: o.dryRun }) as Promise<EtlResult>,
   // National PPI / Taiwan sources — awaiting implementation (source documented).

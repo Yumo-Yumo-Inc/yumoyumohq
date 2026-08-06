@@ -18,7 +18,7 @@ import { bintToInt } from "@/config/tokenomics";
 import { computeAmounts, type RawClaim } from "./compute-amounts";
 import { hashLeaf, buildTree, getProof } from "./merkle";
 
-export type EpochLeaf = {
+type EpochLeaf = {
   username: string;
   walletAddress: string;
   rawAmount: number;

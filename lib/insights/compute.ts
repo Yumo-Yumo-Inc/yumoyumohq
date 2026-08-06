@@ -45,7 +45,7 @@ export function receiptToSummary(receipt: any): ReceiptSummary {
 /**
  * Filter receipts based on filters
  */
-export function filterReceipts(
+function filterReceipts(
   receipts: ReceiptSummary[],
   filters: InsightsFilters
 ): ReceiptSummary[] {
@@ -116,7 +116,7 @@ export function filterReceipts(
 /**
  * Aggregate receipts into insights
  */
-export function aggregateReceipts(
+function aggregateReceipts(
   receipts: ReceiptSummary[],
   filters: InsightsFilters = {}
 ): InsightsAggregate {
@@ -319,7 +319,7 @@ export function aggregateReceipts(
  * Compute transparency score for a merchant (0-100)
  * Lower hidden% relative to baseline => higher score
  */
-export function computeTransparencyScore(
+function computeTransparencyScore(
   merchantStats: MerchantStats,
   categoryBaseline: number,
   countryBaseline: number
@@ -338,7 +338,7 @@ export function computeTransparencyScore(
 /**
  * Compute what-if savings
  */
-export function computeWhatIfSavings(
+function computeWhatIfSavings(
   totalHiddenCostCore: number,
   reductionPercent: number
 ): number {

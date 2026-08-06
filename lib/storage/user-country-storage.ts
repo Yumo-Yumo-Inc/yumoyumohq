@@ -17,7 +17,7 @@ import { normalizeCountryCode } from "@/lib/shared/countries";
 const DATA_DIR = path.join(process.cwd(), ".data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 
-export interface UserCountry {
+interface UserCountry {
   username: string;
   country: string;
 }
@@ -41,7 +41,11 @@ async function ensureDataDir() {
   }
 }
 
+// Memoized per process — the DDL self-heal must not run on every request.
+let profileCountryColumnReady = false;
+
 async function ensureProfileCountryColumn(): Promise<void> {
+  if (profileCountryColumnReady) return;
   if (!isDatabaseAvailable() || !sql) return;
   await sql`
     CREATE TABLE IF NOT EXISTS user_profiles (
@@ -60,6 +64,7 @@ async function ensureProfileCountryColumn(): Promise<void> {
     )
   `;
   await sql`ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS country VARCHAR(255)`;
+  profileCountryColumnReady = true;
 }
 
 async function readUsersFromDatabase(): Promise<UserCountry[]> {
@@ -131,7 +136,7 @@ async function upsertCountryToDatabase(username: string, country: string): Promi
   }
 }
 
-export async function readUsers(): Promise<UserCountry[]> {
+async function readUsers(): Promise<UserCountry[]> {
   // Try database first
   if (isDatabaseAvailable()) {
     try {
@@ -158,7 +163,7 @@ export async function readUsers(): Promise<UserCountry[]> {
   }
 }
 
-export async function writeUsers(users: UserCountry[]): Promise<void> {
+async function writeUsers(users: UserCountry[]): Promise<void> {
   // Try database first
   if (isDatabaseAvailable()) {
     try {
@@ -229,18 +234,22 @@ function toTimestamp(value: unknown): number {
 
 async function healCountryDrift(username: string, resolved: string, usersCountry: string, profileCountry: string): Promise<void> {
   if (!sql) return;
+  const normalized =
+    normalizeCountryCode(resolved) ??
+    (resolved.trim().length === 2 ? resolved.trim().toUpperCase() : null);
+  if (!normalized) return;
   try {
-    if (resolved !== usersCountry) {
+    if (normalized !== usersCountry) {
       await sql`
         UPDATE users
-        SET country = ${resolved}, updated_at = CURRENT_TIMESTAMP
+        SET country = ${normalized}, updated_at = CURRENT_TIMESTAMP
         WHERE username = ${username}
       `;
     }
-    if (resolved !== profileCountry) {
+    if (normalized !== profileCountry) {
       await sql`
         UPDATE user_profiles
-        SET country = ${resolved}, updated_at = CURRENT_TIMESTAMP
+        SET country = ${normalized}, updated_at = CURRENT_TIMESTAMP
         WHERE username = ${username}
       `;
     }
@@ -279,6 +288,13 @@ async function readRawUserCountry(username: string): Promise<string | null> {
       if (!usersCountry) return profileCountry;
       if (!profileCountry) return usersCountry;
       if (usersCountry === profileCountry) return usersCountry;
+
+      const usersIso = normalizeCountryCode(usersCountry);
+      const profileIso = normalizeCountryCode(profileCountry);
+      if (usersIso && profileIso && usersIso === profileIso) {
+        void healCountryDrift(username, usersIso, usersCountry, profileCountry);
+        return usersIso;
+      }
 
       const usersTs = toTimestamp(row.users_updated_at);
       const profileTs = toTimestamp(row.profile_updated_at);

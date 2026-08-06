@@ -69,4 +69,3 @@ export const PH_CONFIG: CountryConfig = {
   ]
 };
 
-export default PH_CONFIG;

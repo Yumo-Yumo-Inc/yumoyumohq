@@ -15,7 +15,7 @@ function buildReceiptDataSnapshot(receipt: ReceiptAnalysis): string {
  * Helper function to clamp rate/confidence values to 0-1 range
  * If value > 1, assume it's a percentage and divide by 100
  */
-export function clampRate(value: number | null | undefined): number | null {
+function clampRate(value: number | null | undefined): number | null {
   if (value == null || !isFinite(value)) return null;
   if (value > 1) {
     // Likely a percentage (e.g., 20 for 20%), convert to decimal (0.20)

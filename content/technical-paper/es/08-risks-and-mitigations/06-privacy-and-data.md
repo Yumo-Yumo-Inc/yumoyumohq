@@ -13,7 +13,7 @@ Yumo Yumo trabaja con dos clases de datos: datos de usuario y datos agregados. L
 
 ## 8.15 Modelo de control
 
-**Contenido de recibo fuera de la cadena.** Los artículos de línea de recibo residen en el libro mayor fuera de la cadena (04 §4.16). La capa on-chain transporta eventos de emisión de bINT y compromisos de raíz Merkle; el contenido se procesa en la capa de datos.
+**Contenido de recibo fuera de la cadena.** Los artículos de línea de recibo residen en el libro mayor fuera de la cadena (04 §4.16). La cadena registra raíces de distribución y reclamaciones INT; el contenido se procesa en la capa de datos.
 
 **Disciplina de publicación agregada.** El producto de datos B2B sigue reglas de k-anonimato y grupos de publicación (05 §5.8). Los grupos de publicación se forman a partir de cohortes de región, categoría y período con densidad suficiente.
 

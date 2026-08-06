@@ -9,14 +9,16 @@ import {
   ChevronRight,
   Gift,
   ReceiptText,
-  Target,
+  Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/app/app-shell";
 import { ErrorState } from "@/components/app/error-state";
+import { GenesisPatchNotesGate } from "@/components/app/dashboard/genesis-patch-notes-gate";
 import { MonthlySummaryCard } from "@/components/app/dashboard/monthly-summary-card";
 import { RecentReceiptsSection } from "@/components/app/dashboard/recent-receipts-section";
-import { YumbieWorkspaceGate } from "@/components/yumbie/YumbieWorkspaceGate";
+import { YumbieMarketDock } from "@/components/app/dashboard/yumbie-market-dock";
 import { useAppProfile } from "@/lib/app/profile-context";
 import { cn } from "@/lib/utils";
 import { useAppLocale } from "@/lib/i18n/app-context";
@@ -292,20 +294,20 @@ const QUICK_CATEGORIES: QuickCategory[] = [
     iconColor: "text-[#fbbf24]",
   },
   {
-    id: "goals",
-    href: "/app/goals",
-    icon: Target,
-    title: { tr: "Hedeflerim", en: "Goals", ru: "Цели", th: "เป้าหมาย", es: "Metas", zh: "目标" },
+    id: "wallet",
+    href: "/app/insights",
+    icon: Wallet,
+    title: { tr: "Cüzdan", en: "Wallet", ru: "Кошелёк", th: "กระเป๋าเงิน", es: "Cartera", zh: "钱包" },
     desc: {
-      tr: "Bütçe limiti kur, ilerlemeyi gör",
-      en: "Set budget limits, track progress",
-      ru: "Лимиты бюджета и прогресс",
-      th: "ตั้งงบและติดตามความคืบหน้า",
-      es: "Define límites y avance",
-      zh: "设定预算并跟踪进度",
+      tr: "Puan bakiyen ve kazanç geçmişin",
+      en: "Your point balance and earnings",
+      ru: "Баланс баллов и история",
+      th: "ยอดคะแนนและประวัติ",
+      es: "Saldo de puntos e historial",
+      zh: "积分余额与收益记录",
     },
-    iconBg: "bg-[#22c55e]/14",
-    iconColor: "text-[#86efac]",
+    iconBg: "bg-[#3b82f6]/14",
+    iconColor: "text-[#93c5fd]",
   },
   {
     id: "tasks",
@@ -339,11 +341,27 @@ const QUICK_CATEGORIES: QuickCategory[] = [
     iconBg: "bg-[#ec4899]/14",
     iconColor: "text-[#f9a8d4]",
   },
+  {
+    id: "friends",
+    href: "/app/friends",
+    icon: Users,
+    title: { tr: "Arkadaşlar", en: "Friends", ru: "Друзья", th: "เพื่อน", es: "Amigos", zh: "好友" },
+    desc: {
+      tr: "Arkadaş ekle, gizli maliyette yarış",
+      en: "Add friends, compete on hidden cost",
+      ru: "Добавляй друзей и соревнуйся",
+      th: "เพิ่มเพื่อนและแข่งขัน",
+      es: "Añade amigos y compite",
+      zh: "添加好友，比拼隐藏成本",
+    },
+    iconBg: "bg-[#22c55e]/14",
+    iconColor: "text-[#86efac]",
+  },
 ];
 
 function QuickCategoriesGrid({ locale }: { locale: YumoLocale }) {
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-5 gap-2">
       {QUICK_CATEGORIES.map((cat) => {
         const Icon = cat.icon;
         return (
@@ -403,18 +421,16 @@ export default function DashboardPage() {
 
   return (
     <AppShell className="max-w-[430px] lg:max-w-[1440px]">
+      <GenesisPatchNotesGate />
       <div className="-mx-3 min-h-[100svh] overflow-hidden bg-[var(--app-bg-dashboard)] px-3 pb-28 pt-2 text-[var(--app-text-primary)] sm:-mx-4 sm:px-4 lg:m-0 lg:min-h-[calc(100svh-3rem)] lg:rounded-[36px] lg:border lg:border-[var(--app-border)] lg:p-6 lg:pb-8">
         <div className="absolute inset-x-0 top-0 h-[420px] bg-[linear-gradient(180deg,rgba(255,200,150,0.06),transparent_60%)]" />
         <div className="relative mx-auto max-w-[1320px] space-y-5 lg:space-y-6">
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
             <div className="order-1 min-w-0 space-y-5 lg:col-span-8 lg:space-y-6">
               <MonthlySummaryCard locale={yumoLocale} />
-              {/* Yumbie room — moved out of the global topbar band into the
-                  Ledger position. The insight sheet portals to <body>, so the
-                  rounded clip here is safe. */}
-              <div className="overflow-hidden rounded-[24px] border border-[var(--app-border)]">
-                <YumbieWorkspaceGate />
-              </div>
+              {/* Yumbie dock — mini companion (opens the room modal) + market
+                  strip (SOL/USDC, SOL/BTC, account-country inflation). */}
+              <YumbieMarketDock locale={yumoLocale} />
               <QuickCategoriesGrid locale={yumoLocale} />
               <SpendingCategoryCard locale={yumoLocale} />
               <RecentReceiptsSection locale={yumoLocale} />

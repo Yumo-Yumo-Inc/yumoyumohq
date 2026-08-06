@@ -22,7 +22,7 @@ export type YumbieMood = "idle" | "happy" | "worried" | "asleep";
  */
 export type YumbieExpression = "celebrate" | null;
 
-export interface UseYumbieMoodInput {
+interface UseYumbieMoodInput {
   /** Was at least 1 receipt uploaded today? */
   checkedInToday?: boolean;
   /** Number of consecutive days with a receipt upload. */
@@ -35,7 +35,7 @@ export interface UseYumbieMoodInput {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-export function useYumbieMood(input: UseYumbieMoodInput): YumbieMood {
+function useYumbieMood(input: UseYumbieMoodInput): YumbieMood {
   return useMemo(() => {
     if (input.override) return input.override;
 

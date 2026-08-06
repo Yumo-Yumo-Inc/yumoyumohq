@@ -83,4 +83,3 @@ export const US_CONFIG: CountryConfig = {
   ]
 };
 
-export default US_CONFIG;

@@ -8,9 +8,9 @@ Düz bir oran, dönüşüm değerini öngörülebilir tutar ve erken ile geç ka
 
 Mutabakat zincir dışıdır (4.4): motor her epoch'ta uygun bINT'i dönüştürür ve kullanıcı elde edilen INT'i denetlenmiş dağıtıcıdan talep eder. Epoch'un toplam uygun ödülü küresel emisyon tavanını aştığında, her katılımcı aynı oranlı katsayıyla küçültülür; böylece ödül oranı, son katkıcıları kesmek yerine herkes için eşit biçimde yumuşar. Hem tavan değeri hem de ölçekleme hesabı operasyon katmanında kalibre edilir ve yayınlanmaz.
 
-## 4.25 Tutma penceresi ve mutabakat kontrolleri
+## 4.25 Mutabakat kontrolleri
 
-bINT, mutabakata uygun hale gelmeden önce asgari bir tutma süresine girer. Tutma penceresi, herhangi bir INT dağıtılmadan önce güven katmanına (03) anormal alışkanlıkları tespit edip yanıt verme zamanı tanır.
+Bir epoch penceresi kapanmadan önce kazanılan bINT o epoch'ta mutabakat eder; uygunluk, ayrı bir tutma süresini değil epoch sınırını izler. Güven katmanı (03) birikimden önce devreye girer — kalite değerlendirmesi ve kopya tespiti her fiş işlenirken çalışır, bu nedenle anormal katkılar deftere ulaşmadan önce ele alınır.
 
 Birikimli bir tavan, katkı katmanının dağıtabileceği toplam INT'i sınırlar (Kullanıcı Ödülleri rayı, 4.17); bağımsız doğrulayıcı (4.17) bu değişmezi her epoch'ta uygular. Bu parametreler operasyon katmanında yönetilir ve kullanıcı deneyimi ile protokol güvenliği arasında denge sağlayacak şekilde kalibre edilir.
 

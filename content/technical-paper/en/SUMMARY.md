@@ -58,6 +58,8 @@
   * [Indexing and partitioning](05-data-schema-and-api/13-indexing-partitioning.md)
   * [Versioning](05-data-schema-and-api/14-versioning.md)
   * [SDK roadmap](05-data-schema-and-api/15-sdk-roadmap.md)
+* [06 Web3 Infrastructure: Solana, Arweave, and Verifiable Records](06-verifiable-publication-and-proof-of-expense/01-overview.md)
+  * [Protocol details and operational boundaries](06-verifiable-publication-and-proof-of-expense/02-protocol-details.md)
 * [08 Risk Model](08-risks-and-mitigations/01-overview.md)
   * [Regulatory risk](08-risks-and-mitigations/02-regulatory.md)
   * [Token and market risk](08-risks-and-mitigations/03-token-and-market.md)

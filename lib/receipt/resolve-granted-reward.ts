@@ -19,6 +19,7 @@ export type GrantedRewardResolution = {
   proofStatus: string | null;
   pendingItemizedReceipt: boolean;
   documentType: string;
+  duplicateBlocked: boolean;
 };
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -52,7 +53,7 @@ function readLineItems(data: Record<string, unknown>): Array<{ name?: string | n
   });
 }
 
-export function buildVisionPostRulesInputFromStoredReceipt(input: {
+function buildVisionPostRulesInputFromStoredReceipt(input: {
   receiptData: unknown;
   merchantName?: string | null;
   extractionDate?: string | null;
@@ -108,7 +109,12 @@ export function resolveGrantedReward(input: {
 }): GrantedRewardResolution {
   const rulesInput = buildVisionPostRulesInputFromStoredReceipt(input);
   const rules = applyVisionPostRules(rulesInput);
-  const eligible = rules.judgment === "reward_eligible";
+  const data = asRecord(input.receiptData);
+  const verification = asRecord(data.verification);
+  const duplicateBlocked =
+    readBoolean(verification, "isDuplicate") === true ||
+    !!readString(data, "duplicateOf", "duplicate_of");
+  const eligible = rules.judgment === "reward_eligible" && !duplicateBlocked;
   const paidExTax = Math.max(0, input.paidExTax);
   const hiddenCostCore = Math.max(0, input.hiddenCostCore);
   const usdRate = Math.max(0.0001, input.usdRate);
@@ -132,7 +138,7 @@ export function resolveGrantedReward(input: {
       ? Math.round(fullRewardEstimate * rewardFraction * 100) / 100
       : 0;
   const stored = Number(input.storedRewardFinal ?? 0) || 0;
-  const grantedBint = stored > 0 ? stored : computedGranted;
+  const grantedBint = duplicateBlocked ? 0 : stored > 0 ? stored : computedGranted;
 
   return {
     rules,
@@ -144,13 +150,15 @@ export function resolveGrantedReward(input: {
     proofStatus: rules.pendingItemizedReceipt ? "pending" : null,
     pendingItemizedReceipt: rules.pendingItemizedReceipt === true,
     documentType: rules.documentType,
+    duplicateBlocked,
   };
 }
 
 export function mergeGrantedRewardIntoReceiptData(
   receiptData: unknown,
   granted: GrantedRewardResolution,
-  bintBonus?: number
+  bintBonus?: number,
+  breakdown?: unknown
 ): Record<string, unknown> {
   const data = asRecord(receiptData);
   const reward = asRecord(data.reward);
@@ -164,6 +172,9 @@ export function mergeGrantedRewardIntoReceiptData(
     fullRewardEstimate:
       granted.fullRewardEstimate > 0 ? granted.fullRewardEstimate : reward.fullRewardEstimate,
     pendingItemizedReceipt: granted.pendingItemizedReceipt || undefined,
+    // Keep the post-process breakdown (CPI/season appended) when provided;
+    // otherwise preserve the upload-pass breakdown already on the reward.
+    breakdown: breakdown ?? reward.breakdown ?? undefined,
     noRewardReasonCode: granted.grantedBint > 0 ? null : reward.noRewardReasonCode ?? "generic",
     noRewardExplanation: granted.grantedBint > 0 ? null : reward.noRewardExplanation ?? null,
   };

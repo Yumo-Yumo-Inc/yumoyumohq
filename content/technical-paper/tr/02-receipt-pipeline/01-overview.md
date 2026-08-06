@@ -30,13 +30,13 @@ sequenceDiagram
     participant L as Ödül defteri
 
     U->>C: Fiş seç veya çek
-    C->>C: Yerel ön işleme
-    C->>API: Yükleme oturumu iste
-    API-->>C: Yükleme hedefi + receipt_id
-    C->>S: Fiş girdisini yükle
+    C->>API: Fiş dosyasını yükle
+    API->>API: Sunucu tarafı ön işleme
+    API->>S: İşlenmiş girdiyi depola
+    API-->>C: receipt_id
     C->>API: İşlemeyi başlat
     API->>P: Metin ve alan çıkarımı
-    P-->>API: ReceiptExtraction
+    P-->>API: Etiketli çıkarım alanları
     API->>V: Tarih, toplam, para birimi ve tutarlılık kontrolü
     V-->>API: ValidationResult
     API->>M: Satıcı ve ürün referanslarını çöz

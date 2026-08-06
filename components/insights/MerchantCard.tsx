@@ -8,10 +8,10 @@
 
 import { useState } from "react";
 import { Store, ChevronRight, X } from "lucide-react";
-import type { MockReceipt } from "./mock-receipts";
+import type { InsightReceiptRow } from "./spending-sections";
 import { resolveMerchantDomain } from "@/lib/insights/merchant-domain";
 
-export interface MerchantCardData {
+interface MerchantCardData {
   name: string;
   category: string;
   visits: number;
@@ -26,7 +26,7 @@ export interface MerchantCardData {
 
 interface MerchantCardProps {
   merchant: MerchantCardData;
-  receipts: MockReceipt[];
+  receipts: InsightReceiptRow[];
   expanded: boolean;
   onToggle: () => void;
   dCurrency: (n: number) => string;

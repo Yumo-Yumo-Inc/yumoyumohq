@@ -13,7 +13,7 @@ export function computeHiddenRate(paidExTax: number, hiddenCost: number): number
   return Math.min(MAX_HIDDEN_RATE, Math.max(0, hiddenCost / paidExTax));
 }
 
-export function hiddenCostFromRate(paidExTax: number, hiddenRate: number): number {
+function hiddenCostFromRate(paidExTax: number, hiddenRate: number): number {
   if (paidExTax <= 0 || hiddenRate <= 0) return 0;
   return paidExTax * Math.min(MAX_HIDDEN_RATE, hiddenRate);
 }

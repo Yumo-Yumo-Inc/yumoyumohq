@@ -20,6 +20,8 @@ interface YumbieProgressFields {
    * fabricated action is shown.
    */
   recentReceipts: number | null;
+  /** Did the user scan at least one receipt today? Null while unknown. */
+  activeToday: boolean | null;
 }
 
 interface YumbieProgressState extends YumbieProgressFields {
@@ -31,5 +33,6 @@ export const useYumbieProgress = create<YumbieProgressState>((set) => ({
   streak: null,
   bond: null,
   recentReceipts: null,
+  activeToday: null,
   set: (p) => set(p),
 }));

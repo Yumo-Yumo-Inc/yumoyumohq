@@ -13,7 +13,7 @@ export function RewardSeal({ receipt }: { receipt: Receipt }) {
   const isTr = locale === "tr";
   const [open, setOpen] = useState(false);
   const r = receipt.reward;
-  const unit = r.symbol || "cPoints";
+  const unit = r.symbol || t("rewardCard.pointsUnit");
   const fraction = r.rewardFraction != null && r.rewardFraction < 1 ? r.rewardFraction : null;
   const partial = fraction != null && (r.pendingItemizedReceipt || (r.fullRewardEstimate ?? 0) > r.amount);
   const hasDetail = partial || (!r.claimable && !!r.noRewardExplanation);

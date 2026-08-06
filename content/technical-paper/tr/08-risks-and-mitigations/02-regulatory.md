@@ -16,7 +16,7 @@ Bu çerçeveler farklı bölgelerde aynı teknik mekanizmaya farklı uyum görev
 
 ## 8.3 Kontrol modeli
 
-**Veri minimizasyonu.** Fiş içeriği zincir dışı veri katmanında tutulur (04 §4.16). Zincir üstü katman bINT mint olayları, INT mutabakatları ve özet taahhütleri taşır. Kullanıcı harcama geçmişi açık zincir verisine dönüşmeden bütünlük kanıtı üretir.
+**Veri minimizasyonu.** Fiş içeriği zincir dışı veri katmanında tutulur (04 §4.16). Zincir üstü katman INT talep transferleri, epoch dağıtım kökleri ve özet taahhütleri taşır. Kullanıcı harcama geçmişi açık zincir verisine dönüşmeden bütünlük kanıtı üretir.
 
 **Toplam yayın politikası.** B2B veri ürünü, k-anonimlik ve toplam yayın kurallarıyla çalışır (05 §5.8). Yayınlanan veri, bireysel fiş yerine bölge / dönem / kategori düzeyinde toplam sinyal üretir.
 
@@ -26,4 +26,4 @@ Bu çerçeveler farklı bölgelerde aynı teknik mekanizmaya farklı uyum görev
 
 ## 8.4 Evrim
 
-Aşamalı yerelleşme ilerledikçe uyum sorumlulukları da yetki taşıma planına bağlanır (00 §0.2, 04 §4.10). Kurumsal yapı, veri saklama sorumluluğu ve token servis rolleri aynı mimari altında farklı bölgesel yapılara taşınabilecek şekilde tasarlanır.
+Gelecekte bir yetki devri önerilirse, uyum sorumlulukları da yayımlanmış yetki devri planına bağlanır (00 §0.2, 04 §4.10). Kurumsal yapı, veri saklama sorumluluğu ve token servis rolleri için ayrı bir düzenleyici değerlendirme gerekir.

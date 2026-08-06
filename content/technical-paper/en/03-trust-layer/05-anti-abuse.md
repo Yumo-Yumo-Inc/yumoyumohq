@@ -12,22 +12,27 @@ Each class has its own signal family. The layer assumes that abuse is iterative 
 
 ## 3.9 Signal categories
 
-Across the three classes, the layer draws on signal categories named here at a high level:
+Across the three classes, the layer draws on signal categories named here at a high level.
+
+Active in the current release:
 
 - **Perceptual similarity** — detects re-use of the same receipt across uploads.
+
+Planned categories, not active in the current release:
+
 - **Device and session continuity** — detects unusual patterns in how an account interacts with the protocol.
 - **Cross-account correlation** — detects clusters of accounts that share patterns inconsistent with independent households.
 - **Synthetic-media authenticity** — distinguishes photographs of physical receipts from machine-generated images. The signals are managed in the internal operations layer.
 - **Behavioural rhythm** — models account activity over time. The specific signals that compose this category are managed in the internal operations layer.
 
-Each category produces signals that feed the receipt's trust score and, where relevant, the user's health. The specific signals, thresholds, and cluster construction method are managed in the internal operations layer.
+Each category produces signals that feed the receipt's quality assessment and, where relevant, the user's health. The specific signals, thresholds, and cluster construction method are managed in the internal operations layer.
 
 ## 3.10 Treatment
 
 Treatment is graduated:
 
-- A signal in isolation **lowers the trust band** for the affected receipt.
-- A cluster of signals across receipts **lowers the user's health**, which compresses the daily ceiling.
-- A persistent pattern across users **opens a review case** in the operational queue; resolution may involve human review, additional verification, or — in repeated and unambiguous cases — account-level action.
+- A signal in isolation **lowers the quality outcome** for the affected receipt.
+- A cluster of signals across receipts **lowers the user's health**, which reduces the per-receipt reward rate.
+- A persistent pattern across users **opens a review case** in the operational queue *(planned mechanism; not active in the current release)*; resolution may involve human review, additional verification, or — in repeated and unambiguous cases — account-level action.
 
 The graduated treatment is intentional. Receipts and users sit on a trust spectrum, and the protocol's economic logic depends on keeping that spectrum legible.

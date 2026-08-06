@@ -36,7 +36,7 @@ export type ServiceProvider = {
   updatedAt: string;
 };
 
-export type CreateServiceProviderInput = {
+type CreateServiceProviderInput = {
   category: ServiceProviderCategory;
   name: string;
   paymentDay: number;
@@ -46,7 +46,7 @@ export type CreateServiceProviderInput = {
   expectedAmount?: number | null;
 };
 
-export type UpdateServiceProviderInput = Partial<{
+type UpdateServiceProviderInput = Partial<{
   category: ServiceProviderCategory;
   name: string;
   paymentDay: number;
@@ -64,7 +64,7 @@ export type UpcomingPayment = {
   expectedAmount: number | null;
 };
 
-export function isValidCategory(value: unknown): value is ServiceProviderCategory {
+function isValidCategory(value: unknown): value is ServiceProviderCategory {
   return (
     typeof value === "string" &&
     (SERVICE_PROVIDER_CATEGORIES as readonly string[]).includes(value)

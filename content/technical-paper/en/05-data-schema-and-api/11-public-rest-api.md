@@ -1,45 +1,25 @@
-# Public REST API
+# API surface
 
-## 5.10 Public REST API
+## 5.10 API surface
 
-```
-Base: https://api.yumo.io/v1
-Auth: OAuth 2.0 PKCE (public client) · Bearer token
-Rate limit: per-user and per-app limiting; current quotas in the SDK reference
-```
+### Current: application routes
+
+The live API is the application's own route surface: **session-authenticated routes under `/api/*` on `yumoyumo.com`**, served by the same Next.js deployment as the product. Authentication is the user's session; there is no separate developer credential today.
 
 | Method | Path | Purpose | Auth |
 |---|---|---|---|
-| POST | `/receipts/upload` | Get presigned upload URL | User |
-| POST | `/receipts/{id}/process` | Trigger pipeline | User |
-| GET  | `/receipts/{id}` | Fetch receipt record | User (own only) |
-| GET  | `/receipts` | List user's receipts | User (own only) |
-| GET  | `/users/me/price-memory` | Personal price memory | User |
-| GET  | `/users/me/bint` | bINT balance and history | User |
-| POST | `/conversions/bint-to-int` | Convert bINT → INT (prepares TX) | User |
-| GET  | `/users/me/level` | Level + health snapshot | User |
-| GET  | `/canonical-products/{id}` | Public canonical product details | Public |
-| GET  | `/merchants/{id}` | Public merchant details | Public |
+| POST | `/api/receipt/upload` | Upload a receipt image | Session |
+| POST | `/api/receipt/analyze` | Run the pipeline on an upload | Session |
+| GET  | `/api/receipts` | List the user's receipts | Session (own only) |
+| GET  | `/api/receipts/{id}` | Fetch a receipt record | Session (own only) |
+| GET  | `/api/wallet/summary` | Points balance and history | Session |
+| GET  | `/api/prices/epoch/{epoch}` | Public price-epoch data: epoch metadata, observation pages, and Merkle inclusion proofs (`?proof=<leaf_hash>`) | Public |
+| GET  | `/api/prices/product/{productId}` | Public price history for a catalog product | Public |
 
-### Webhooks
+The price-ledger routes are the public read surface today: anyone can fetch a sealed epoch, pull its observations, and request an inclusion proof that folds to the on-chain root. The published Arweave manifests provide the same data independently of these routes.
 
-Apps can subscribe to user-scoped events:
+### Planned: versioned public REST API
 
-```json
-// receipt.verified
-{
-  "event_type": "receipt.verified",
-  "event_id": "01HXY...",
-  "occurred_at": "2026-05-17T14:23:13Z",
-  "data": {
-    "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-    "user_id": "01HXY...",
-    "trust_score": "0.XX",
-    "bint_credited_minor": 12500
-  }
-}
-```
-
-Event types at v1: `receipt.verified`, `receipt.rejected`, `bint.credited`, `bint.settled`, `conversion.completed`, `level.advanced`.
+A versioned public REST API for third-party applications is **planned future work**. The design sketch: a `/v1` base on `yumoyumo.com`, standards-based delegated authorization for third-party clients, resource-style receipt and reward endpoints, and event subscriptions for state changes (receipt verified, reward credited, epoch sealed). The concrete surface will be specified when the developer program opens; the application routes above are the contract until then.
 
 ---

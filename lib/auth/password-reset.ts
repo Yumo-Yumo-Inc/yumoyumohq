@@ -8,7 +8,7 @@ import {
 } from "@/lib/storage/password-reset-storage";
 
 const TOKEN_TTL_MS = 1000 * 60 * 60;
-export const PASSWORD_RESET_COOLDOWN_MS = 1000 * 60;
+const PASSWORD_RESET_COOLDOWN_MS = 1000 * 60;
 
 function createPasswordResetSecret() {
   const token = crypto.randomBytes(32).toString("hex");
@@ -23,7 +23,7 @@ function createPasswordResetSecret() {
   };
 }
 
-export function buildPasswordResetUrl(token: string): string {
+function buildPasswordResetUrl(token: string): string {
   const url = new URL("/app/reset-password", getEmailLinkBaseUrl());
   url.searchParams.set("token", token);
   return url.toString();

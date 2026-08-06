@@ -1,4 +1,6 @@
 import { sql } from "@/lib/db/client";
+import { normalizeCountryCode } from "@/lib/shared/countries";
+import { getUserCountry } from "@/lib/storage/user-country-storage";
 
 export interface OnboardingInput {
   display_name: string;
@@ -20,12 +22,18 @@ export async function saveOnboardingPreferences(
   const birthYear = input.age ? new Date().getFullYear() - input.age : null;
   const birthDate = birthYear ? `${birthYear}-01-01` : null;
 
+  // Account country is set at registration and is immutable. Never overwrite
+  // with a full country name from onboarding — always store ISO 2-letter codes.
+  const existingCountry = normalizeCountryCode(await getUserCountry(username));
+  const inputCountry = normalizeCountryCode(input.country);
+  const countryToStore = existingCountry ?? inputCountry;
+
   await sql`
     UPDATE user_profiles SET
       display_name = ${input.display_name.trim()},
       gender       = ${input.gender},
       birth_date   = ${birthDate}::date,
-      country      = ${input.country},
+      country      = ${countryToStore},
       updated_at   = NOW()
     WHERE username = ${username}
   `;

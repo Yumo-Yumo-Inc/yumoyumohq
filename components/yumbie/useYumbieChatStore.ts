@@ -4,7 +4,7 @@
  */
 import { create } from "zustand";
 
-export interface YumbieChatMessage {
+interface YumbieChatMessage {
   id: string;
   role: "user" | "yumbie";
   text: string;

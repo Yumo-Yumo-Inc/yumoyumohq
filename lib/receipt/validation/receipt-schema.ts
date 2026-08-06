@@ -11,7 +11,7 @@ const TIME_REGEX = /^\d{2}:\d{2}$/;
 
 const unitTypeEnum = z.enum(["adet", "kg", "g", "l", "ml"]);
 
-export const receiptLineItemSchema = z.object({
+const receiptLineItemSchema = z.object({
   name: z.string().min(1),
   quantity: z.number().positive().nullable(),
   unitType: unitTypeEnum.nullable(),
@@ -21,7 +21,7 @@ export const receiptLineItemSchema = z.object({
 });
 
 /** Unified extraction shape (GeminiReceiptResult / GPT full receipt compatible). */
-export const receiptExtractionSchema = z.object({
+const receiptExtractionSchema = z.object({
   merchantName: z.preprocess((v) => (v === "" || v === undefined ? null : v), z.string().nullable()),
   merchantAddress: z.preprocess((v) => (v === "" || v === undefined ? null : v), z.string().nullable()),
   branchInfo: z.preprocess((v) => (v === "" || v === undefined ? null : v), z.string().nullable()),
@@ -43,8 +43,8 @@ export const receiptExtractionSchema = z.object({
   lineItems: z.array(receiptLineItemSchema),
 });
 
-export type ReceiptExtractionInput = z.input<typeof receiptExtractionSchema>;
-export type ReceiptExtractionValidated = z.infer<typeof receiptExtractionSchema>;
+type ReceiptExtractionInput = z.input<typeof receiptExtractionSchema>;
+type ReceiptExtractionValidated = z.infer<typeof receiptExtractionSchema>;
 
 export type ValidateReceiptExtractionResult =
   | { status: "accepted"; data: ReceiptExtractionValidated }
@@ -62,11 +62,11 @@ export type ValidateReceiptExtractionResult =
     }
   | { status: "rejected"; reason: string; zodErrors: string[] };
 
-export const LINE_TOTAL_REASON = "Line items total deviates from grand total beyond tolerance";
-export const NO_QTY_UP_REASON =
+const LINE_TOTAL_REASON = "Line items total deviates from grand total beyond tolerance";
+const NO_QTY_UP_REASON =
   "Line items present but quantity×unitPrice cannot be computed for any line (needs manual review)";
 
-export const NO_STRUCTURED_LINES_REASON =
+const NO_STRUCTURED_LINES_REASON =
   "No structured line items; Gemini/GPT extraction did not produce purchasable lines";
 
 export function isSoftLineItemReviewReason(reason: string | undefined): boolean {
@@ -104,7 +104,7 @@ function computeQtyUnitPriceSum(lineItems: ReceiptExtractionValidated["lineItems
 /**
  * Tolerance: max(1.00 TRY, 2% of totalAmount).
  */
-export function lineTotalTolerance(totalAmount: number): number {
+function lineTotalTolerance(totalAmount: number): number {
   return Math.max(1, 0.02 * totalAmount);
 }
 
@@ -175,7 +175,7 @@ export function validateReceiptExtraction(data: unknown): ValidateReceiptExtract
 }
 
 /** Normalize raw geminiLineItems / API blobs to objects Zod can parse. */
-export function normalizeRawLineItems(raw: unknown): Array<Record<string, unknown>> {
+function normalizeRawLineItems(raw: unknown): Array<Record<string, unknown>> {
   if (!Array.isArray(raw)) return [];
   const out: Array<Record<string, unknown>> = [];
   for (const it of raw) {

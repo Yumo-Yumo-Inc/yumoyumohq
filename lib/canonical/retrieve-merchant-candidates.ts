@@ -2,6 +2,8 @@ import crypto from "crypto";
 import { cacheRead } from "@/lib/cache/redis";
 import { db } from "@/lib/db/client";
 import { CacheTTL, CacheKeys } from "./cache-config";
+import { embedText, vecToPgvector } from "./embedding";
+import { embedTextForMerchant } from "./preprocess";
 
 export interface MerchantCandidate {
   id: string;
@@ -14,7 +16,7 @@ export interface MerchantCandidate {
   category: string | null;
   aliases: string[];
   score: number;
-  source: "token" | "trgm" | "phonetic";
+  source: "token" | "trgm" | "phonetic" | "embedding";
 }
 
 interface MerchantCandidateRow {
@@ -32,14 +34,19 @@ interface MerchantCandidateRow {
 }
 
 function cacheHash(
+  raw: string,
   contentTokens: string[],
   countryCode: string | null | undefined,
   phoneticKey: string
 ): string {
   const normalizedTokens = [...contentTokens].sort().join(",");
+  // raw is part of the key: a pure CJK/Thai name produces no ASCII tokens and
+  // no phonetic key, so without it every such query would share one cache slot.
   return crypto
     .createHash("sha1")
-    .update(`${normalizedTokens}|${countryCode ?? ""}|${phoneticKey}`)
+    .update(
+      `${raw.trim().toLowerCase()}|${normalizedTokens}|${countryCode ?? ""}|${phoneticKey}`
+    )
     .digest("hex");
 }
 
@@ -60,15 +67,49 @@ export async function retrieveMerchantCandidates(input: {
     limit = 10,
   } = input;
 
-  if (contentTokens.length === 0 && !phoneticKey && !legalStripped.trim()) {
+  // A pure CJK/Thai name yields no ASCII tokens, no phonetic key and an empty
+  // legal-strip — but embedding recall still works on the raw text, so only
+  // a genuinely empty input short-circuits.
+  if (
+    !input.raw.trim() &&
+    contentTokens.length === 0 &&
+    !phoneticKey &&
+    !legalStripped.trim()
+  ) {
     return [];
   }
 
   const key = CacheKeys.retrieveMerchant(
-    cacheHash(contentTokens, countryCode, phoneticKey)
+    cacheHash(input.raw, contentTokens, countryCode, phoneticKey)
   );
 
   return cacheRead(key, CacheTTL.retrieve, async () => {
+    // COST GATE: text strategies (token/trgm/phonetic — pure SQL, zero API
+    // calls) run first. A strong text hit answers most receipts; only weak or
+    // empty text results pay for a Gemini embedding call.
+    const textOnly = await runRetrievalQuery(null);
+    const bestText = textOnly[0]?.score ?? 0;
+    if (bestText >= 0.9) return textOnly;
+
+    // Embedding recall: the only strategy that can surface "7-Eleven" for the
+    // raw "7-11" or a cross-script sibling — text similarity never will.
+    // Query embeds the SAME text form the patterns were embedded from
+    // (embedTextForMerchant): raw-vs-normalized mismatch costs ~0.2 similarity.
+    // Recall-oriented threshold; the LLM decision layer filters precision.
+    let embVector: string | null = null;
+    try {
+      const vec = await embedText(embedTextForMerchant(input.raw, legalStripped));
+      if (vec) embVector = vecToPgvector(vec);
+    } catch {
+      /* embedding unavailable → text strategies only */
+    }
+    if (!embVector) return textOnly;
+    return runRetrievalQuery(embVector);
+  });
+
+  async function runRetrievalQuery(
+    embVector: string | null
+  ): Promise<MerchantCandidate[]> {
     const query = `
       WITH token_hits AS (
         SELECT
@@ -103,6 +144,15 @@ export async function retrieveMerchantCandidates(input: {
         WHERE $3 <> ''
           AND mp.phonetic_key = $3
       ),
+      embedding_hits AS (
+        SELECT
+          mp.merchant_id,
+          1 - (mp.embedding <=> ($7::text)::vector) AS score
+        FROM merchant_patterns mp
+        WHERE $7::text IS NOT NULL
+          AND mp.embedding IS NOT NULL
+          AND 1 - (mp.embedding <=> ($7::text)::vector) >= 0.60
+      ),
       merged AS (
         SELECT merchant_id, score, 'token'::text AS source
         FROM token_hits
@@ -113,6 +163,9 @@ export async function retrieveMerchantCandidates(input: {
         UNION ALL
         SELECT merchant_id, score, 'phonetic'::text AS source
         FROM phonetic_hits
+        UNION ALL
+        SELECT merchant_id, score, 'embedding'::text AS source
+        FROM embedding_hits
       ),
       dedup AS (
         SELECT
@@ -166,6 +219,7 @@ export async function retrieveMerchantCandidates(input: {
       ["candidate", "verified"],
       countryCode ?? null,
       limit,
+      embVector,
     ]);
 
     return rows.rows.map((row) => ({
@@ -181,5 +235,5 @@ export async function retrieveMerchantCandidates(input: {
       score: Number(row.score) || 0,
       source: row.source,
     }));
-  });
+  }
 }

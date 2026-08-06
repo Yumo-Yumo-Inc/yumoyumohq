@@ -10,7 +10,7 @@ Boru hattı, hataları kullanıcıya bakan mesajlardan ve defter etkisinden ayr�
 | Fiş eksik veya tutarsız | Kullanıcıya doğrulama/yeniden yükleme akışı gösterilir | Kayıt incelemeye veya reddedilmeye gider |
 | Kapsam dışı belge tipi | Kullanıcıya belge tipinin desteklenmediği bildirilir | Ödül muhasebesine kabul edilmez |
 | Tekrar veya çakışma şüphesi | Kullanıcıya mevcut kayıt gösterilebilir veya sessiz inceleme yapılır | Güven katmanı kararı belirler |
-| Eski veya iade fişi | Kullanıcıya uygun statü gösterilir | bINT yerine hafıza/ePoints etkisi oluşabilir |
+| Eski veya iade fişi | Kullanıcıya uygun statü gösterilir | Analitik geçmişini etkileyebilir bINT'i değil |
 | Sistem gecikmesi | Kullanıcıya bekleme veya yeniden deneme durumu gösterilir | İş olay kuyruğunda korunur |
 
 ## 2.11 Maliyet ve performans

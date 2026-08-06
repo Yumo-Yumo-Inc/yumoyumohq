@@ -9,11 +9,11 @@ Los runbooks internos, la lógica de alertas, la disposición de firmantes, el o
 | Clase | Superficie del protocolo | Principio de control público |
 |---|---|---|
 | Regulatorio | Procesamiento de datos, clasificación de tokens, impuestos y registro regional | Minimización de datos, política de publicación agregada, proceso legal por jurisdicción |
-| Token y mercado | Emisión, vesting, staking, BBB y liquidez de mercado secundario | Flujo de oferta basado en fórmula, vesting público, quema vinculada a ingresos |
+| Token y mercado | Emisión, vesting, staking, BBB y liquidez de mercado secundario | Flujo de oferta basado en fórmula, vesting público, política de tesorería |
 | Contrato inteligente | Autoridades de programa, emisión/quema de tokens, staking y movimiento de tesorería | Despliegue versionado, revisión independiente, separación de autoridad |
 | Producto y canalización | Lectura de documentos, extracción estructurada, capa de reglas y escritura de registro | Validación de esquema, adaptadores agnósticos de proveedor, visibilidad de estado |
 | Privacidad y datos | Contenido de recibo, historial de usuario, producto de datos agregado | Contenido fuera de la cadena, k-anonimato, acceso de ámbito de tarea |
-| Operacional | Custodia de autoridad, continuidad de servicios externos, latencia de red y manejo de incidentes | Clase de aprobación múltiple, rastro auditable, gobernanza escalonada |
+| Operacional | Custodia de autoridad, continuidad de servicios externos, vivacidad de red y manejo de incidentes | Clase de aprobación múltiple, rastro auditable, gobernanza escalonada |
 
 §8.2-§8.19 describen cada clase de riesgo a través del impacto técnico y el modelo de control público. §8.20-§8.21 resumen esas clases en una tabla. Los principios de control pertenecen al documento técnico; los detalles de implementación residen en la documentación de operaciones de seguridad.
 
@@ -21,9 +21,9 @@ Los runbooks internos, la lógica de alertas, la disposición de firmantes, el o
 
 ## Referencias cruzadas
 
-- Modelo operativo y localización progresiva → 00 §0.2.
+- Modelo operativo y cualquier transferencia futura de autoridad → 00 §0.2.
 - Modelo de estado de la canalización → 02 §2.9.
 - Conjunto de señales de la capa de confianza → 03 Capa de confianza.
 - Gobernanza de tesorería y migración de autoridad → 04 §4.10.
 - Modelo de privacidad del producto de datos → 05 §5.8.
-- Entradas del glosario: MiCA, k-anonimato, puntuación de salud → 09 Glosario.
+- Entradas del glosario: MiCA, k-anonimato, trust standing → 09 Glosario.

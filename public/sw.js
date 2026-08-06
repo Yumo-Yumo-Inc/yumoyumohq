@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v6";
 const STATIC_CACHE = `yumo-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `yumo-runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";
@@ -32,8 +32,10 @@ if (IS_DEV) {
         const keys = await caches.keys();
         await Promise.all(keys.map((key) => caches.delete(key)));
         await self.clients.claim();
-        const clients = await self.clients.matchAll({ type: "window" });
-        clients.forEach((client) => client.navigate(client.url));
+        // Do NOT navigate/reload open tabs here: navigate() re-triggers
+        // registration (pwa-init) which re-activates this handler → infinite
+        // reload loop hammering the dev server. Tabs pick up fresh code on
+        // their next natural navigation; caches are already gone.
         await self.registration.unregister();
       })()
     );

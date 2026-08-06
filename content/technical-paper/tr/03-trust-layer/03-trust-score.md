@@ -1,35 +1,28 @@
 # Güven puanı
 
-## 3.3 Fiş başına güven puanı
+## 3.3 Fiş başına kalite ve kullanıcı başına güven
 
-Bir fiş için güven puanı, sinyallerin ağırlıklı birleşiminden türetilen `[0, 1]` aralığında bir sayıdır. Yüksek olan iyidir. Puan, fiş kaydına (bkz. 05 §5.3) katkıda bulunan sinyallerin listesiyle birlikte yazılır.
+Güven, birbirine bağlı iki katmanda izlenir. Boru hattından çıkan her fiş bir **kalite değerlendirmesi** alır: katman, çıkarılan kaydın ne kadar eksiksiz olduğunu (işletme, tarih, saat, toplamlar, kalemler) ve fişin tutarlarının kendi içinde mutabık olup olmadığını kontrol eder. Değerlendirme, fiş için bir kalite kademesine çözülür. Bu kademe daha sonra aynı işleme geçişinde eşzamanlı güncellenen **birikimli kullanıcı güven duruşunu** besler: temiz, eksiksiz fiş akışı duruşu zamanla yükseltir; düşük kaliteli veya tutarsız yüklemeler onu yavaşlatır veya geri çevirir. Aşağı akış sistemler duruşu ham değerler yerine kademeler olarak tüketir.
 
 ### Sinyal aileleri
 
-Puan dört sinyal ailesinden yararlanır. Her aile bir veya daha fazla bireysel sinyal üretir; katman bunları nihai puana harmanlar.
+Mevcut sürümdeki kalite değerlendirmesi, tekrar tespitiyle (3.9) birlikte **kayıt eksiksizliği** ve **tutar mutabakatından** yararlanır. Aşağıdaki sinyal aileleri modeli genişletir ve **planlanmıştır**; mevcut sürümde aktif değildir:
 
-| Aile | Neyi gözlemler |
+| Aile (planlanan) | Neyi gözlemler |
 |---|---|
 | **Boru hattı güveni** | Yukarı akış boru hattının çıkarımdan ne kadar emin olduğu (OCR güveni, LLM güveni, kural katmanı mutabakatı). |
-| **Satıcı tutarlılığı** | Satıcı, şube ve fiş şablonunun bu satıcıdan daha önce gördüğümüzle eşleşip eşleşmediği. |
+| **İşletme tutarlılığı** | İşletme, şube ve fiş şablonunun bu işletmeden daha önce gördüğümüzle eşleşip eşleşmediği. |
 | **Zamansal makullük** | Fişin tarih, saat ve kullanıcının yükleme düzeninin normal davranışla tutarlı olup olmadığı. |
-| **Kullanıcı geçmişi** | Yuvarlanan bir pencereye kapsanmış kullanıcının yakın katkı kalitesi. |
+| **Kullanıcı geçmişi** | Yuvarlanan bir pencereye kapsanmış, kullanıcının yakın katkı kalitesi. |
 
-Her aile içinde bireysel sinyaller gözlemlenen değer ve katkı bayrağı (`signal_used` / `signal_skipped`) ile kaydedilir. Tam ağırlıklandırma, aile eşikleri ve atlama kuralları iç operasyon katmanında yönetilir.
+Tam puanlama bileşimi, kademe sınırları ve kademe başına etkiler iç operasyon katmanında yönetilir.
 
-### Puan bantları
+### Kalite kademeleri
 
-Nihai puan, aşağı akış kullanımı için bantlara bölünür:
-
-- **Yüksek** — fiş tam bINT kredisi için geçer.
-- **Orta** — fiş azaltılmış bINT kredisi için geçer. Kullanıcı doğrulanmış önizlemeyi ve bINT miktarını görür; akış doğrudan tamamlanır.
-- **Düşük** — fiş incelemeye tutulur (bkz. 3.7). Kullanıcıya kontrol edildiği söylenir.
-- **Ret** — fiş reddedilen duruma girer. Kullanıcı sade dille bir neden kategorisi görür.
-
-Bant sınırları periyodik olarak gözlemlenen sonuçlara karşı kalibre edilir ve iç operasyon katmanında yönetilir.
+Fiş başına değerlendirme, sıralı bir kalite kademesi kümesine çözülür. Yüksek kademeler eksiksiz, kendi içinde tutarlı fişleri yansıtır ve kullanıcının güven duruşunu daha çok güçlendirir; düşük kademeler seyrek veya tutarsız kayıtları yansıtır ve daha az katkı sağlar. Kademe tanımları ve tam etkileri üretimde kalibre edilir ve yayınlanmaz.
 
 ## 3.4 Fiş kaydı neyi taşır
 
-Fişin güven bloğu, katkıda bulunan sinyal ailelerini ve sonuç bandını listeler. Bireysel sinyal değerleri, ağırlıklar ve puan iç güven konfigürasyonunda kalır. Kullanıcıya bakan yüzey **sonucu** (bINT miktarı, tut, ret) ve uygun yerde **neden kategorisini** iletir.
+Fişin kalite bloğu, değerlendirilen kademeyi ve onu üreten eksiksizlik gözlemlerini kaydeder. Kademe sınırları ve kademe başına etkiler iç güven konfigürasyonunda kalır. Kullanıcıya bakan yüzey **sonucu** (bINT miktarı, ret) ve uygun yerde **neden kategorisini** iletir.
 
-Bu kasıtlıdır: açık bantlar kullanıcıya sonuç netliği sağlarken iç puanlar kalibrasyon yüzeyini korur.
+Bu kasıtlıdır: açık sonuçlar netlik sağlarken iç kalibrasyon değerleri kalibrasyon yüzeyini korur.

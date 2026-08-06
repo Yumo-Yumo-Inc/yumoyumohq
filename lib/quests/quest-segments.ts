@@ -109,7 +109,7 @@ export async function getUserSegment(username: string): Promise<UserSegment> {
   }
 }
 
-export async function getDifficultyFactor(username: string): Promise<number> {
+async function getDifficultyFactor(username: string): Promise<number> {
   const sql = getSql();
   if (!sql) return 1.0;
 

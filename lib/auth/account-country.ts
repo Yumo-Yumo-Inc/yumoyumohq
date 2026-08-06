@@ -22,7 +22,7 @@ export function setSessionAccountCountry(country: string | null): void {
 }
 
 /** Live account country from the server — never read from IndexedDB for this call. */
-export async function fetchAccountCountryFromApi(): Promise<string | null> {
+async function fetchAccountCountryFromApi(): Promise<string | null> {
   const response = await fetch("/api/auth/country", {
     credentials: "include",
     cache: "no-store",
@@ -39,6 +39,12 @@ export async function fetchAccountCountryFromApi(): Promise<string | null> {
 }
 
 export async function fetchAccountCountryWithRetry(): Promise<string | null> {
+  // Country is effectively immutable within a session: it only changes through
+  // the country-selector modal, which updates the in-memory value itself. Reuse
+  // it instead of re-hitting /api/auth/country on every profile refetch.
+  if (sessionAccountCountry) {
+    return sessionAccountCountry;
+  }
   for (let attempt = 0; attempt < COUNTRY_RETRY_ATTEMPTS; attempt++) {
     const country = await fetchAccountCountryFromApi();
     if (country) {

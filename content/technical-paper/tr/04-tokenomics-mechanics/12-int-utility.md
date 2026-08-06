@@ -2,31 +2,26 @@
 
 ## 4.27 Kullanım yüzeyi
 
-INT, Yumo Yumo protokolü içinde altı işlev taşır. İkisi aktiftir; dördü planlanmıştır ve protokol yüzeyi olgunlaştıkça etkinleşir.
+INT, Yumo Yumo protokolü içinde altı işlev taşır. Ödül işlevinin mutabakat ve talep altyapısı kuruludur, etkinleştirilmesi beklemededir; diğerleri planlanmıştır ve protokol yüzeyi olgunlaştıkça etkinleşir.
 
 | İşlev | Durum | Açıklama |
 |---|---|---|
-| **Ödül varlığı** | Aktif | Kullanıcılar, doğrulanmış Harcama İspatı katkıları için bINT → INT dönüşüm yaşam döngüsü (4.4) aracılığıyla INT kazanır |
-| **Staking varlığı** | TGE+1 haftada aktif | Sahipler, staking teşvik tahsisinden ödül kazanmak için INT'i kademe ağırlıklı staking havuzlarına (4.6) kilitler |
-| **Geri al ve yak hedefi** | Gelir başlangıcında aktif | Hazine, veri ürünü gelirini açık piyasadan INT satın almak ve yakmak (4.9) için kullanır; deflasyonist baskı yaratır |
+| **Ödül varlığı** | Altyapı tamam, etkinleştirme beklemede | Doğrulanmış katkılar şu anda bINT muhasebe katmanında (4.14) birikir. bINT → INT dönüşüm yaşam döngüsünün (4.4) mutabakat ve talep yolu kuruludur; zincir üstü INT dağıtımı Token Üretim Etkinliğiyle etkinleşir |
+| **Staking varlığı** | Planlanan | Staking etkinleştirilirse, sahipler INT'i kademe ağırlıklı staking havuzlarına (4.6) kilitleyebilir |
+| **Geri al ve yak** | Politika etkinleştirilirse | Hazine, yayımlanmış politika uyarınca INT satın alıp yakabilir (4.9) |
 | **Veri raporu yakımı** | Planlanan | Toplulaştırılmış topluluk veri raporlarına erişen işletmeler, rapor başına belirli miktarda INT yakmalıdır (4.30) |
 | **Yönetişim sinyali** | Planlanan | Veri ürünü öncelikleri, hazine tahsisleri ve ekosistem hibeleri üzerindeki kararlar için INT ağırlıklı sinyal |
 | **Bağlı API erişimi** | Planlanan | Anonimleştirilmiş veri ürünü API tüketicilerinin erişim anahtarlarına INT bağlaması gerekebilir |
 
-## 4.28 Gerçek getiri
+## 4.28 Hazine gelir politikası
 
-INT, gerçek getiri varlığı olarak tasarlanmıştır. Uzun vadeli değer yakalama, token emisyonundan değil, veri ürünü işinin ürettiği dış gelirden gelir.
+INT bir getiri, değer artışı veya fiyat desteği vaadi taşımaz. Veri ürünü veya başka bir faaliyetten gelir doğarsa, gelirin hazineye ayrılması, operasyonlarda kullanılması, staking teşviğine yönlendirilmesi veya geri al/yak için kullanılması ancak yayımlanmış bir politika ve gerekli hukuki inceleme sonrasında uygulanır.
 
-İki mekanizma platform gelirini token sahiplerine bağlar:
+Gelir tahsisi ve varsa staking teşviki; miktar, dönem, yetkili karar organı ve zincir üstü kayıtla birlikte yayımlanır. Gelecekteki gelir, yakım veya staking ödemeleri hakkında bu bölüm bir taahhüt oluşturmaz.
 
-1. **Staker getirisi.** Net veri ürünü gelirinin bir kısmı, INT stakerları tarafından pay ve kademe ağırlığıyla orantılı olarak talep edilebilen bir staker getiri havuzuna akar.
-2. **Geri al ve yak.** Net gelirin bir kısmı, hazine tarafından açık piyasadan INT satın almak ve kalıcı olarak yakmak için kullanılır.
+## 4.29 Olası gelir kaynakları
 
-Staker getirisi ile geri al ve yak arasındaki dağılım, 4.10'da açıklanan kontroller altında yönetilen bir hazine politikası parametresidir. Her iki akış da token emisyonuna değil, dış gelire bağlıdır. Bu ayrım, emisyonun (4.19) arzı öngörülebilir şekilde genişletirken, gerçek getirinin gerçek iş performansına dayalı olarak arzı sıkıştırması veya dağıtması anlamına gelir.
-
-## 4.29 Gelir kaynakları
-
-Gerçek getiri mekanizmasını besleyen gelir şu kaynaklardan gelir:
+Hazine politikasına konu olabilecek gelir kaynakları şunlardır:
 
 - **Anonimleştirilmiş veri satışları.** k-anonimleştirilmiş, toplulaştırılmış fiş düzeyinde veriler; FMCG markalarına, perakendecilere, araştırma firmalarına ve geliştiricilere kademeli API erişimi aracılığıyla satılır.
 - **Ortaklık ve referans geliri.** Perakendeci veya kupon ortaklarına fiyat karşılaştırma tıklamaları (planlanan).
@@ -36,11 +31,6 @@ Gelir üretimi ayrıntıları ve anonimleştirme mimarisi 05 Veri Şeması ve AP
 
 ## 4.30 Veri raporu yakımı
 
-Toplulaştırılmış topluluk veri raporları satın alan işletmelerin, ürettikleri her rapor için belirli miktarda INT yakması gerekir. Yakım zincir üstünde gerçekleşir ve kalıcıdır.
+Planlanan veri raporu erişim modeli, belirli rapor türleri için INT yakımını gerektirebilir. Böyle bir model etkinleştirilirse, yakım işlemi zincir üstünde kaydedilir ve rapor türü ile miktar yayımlanır.
 
-Bu mekanizma iki amaca hizmet eder:
-
-1. **Deflasyonist baskı.** Tüketilen her veri raporu, dolaşımdaki arzdan kalıcı olarak INT çıkarır; veri ürününün ticari benimsenmesiyle orantılı talep tarafı kıtlığı yaratır.
-2. **Değer hizalaması.** Yakım gerekliliği, veri ürününün faydasını doğrudan tokena bağlar. Daha fazla işletme Yumo Yumo verisini tükettikçe, dolaşımdan daha fazla INT çıkarılır ve platform kullanımı ile token değeri arasındaki ilişki güçlenir.
-
-Rapor başına yakım miktarı hazine politikası tarafından belirlenir ve rapor kademesine göre değişir (ör. kategori düzeyinde toplamlar ile tam sepet düzeyinde paneller). Fiyatlandırma yapısı, yakım maliyetinin veri ürününün ticari değerinin küçük bir kesri kalmasını sağlarken, arz üzerinde anlamlı birikimli etki üretmesini güvence altına alır.
+Yakım, dolaşımdaki INT miktarını azaltır; token fiyatı, değeri veya talebi için sonuç garanti etmez. Rapor başına yakım miktarı ancak ilgili hazine politikası ve ürün fiyatlandırması yayımlandığında geçerlilik kazanır.

@@ -3,17 +3,17 @@
  * These are starting points that get adjusted by trends and volatility
  */
 
-export type Country = "TR" | "TH";
+type Country = "TR" | "TH";
 export type Category = 
   | "restaurant" | "cafe" | "grocery" | "convenience" 
   | "fuel" | "fashion" | "electronics" | "pharmacy" | "services" | "utilities" | "other";
 
-export interface RateBounds {
+interface RateBounds {
   min: number;
   max: number;
 }
 
-export interface CategoryRates {
+interface CategoryRates {
   importSystemBaseRate: number;
   retailHiddenBaseRate: number;
   importSystemBounds: RateBounds;
@@ -24,7 +24,7 @@ export interface CategoryRates {
  * Base rates by country and category
  * These represent industry-average priors
  */
-export const baseRates: Record<Country, Record<Category, CategoryRates>> = {
+const baseRates: Record<Country, Record<Category, CategoryRates>> = {
   TR: {
     restaurant: {
       importSystemBaseRate: 0.08,
@@ -166,14 +166,14 @@ export const baseRates: Record<Country, Record<Category, CategoryRates>> = {
 /**
  * Get base rates for a country and category
  */
-export function getBaseRates(country: Country, category: Category): CategoryRates {
+function getBaseRates(country: Country, category: Category): CategoryRates {
   return baseRates[country]?.[category] || baseRates[country]?.other || baseRates.TR.other;
 }
 
 /**
  * Clamp a value to bounds
  */
-export function clampRate(value: number, bounds: RateBounds): number {
+function clampRate(value: number, bounds: RateBounds): number {
   return Math.max(bounds.min, Math.min(bounds.max, value));
 }
 

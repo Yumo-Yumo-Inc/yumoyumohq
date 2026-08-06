@@ -123,4 +123,4 @@ export async function runEurostatEtl(opts: {
   return summarizeRows(rows, written, dryRun);
 }
 
-export { SOURCE as EUROSTAT_SOURCE, EUROSTAT_COUNTRIES };
+;

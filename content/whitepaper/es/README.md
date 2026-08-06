@@ -16,13 +16,19 @@ La mayoría de los productos de finanzas personales actuales clasifican transacc
 
 Este marco reúne al lector general y al inversor dentro del mismo documento. Del lado público hace visibles el valor de uso, las superficies del producto y la memoria de precios. Del lado del inversor explica la economía abierta, la transparencia de parámetros, la calidad de la contribución, la propiedad de los datos y por qué los rieles Web3 ofrecen un terreno más sólido. La tesis de Yumo Yumo es sacar los datos de gasto cotidiano de ser solo un historial observado y convertirlos en una capa financiera viva.
 
+## Compañía y Misión
+
+Yumo Yumo es desarrollado por Yumo Yumo Inc., una corporación de Delaware en los Estados Unidos. La misión de la compañía es convertir los datos cotidianos de gasto en memoria financiera de propiedad del usuario, comprensible y portátil; luego conectar las señales anónimas de precios y cestas que emergen de esa memoria a una economía abierta de contribución.
+
+La visión de Yumo Yumo es comenzar en mercados emergentes y expandir las finanzas personales más allá de reportes estáticos hacia un sistema operativo financiero global construido sobre datos de gasto verificables, guía de Yumbie y rieles Web3 de larga duración.
+
 ```mermaid
 flowchart LR
     A["Gasto cotidiano"] --> B["Prueba de Gasto"]
     B --> C["Memoria viva de precios"]
     B --> D["Guía de Yumbie + identidad NFT Fundacional"]
     B --> E["Economía de contribución"]
-    E --> F["bINT y ePoints"]
+    E --> F["bINT"]
     F --> G["INT, staking y gobernanza"]
 ```
 

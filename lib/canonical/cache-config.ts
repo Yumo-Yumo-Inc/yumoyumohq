@@ -28,8 +28,11 @@ export const CacheTTL = {
   /** Embedding vector cache (paid) or lookup mapping (free) */
   embedding: PAID ? 30 * 86_400 : 7 * 86_400,
 
-  /** Retrieval candidate results (token+phonetic fingerprint hash) */
-  retrieve: PAID ? 30 * 60 : 10 * 60,
+  /** Retrieval candidate results (token+phonetic fingerprint hash).
+   *  Long TTL is a Gemini cost lever: a cache miss can trigger a query
+   *  embedding. Staleness is bounded — matched names land in the decision
+   *  cache anyway, and new patterns only matter for names not yet decided. */
+  retrieve: PAID ? 24 * 3_600 : 12 * 3_600,
 
   /** Hot merchant full-row cache (matchMerchant skip path) */
   hotMerchant: 3_600,
@@ -49,10 +52,13 @@ export const CacheTTL = {
  */
 export const CacheMode = {
   /**
-   * true: full 1536-d embedding vectors live in Redis (paid).
-   * false: only a text→canonical_id lookup mapping (free, ~50 bytes/key).
+   * true: full 1536-d embedding vectors live in Redis; false: only a
+   * text→canonical_id lookup mapping (~50 bytes/key). Enabled on every tier
+   * since the Gemini migration: live embed traffic is merchant-name queries
+   * only (product RAC is dormant), a bounded set of short texts — re-embedding
+   * them per serverless instance costs more than the Redis space they take.
    */
-  fullEmbeddingCache: PAID,
+  fullEmbeddingCache: true,
 
   /**
    * Hot merchant prewarm cron frequency.

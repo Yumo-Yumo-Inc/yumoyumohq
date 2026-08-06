@@ -1,24 +1,22 @@
-# B2B REST API
+# B2B API (planned)
 
-## 5.11 B2B REST API
+## 5.11 B2B API (planned)
 
-Separate base, separate auth, separate rate limits.
+The B2B data product's API is **planned future work**; no B2B endpoints are live today. B2B-relevant data currently reaches the outside world through the public price ledger (5.10) and its Arweave manifests.
 
-```
-Base: https://b2b-api.yumo.io/v1
-Auth: API key + authenticated requests with replay protection. The signing scheme and replay window are managed in the internal operations layer.
-Rate limit: tier-dependent · separate quota from public API
-```
+Design sketch for the planned surface — separate base path, separate credentials, separate quotas from the public API:
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/inflation-pulse` | TR Inflation Pulse series |
+| GET | `/inflation-pulse` | Inflation Pulse series |
 | GET | `/basket-panel` | Basket Panel query |
 | GET | `/merchant-benchmarks` | Merchant Benchmarks |
 | POST | `/cohort-query` | Custom cohort with k-floor enforcement |
 | GET | `/catalog` | Available products + freshness + pricing |
 | GET | `/methodology/{version}` | Methodology document for a given version |
 
-Every B2B response includes `methodology_version`, `k_anonymity_floor`, and the response's contributor count, so the buyer's compliance team can audit a release.
+Planned auth: API key with replay-protected request signing; the signing scheme and replay window stay in the internal operations layer.
+
+Every planned B2B response includes `methodology_version`, the k-anonymity floor indicator, and the response's contributor count, so the buyer's compliance team can audit a release.
 
 ---

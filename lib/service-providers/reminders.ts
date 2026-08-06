@@ -78,7 +78,7 @@ function lastDayOfMonth(year: number, month: number): number {
 }
 
 /** Next occurrence of `paymentDay` on or after the given calendar day. */
-export function nextDue(
+function nextDue(
   year: number,
   month: number,
   day: number,

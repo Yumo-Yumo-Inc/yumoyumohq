@@ -14,7 +14,7 @@ INT es un token SPL negociado en mercados públicos. El riesgo de mercado se lee
 
 **Curva de emisión basada en pico.** El pool diario de recompensas de usuario sigue la fórmula basada en pico definida en 04 §4.3. El crecimiento de MAU cambia la densidad de contribución por usuario a través de esa fórmula.
 
-**Quema vinculada a ingresos.** Los ingresos del producto de datos B2B crean la fuente económica para la recompra y quema de INT a través del rail de BBB (4.9). La capacidad de quema escala con los ingresos del producto de datos.
+**Quema financiada por tesorería.** Cualquier ejecución de recompra y quema a través del rail BBB (4.9) queda sujeta a la política de tesorería publicada, las aprobaciones aplicables y la revisión legal. No constituye un compromiso de recomprar o quemar INT.
 
 **Vesting y staking.** Las distribuciones de PoC siguen calendarios de vesting plurianuales (4.13). Los pools de staking y las duraciones de bloqueo hacen que la tenencia a largo plazo sea económicamente legible (4.6).
 

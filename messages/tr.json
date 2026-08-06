@@ -384,7 +384,7 @@
       },
       {
         "question": "Ödülleri nasıl kazanırım? Eğlenceli kısmı anlat!",
-        "answer": "İki yol var: ✨\n\ncPoints 🍪: Uygun gerçek hayat fişlerinden oluşan uygulama içi kayıtlar.\n\ncPoints 🎈: Uygun topluluk katkılarından (görevler) oluşan uygulama içi kayıtlar.\n\nBu kayıtlar transfer edilemez; gelecekte token programı açılırsa her claim uygunluk, güncel şartlar ve yasal kontrollerden geçer."
+        "answer": "İki yol var: ✨\n\npuan 🍪: Uygun gerçek hayat fişlerinden oluşan uygulama içi kayıtlar.\n\npuan 🎈: Uygun topluluk katkılarından (görevler) oluşan uygulama içi kayıtlar.\n\nBu kayıtlar transfer edilemez; gelecekte token programı açılırsa her claim uygunluk, güncel şartlar ve yasal kontrollerden geçer."
       },
       {
         "question": "YUMO token nedir? Aya mı gidiyor? 🚀",
@@ -448,7 +448,7 @@
       },
       {
         "title": "3. Burada neler yapabilirsin?",
-        "content": "Uygun fişlerini yükleyebilir, \"Harcama Kanıtı\" (PoE) ile gizli maliyetleri keşfedebilir, harcama içgörülerini görebilir ve uygunsan transfer edilemeyen cPoints uygulama içi kayıtları toplayabilirsin. Gelecekteki token özellikleri ayrı uygunluk ve şartlara tabidir."
+        "content": "Uygun fişlerini yükleyebilir, \"Harcama Kanıtı\" (PoE) ile gizli maliyetleri keşfedebilir, harcama içgörülerini görebilir ve uygunsan transfer edilemeyen puan kayıtlarını toplayabilirsin. Gelecekteki token özellikleri ayrı uygunluk ve şartlara tabidir."
       },
       {
         "title": "4. Fişler ve Senin Paylaştıkların",
@@ -457,7 +457,7 @@
       {
         "title": "5. Ödüller ve YUMO Token'lar",
         "content": [
-          "cPoints uygun faaliyete bağlı, transfer edilemeyen uygulama içi kayıtlardır.",
+          "Puanlar uygun faaliyete bağlı, transfer edilemeyen uygulama içi kayıtlardır.",
           "Bunlar token claim, airdrop, transfer, listeleme, nakit değer, kâr veya takas edilebilirlik garantisi vermez.",
           "YUMO, uygun uygulama işlevleri için planlanan bir utility token'dır; yatırım tavsiyesi, menkul kıymet teklifi veya \"köşeyi dönme bileti\" değildir.",
           "Uygunluk kuralları değişebilir. Dolandırıcılık, mükerrer faaliyet, yaptırım riski, yasal kısıt veya politika ihlalinde ödülleri durdurabilir, geri alabilir veya askıya alabiliriz. Vergi sorumluluğu sana aittir."
@@ -707,6 +707,41 @@
     }
   },
   "app": {
+    "contribute": {
+      "title": "Katkı Merkezi",
+      "subtitle": "Fişler ürün adlarını kısaltır. Ne aldığını sen bilirsin — adını koymaya yardım et.",
+      "meaning": "Tanımladığın her ürün, marketler arası gerçek fiyat karşılaştırmasını mümkün kılar.",
+      "stats": {
+        "impactEyebrow": "Katkın",
+        "receiptsFixed": "fiş düzeldi",
+        "identified": "tanımlandı",
+        "today": "Bugün"
+      },
+      "card": {
+        "appearsIn": "{count} fişte",
+        "question": "Bu hangi ürün?",
+        "other": "Diğer — yazayım",
+        "otherPlaceholder": "Ürün adını yaz…",
+        "otherSubmit": "Gönder",
+        "dontKnow": "Bilmiyorum"
+      },
+      "flash": {
+        "thanks": "Teşekkürler — kaydedildi",
+        "receiptsFixed": "fiş düzeldi",
+        "points": "puan"
+      },
+      "done": {
+        "emptyTitle": "Hepsini bitirdin",
+        "emptyBody": "Şu an tanımlanacak ürün yok. Fiş yükledikçe yenileri çıkar.",
+        "quotaTitle": "Bugünlük bu kadar",
+        "quotaBody": "Günlük sınıra ulaştın. Yarın devam et — ya da bir fiş tara.",
+        "scanCta": "Fiş tara"
+      },
+      "toast": {
+        "quotaReached": "Bugünkü sınıra ulaştın. Eline sağlık!",
+        "answerFailed": "Cevabın kaydedilemedi. Lütfen tekrar dene."
+      }
+    },
     "scanReveal": {
       "itemsRead": "{count} kalem okundu",
       "receiptRead": "Fiş okundu",
@@ -781,13 +816,13 @@
           "giveTip": "Bana ipucu ver",
           "showLastReceipt": "Son fişimi göster",
           "monthSpend": "Bu ay ne harcadım?",
-          "myCpoints": "Kaç cPoint'im var?",
+          "myPoints": "Kaç puanım var?",
           "whatsHere": "Bu sayfada ne var?",
           "help": "Bana yardım et"
         }
       },
       "daily": {
-        "yesterdayReceiptsPoints": "Dün {receipts} fiş ekledin, +{points} cPoint kazandın.",
+        "yesterdayReceiptsPoints": "Dün {receipts} fiş ekledin, +{points} puan kazandın.",
         "yesterdayReceipts": "Dün {receipts} fiş ekledin, eline sağlık.",
         "streak": "{days} gündür buradasın — birlikte iyi gidiyoruz.",
         "topCategory": "Bu ara en çok {label} rafını dolduruyorsun.",
@@ -831,7 +866,7 @@
         "pill": "Haftalık özet",
         "intro": "Haftanı birlikte gözden geçirelim.",
         "topCategory": "En çok {label}: %{pct}.",
-        "weekPoints": "Bu hafta +{points} cPoint kazandın.",
+        "weekPoints": "Bu hafta +{points} puan kazandın.",
         "streak": "{days} gündür buradasın — bu emek değerli.",
         "closing": "Güzel bir haftaydı. Yarın görüşürüz."
       },
@@ -877,8 +912,8 @@
         },
         "wallet": {
           "counting": "Kasa sayımı",
-          "collecting": "cPoints toplanıyor",
-          "picked": "cPoint alındı",
+          "collecting": "Puanlar toplanıyor",
+          "picked": "Puan alındı",
           "toVault": "Kasaya taşıyor",
           "stacking": "İstifleniyor…",
           "polishing": "Parayı parlatıyor"
@@ -918,7 +953,7 @@
         },
         "fx": {
           "plusReceipt": "+1 fiş",
-          "plusCPoint": "+1 cPoint",
+          "plusCPoint": "+1 puan",
           "archived": "arşivlendi",
           "plusTrend": "+eğilim",
           "scanFailed": "okunamadı"
@@ -1055,7 +1090,36 @@
       "quests": {
         "notActive": "⚠️ Aktif değil"
       },
-      "totalReceipts": "Toplam {count} fiş yüklediniz."
+      "totalReceipts": "Toplam {count} fiş yüklediniz.",
+      "genesisPatchNotes": {
+        "badge": "YENİ SEZON",
+        "duration": "4 hafta",
+        "title": "Genesis Sezonu başladı",
+        "subtitle": "Herkes seviye 1 ve sıfır bakiyeyle aynı çizgiden başlıyor. Eski katkın kayıtlı.",
+        "rewardPointsLabel": "Puan",
+        "rewardPointsHint": "Her fişte anında ödül",
+        "rewardXpLabel": "Deneyim",
+        "rewardXpHint": "Sezon merdivenine tırman",
+        "rule1Title": "Geçmişin güvende",
+        "rule1Desc": "Sezon puanın ve deneyimin sıfırdan başlar. Daha önce biriktirdiğin katkı puanların silinmez.",
+        "rule2Title": "Her fişte iki ödül",
+        "rule2Desc": "Ödüllü her taramada puan hemen görünür; deneyim seni sezon kademelerine taşır.",
+        "rule4Title": "Seviye yükseldikçe",
+        "rule4Desc": "Günlük deneyim hakkın değişmez. Seviye arttıkça fiş başına kazanabileceğin puan artar.",
+        "limitsTitle": "Günlük limitler",
+        "limitXpValue": "5 fiş",
+        "limitXpDesc": "Deneyim için",
+        "limitPointsValue": "Seviyene göre",
+        "limitPointsDesc": "Puan tavanı",
+        "limitFootnote": "6. ve sonraki fişler kaydedilir ve analiz edilir; o gün ödül gelmez.",
+        "tiersTitle": "Sezon kademeleri",
+        "tierSpark": "Kıvılcım",
+        "tierEmber": "Kor",
+        "tierFlame": "Alev",
+        "tierForge": "Ocak",
+        "dontShowAgain": "Bunu bir daha gösterme",
+        "cta": "Hadi başlayalım"
+      }
     },
     "receipts": {
       "title": "Fişler",
@@ -1214,10 +1278,10 @@
         "forgotPassword": "Şifremi unuttum",
         "resetSuccess": "Şifren güncellendi. Yeni şifrenle giriş yapabilirsin.",
         "noAccount": "Hesabın yok mu?",
-        "registerLink": "Kayıt ol"
+        "registerLink": "Kayıt ol",
+        "captchaLabel": "İnsan doğrulaması"
       },
       "register": {
-        "badge": "Korunan onboarding",
         "headline": "Yumo Yumo hesabını oluştur ve doğrulanmış bir profille başla.",
         "subheadline": "Hesabın, güvenli doğrulama, ülkeye duyarlı varsayılanlar ve uygulamaya temiz bir geçiş ile açılır.",
         "featureSecureTitle": "Botlara karşı koruma",
@@ -1256,11 +1320,13 @@
         "acceptTermsSuffix": "'nı okudum ve kabul ediyorum.",
         "acceptPrivacyPrefix": "",
         "acceptPrivacyLink": "KVKK Aydınlatma Metni",
-        "acceptPrivacySuffix": "'ni okudum."
+        "acceptPrivacySuffix": "'ni okudum.",
+        "invitedBy": "seni davet etti — ilk doğrulanan fişinle ikiniz de bonus kazanırsınız."
       },
       "verify": {
         "pendingTitle": "E-postanı doğrula",
-        "pendingBody": "Doğrulama linkini gelen kutuna gönderdik. Uygulamayı açmak için onayla.",
+        "pendingBody": "Doğrulama linkini {email} adresine gönderdik. Uygulamayı açmak için onayla.",
+        "pendingBodyFallback": "Doğrulama linkini gelen kutuna gönderdik. Uygulamayı açmak için onayla.",
         "pendingEmailFailedBody": "Hesabın oluştu fakat doğrulama e-postası otomatik gönderilemedi. Aşağıdaki butonla tekrar iste.",
         "verifiedTitle": "E-posta doğrulandı",
         "verifiedBody": "Hesabın artık doğrulandı. Doğrudan uygulamaya devam edebilirsin.",
@@ -1534,7 +1600,7 @@
         "reward": {
           "short": "Ödül",
           "title": "Ödülü hesaplıyoruz",
-          "sub": "Gizli maliyetleri cPoints’e cevirip sonucu tamamlıyoruz."
+          "sub": "Gizli maliyetleri puana cevirip sonucu tamamlıyoruz."
         }
       }
     },
@@ -1717,8 +1783,8 @@
     "rewards": {
       "title": "Ödüller",
       "description": "Hesap bakiyeleri ve işlem geçmişi",
-      "cPointsTotal": "Toplam cPoints",
-      "cPointsBreakdown": "cPoints Kirilimi",
+      "cPointsTotal": "Toplam puan",
+      "cPointsBreakdown": "Puan Kirilimi",
       "totalEarned": "Toplam Kazanç",
       "activity": "Aktivite Günlüğü",
       "receiptVerified": "Fiş doğrulandı",
@@ -1747,6 +1813,7 @@
       "hiddenCostLabel": "gizli maliyet",
       "uploadToRank": "Fiş yükleyerek sıralamaya gir.",
       "yourRank": "Senin sıran",
+      "prestigeBadge": "Prestij üyesi",
       "you": "Sen",
       "rank": "Sıra",
       "user": "Kullanıcı",
@@ -1756,10 +1823,10 @@
       "days": "gün",
       "badges": "Rozetler",
       "honor": "Onur",
-      "totalAyumo": "Toplam fis cPoints",
-      "totalRyumo": "Toplam gorev cPoints",
-      "totalAyumoAdminHint": "Bugune kadar kazanilan fis cPoints (sadece admin)",
-      "totalRyumoAdminHint": "Bugune kadar kazanilan gorev cPoints (sadece admin)",
+      "totalAyumo": "Toplam fis puani",
+      "totalRyumo": "Toplam gorev puani",
+      "totalAyumoAdminHint": "Bugune kadar kazanilan fis puani (sadece admin)",
+      "totalRyumoAdminHint": "Bugune kadar kazanilan gorev puani (sadece admin)",
       "error": "Lider tablosu yüklenemedi",
       "empty": "Lider tablosu verisi mevcut değil",
       "seasonLabel": "Sezon"
@@ -2189,6 +2256,7 @@
     "potentialReward": {
       "honorEffect": "Ödül oranı",
       "title": "Potansiyel Ödülünüz",
+      "pointsUnit": "puan",
       "potential": "(potansiyel)",
       "description": "Bu analiz sonucunda potansiyel ödülünüz hesaplandı.",
       "rewardNote": "Ödül tahmini hazır.",
@@ -2281,6 +2349,18 @@
       "mineAnother": "Yeni Fiş Analiz Et",
       "viewHistory": "Geçmişe Git",
       "totalPotential": "Potansiyel Ödül"
+    },
+    "restriction": {
+      "badge": "Hesap kısıtlı",
+      "title": "Fiş yükleme hakkınız geçici olarak sınırlandırıldı",
+      "body": "Hesabınızda, yükleme kurallarına aykırı belgeler tespit edildi.",
+      "perDay": "fiş / gün",
+      "endsLabel": "Kısıtlamanın bitişi",
+      "note": "Bu tarihten sonra hesabınız kendiliğinden normale döner. Yumo Yumo, farklı ülkelerden katkı veren herkes için aynı kuralları uygular.",
+      "acknowledge": "Anladım",
+      "appealPrefix": "Bir hata olduğunu düşünüyorsanız",
+      "appealLink": "bize yazın",
+      "close": "Kapat"
     }
   },
   "dashboard": {
@@ -2523,6 +2603,14 @@
     "deleteGoal": "Hedefi sil",
     "goalTarget": "Hedef {amount}",
     "addGoalButton": "Finansal hedef ekle",
+    "trustChecks": {
+      "image_quality": "Net görüntü",
+      "date_time": "Tarih & saat",
+      "total": "Toplam tutar",
+      "merchant": "İşyeri adı",
+      "verified_merchant": "Onaylı işyeri",
+      "ocr_confidence": "OCR güveni"
+    },
     "trustCard": {
       "title": "Fiş kalitesi",
       "desc": "Net fişler güven skorunu artırır ve daha iyi ödüller açar.",
@@ -2565,6 +2653,16 @@
     "tryNow": "Yolculuğunu gör",
     "later": "Sonra"
   },
+  "seasonComplete": {
+    "aria": "Sezon tamamlandı",
+    "kicker": "{name} · TAMAMLANDI",
+    "title": "Tebrikler!",
+    "rankLine": "{rank}. sıradasınız",
+    "xpLine": "{xp} sezon XP",
+    "rewardLine": "+{points} puan · {tier}",
+    "cta": "Devam",
+    "dismiss": "Kapat"
+  },
   "rewardsPage": {
     "journeyLink": "Kilit Yolculuğu",
     "journeyLinkDesc": "Kalıcı hesap merdivenin — 1'den 50'ye tüm kilitler",
@@ -2575,8 +2673,8 @@
     "totalProof": "Toplam kanıtlanmış katkın",
     "fromReceipts": "Fişlerden",
     "fromQuests": "Görevlerden",
-    "receiptCPoints": "Fiş cPoints",
-    "bonusCPoints": "Bonus cPoints",
+    "receiptCPoints": "Fiş puanı",
+    "bonusCPoints": "Bonus puan",
     "earnedFromReceipts": "Doğrulanan fişlerden kazanılır",
     "earnedFromQuests": "Tamamlanan görevlerden kazanılır",
     "nextUnlocks": "Sıradaki açılımlar",
@@ -2584,13 +2682,13 @@
     "reached": "✓ Ulaşıldı",
     "howYouEarn": "Nasıl kazanırsınız?",
     "earnReceiptLabel": "Fiş yükleme",
-    "earnReceiptDesc": "Season XP · Hesap XP · Katkı puanı · cPoints",
+    "earnReceiptDesc": "Season XP · Hesap XP · Puan",
     "earnVerifyLabel": "Doğrula ve kazan",
-    "earnVerifyDesc": "Başkalarının fişlerini doğrula → cPoints + Season XP kazan",
+    "earnVerifyDesc": "Başkalarının fişlerini doğrula → puan + Season XP kazan",
     "earnDailyLabel": "Günlük görevler",
-    "earnDailyDesc": "cPoints · Season XP",
+    "earnDailyDesc": "Puan · Season XP",
     "earnWeeklyLabel": "Haftalık görevler",
-    "earnWeeklyDesc": "Daha fazla cPoints · Season XP",
+    "earnWeeklyDesc": "Daha fazla puan · Season XP",
     "earnQualityLabel": "Yüksek kaliteli fişler",
     "earnQualityDesc": "Daha iyi ödül sonucu",
     "activity": "Aktivite",
@@ -2598,12 +2696,10 @@
     "receipts": "Fişler",
     "quests": "Görevler",
     "noActivity": "Henüz aktivite yok",
-    "invitesTitle": "Davet ettiklerin",
-    "invitesSubtitle": "Davet ettiğin kişilerin aktivitesi ve kazançları",
     "seasonRecap": "Bu sezon",
     "receiptsVerified": "Doğrulanan fiş",
     "questsCompleted": "Tamamlanan görev",
-    "cPointsEarned": "Kazanılan cPoints",
+    "cPointsEarned": "Kazanılan puan",
     "seasonXp": "Season XP",
     "currentLevel": "Mevcut seviye",
     "rewardBoost": "Ödül çarpanı",
@@ -2620,7 +2716,22 @@
     "claiming": "Talep ediliyor…",
     "claimDone": "Talep edildi",
     "claimOpensAtTge": "Talep TGE ile açılır",
-    "claimWalletMismatch": "Bağlı cüzdan bu tahsisin cüzdanından farklı. Talep için tahsis cüzdanını bağlayın."
+    "claimWalletMismatch": "Bağlı cüzdan bu tahsisin cüzdanından farklı. Talep için tahsis cüzdanını bağlayın.",
+    "leaderboardTitle": "Sıralama",
+    "leaderboardTabGenesis": "Genesis",
+    "leaderboardTabAlpha": "Alpha",
+    "leaderboardPoints": "puan",
+    "leaderboardYou": "Sen",
+    "leaderboardGenesisSubtitle": "Genesis sezonu canlı sıralaması — fiş ve görevlerden gelen sezon XP'sine göre.",
+    "leaderboardGenesisFinalSubtitle": "Genesis final sıralaması — resmi kapanış anlık görüntüsü.",
+    "leaderboardAlphaSubtitle": "Donmuş Early Alpha sıralaması — Genesis öncesi katkının kalıcı kaydı.",
+    "leaderboardEmpty": "Henüz katılım yok.",
+    "leaderboardLeader": "Lider",
+    "leaderboardLive": "Canlı",
+    "leaderboardFrozen": "Donmuş",
+    "leaderboardYourRank": "Senin konumun",
+    "leaderboardYouLead": "Sezonun lideri sensin",
+    "leaderboardToPass": "{name} adlı kişiyi geçmene {points} puan"
   },
   "notificationsPage": {
     "eyebrow": "GELEN KUTUSU",
@@ -2767,9 +2878,12 @@
   },
   "rewardCard": {
     "title": "Potansiyel Ödül",
-    "subtitle": "Bu fişten kazanılan cPoints",
-    "totalPoints": "Kazanılan cPoints",
-    "calculating": "cPoints hesaplanıyor…",
+    "subtitle": "Bu fişten kazandığın puan",
+    "totalPoints": "Kazanılan puan",
+    "pointsUnit": "puan",
+    "calculating": "Hesaplanıyor…",
+    "calculatingXp": "XP hesaplanıyor…",
+    "xpDailyLimit": "Günlük XP limiti doldu — bugün sonraki fişler XP kazandırmaz.",
     "receipt": "Fiş",
     "quest": "Görev",
     "honorBonus": "Onur Bonusu 1,2x uygulandı",
@@ -2780,10 +2894,27 @@
     "appliedLimits": "Uygulanan limitler:",
     "partial": {
       "title": "Ödeme doğrulandı — şimdilik ödülün {pct}% kadarı",
-      "fullEstimate": "Kalemli fiş yüklendiğinde tahmini tam ödül: {amount} cPoints",
+      "fullEstimate": "Kalemli fiş yüklendiğinde tahmini tam ödül: {amount} puan",
       "followUp": "Ödülün geri kalanını almak için ürün kalemlerinin listelendiği kasa fişini yükleyin.",
       "uploadCta": "Kasa fişi yükle",
-      "ceiling": "Şu an {current} cPoints kazandın — kalemleri tamamlarsan {full} cPoints'e kadar çıkabilir."
+      "ceiling": "Şu an {current} puan kazandın — kalemleri tamamlarsan {full} puana kadar çıkabilir."
+    },
+    "breakdown": {
+      "toggle": "Bu puan nasıl hesaplandı?",
+      "hide": "Hesabı gizle",
+      "title": "Puan dökümü",
+      "base": "Temel ödül (gizli maliyet payı)",
+      "scanBonus": "Tarama bonusu",
+      "firstScanOfDay": "Günün ilk fişi",
+      "itemized": "Kalemli fiş",
+      "streak": "Günlük seri",
+      "cpi": "Enflasyon (CPI) çarpanı",
+      "seasonLevel": "Sezon seviyesi",
+      "honor": "Hesap sağlığı uygulandı",
+      "cap": "Ödül tavanı uygulandı",
+      "total": "Toplam puan",
+      "capNote": "Bir ödül tavanı uygulandığı için toplam, ham çarpımdan düşük kaldı.",
+      "honorNote": "Hesap sağlığın bu ödülü ölçekledi."
     },
     "itemizedDialog": {
       "title": "Kalemli kasa fişi",
@@ -2818,6 +2949,7 @@
       "amount_inconsistent": "Toplam tutar, listelenen kalemlerle uyuşmuyor; bu yüzden ödül beklemede. Tutarı kontrol edip yanlışsa düzeltin.",
       "duplicate_same_user": "Bu fişi daha önce yüklediniz. Yinelenen fişler ödül kazandırmaz.",
       "duplicate_other_user": "Bu fiş daha önce yüklenmiş. Yinelenen fişler ödül kazandırmaz.",
+      "cancelled_receipt": "Bu bir iptal fişi; tamamlanmış bir harcama olmadığı için ödül kazanmaz.",
       "generic": "Bu belge ödülsüz olarak kaydedildi."
     }
   },
@@ -2841,5 +2973,133 @@
     "successToast": "Teşekkürler — seçiminiz incelenecek.",
     "errorToast": "Gönderilemedi. Lütfen tekrar deneyin.",
     "reviewNote": "Seçiminiz incelemeye gider ve onaylandıktan sonra uygulanır."
+  },
+  "weeklyLedger": {
+    "eyebrow": "HAFTALIK DEFTER",
+    "closed": "Kapanmış defter",
+    "loading": "Defter açılıyor…",
+    "error": "Defter açılamadı. Lütfen tekrar deneyin.",
+    "archetype": {
+      "night_shift": {
+        "title": "Gece Vardiyası Haftası",
+        "line": "Fişlerin hava karardıktan sonra gelmeye devam etti."
+      },
+      "early_bird": {
+        "title": "Erken Mesai Haftası",
+        "line": "Kasalar seni dokuzdan önce duydu."
+      },
+      "single_fort": {
+        "title": "Tek Kale Haftası",
+        "line": "Haftanın yükünü tek bir yer taşıdı."
+      },
+      "explorer": {
+        "title": "Kâşif Haftası",
+        "line": "Paran bu hafta alışılmıştan çok yere uğradı."
+      },
+      "weekend_run": {
+        "title": "Hafta Sonu Koşusu",
+        "line": "Bu hafta kendini cumartesi ile pazara sakladı."
+      },
+      "category_week": {
+        "title": "{category} Haftası",
+        "line": "Haftanın tonunu tek bir reyon belirledi."
+      },
+      "steady_log": {
+        "title": "Düzenli Kayıt",
+        "line": "Baştan sona kaydedilmiş bir hafta."
+      }
+    },
+    "section": {
+      "volume": "Hacim",
+      "entries": "Defter kayıtları",
+      "reveal": "İfşa",
+      "moment": "An",
+      "wildcard": "Haftanın bulgusu",
+      "items": "Sepetin öne çıkanları",
+      "rewards": "Final",
+      "outlook": "İleri bakış"
+    },
+    "entries": {
+      "more": "+{count} fiş daha"
+    },
+    "items": {
+      "times": "{count}×"
+    },
+    "volume": {
+      "receipts": "{count} fiş",
+      "captured": "harcama kanıtı olarak kaydedildi",
+      "aboveAvg": "Kendi üç haftalık temponun %{pct} üstünde.",
+      "belowAvg": "Kendi üç haftalık temponun %{pct} altında.",
+      "onPace": "Kendi üç haftalık temponla aynı çizgide.",
+      "noBaseline": "Kayıtlı ilk haftan — çizgi buradan başlıyor.",
+      "places": "{count} yer",
+      "priorWeeks": "Son dört hafta yan yana"
+    },
+    "reveal": {
+      "lead": "Bu hafta ödediğin {total} içinden",
+      "trail": "üreticiye ulaşmadan sistemde kaldı.",
+      "note": "Vergiler, marjlar ve aradaki katmanlar — kendi fişlerinden okundu.",
+      "vat": "Haftanın fişlerinde yazılı KDV: {vat}"
+    },
+    "moment": {
+      "title": "Haftanın en büyük sepeti"
+    },
+    "wildcard": {
+      "price_repeat_up": "{item} — önceki alımda {prev} ödemiştin ({date}); bu hafta {now} yazdı.",
+      "price_repeat_down": "{item} — önceki alımda {prev} ({date}); bu hafta {now}'a indi.",
+      "night_share": "haftalık harcamanın hava karardıktan sonra yapılan payı ({count} fiş).",
+      "loyalty": "{merchant} bu hafta seni {visits} kez gördü — toplam {total}.",
+      "category_pulse_up": "{category} kendi üç haftalık ortalamasının üstünde seyretti.",
+      "category_pulse_down": "{category} kendi üç haftalık ortalamasının altında seyretti."
+    },
+    "rewards": {
+      "points": "puan",
+      "pointsLine": "bu haftanın fişlerinden kazanıldı",
+      "xp": "{xp} sezon XP",
+      "quests": "{count} görev tamamlandı",
+      "level": "Sezon seviyesi {level}"
+    },
+    "outlook": {
+      "line": "Bu tempoyla ay şu civarda kapanır:",
+      "soFar": "Bu ay şu ana dek {amount} kaydedildi.",
+      "cta": "Tam analizi aç"
+    },
+    "single": {
+      "intro": "Bu haftayı tek fiş taşıdı — defter de onun tamamını okudu.",
+      "hiddenLead": "Bu {total} içinden",
+      "hiddenTrail": "sistemde kaldı.",
+      "items": "Sepetin içi"
+    },
+    "empty": {
+      "title": "Sakin bir hafta",
+      "body": "Bu hafta kayıtlı fiş yok. Defter bir sonraki taramanla yeniden açılır."
+    },
+    "locked": {
+      "title": "Haftalık Defter {level}. seviyede açılır",
+      "body": "Her pazartesi bir önceki haftan tek raporda mühürlenir: ne ödedin, ne gizli kaldı, ne kazandın. Şu an {current}. seviyedesin.",
+      "cta": "Yolculuğa bak"
+    },
+    "nav": {
+      "prev": "Önceki hafta",
+      "next": "Sonraki hafta"
+    },
+    "category": {
+      "groceries": "Market & Gıda",
+      "restaurant": "Yeme & İçme",
+      "alcohol": "İçki",
+      "fuel": "Ulaşım & Yakıt",
+      "apparel": "Giyim & Moda",
+      "cosmetics": "Kişisel Bakım",
+      "electronics": "Elektronik",
+      "home": "Ev & Yaşam",
+      "tobacco": "Tütün",
+      "pharmacy": "Sağlık",
+      "services": "Hizmetler",
+      "hospitality": "Konaklama",
+      "sports": "Spor",
+      "pets": "Evcil Hayvan",
+      "baby": "Bebek & Çocuk",
+      "other": "Diğer"
+    }
   }
 }

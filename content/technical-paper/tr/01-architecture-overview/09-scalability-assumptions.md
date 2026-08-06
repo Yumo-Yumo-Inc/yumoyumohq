@@ -12,6 +12,7 @@ Bu bölüm kapasiteyi iş yükü değişkenleriyle ifade eder. Mimari; kullanıc
 | `L` | Fiş başına ortalama satır kalemi |
 | `v` | Ödüle uygun doğrulanmış fiş oranı |
 | `e` | Fiş başına ortalama olay kaydı |
+| `p` | PDF olarak gönderilen fiş oranı (OCR yolu) |
 | `ρ_ocr` | OCR yeniden deneme oranı |
 | `ρ_llm` | LLM yeniden deneme veya öz-tutarlılık oranı |
 | `B` | Zincir üstü mutabakat yığın boyutu |
@@ -31,7 +32,7 @@ Rows_m ≈ 30 × R_d × (1 + L + e)
 Günlük model çağrısı hacmi:
 
 ```text
-OCR_d ≈ R_d × (1 + ρ_ocr)
+OCR_d ≈ R_d × p × (1 + ρ_ocr)
 LLM_d ≈ R_d × (1 + ρ_llm)
 ```
 
@@ -39,7 +40,7 @@ Günlük ödül ve mutabakat hacmi:
 
 ```text
 Verified_d ≈ R_d × v
-Onchain_yığınes_d ≈ ceil(Verified_d / B)
+Onchain_batches_d ≈ ceil(Verified_d / B)
 ```
 
 Günlük değişken maliyet modelinin açık formu:

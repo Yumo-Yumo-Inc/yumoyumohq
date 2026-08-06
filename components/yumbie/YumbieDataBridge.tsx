@@ -147,8 +147,9 @@ export function YumbieDataBridge() {
       streak: src.streak,
       bond: src.bond,
       recentReceipts: src.recentReceipts,
+      activeToday: src.ready ? src.activeToday : null,
     });
-  }, [src.cPoints, src.streak, src.bond, src.recentReceipts]);
+  }, [src.cPoints, src.streak, src.bond, src.recentReceipts, src.ready, src.activeToday]);
 
   // Phase 3 — load the user's existing soft caps (server truth)
   useEffect(() => {

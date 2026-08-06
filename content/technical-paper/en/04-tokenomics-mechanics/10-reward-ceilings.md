@@ -14,9 +14,9 @@ Each user has a daily bINT budget that caps the total reward earned across all r
 
 Once a user's daily total reaches the ceiling, additional receipts are processed and recorded but produce no incremental bINT for that day. The ceiling resets at UTC midnight. These values are overridable through configuration per level and are re-tuned as the user base grows and the level distribution evolves.
 
-## 4.23 Target architecture: formula-based ceiling
+## 4.23 Target architecture: formula-based ceiling (planned)
 
-The long-term ceiling model replaces the flat per-level table with a continuous formula:
+This model is planned and not active in the current release; today the daily ceiling is set by the per-level tables (4.22), and health acts on the per-receipt reward rate (03 §3.5). The long-term ceiling model replaces the flat per-level table with a continuous formula:
 
 ```
 effective_daily_ceiling = base_cap × level_multiplier × health_score
@@ -32,4 +32,4 @@ Under this model, a low-level user with neutral health earns a fraction of the b
 
 ### Transition path
 
-The MVP table and the target formula coexist during the pre-TGE and early post-TGE phases. The MVP table provides deterministic, easily auditable ceilings during the period when the health scoring system and level distribution are still maturing. The formula-based model activates when the trust layer's health and level signals reach sufficient calibration depth. The transition is a protocol configuration change, not a smart-contract migration.
+The MVP table is the active model through the pre-TGE and early post-TGE phases. It provides deterministic, easily auditable ceilings during the period when the health scoring system and level distribution are still maturing. The formula-based model activates when the trust layer's health and level signals reach sufficient calibration depth. The transition is a protocol configuration change, not a smart-contract migration.

@@ -16,7 +16,7 @@ export function composeAwarenessLine(a: YumbieAwareness, { t }: I18n): string {
   return t("yumbie.insight.flat", { label: a.label });
 }
 
-export function roundFriendly(v: number): number {
+function roundFriendly(v: number): number {
   if (v <= 0) return 0;
   const mag = Math.pow(10, Math.floor(Math.log10(v)));
   const step = mag >= 1000 ? 500 : mag >= 100 ? 100 : 50;

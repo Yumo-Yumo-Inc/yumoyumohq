@@ -16,7 +16,7 @@ flowchart LR
 
     subgraph Data["Datos fuera de la cadena"]
         E[("Registros de recibos")]
-        F[("Libro mayor bINT / ePoints")]
+        F[("bINT ledger")]
         G["Agregados anonimizados"]
     end
 
@@ -30,9 +30,9 @@ flowchart LR
     D --> E
     D --> F
     E --> G
-    F -. "liquidación por lotes" .-> H
+    F -. "raíz de distribución por época" .-> H
     F -. "compromiso" .-> J
     H --> I
 ```
 
-El mapa muestra el límite de la arquitectura pública: la vista previa orientada al usuario es sincrónica; la contabilidad de bINT y ePoints se escribe primero en el libro mayor y luego se liquida por lotes a la capa en cadena por los workers de liquidación. El diagrama se centra en los componentes del protocolo y el movimiento de datos.
+El mapa muestra el límite de la arquitectura pública: la vista previa orientada al usuario es sincrónica, mientras que la contabilidad de bINT permanece fuera de la cadena. Los workers de liquidación publican en la capa en cadena una raíz de distribución de INT derivada de los créditos bINT elegibles. El diagrama se centra en los componentes del protocolo y el movimiento de datos.

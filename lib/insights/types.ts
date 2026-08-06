@@ -7,7 +7,7 @@ import type { IncomeBandKey } from "@/config/income-bands";
 export type ConfidenceLevel = "verified" | "low" | "rejected";
 
 /** Per-category budget progress for the current month (Plan tab + radar). */
-export interface BudgetUsageEntry {
+interface BudgetUsageEntry {
   category: string;
   limit: number;
   spent: number;
@@ -16,22 +16,22 @@ export interface BudgetUsageEntry {
 }
 
 /** Client-side anomaly / behavior signal for radar cards. */
-export interface AnomalySignal {
+interface AnomalySignal {
   id: string;
   severity: RadarSeverityLevel;
   title: string;
   detail: string;
 }
 
-export type RadarSeverityLevel = "info" | "warning" | "alert";
+type RadarSeverityLevel = "info" | "warning" | "alert";
 
-export type IncomeRatioAlertKind =
+type IncomeRatioAlertKind =
   | "overall_over"
   | "needs_over"
   | "wants_over"
   | "low_savings";
 
-export interface IncomeRatioAlert {
+interface IncomeRatioAlert {
   id: string;
   kind: IncomeRatioAlertKind;
   severity: RadarSeverityLevel;
@@ -40,7 +40,7 @@ export interface IncomeRatioAlert {
   metric: number;
 }
 
-export interface IncomeRatioSummary {
+interface IncomeRatioSummary {
   incomeMidpoint: number;
   currency: string;
   monthlySpend: number;
@@ -60,7 +60,7 @@ export interface IncomeRatioSummary {
 }
 
 /** Normalized subscription row for insights UI (monthly-equivalent amounts). */
-export interface SubscriptionSummary {
+interface SubscriptionSummary {
   merchantName: string;
   monthlyAmount: number;
   annualAmount: number;
@@ -71,11 +71,11 @@ export interface SubscriptionSummary {
   category?: string;
 }
 
-export interface ImpulseScoreSnapshot {
+interface ImpulseScoreSnapshot {
   score: number;
 }
 
-export interface MonthSpendForecast {
+interface MonthSpendForecast {
   overBudgetRisk: number;
   projectedMonthEnd: number;
 }
@@ -115,7 +115,7 @@ export interface MerchantStats {
   transparencyScore?: number;
 }
 
-export interface CategoryStats {
+interface CategoryStats {
   category: string;
   receiptCount: number;
   totalHiddenCostCore: number;

@@ -20,17 +20,17 @@ import { shouldExcludeLineItem, buildUserNameFolds, isCategoryNameItem } from ".
 import { isJunkMerchantName, merchantGroupKey } from "./merchant-name-filter";
 
 /** Maximum number of products shown in the Insights "top products" list. */
-export const TOP_PRODUCTS_LIMIT = 10;
+const TOP_PRODUCTS_LIMIT = 10;
 /** Maximum number of slices shown in the category distribution. */
-export const CATEGORY_LIMIT = 10;
+const CATEGORY_LIMIT = 10;
 /** Maximum number of merchants shown in the "places you visit most" list. */
-export const MERCHANT_LIMIT = 10;
+const MERCHANT_LIMIT = 10;
 /** Maximum number of brands shown in the "favorite brands" list. */
-export const BRAND_LIMIT = 10;
+const BRAND_LIMIT = 10;
 
 export type Range = "7d" | "30d" | "90d" | "all";
 
-export interface Totals {
+interface Totals {
   currency: string;
   totalSpend: number;
   receiptCount: number;
@@ -41,7 +41,7 @@ export interface Totals {
   deltaBasketAbs: number;
 }
 
-export interface CategorySlice {
+interface CategorySlice {
   key: string;
   label: string;
   amount: number;
@@ -50,7 +50,7 @@ export interface CategorySlice {
   color: string;
 }
 
-export interface ProductRow {
+interface ProductRow {
   name: string;
   brand: string;
   receiptCount: number;
@@ -62,7 +62,7 @@ export interface ProductRow {
   categoryKey?: string;
 }
 
-export interface MerchantTile {
+interface MerchantTile {
   name: string;
   category: string;
   visits: number;
@@ -73,9 +73,21 @@ export interface MerchantTile {
   domain?: string;
   logoUrl?: string;
   timeline?: number[];
+  /** Receipt ids in this merchant group — resolves the tile's rows in Bucket.receipts. */
+  receiptIds: string[];
 }
 
-export interface BrandRow {
+/** One of the user's real receipts, for category/merchant detail lists. */
+interface InsightReceiptRow {
+  id: string;
+  date: string; // ISO YYYY-MM-DD
+  merchant: string;
+  category: string;
+  total: number;
+  itemCount: number;
+}
+
+interface BrandRow {
   name: string;
   hint: string;
   amount: number;
@@ -91,7 +103,12 @@ export interface Bucket {
   brands: BrandRow[];
   heatmap: number[][];
   sparkline: number[];
+  /** The range's receipts (newest first, capped) — source for detail lists. */
+  receipts: InsightReceiptRow[];
 }
+
+/** Cap on receipts shipped to the client for detail lists. */
+const RECEIPT_LIST_LIMIT = 400;
 
 export interface LineItemRow {
   name: string;
@@ -229,16 +246,18 @@ function buildMerchants(cur: ReceiptSummary[], days: number, logoByName: Map<str
     category: string;
     dates: string[];
     nameCounts: Map<string, number>;
+    receiptIds: string[];
   }
   const byGroup = new Map<string, Acc>();
   for (const r of cur) {
     const name = r.merchantName || "";
     if (isJunkMerchantName(name)) continue;
     const key = merchantGroupKey(name) || name.toLowerCase();
-    const a: Acc = byGroup.get(key) ?? { visits: 0, total: 0, category: r.category || "other", dates: [], nameCounts: new Map<string, number>() };
+    const a: Acc = byGroup.get(key) ?? { visits: 0, total: 0, category: r.category || "other", dates: [], nameCounts: new Map<string, number>(), receiptIds: [] };
     a.visits += 1;
     a.total += r.totalPaid || 0;
     a.dates.push(r.date);
+    a.receiptIds.push(r.id);
     a.nameCounts.set(name, (a.nameCounts.get(name) ?? 0) + 1);
     byGroup.set(key, a);
   }
@@ -265,6 +284,7 @@ function buildMerchants(cur: ReceiptSummary[], days: number, logoByName: Map<str
       t.visits += shortAcc.visits;
       t.total += shortAcc.total;
       t.dates.push(...shortAcc.dates);
+      t.receiptIds.push(...shortAcc.receiptIds);
       for (const [n, c] of shortAcc.nameCounts) t.nameCounts.set(n, (t.nameCounts.get(n) ?? 0) + c);
       byGroup.delete(shortKey);
     }
@@ -306,6 +326,7 @@ function buildMerchants(cur: ReceiptSummary[], days: number, logoByName: Map<str
       initial: name.charAt(0).toUpperCase(),
       logoUrl: logoByName.get(name),
       timeline,
+      receiptIds: a.receiptIds,
     });
     idx++;
   }
@@ -433,5 +454,24 @@ export function buildBucket(args: {
     brands: buildBrands(items, userNameFolds),
     heatmap: buildHeatmap(current),
     sparkline: buildSparkline(current, days),
+    receipts: buildReceiptRows(current, items),
   };
+}
+
+function buildReceiptRows(cur: ReceiptSummary[], items: LineItemRow[]): InsightReceiptRow[] {
+  const itemCountByReceipt = new Map<string, number>();
+  for (const it of items) {
+    itemCountByReceipt.set(it.receiptId, (itemCountByReceipt.get(it.receiptId) ?? 0) + 1);
+  }
+  return cur
+    .map((r) => ({
+      id: r.id,
+      date: r.date,
+      merchant: r.merchantName || "",
+      category: r.category || "other",
+      total: Math.round(r.totalPaid || 0),
+      itemCount: itemCountByReceipt.get(r.id) ?? 0,
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, RECEIPT_LIST_LIMIT);
 }

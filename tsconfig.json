@@ -46,10 +46,8 @@
     "yumo-contracts",
     "scripts",
     "outputs",
-    "cattest.mts",
-    "mttest.mts",
-    "split-check.mts",
-    "verify-logs.mts",
+    "tooling",
+    "tools",
     "*.mjs"
   ]
 }

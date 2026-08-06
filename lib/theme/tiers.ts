@@ -3,7 +3,7 @@
  * Seed → Immortal. Used for ThemeBg, ThemeCard, Sidebar, TopBar, BottomNav. Names are always English.
  */
 
-export interface BlobSpec {
+interface BlobSpec {
   x: number;
   y: number;
   rx: number;
@@ -45,7 +45,7 @@ export interface TierTheme {
   vignetteLight?: number;
 }
 
-export const TIERS: TierTheme[] = [
+const TIERS: TierTheme[] = [
   {
     name: "Seed",
     range: "1–9",

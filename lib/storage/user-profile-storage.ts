@@ -30,6 +30,18 @@ export interface UserProfile {
   country?: string;
   website?: string;
   bio?: string;
+  /** Name-color cosmetic palette key (account-level-4 unlock). null = no override. */
+  nameColor?: string | null;
+  /** Profile-frame cosmetic key (avatar-ring unlocks). null = no frame. */
+  profileFrame?: string | null;
+  /** Theme-accent cosmetic key (app accent override, L9+). null = brand accent. */
+  themeAccent?: string | null;
+  /** Profile-background cosmetic key (identity hero backdrop, L40). null = default. */
+  profileBg?: string | null;
+  /** Avatar-sticker cosmetic key (emoji on avatar corner, L14). null = none. */
+  avatarSticker?: string | null;
+  /** Proof-of-Expense seal cosmetic key (season-exclusive stamp on receipts). null = none. */
+  seal?: string | null;
 }
 
 // In-memory storage fallback (for Vercel without database)
@@ -93,6 +105,9 @@ async function ensureUserProfilesTable(): Promise<boolean> {
         country VARCHAR(255),
         website VARCHAR(255),
         bio TEXT,
+        name_color VARCHAR(32),
+        profile_frame VARCHAR(32),
+        theme_accent VARCHAR(32),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -149,6 +164,24 @@ async function ensureUserProfileColumns(): Promise<void> {
   if (!existing.has("bio")) {
     await sql`ALTER TABLE user_profiles ADD COLUMN bio TEXT`;
   }
+  if (!existing.has("name_color")) {
+    await sql`ALTER TABLE user_profiles ADD COLUMN name_color VARCHAR(32)`;
+  }
+  if (!existing.has("profile_frame")) {
+    await sql`ALTER TABLE user_profiles ADD COLUMN profile_frame VARCHAR(32)`;
+  }
+  if (!existing.has("theme_accent")) {
+    await sql`ALTER TABLE user_profiles ADD COLUMN theme_accent VARCHAR(32)`;
+  }
+  if (!existing.has("showcased_badges")) {
+    await sql`ALTER TABLE user_profiles ADD COLUMN showcased_badges TEXT`;
+  }
+  if (!existing.has("profile_bg")) {
+    await sql`ALTER TABLE user_profiles ADD COLUMN profile_bg VARCHAR(32)`;
+  }
+  if (!existing.has("avatar_sticker")) {
+    await sql`ALTER TABLE user_profiles ADD COLUMN avatar_sticker VARCHAR(32)`;
+  }
 }
 
 async function ensureDataDir() {
@@ -159,7 +192,7 @@ async function ensureDataDir() {
   }
 }
 
-export async function readUserProfiles(): Promise<UserProfile[]> {
+async function readUserProfiles(): Promise<UserProfile[]> {
   // Try database first
   if (isDatabaseAvailable()) {
     try {
@@ -167,8 +200,8 @@ export async function readUserProfiles(): Promise<UserProfile[]> {
       await ensureUserProfilesTable();
       
       const rows = await sql`
-        SELECT username, display_name, avatar_url, gender, birth_date, honor, occupation, city, country, website, bio
-        FROM user_profiles 
+        SELECT username, display_name, avatar_url, gender, birth_date, honor, occupation, city, country, website, bio, name_color, profile_frame, theme_accent, profile_bg, avatar_sticker, proof_seal
+        FROM user_profiles
         ORDER BY updated_at DESC
       `;
       return rows.map((row: any) => ({
@@ -183,6 +216,12 @@ export async function readUserProfiles(): Promise<UserProfile[]> {
         country: row.country || undefined,
         website: row.website || undefined,
         bio: row.bio || undefined,
+        nameColor: row.name_color || null,
+        profileFrame: row.profile_frame || null,
+        themeAccent: row.theme_accent || null,
+        profileBg: row.profile_bg || null,
+        avatarSticker: row.avatar_sticker || null,
+        seal: row.proof_seal || null,
       }));
     } catch (error) {
       console.error("[user-profile-storage] Failed to read from database, falling back to file storage:", error);
@@ -206,7 +245,7 @@ export async function readUserProfiles(): Promise<UserProfile[]> {
   }
 }
 
-export async function writeUserProfiles(profiles: UserProfile[]): Promise<void> {
+async function writeUserProfiles(profiles: UserProfile[]): Promise<void> {
   // Try database first
   if (isDatabaseAvailable()) {
     try {
@@ -216,10 +255,10 @@ export async function writeUserProfiles(profiles: UserProfile[]): Promise<void> 
       // Upsert for each profile
       for (const profile of profiles) {
         await sql`
-          INSERT INTO user_profiles (username, display_name, avatar_url, gender, birth_date, occupation, city, country, website, bio, updated_at)
-          VALUES (${profile.username}, ${profile.displayName || null}, ${profile.avatarUrl || null}, ${profile.gender || null}, ${profile.birthDate || null}, ${profile.occupation || null}, ${profile.city || null}, ${profile.country || null}, ${profile.website || null}, ${profile.bio || null}, CURRENT_TIMESTAMP)
-          ON CONFLICT (username) 
-          DO UPDATE SET 
+          INSERT INTO user_profiles (username, display_name, avatar_url, gender, birth_date, occupation, city, country, website, bio, name_color, profile_frame, theme_accent, profile_bg, avatar_sticker, updated_at)
+          VALUES (${profile.username}, ${profile.displayName || null}, ${profile.avatarUrl || null}, ${profile.gender || null}, ${profile.birthDate || null}, ${profile.occupation || null}, ${profile.city || null}, ${profile.country || null}, ${profile.website || null}, ${profile.bio || null}, ${profile.nameColor ?? null}, ${profile.profileFrame ?? null}, ${profile.themeAccent ?? null}, ${profile.profileBg ?? null}, ${profile.avatarSticker ?? null}, CURRENT_TIMESTAMP)
+          ON CONFLICT (username)
+          DO UPDATE SET
             display_name = EXCLUDED.display_name,
             avatar_url = EXCLUDED.avatar_url,
             gender = EXCLUDED.gender,
@@ -229,6 +268,11 @@ export async function writeUserProfiles(profiles: UserProfile[]): Promise<void> 
             country = EXCLUDED.country,
             website = EXCLUDED.website,
             bio = EXCLUDED.bio,
+            name_color = EXCLUDED.name_color,
+            profile_frame = EXCLUDED.profile_frame,
+            theme_accent = EXCLUDED.theme_accent,
+            profile_bg = EXCLUDED.profile_bg,
+            avatar_sticker = EXCLUDED.avatar_sticker,
             updated_at = CURRENT_TIMESTAMP
         `;
       }
@@ -280,6 +324,11 @@ async function upsertUserProfile(profile: UserProfile): Promise<void> {
       country,
       website,
       bio,
+      name_color,
+      profile_frame,
+      theme_accent,
+      profile_bg,
+      avatar_sticker,
       updated_at
     )
     VALUES (
@@ -294,6 +343,11 @@ async function upsertUserProfile(profile: UserProfile): Promise<void> {
       ${profile.country ?? null},
       ${profile.website ?? null},
       ${profile.bio ?? null},
+      ${profile.nameColor ?? null},
+      ${profile.profileFrame ?? null},
+      ${profile.themeAccent ?? null},
+      ${profile.profileBg ?? null},
+      ${profile.avatarSticker ?? null},
       CURRENT_TIMESTAMP
     )
     ON CONFLICT (username)
@@ -308,6 +362,11 @@ async function upsertUserProfile(profile: UserProfile): Promise<void> {
       country = COALESCE(EXCLUDED.country, user_profiles.country),
       website = COALESCE(EXCLUDED.website, user_profiles.website),
       bio = COALESCE(EXCLUDED.bio, user_profiles.bio),
+      name_color = COALESCE(EXCLUDED.name_color, user_profiles.name_color),
+      profile_frame = COALESCE(EXCLUDED.profile_frame, user_profiles.profile_frame),
+      theme_accent = COALESCE(EXCLUDED.theme_accent, user_profiles.theme_accent),
+      profile_bg = COALESCE(EXCLUDED.profile_bg, user_profiles.profile_bg),
+      avatar_sticker = COALESCE(EXCLUDED.avatar_sticker, user_profiles.avatar_sticker),
       updated_at = CURRENT_TIMESTAMP
   `;
 }
@@ -317,7 +376,7 @@ export async function getUserProfile(username: string): Promise<UserProfile | nu
     try {
       await ensureUserProfilesTable();
       const rows = await sql`
-        SELECT username, display_name, avatar_url, gender, birth_date, honor, occupation, city, country, website, bio
+        SELECT username, display_name, avatar_url, gender, birth_date, honor, occupation, city, country, website, bio, name_color, profile_frame, theme_accent, profile_bg, avatar_sticker, proof_seal
         FROM user_profiles
         WHERE username = ${username}
         LIMIT 1
@@ -335,6 +394,12 @@ export async function getUserProfile(username: string): Promise<UserProfile | nu
         country?: string | null;
         website?: string | null;
         bio?: string | null;
+        name_color?: string | null;
+        profile_frame?: string | null;
+        theme_accent?: string | null;
+        profile_bg?: string | null;
+        avatar_sticker?: string | null;
+        proof_seal?: string | null;
       };
       return {
         username: row.username,
@@ -348,6 +413,12 @@ export async function getUserProfile(username: string): Promise<UserProfile | nu
         country: row.country || undefined,
         website: row.website || undefined,
         bio: row.bio || undefined,
+        nameColor: row.name_color || null,
+        profileFrame: row.profile_frame || null,
+        themeAccent: row.theme_accent || null,
+        profileBg: row.profile_bg || null,
+        avatarSticker: row.avatar_sticker || null,
+        seal: row.proof_seal || null,
       };
     } catch (error) {
       console.error("[user-profile-storage] Failed to read profile from database, falling back:", error);

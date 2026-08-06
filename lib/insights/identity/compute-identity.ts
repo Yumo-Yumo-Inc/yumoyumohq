@@ -35,7 +35,7 @@ const MIN_RECEIPTS_FOR_DELTA = 3;
 const DEFAULT_WINDOW_DAYS = 90;
 const DAY_MS = 86_400_000;
 
-export interface ReceiptRow {
+interface ReceiptRow {
   receipt_id: string;
   merchant_name: string | null;
   merchant_city: string | null;
@@ -64,7 +64,7 @@ function dominantCity(receipts: ReceiptRow[]): string | null {
   return best?.raw ?? null;
 }
 
-export interface LineItemRow {
+interface LineItemRow {
   receipt_id: string;
   category_path: string | null;
   line_total_gross: number | string | null;
@@ -328,7 +328,7 @@ function rangeToDays(range: IdentityRange): number {
  * @param requestedDays trailing window length; the full span is used when this
  *            exceeds the available history (so "all" passes Infinity).
  */
-export function buildIdentity(
+function buildIdentity(
   allReceipts: ReceiptRow[],
   allItems: LineItemRow[],
   now: number,

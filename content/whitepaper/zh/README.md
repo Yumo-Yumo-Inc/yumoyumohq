@@ -20,9 +20,9 @@ Web3 层为这套叙事补上一条更长久的轨道。选定的数据包可以
 flowchart LR
     A["日常支出"] --> B["支出凭证"]
     B --> C["活体价格记忆"]
-    B --> D["Yumbie 引导 + Founding NFT 身份"]
+    B --> D["Yumbie 引导 + Foundation NFT 身份"]
     B --> E["贡献经济"]
-    E --> F["bINT 与 ePoints"]
+    E --> F["bINT"]
     F --> G["INT、质押与治理"]
 ```
 

@@ -1,5 +1,5 @@
 /** Previous calendar day as YYYY-MM-DD (UTC date arithmetic on date-only strings). */
-export function previousDateString(dateStr: string): string {
+function previousDateString(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   const dt = new Date(Date.UTC(y, m - 1, d));
   dt.setUTCDate(dt.getUTCDate() - 1);

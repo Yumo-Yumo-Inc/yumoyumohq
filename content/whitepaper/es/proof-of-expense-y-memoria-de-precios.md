@@ -14,7 +14,7 @@ flowchart TD
     B --> E["Contexto de Yumbie"]
     B --> F["Puntaje de calidad y confianza"]
     F --> G["Generación de bINT"]
-    F --> H["Registro ePoints (costo oculto en dólares)"]
+    F --> H["Insight de costo oculto"]
     F --> I["Actualización de nivel y salud del Yumbie"]
 ```
 
@@ -28,7 +28,7 @@ La memoria de precios es uno de los beneficios más claros para el usuario. Cuan
 | Series temporales de producto y comercio | Seguimiento más claro del precio | Memoria colectiva más fuerte |
 | Contexto de Yumbie | Orientación mejor sincronizada | Mejor personalización |
 | Señal de contribución (bINT) | Crédito blando hacia conversión a INT | Crecimiento de la economía abierta |
-| Registro de costo oculto (ePoints) | Huella en dólares de la presión de gasto | Peso futuro en distribuciones de token |
+| Insight de costo oculto | Visibilidad de la presión de gasto y el movimiento de precios | Fortalece la evaluación de la calidad de la contribución |
 | Progresión de identidad | El nivel y la salud del Yumbie avanzan | Base de contribuidores de largo plazo más sólida |
 
 Imaginemos un hogar que compra leche, café y pañales en la misma cadena durante tres meses. El sistema no se limita a añadir nuevas líneas cada vez. Detecta el aumento en pañales, mide el efecto de un cambio de comercio sobre el café, fortalece patrones de compra conjunta y lee con mayor precisión el ritmo del hogar. El usuario recibe una guía más útil y la red crece con datos más limpios y más valiosos a lo largo del tiempo.

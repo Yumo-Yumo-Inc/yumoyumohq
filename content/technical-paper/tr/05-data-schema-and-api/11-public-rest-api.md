@@ -1,45 +1,25 @@
-# Açık REST API
+# API yüzeyi
 
-## 5.10 Açık REST API
+## 5.10 API yüzeyi
 
-```
-Taban: https://api.yumo.io/v1
-Yetki: OAuth 2.0 PKCE (açık istemci) · Bearer token
-Hız sınırı: kullanıcı ve uygulama başına sınırlama; mevcut kotalar SDK referansında
-```
+### Mevcut: uygulama rotaları
 
-| Yöntem | Yol | Amaç | Yetki |
+Canlı API, uygulamanın kendi rota yüzeyidir: **`yumoyumo.com` üzerinde `/api/*` altında oturum kimlikli rotalar**, ürünle aynı Next.js dağıtımından sunulur. Kimlik doğrulama kullanıcının oturumudur; bugün ayrı bir geliştirici kimlik bilgisi bulunmaz.
+
+| Metot | Yol | Amaç | Kimlik |
 |---|---|---|---|
-| POST | `/receipts/upload` | Önceden imzalı yükleme URL'si al | Kullanıcı |
-| POST | `/receipts/{id}/process` | Boru hattını tetikle | Kullanıcı |
-| GET  | `/receipts/{id}` | Fiş kaydını getir | Kullanıcı (sadece kendi) |
-| GET  | `/receipts` | Kullanıcının fişlerini listele | Kullanıcı (sadece kendi) |
-| GET  | `/users/me/price-memory` | Kişisel fiyat hafızası | Kullanıcı |
-| GET  | `/users/me/bint` | bINT bakiyesi ve geçmişi | Kullanıcı |
-| POST | `/conversions/bint-to-int` | bINT → INT dönüştürme (TX hazırlar) | Kullanıcı |
-| GET  | `/users/me/level` | Seviye + sağlık anlık görüntüsü | Kullanıcı |
-| GET  | `/canonical-products/{id}` | Açık kanonik ürün ayrıntıları | Açık |
-| GET  | `/merchants/{id}` | Açık satıcı ayrıntıları | Açık |
+| POST | `/api/receipt/upload` | Fiş görseli yükleme | Oturum |
+| POST | `/api/receipt/analyze` | Yüklenen görsel üzerinde pipeline'ı çalıştırma | Oturum |
+| GET  | `/api/receipts` | Kullanıcının fişlerini listeleme | Oturum (yalnız kendi) |
+| GET  | `/api/receipts/{id}` | Bir fiş kaydını getirme | Oturum (yalnız kendi) |
+| GET  | `/api/wallet/summary` | Puan bakiyesi ve geçmişi | Oturum |
+| GET  | `/api/prices/epoch/{epoch}` | Açık fiyat epoch verisi: epoch üst verisi, gözlem sayfaları ve Merkle dahil edilme kanıtları (`?proof=<leaf_hash>`) | Açık |
+| GET  | `/api/prices/product/{productId}` | Katalog ürünü için açık fiyat geçmişi | Açık |
 
-### Webhook'lar
+Fiyat defteri rotaları bugünkü açık okuma yüzeyidir: herkes mühürlenmiş bir epoch'u getirebilir, gözlemlerini çekebilir ve zincir üstü köke katlanan bir dahil edilme kanıtı isteyebilir. Yayımlanan Arweave manifestleri aynı veriyi bu rotalardan bağımsız olarak sunar.
 
-Uygulamalar kullanıcı kapsamlı olaylara abone olabilir:
+### Planlı: sürümlü açık REST API
 
-```json
-// receipt.verified
-{
-  "event_type": "receipt.verified",
-  "event_id": "01HXY...",
-  "occurred_at": "2026-05-17T14:23:13Z",
-  "data": {
-    "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-    "user_id": "01HXY...",
-    "trust_score": "0.XX",
-    "bint_credited_minor": 12500
-  }
-}
-```
-
-v1'deki olay tipleri: `receipt.verified`, `receipt.rejected`, `bint.credited`, `bint.settled`, `conversion.completed`, `level.advanced`.
+Üçüncü taraf uygulamalar için sürümlü bir açık REST API **planlanan gelecek iştir**. Tasarım taslağı: `yumoyumo.com` üzerinde `/v1` tabanı, üçüncü taraf istemciler için standartlara dayalı yetki devri, kaynak-biçimli fiş ve ödül uç noktaları ve durum değişiklikleri için olay abonelikleri (fiş doğrulandı, ödül yazıldı, epoch mühürlendi). Somut yüzey geliştirici programı açıldığında tanımlanacaktır; o zamana kadar sözleşme yukarıdaki uygulama rotalarıdır.
 
 ---

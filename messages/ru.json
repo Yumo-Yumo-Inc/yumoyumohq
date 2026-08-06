@@ -72,7 +72,7 @@
         "title": "Фаза 1 — Генезис\nПробуждение начинается",
         "items": [
           "Честный запуск: Ликвидность и цена от сообщества",
-          "PoE-добыча: Чеки превращаются в cPoints",
+          "PoE-добыча: Чеки превращаются в points",
           "Цифровая идентичность: Foundation NFT и рост уровня"
         ]
       },
@@ -241,7 +241,7 @@
       },
       {
         "question": "Как я зарабатываю награды? Расскажи мне весёлую часть!",
-        "answer": "cPoints and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
+        "answer": "Points and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
       },
       {
         "question": "Что такое токен INT? Он полетит на луну? 🚀",
@@ -441,7 +441,7 @@
       },
       {
         "title": "3. Что здесь можно делать? 🍎",
-        "content": "Upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see spending insights, and collect non-transferable cPoints/bINT app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
+        "content": "Upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see spending insights, and collect non-transferable points/bINT app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
       },
       {
         "title": "4. Чеки и твой контент 📸",
@@ -450,7 +450,7 @@
       {
         "title": "5. Награды и токены INT 🍪🎈",
         "content": [
-          "cPoints and bINT are non-transferable in-app records tied to eligible activity.",
+          "Points and bINT are non-transferable in-app records tied to eligible activity.",
           "They do not guarantee any token claim, airdrop, transfer, listing, cash value, profit, or exchangeability.",
           "INT is planned as a utility token for eligible app functionality, not investment advice, a security offering, or a get rich quick ticket.",
           "Eligibility rules may change. We may withhold, reverse, or suspend rewards for fraud, duplicate activity, sanctions risk, legal restrictions, or policy violations. Taxes are your responsibility."
@@ -835,7 +835,36 @@
       "quests": {
         "notActive": "⚠️ Не активно"
       },
-      "totalReceipts": "Ты загрузил {count} чек(ов) всего."
+      "totalReceipts": "Ты загрузил {count} чек(ов) всего.",
+      "genesisPatchNotes": {
+        "badge": "НОВЫЙ СЕЗОН",
+        "duration": "4 недели",
+        "title": "Сезон Genesis начался",
+        "subtitle": "Все стартуют с 1 уровня и нулевого баланса. Прошлый вклад сохранён.",
+        "rewardPointsLabel": "Очки",
+        "rewardPointsHint": "Мгновенная награда за чек",
+        "rewardXpLabel": "Опыт",
+        "rewardXpHint": "Поднимайся по сезонной лестнице",
+        "rule1Title": "Прошлое в безопасности",
+        "rule1Desc": "Сезонные очки и опыт обнуляются. Накопленные contribution points не удаляются.",
+        "rule2Title": "Две награды за чек",
+        "rule2Desc": "За каждый награждённый чек сразу видны очки и опыт для сезонного уровня.",
+        "rule4Title": "Выше уровень — больше за чек",
+        "rule4Desc": "Дневной лимит чеков на опыт не меняется. С ростом уровня каждый чек даёт больше очков.",
+        "limitsTitle": "Дневные лимиты",
+        "limitXpValue": "5 чеков",
+        "limitXpDesc": "На опыт",
+        "limitPointsValue": "По уровню",
+        "limitPointsDesc": "Потолок очков",
+        "limitFootnote": "Чеки после 5-го сохраняются и анализируются; в этот день награды нет.",
+        "tiersTitle": "Сезонные уровни",
+        "tierSpark": "Spark",
+        "tierEmber": "Ember",
+        "tierFlame": "Flame",
+        "tierForge": "Forge",
+        "dontShowAgain": "Больше не показывать",
+        "cta": "Поехали"
+      }
     },
     "receipts": {
       "title": "Чеки",
@@ -990,7 +1019,6 @@
         "registerLink": "Создать"
       },
       "register": {
-        "badge": "Защищённая регистрация",
         "headline": "Создай свой аккаунт Yumo Yumo и начни с проверенного профиля.",
         "subheadline": "Твой аккаунт начинается с безопасной верификации, учётом страны и чистым входом в приложение.",
         "featureSecureTitle": "Защита от ботов",
@@ -1026,11 +1054,13 @@
         "acceptPrivacyPrefix": "Я прочитал",
         "acceptPrivacyLink": "Политику конфиденциальности",
         "acceptPrivacySuffix": ".",
-        "passwordHint": "Минимум 8 символов, включая заглавные и строчные буквы, цифру и специальный символ"
+        "passwordHint": "Минимум 8 символов, включая заглавные и строчные буквы, цифру и специальный символ",
+        "invitedBy": "пригласил вас — после первого подтверждённого чека вы оба получите бонус."
       },
       "verify": {
         "pendingTitle": "Подтверди свою почту",
-        "pendingBody": "Мы отправили ссылку для подтверждения на твою почту. Подтверди её, чтобы разблокировать приложение.",
+        "pendingBody": "Мы отправили ссылку для подтверждения на {email}. Подтверди её, чтобы разблокировать приложение.",
+        "pendingBodyFallback": "Мы отправили ссылку для подтверждения на твою почту. Подтверди её, чтобы разблокировать приложение.",
         "pendingEmailFailedBody": "Твой аккаунт создан, но мы не смогли автоматически отправить письмо для подтверждения. Используй кнопку повторной отправки ниже.",
         "verifiedTitle": "Почта подтверждена",
         "verifiedBody": "Твой аккаунт теперь подтвержден. Ты можешь продолжить прямо в приложение.",
@@ -1296,7 +1326,7 @@
         "reward": {
           "short": "Награда",
           "title": "Рассчитываем твою награду",
-          "sub": "Мы превращаем скрытые расходы в cPoints и завершаем твой результат."
+          "sub": "Мы превращаем скрытые расходы в points и завершаем твой результат."
         }
       }
     },
@@ -1479,8 +1509,8 @@
     "rewards": {
       "title": "Награды",
       "description": "Баланс аккаунта и история транзакций",
-      "cPointsTotal": "Всего cPoints",
-      "cPointsBreakdown": "Разбивка cPoints",
+      "cPointsTotal": "Всего points",
+      "cPointsBreakdown": "Разбивка points",
       "totalEarned": "Всего заработано",
       "activity": "Журнал активности",
       "receiptVerified": "Чек подтвержден",
@@ -1518,10 +1548,10 @@
       "days": "дней",
       "badges": "Значки",
       "honor": "Честь",
-      "totalAyumo": "Всего cPoints за чеки",
-      "totalRyumo": "Всего cPoints за квесты",
-      "totalAyumoAdminHint": "Всего заработано cPoints за чеки (только для админов)",
-      "totalRyumoAdminHint": "Всего заработано cPoints за квесты (только для админов)",
+      "totalAyumo": "Всего points за чеки",
+      "totalRyumo": "Всего points за квесты",
+      "totalAyumoAdminHint": "Всего заработано points за чеки (только для админов)",
+      "totalRyumoAdminHint": "Всего заработано points за квесты (только для админов)",
       "error": "Не удалось загрузить таблицу лидеров",
       "empty": "Нет данных для таблицы лидеров",
       "seasonLabel": "Сезон"
@@ -2093,6 +2123,14 @@
     "deleteGoal": "Удалить цель",
     "goalTarget": "Цель {amount}",
     "addGoalButton": "Добавить финансовую цель",
+    "trustChecks": {
+      "image_quality": "Чёткое изображение",
+      "date_time": "Дата и время",
+      "total": "Итоговая сумма",
+      "merchant": "Название магазина",
+      "verified_merchant": "Проверенный магазин",
+      "ocr_confidence": "Точность OCR"
+    },
     "trustCard": {
       "title": "Качество чеков",
       "desc": "Чёткие чеки повышают доверие и открывают лучшие награды.",
@@ -2127,8 +2165,8 @@
     "totalProof": "Твой общий подтвержденный вклад",
     "fromReceipts": "Из чеков",
     "fromQuests": "Из квестов",
-    "receiptCPoints": "cPoints чеков",
-    "bonusCPoints": "Бонус cPoints",
+    "receiptCPoints": "Points чеков",
+    "bonusCPoints": "Бонус points",
     "earnedFromReceipts": "Начисляется за подтвержденные чеки",
     "earnedFromQuests": "Начисляется за выполненные квесты",
     "nextUnlocks": "Следующие открытия",
@@ -2136,13 +2174,13 @@
     "reached": "✓ Достигнуто",
     "howYouEarn": "Как ты зарабатываешь",
     "earnReceiptLabel": "Загрузка чека",
-    "earnReceiptDesc": "Season XP · XP аккаунта · Вклад · cPoints",
+    "earnReceiptDesc": "Season XP · XP аккаунта · points",
     "earnVerifyLabel": "Проверь и получай",
-    "earnVerifyDesc": "Проверяй чужие чеки → получай cPoints + Season XP",
+    "earnVerifyDesc": "Проверяй чужие чеки → получай points + Season XP",
     "earnDailyLabel": "Ежедневные квесты",
-    "earnDailyDesc": "cPoints · Season XP",
+    "earnDailyDesc": "points · Season XP",
     "earnWeeklyLabel": "Еженедельные квесты",
-    "earnWeeklyDesc": "Больше cPoints · Season XP",
+    "earnWeeklyDesc": "Больше points · Season XP",
     "earnQualityLabel": "Качественные чеки",
     "earnQualityDesc": "Лучший результат наград",
     "activity": "Активность",
@@ -2150,12 +2188,10 @@
     "receipts": "Чеки",
     "quests": "Квесты",
     "noActivity": "Пока нет активности",
-    "invitesTitle": "Ваши приглашения",
-    "invitesSubtitle": "Активность и доход приглашённых вами",
     "seasonRecap": "Итоги сезона на сейчас",
     "receiptsVerified": "Проверено чеков",
     "questsCompleted": "Квестов выполнено",
-    "cPointsEarned": "Заработано cPoints",
+    "cPointsEarned": "Заработано points",
     "seasonXp": "Season XP",
     "currentLevel": "Текущий уровень",
     "rewardBoost": "Буст наград",
@@ -2172,7 +2208,15 @@
     "claiming": "Получение…",
     "claimDone": "Получено",
     "claimOpensAtTge": "Получение откроется на TGE",
-    "claimWalletMismatch": "Подключённый кошелёк отличается от кошелька этого начисления. Подключите кошелёк начисления, чтобы получить."
+    "claimWalletMismatch": "Подключённый кошелёк отличается от кошелька этого начисления. Подключите кошелёк начисления, чтобы получить.",
+    "supportLeaderboardTitle": "Чемпионы платформы",
+    "supportLeaderboardSubtitle": "Рейтинг по открытиям, исправлениям и вкладу в доказательства — не только по points.",
+    "supportLeaderboardScore": "балл",
+    "supportLeaderboardYou": "Вы",
+    "alphaLeaderboardTitle": "Early Alpha",
+    "alphaLeaderboardSubtitle": "Всего points за альфа-период — постоянная запись.",
+    "alphaLeaderboardScore": "points",
+    "alphaLeaderboardYou": "Вы"
   },
   "notificationsPage": {
     "eyebrow": "ВХОДЯЩИЕ",
@@ -2338,6 +2382,7 @@
       "reward_pending_verification": "Награда пока не рассчитана. Может обновиться после проверки строк.",
       "duplicate_same_user": "Вы уже загрузили этот чек. Дубликаты не приносят награду.",
       "duplicate_other_user": "Этот чек уже был загружен. Дубликаты не приносят награду.",
+      "cancelled_receipt": "Это аннулированный чек, а не завершённая покупка, поэтому вознаграждение не начисляется.",
       "generic": "Этот документ сохранён без награды."
     }
   },

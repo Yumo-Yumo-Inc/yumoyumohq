@@ -1,13 +1,15 @@
 import crypto from "crypto";
-import OpenAI from "openai";
 import { cacheGet, cacheSet } from "@/lib/cache/redis";
 import { db } from "@/lib/db/client";
 import { CacheKeys, CacheTTL } from "./cache-config";
 import type { Lang } from "./preprocess";
 import type { MerchantCandidate } from "./retrieve-merchant-candidates";
 
-const client = process.env.OPENAI_API_KEY ? new OpenAI() : null;
-const MODEL = process.env.MERCHANT_LLM_MODEL ?? "gpt-4.1-mini";
+import { callGeminiText, getGeminiKey } from "./gemini-text";
+
+// Gemini is the decision model: the OpenAI account ran out of quota in
+// production, which had silently disabled this layer entirely.
+const MODEL = process.env.MERCHANT_LLM_MODEL ?? "gemini-3.1-flash-lite";
 
 export interface LlmMerchantDecision {
   decision: "match" | "new" | "merge_to_master";
@@ -117,18 +119,18 @@ Be cautious with partial-name overlaps:
 - "Tesco" alone could be Tesco Malaysia, Tesco UK, Tesco Lotus (Thailand) — use country_code to disambiguate.
 
 ═══════════════════════════════════════════════════════════════════════════
-OUTPUT (strict JSON only):
+OUTPUT (labeled plain text — one field per line, use "-" for empty):
 ═══════════════════════════════════════════════════════════════════════════
 
-{
-  "decision": "match" | "new" | "merge_to_master",
-  "matched_id": "<uuid>" or null,
-  "proposed_canonical": "<short brand name in canonical script>" or null,
-  "proposed_relationship": "legal_owner" | "franchise" | "subsidiary" | "rebranded" | "location" | "duplicate" | null,
-  "proposed_master_id": "<uuid>" or null,
-  "confidence": 0.0-1.0,
-  "reasoning": "<one short sentence in English>"
-}
+DECISION: match | new | merge_to_master
+MATCHED_ID: <uuid> or -
+PROPOSED_CANONICAL: <short brand name in canonical script> or -
+RELATIONSHIP: legal_owner | franchise | subsidiary | rebranded | location | duplicate | -
+MASTER_ID: <uuid> or -
+CONFIDENCE: <0.0-1.0>
+REASONING: <one short sentence in English>
+
+No JSON, no markdown fences.
 
 DECISION SEMANTICS:
 - "match": same exact merchant entity. matched_id required.
@@ -264,10 +266,10 @@ export async function llmCanonicalizeMerchant(input: {
   category?: string | null;
   candidates: MerchantCandidate[];
 }): Promise<LlmMerchantDecision> {
-  if (!client) {
+  if (!getGeminiKey()) {
     return fallbackDecision(
       input.raw,
-      "OPENAI_API_KEY not set; defaulting to new merchant."
+      "GEMINI_API_KEY not set; defaulting to new merchant."
     );
   }
 
@@ -306,52 +308,58 @@ Category hint: ${input.category ?? "unknown"}
 Existing merchant candidates:
 ${candidateLines}
 
-Return JSON only.`;
+Answer with the labeled lines only.`;
 
   try {
-    const completion = await client.chat.completions.create({
-      model: MODEL,
-      temperature: 0,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: SYSTEM },
-        { role: "user", content: userPrompt },
-      ],
-    });
+    const rawContent = (await callGeminiText(MODEL, SYSTEM, userPrompt)) ?? "";
+    // T1: labeled plain-text parsing — a missing/malformed line leaves the
+    // field at its default; never throws.
+    const fields: Record<string, string> = {};
+    for (const line of rawContent.split("\n")) {
+      const m = line.match(/^\s*([A-Z_]+)\s*:\s*(.*)\s*$/);
+      if (!m) continue;
+      const value = m[2].trim();
+      if (value && value !== "-") fields[m[1]] = value;
+    }
 
-    const rawContent = completion.choices[0]?.message?.content ?? "{}";
-    const parsed = JSON.parse(rawContent) as Partial<LlmMerchantDecision>;
+    const UUID_RE =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const decisionRaw = fields.DECISION?.toLowerCase();
+    const matchedId =
+      fields.MATCHED_ID && UUID_RE.test(fields.MATCHED_ID)
+        ? fields.MATCHED_ID
+        : null;
+    const masterId =
+      fields.MASTER_ID && UUID_RE.test(fields.MASTER_ID)
+        ? fields.MASTER_ID
+        : null;
+    const relationshipRaw = fields.RELATIONSHIP?.toLowerCase();
+    const confNum = Number(fields.CONFIDENCE);
 
     return {
       decision:
-        parsed.decision === "match" ||
-        parsed.decision === "merge_to_master" ||
-        parsed.decision === "new"
-          ? parsed.decision
+        decisionRaw === "match" && matchedId
+          ? "match"
+          : decisionRaw === "merge_to_master" && masterId
+          ? "merge_to_master"
           : "new",
-      matched_id: typeof parsed.matched_id === "string" ? parsed.matched_id : null,
-      proposed_canonical:
-        typeof parsed.proposed_canonical === "string"
-          ? parsed.proposed_canonical
-          : null,
+      matched_id: matchedId,
+      proposed_canonical: fields.PROPOSED_CANONICAL ?? null,
       proposed_relationship:
-        parsed.proposed_relationship === "legal_owner" ||
-        parsed.proposed_relationship === "franchise" ||
-        parsed.proposed_relationship === "subsidiary" ||
-        parsed.proposed_relationship === "rebranded" ||
-        parsed.proposed_relationship === "location" ||
-        parsed.proposed_relationship === "duplicate"
-          ? parsed.proposed_relationship
+        relationshipRaw === "legal_owner" ||
+        relationshipRaw === "franchise" ||
+        relationshipRaw === "subsidiary" ||
+        relationshipRaw === "rebranded" ||
+        relationshipRaw === "location" ||
+        relationshipRaw === "duplicate"
+          ? relationshipRaw
           : null,
-      proposed_master_id:
-        typeof parsed.proposed_master_id === "string"
-          ? parsed.proposed_master_id
-          : null,
+      proposed_master_id: masterId,
       confidence:
-        typeof parsed.confidence === "number"
-          ? Math.max(0, Math.min(1, parsed.confidence))
+        Number.isFinite(confNum) && confNum >= 0 && confNum <= 1
+          ? confNum
           : 0.7,
-      reasoning: typeof parsed.reasoning === "string" ? parsed.reasoning : "",
+      reasoning: fields.REASONING ?? "",
     };
   } catch (error) {
     return fallbackDecision(

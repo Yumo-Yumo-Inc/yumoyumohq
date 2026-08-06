@@ -74,4 +74,3 @@ export const BR_CONFIG: CountryConfig = {
   ]
 };
 
-export default BR_CONFIG;

@@ -118,4 +118,4 @@ export async function runImfIfsEtl(opts: {
   return summarizeRows(rows, written, dryRun);
 }
 
-export { SOURCE as IMF_IFS_SOURCE };
+;

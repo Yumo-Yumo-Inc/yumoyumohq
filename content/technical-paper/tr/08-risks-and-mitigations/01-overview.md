@@ -9,21 +9,21 @@ Bu bölüm Yumo Yumo'nun açık teknik belge içinde açıklanan risk sınıflar
 | Sınıf | Protokol yüzeyi | Açık kontrol ilkesi |
 |---|---|---|
 | Düzenleyici | Veri işleme, token sınıflandırması, vergi ve bölgesel kayıt | Veri minimizasyonu, aggregate yayın politikası, yetki alanına göre hukuk süreci |
-| Token ve piyasa | Emisyon, hak ediş, staking, BBB ve ikincil piyasa likiditesi | Formül tabanlı arz akışı, açık hak ediş, gelir bağlantılı yakım |
+| Token ve piyasa | Emisyon, hak ediş, staking, BBB ve ikincil piyasa likiditesi | Formül tabanlı arz akışı, açık hak ediş, hazine politikası |
 | Akıllı kontrat | Program yetkileri, token mint/burn, staking ve hazine hareketleri | Sürümlü dağıtım, bağımsız inceleme, yetki ayrıştırma |
 | Ürün ve boru hattı | Belge okuma, yapılandırılmış çıkarım, kural katmanı ve kayıt yazımı | Şema doğrulama, sağlayıcıdan bağımsız adaptörler, durum görünürlüğü |
 | Gizlilik ve veri | Fiş içeriği, kullanıcı geçmişi, aggregate veri ürünü | Zincir dışı içerik, k-anonimlik, görev kapsamlı erişim |
 | Operasyonel | Yetki saklama, dış servis sürekliliği, ağ canlılığı ve olay yönetimi | Çoklu onay sınıfı, denetlenebilir iz, aşamalı yönetişim |
 
-§8.2-§8.19 her risk sınıfını teknik etki ve açık kontrol modeli üzerinden açıklar. §8.20-§8.21 bu sınıfları tek bakışta özetler. Kontrol ilkeleri teknik belge içinde paylaşılır; uygulama ayrıntıları, güvenlik operasyonunun kendi dokümantasyonunda yönetilir.
+§8.2-§8.19 her risk sınıfını teknik etki ve açık kontrol modeli üzerinden açıklar. §8.20-§8.21 bu sınıfları tek tabloda özetler. Kontrol ilkeleri teknik belge içinde paylaşılır; uygulama ayrıntıları, güvenlik operasyonunun kendi dokümantasyonunda yönetilir.
 
 ---
 
 ## Çapraz referanslar
 
-- Operasyonel model ve aşamalı yerelleşme → 00 §0.2.
+- Operasyonel model ve olası gelecekteki yetki devri → 00 §0.2.
 - Boru hattı durum modeli → 02 §2.9.
 - Güven katmanı sinyal seti → 03 Güven Katmanı.
 - Hazine yönetişimi ve yetki taşıma → 04 §4.10.
 - Veri ürünü gizlilik modeli → 05 §5.8.
-- Sözlük girişleri: MiCA, k-anonimlik, sağlık skoru → 09 Sözlük.
+- Sözlük girişleri: MiCA, k-anonimlik, güven durumu → 09 Sözlük.

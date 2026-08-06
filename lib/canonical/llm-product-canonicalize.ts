@@ -4,7 +4,7 @@
  * Flow:
  *   raw OCR line + retrieved candidates
  *     ↓
- *   GPT-4.1-mini disambiguator (decides match vs new)
+ *   Gemini disambiguator (decides match vs new)
  *     ↓
  *   Redis-first cache (write-through) + Postgres audit trail
  *     ↓
@@ -24,15 +24,17 @@ if (typeof window !== "undefined") {
   );
 }
 
-import OpenAI from "openai";
 import crypto from "crypto";
 import { cacheGet, cacheSet } from "@/lib/cache/redis";
 import { db } from "@/lib/db/client";
 import { CacheKeys, CacheTTL } from "./cache-config";
+import { normalizeBrandName } from "@/lib/receipt/name-normalization";
 import type { ProductCandidate } from "./retrieve-product-candidates";
 
-const client = process.env.OPENAI_API_KEY ? new OpenAI() : null;
-const MODEL = process.env.PRODUCT_LLM_MODEL ?? "gpt-4.1-mini";
+import { callGeminiText, getGeminiKey } from "./gemini-text";
+
+// Gemini transport — the OpenAI account ran out of quota in production.
+const MODEL = process.env.PRODUCT_LLM_MODEL ?? "gemini-3.1-flash-lite";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -226,7 +228,6 @@ Only return "new" when one of these is clearly different:
 v3 NORMALIZATION FIELDS (for "new")
 ═══════════════════════════════════════════════════════════════════════════
 
-  - canonical_name: ASCII snake_case key (e.g. "tadim_antep_fistigi_150g")
   - display_name_tr: human Turkish name with proper diacritics
   - brand: identified brand or null
   - category_path: deepest matching Yumo taxonomy path
@@ -257,30 +258,25 @@ catch them:
   - Receipt admin: "Fiş İptal", "K. Kartı", "Mali Değeri Yoktur"
 
 ═══════════════════════════════════════════════════════════════════════════
-OUTPUT (strict JSON only)
+OUTPUT (labeled plain text — one block per input line, use the given numbering)
 ═══════════════════════════════════════════════════════════════════════════
-{
-  "items": [
-    {
-      "raw_name": "...",
-      "decision": "match" | "new",
-      "matched_id": "<uuid>" or null,
-      "canonical_name": "<snake_case>" or null,
-      "display_name_tr": "..." or null,
-      "brand": "..." or null,
-      "category_path": "..." or null,
-      "attributes": {},
-      "unit_size": "..." or null,
-      "unit_type": "..." or null,
-      "lifestyle_tags": [],
-      "consumption_occasions": [],
-      "allergens": [],
-      "price_tier": "butce|orta|premium|luks|degisken" or null,
-      "confidence": 0.0-1.0,
-      "reasoning": "<short>"
-    }
-  ]
-}`;
+=== ITEM <n> ===
+DECISION: match | new
+MATCHED_ID: <uuid of the matched candidate, or -> (only for match)
+DISPLAY_TR: <human Turkish name, or ->
+BRAND: <brand name, or ->
+CATEGORY_PATH: <taxonomy path, or ->
+ATTRIBUTES: <key=value; key=value, or ->
+UNIT_SIZE: <number, or ->
+UNIT_TYPE: <g|kg|ml|l|adet|..., or ->
+LIFESTYLE: <comma list, or ->
+OCCASIONS: <comma list, or ->
+ALLERGENS: <comma list, or ->
+PRICE_TIER: <butce|orta|premium|luks|degisken, or ->
+CONFIDENCE: <0.0-1.0>
+REASONING: <short>
+
+One field per line. Use "-" for unknown/empty. No JSON, no markdown fences.`;
 
 // ─── Output normalizers ──────────────────────────────────────────────────────
 
@@ -317,6 +313,85 @@ function fallbackNewDecision(rawName: string, reason: string): LlmProductDecisio
   };
 }
 
+// ─── Labeled plain-text parsing (T1: no JSON from the LLM) ───────────────────
+
+/**
+ * Parse "=== ITEM <n> ===" blocks with "FIELD: value" lines.
+ * Defensive: a missing or malformed line leaves that field undefined,
+ * a malformed block is skipped — never throws.
+ */
+function parseItemBlocks(raw: string): Map<number, Record<string, string>> {
+  const blocks = new Map<number, Record<string, string>>();
+  const sections = raw.split(/^\s*===\s*ITEM\s+(\d+)\s*===\s*$/m);
+  // sections = [preamble, "1", body1, "2", body2, ...]
+  for (let i = 1; i + 1 < sections.length; i += 2) {
+    const num = Number(sections[i]);
+    if (!Number.isInteger(num) || num < 1) continue;
+    const fields: Record<string, string> = {};
+    for (const line of sections[i + 1].split("\n")) {
+      const m = line.match(/^\s*([A-Z_]+)\s*:\s*(.*)\s*$/);
+      if (!m) continue;
+      const value = m[2].trim();
+      if (value && value !== "-") fields[m[1]] = value;
+    }
+    blocks.set(num, fields);
+  }
+  return blocks;
+}
+
+function parseCommaList(v: string | undefined): string[] {
+  if (!v) return [];
+  return v.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function parseAttributePairs(v: string | undefined): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  if (!v) return out;
+  for (const pair of v.split(";")) {
+    const eq = pair.indexOf("=");
+    if (eq <= 0) continue;
+    const key = pair.slice(0, eq).trim();
+    const value = pair.slice(eq + 1).trim();
+    if (key && value) out[key] = value;
+  }
+  return out;
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function fieldsToDecision(
+  rawName: string,
+  f: Record<string, string>
+): LlmProductDecision {
+  const matchedId =
+    f.MATCHED_ID && UUID_RE.test(f.MATCHED_ID) ? f.MATCHED_ID : null;
+  const confNum = Number(f.CONFIDENCE);
+  return {
+    raw_name: rawName,
+    decision: f.DECISION?.toLowerCase() === "match" && matchedId ? "match" : "new",
+    matched_id: matchedId,
+    // The canonical slug is always built in code (product-slug.ts); the LLM
+    // only supplies display fields.
+    canonical_name: null,
+    display_name_tr: f.DISPLAY_TR ?? null,
+    // Same guard as every other brand ingestion point: a column-misaligned
+    // parse that put a quantity/price into BRAND must not survive.
+    brand: normalizeBrandName(f.BRAND ?? null, rawName),
+    category_path: f.CATEGORY_PATH ?? null,
+    attributes: parseAttributePairs(f.ATTRIBUTES),
+    unit_size: f.UNIT_SIZE ?? null,
+    unit_type: f.UNIT_TYPE?.toLowerCase() ?? null,
+    lifestyle_tags: parseCommaList(f.LIFESTYLE),
+    consumption_occasions: parseCommaList(f.OCCASIONS),
+    allergens: parseCommaList(f.ALLERGENS),
+    price_tier: f.PRICE_TIER?.toLowerCase() ?? null,
+    confidence:
+      Number.isFinite(confNum) && confNum >= 0 && confNum <= 1 ? confNum : 0.7,
+    reasoning: f.REASONING ?? "",
+  };
+}
+
 // ─── Main batch API ──────────────────────────────────────────────────────────
 
 const LLM_BATCH = Number(process.env.PRODUCT_LLM_BATCH ?? 18);
@@ -328,15 +403,19 @@ const LLM_BATCH = Number(process.env.PRODUCT_LLM_BATCH ?? 18);
  * @param candidatesByRaw For each raw line, top-K candidates from retrieve helper
  * @param merchantId Hint for cache key
  * @param language Optional: language hint for prompt
+ * @param priceByRaw Observed unit price per raw line. A supermarket abbreviation is
+ *                   ambiguous on text alone but the price narrows it hard, so it goes
+ *                   into the prompt alongside each candidate's reference median.
  */
 export async function llmCanonicalizeProductsBatch(input: {
   rawNames: string[];
   candidatesByRaw: Map<string, ProductCandidate[]>;
   merchantId?: string | null;
   language?: string;
+  priceByRaw?: Map<string, { unitPrice: number | null; unitType: string | null }>;
 }): Promise<Map<string, LlmProductDecision>> {
   const out = new Map<string, LlmProductDecision>();
-  if (!client || input.rawNames.length === 0) return out;
+  if (!getGeminiKey() || input.rawNames.length === 0) return out;
 
   // De-dup raw names, normalize for cache key matching
   const unique = Array.from(
@@ -357,86 +436,37 @@ export async function llmCanonicalizeProductsBatch(input: {
               .slice(0, 3)
               .map((c) => {
                 const attrs = JSON.stringify(c.attributes ?? {});
-                return `[id=${c.id} name="${c.display_name_tr ?? c.canonical_name}" cat=${c.category_path ?? "?"} size=${c.typical_unit_size ?? "?"} attrs=${attrs} score=${c.score.toFixed(2)} via=${c.source}]`;
+                const ref =
+                  c.price_median != null ? ` ref_price=${c.price_median}` : "";
+                return `[id=${c.id} name="${c.display_name_tr ?? c.canonical_name}" cat=${c.category_path ?? "?"} size=${c.typical_unit_size ?? "?"} attrs=${attrs}${ref} score=${c.score.toFixed(2)} via=${c.source}]`;
               })
               .join("; ");
-      return `${idx + 1}. raw=${JSON.stringify(raw)} candidates=${candStr}`;
+      const price = input.priceByRaw?.get(raw);
+      const priceStr =
+        price?.unitPrice != null && price.unitPrice > 0
+          ? ` observed_price=${price.unitPrice.toFixed(2)} unit=${price.unitType ?? "?"}`
+          : "";
+      return `${idx + 1}. raw=${JSON.stringify(raw)}${priceStr} candidates=${candStr}`;
     });
 
     const userMsg = `Receipt language: ${input.language ?? "unknown"}
 Merchant id: ${input.merchantId ?? "unknown"}
 
-For each line, prefer matching to candidates over creating new. Return JSON.
+For each line, prefer matching to candidates over creating new. Output one "=== ITEM <n> ===" block per line, using the numbering shown.
+
+When observed_price is present, use it as evidence. A candidate whose ref_price is far
+from observed_price (roughly beyond a 2x factor either way) is probably the wrong product
+— a 47g wafer and a 500g box do not share a price. Treat ref_price as a hint, not proof:
+it is a median over few observations and may be missing or stale. Never invent a price.
 
 ${lines.join("\n")}`;
 
     try {
-      const completion = await client.chat.completions.create({
-        model: MODEL,
-        temperature: 0,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: SYSTEM },
-          { role: "user", content: userMsg },
-        ],
-      });
-
-      const rawContent = completion.choices[0]?.message?.content ?? "{}";
-      const parsed = JSON.parse(rawContent) as { items?: unknown };
-      const items = Array.isArray(parsed.items) ? parsed.items : [];
-
-      for (const item of items) {
-        if (!item || typeof item !== "object") continue;
-        const obj = item as Record<string, unknown>;
-
-        const rawName =
-          typeof obj.raw_name === "string" ? obj.raw_name.trim() : "";
+      const rawContent = (await callGeminiText(MODEL, SYSTEM, userMsg)) ?? "";
+      for (const [num, f] of parseItemBlocks(rawContent)) {
+        const rawName = chunk[num - 1];
         if (!rawName) continue;
-
-        const decision: LlmProductDecision = {
-          raw_name: rawName,
-          decision: obj.decision === "match" ? "match" : "new",
-          matched_id:
-            typeof obj.matched_id === "string" ? obj.matched_id : null,
-          canonical_name:
-            typeof obj.canonical_name === "string"
-              ? obj.canonical_name.trim() || null
-              : null,
-          display_name_tr:
-            typeof obj.display_name_tr === "string"
-              ? obj.display_name_tr.trim() || null
-              : null,
-          brand:
-            typeof obj.brand === "string" ? obj.brand.trim() || null : null,
-          category_path:
-            typeof obj.category_path === "string"
-              ? obj.category_path.trim() || null
-              : null,
-          attributes: safeRecord(obj.attributes),
-          unit_size:
-            typeof obj.unit_size === "string"
-              ? obj.unit_size.trim() || null
-              : null,
-          unit_type:
-            typeof obj.unit_type === "string"
-              ? obj.unit_type.trim().toLowerCase() || null
-              : null,
-          lifestyle_tags: safeStringArray(obj.lifestyle_tags),
-          consumption_occasions: safeStringArray(obj.consumption_occasions),
-          allergens: safeStringArray(obj.allergens),
-          price_tier:
-            typeof obj.price_tier === "string"
-              ? obj.price_tier.trim() || null
-              : null,
-          confidence:
-            typeof obj.confidence === "number"
-              ? Math.max(0, Math.min(1, obj.confidence))
-              : 0.7,
-          reasoning:
-            typeof obj.reasoning === "string" ? obj.reasoning : "",
-        };
-
-        out.set(rawName.toLowerCase(), decision);
+        out.set(rawName.toLowerCase(), fieldsToDecision(rawName, f));
       }
     } catch (error) {
       console.error(

@@ -20,7 +20,7 @@ Tepe banttan sonra ek MAU büyümesi, toplam emisyonu artırmak yerine kullanıc
 
 | Ray | Açılış mekanizması | Zamanlama |
 |---|---|---|
-| **Kullanıcı Ödülleri (%65)** | Emisyon eğrisi (4.19) → zincir dışı bINT birikimi → haftalık mutabakat → dağıtıcıdan talep (4.4) | 15 yıl boyunca sürekli |
+| **Kullanıcı Ödülleri (%65)** | Emisyon eğrisi (4.19) → zincir dışı bINT birikimi → periyodik epoch mutabakatı → dağıtıcıdan talep (4.4) | 15 yıl boyunca sürekli |
 | **Likidite (%5)** | Başlangıç: TGE'de tamamen serbest. Rezerv: topluluk yönetimli | TGE + yönetilen takvim |
 | **Airdrop (%5)** | Periyodik, katılım tabanlı pazarlama dağıtımları | Yıllara yayılan birden fazla dönem |
 | **Referans (%5)** | Başarılı davet başına olay güdümlü | Sürekli |
@@ -30,7 +30,7 @@ Tepe banttan sonra ek MAU büyümesi, toplam emisyonu artırmak yerine kullanıc
 ### Kesinleşmiş açılış parametreleri
 
 - **Likidite** — 1.000.000.000 INT, TGE'de borsa çiftlerini beslemek için tamamen likit. LP pozisyonu 12 ay kilitli. Kalan 3.950.000.000 INT rezervde tutulur.
-- **Airdrop** — tek bir etkinlikte değil, yıllara yayılan birden fazla dönem boyunca, katılım tabanlı pazarlama dağıtımları olarak serbest bırakılır. Her dağıtım, zamanlaması sürpriz ama ispatlanabilir niteliktedir: alıcı kümesi, tokenler hareket etmeden önce zincire taahhüt edilir. Her pay, haftalık kullanıcı ödülü mutabakatından ayrı, kendine ait bir dağıtıcı üzerinden hakediş kilidi olmadan tam olarak talep edilir. Dağıtım oranlaması katılımla ölçeklenir ve operasyon katmanında yönetilir.
+- **Airdrop** — tek bir etkinlikte değil, birden fazla dönem boyunca kampanya dağıtımı olarak serbest bırakılır. Her dağıtım için alıcı kümesi ve hesaplama yöntemi token hareketinden önce zincire taahhüt edilir. Her pay, periyodik kullanıcı ödülü mutabakatından ayrı, kendine ait bir dağıtıcı üzerinden hakediş kilidi olmadan talep edilir. Dağıtım oranlaması ilgili kampanya kaydında yayımlanır.
 - **Referans** — uygun bir davet bir birim açılış tetikler; uygunluk eşiği üretimde kalibre edilir ve yayınlanmaz. Zamana bağlı hakediş yoktur.
 
 ### Tasarım alanı kalemleri (parametreler TGE'de yayınlanacaktır)
@@ -39,7 +39,7 @@ Aşağıdaki kalemler aktif token tasarımı çalışmasının parçasıdır. Ya
 
 - **Kullanıcı Ödülleri emisyon eğrisi şekli.** Yukarıdaki basamaklı bantlar günlük tavanı belirler. Bantlar arası tam geçiş davranışı ve erken büyüme dönemindeki rampa takvimi, gözlemlenen kullanıcı büyümesi verisine göre kalibre edilir.
 - **Katkı İspatı dağıtım kadansı.** Periyodik anlık görüntülerde katkı metriklerine (doğrulanmış Harcama İspatı hacmi ve kalitesi, sıralama tablosu konumu) bağlıdır. Uçurum ve hakediş süreleri politikadır ve dağıtım başına belgelenir.
-- **Staking havuzu serbest bırakma takvimi.** Uzun vadeli sahipleri platform geliriyle hizalamak için gerçek getiri mimarisiyle birlikte tasarlanmıştır.
+- **Staking havuzu serbest bırakma takvimi.** Etkinleştirme tarihi, serbest bırakma takvimi ve ilgili koşullar ayrıca yayımlanır.
 
 ## 4.21 TGE dolaşımdaki arz tahmini
 
@@ -50,4 +50,4 @@ Token Üretim Etkinliğinde dolaşımdaki arz, başlangıç likiditesiyle beslen
 | Başlangıç likiditesi | 1.000.000.000 | TGE'de tamamen likit |
 | **TGE dolaşımdaki** | **~1.000.000.000** | Toplam arzın ~%1,01'i |
 
-Kalan ~%98,99'luk arz; emisyon takvimleri, hakediş kontratları, staking havuzları, yönetilen rezervler ve çok dönemli airdrop programı arasında kilitlidir. Airdrop dağıtımları, TGE'de değil, yıllar içinde katılım tabanlı pazarlama etkinlikleri olarak kademeli biçimde dolaşıma girer. Bu düşük başlangıç dolaşımı, protokolün arz genişlemesini gerçek katkıya bağlı kademeli bir şekilde yürütme tercihini yansıtır.
+Kalan ~%98,99'luk arz; emisyon takvimleri, hakediş kontratları, staking havuzları, yönetilen rezervler ve çok dönemli airdrop programı arasında kilitlidir. Airdrop dağıtımları, TGE'de değil, yıllar içinde kampanya dağıtımları olarak kademeli biçimde dolaşıma girer. Bu başlangıç dolaşımı, yukarıdaki tahsis ve açılış takvimlerinin sonucudur.

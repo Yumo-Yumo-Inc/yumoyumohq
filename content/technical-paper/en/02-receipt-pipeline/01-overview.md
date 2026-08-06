@@ -30,13 +30,13 @@ sequenceDiagram
     participant L as Reward ledger
 
     U->>C: Select or capture receipt
-    C->>C: Local preprocessing
-    C->>API: Request upload session
-    API-->>C: Upload target + receipt_id
-    C->>S: Upload receipt input
+    C->>API: Upload receipt file
+    API->>API: Server-side preprocessing
+    API->>S: Store processed input
+    API-->>C: receipt_id
     C->>API: Start processing
     API->>P: Extract text and fields
-    P-->>API: ReceiptExtraction
+    P-->>API: Labeled extraction fields
     API->>V: Check date, total, currency, consistency
     V-->>API: ValidationResult
     API->>M: Resolve merchant and product references

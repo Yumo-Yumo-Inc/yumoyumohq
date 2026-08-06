@@ -6,7 +6,7 @@ export type ReceiptStatus =
   | "scanned"
   | "rewarded_other";
 
-export type ReceiptExpenseType = "personal" | "other";
+type ReceiptExpenseType = "personal" | "other";
 
 export interface HiddenCost {
   importSystem: number;
@@ -33,7 +33,7 @@ export interface HiddenCost {
    * MUST trigger a user-facing notice that the figure is an estimate, not computed
    * from the receipt's own line items (product decision, 2026-06-24).
    */
-  provenance?: "item_derived" | "category_derived" | "sector_average" | "inflation_premium";
+  provenance?: "item_derived" | "retail_margin" | "category_derived" | "sector_average" | "inflation_premium";
   /** Share (0-1) of paid amount priced from matched line items. */
   completeShare?: number;
 }
@@ -86,14 +86,14 @@ export interface TotalCandidate {
   reasons: string[];
 }
 
-export interface DuplicateCheck {
+interface DuplicateCheck {
   isDuplicate: boolean;
   matchedReceiptId?: string;
   duplicateType?: "file" | "visual" | "content";
   duplicateUsername?: string;
 }
 
-export interface FraudInfo {
+interface FraudInfo {
   fraudScore: number;
   riskLevel: "low" | "medium" | "high" | "critical";
   isValid: boolean;
@@ -180,7 +180,7 @@ export interface Receipt {
   };
 }
 
-export interface UserStats {
+interface UserStats {
   spentMonth: number;
   hiddenMonth: number;
   productValueMonth: number;
@@ -191,9 +191,9 @@ export interface UserStats {
   claimableRewards: number;
 }
 
-export type QuestType = "DAILY" | "WEEKLY" | "SEASONAL";
+type QuestType = "DAILY" | "WEEKLY" | "SEASONAL";
 
-export interface Quest {
+interface Quest {
   id: string;
   title: string;
   description: string;
@@ -204,9 +204,9 @@ export interface Quest {
   completed: boolean;
 }
 
-export type TaskType = "SOCIAL_MEDIA" | "CHALLENGE" | "CONTENT_CREATION" | "COMMUNITY";
+type TaskType = "SOCIAL_MEDIA" | "CHALLENGE" | "CONTENT_CREATION" | "COMMUNITY";
 
-export interface Task {
+interface Task {
   id: string;
   title: string;
   description: string;
@@ -229,6 +229,14 @@ export interface LeaderboardEntry {
   address: string;
   displayName: string;
   avatarUrl?: string | null;
+  /** Name-color cosmetic palette key (account-level-4 unlock). null = no override. */
+  nameColor?: string | null;
+  /** Profile-frame cosmetic key (avatar-ring unlocks). null = no frame. */
+  profileFrame?: string | null;
+  /** Avatar-sticker cosmetic key (emoji on avatar corner, L14). null = none. */
+  avatarSticker?: string | null;
+  /** Account level — drives leaderboard prestige highlight/badge (L20/L28). */
+  accountLevel?: number;
   receiptsVerified: number;
   hiddenCostUncovered: number;
   streakDays: number;
@@ -257,16 +265,16 @@ export interface ReceiptFilters {
   search?: string;
 }
 
-export interface InsightData {
+interface InsightData {
   monthlySpend: { month: string; spend: number; hidden: number }[];
   categoryBreakdown: { category: string; amount: number }[];
   topMerchants: { name: string; receipts: number; total: number }[];
   inflationIndex: number;
 }
 
-export type ActivityType = "RECEIPT_VERIFIED" | "TASK_COMPLETED" | "ADJUSTMENT" | "CLAIM";
+type ActivityType = "RECEIPT_VERIFIED" | "TASK_COMPLETED" | "ADJUSTMENT" | "CLAIM";
 
-export interface ActivityLog {
+interface ActivityLog {
   id: string;
   type: ActivityType;
   date: string;

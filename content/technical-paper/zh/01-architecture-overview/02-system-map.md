@@ -1,38 +1,38 @@
-# 高階系統圖
+# 高阶系统图
 
-## 1.1 高階系統圖
+## 1.1 高阶系统图
 
 ```mermaid
 flowchart LR
-    subgraph Client["使用者裝置"]
-        A["應用程式<br/>錢包簽名 + 收據拍攝"]
+    subgraph Client["使用者装置"]
+        A["应用程式<br/>钱包签名 + 收据拍摄"]
     end
 
-    subgraph Processing["同步處理"]
-        B["API 介面"]
-        C["收據處理管線"]
-        D["信任層"]
+    subgraph Processing["同步处理"]
+        B["API 界面"]
+        C["收据处理管线"]
+        D["信任层"]
     end
 
-    subgraph Data["鏈下資料"]
-        E[("收據記錄")]
-        F[("bINT / ePoints 分類帳")]
-        G["匿名化彙總資料"]
+    subgraph Data["链下资料"]
+        E[("收据记录")]
+        F[("bINT 分类帐")]
+        G["匿名化汇总资料"]
     end
 
-    subgraph Chain["鏈上層"]
-        H["代幣程式"]
-        I["金庫與質押"]
-        J["密碼學承諾"]
+    subgraph Chain["链上层"]
+        H["代币程式"]
+        I["金库与质押"]
+        J["密码学承诺"]
     end
 
     A --> B --> C --> D
     D --> E
     D --> F
     E --> G
-    F -. "批次結算" .-> H
-    F -. "承諾" .-> J
+    F -. "epoch 分配根" .-> H
+    F -. "承诺" .-> J
     H --> I
 ```
 
-此圖展示公開的架構邊界：面向使用者的預覽為同步流程；bINT 與 ePoints 的會計資料先寫入分類帳，再由結算工作者（settlement workers）批次結算至鏈上層。本圖聚焦於協議元件與資料流動。
+此图展示公开的架构边界：面向使用者的预览为同步流程，而 bINT 会计保持在链下。结算工作者将由符合条件的 bINT 记帐推导出的 INT 分配根提交至链上层。本图聚焦于协议元件与资料流动。

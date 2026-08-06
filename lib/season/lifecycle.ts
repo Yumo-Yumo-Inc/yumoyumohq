@@ -49,21 +49,70 @@ export async function getActiveSeason(): Promise<SeasonRow | null> {
 }
 
 /** Canonical active season number (DB-driven). Null when no season is running. */
-export async function getActiveSeasonNumber(): Promise<number | null> {
+async function getActiveSeasonNumber(): Promise<number | null> {
   const season = await getActiveSeason();
   return season ? Number(season.season_number) : null;
 }
 
 /**
- * Eligibility gate for a season tier reward. Anti-Sybil parameters (trust floor,
- * distinct-day / distinct-merchant minimums) are deliberately not encoded here:
- * this mechanism exists, but specific parameters are calibrated in production
- * and not published (per the product decision). Skeleton returns true; wire
- * the real gate before launch.
+ * Anti-Sybil thresholds for the season tier reward. The mechanism is fixed; the
+ * specific values are calibrated in production and NOT published (CLAUDE.md §9),
+ * so they live behind env with conservative code defaults. Diversity (distinct
+ * days + merchants) does the anti-farming work; the trust floor is an extra gate
+ * that ships off (0) until calibrated, so a transient trust gap never denies a
+ * genuine participant.
  */
-async function isEligibleForSeasonReward(_username: string): Promise<boolean> {
-  // TODO(anti-sybil): trust-score production floor + min distinct-day/merchant.
-  return true;
+function eligibilityParams(): { minDays: number; minMerchants: number; trustFloor: number } {
+  const num = (v: string | undefined, d: number): number => {
+    if (v == null || v === "") return d;
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : d;
+  };
+  return {
+    minDays: Math.floor(num(process.env.SEASON_ELIGIBILITY_MIN_DISTINCT_DAYS, 3)),
+    minMerchants: Math.floor(num(process.env.SEASON_ELIGIBILITY_MIN_DISTINCT_MERCHANTS, 2)),
+    trustFloor: num(process.env.SEASON_ELIGIBILITY_TRUST_FLOOR, 0),
+  };
+}
+
+/**
+ * Eligibility gate for a season tier reward — proves the season XP came from
+ * genuine, diverse activity rather than a farm. A participant qualifies when,
+ * within the season window, their VERIFIED receipts span at least `minDays`
+ * distinct UTC days and `minMerchants` distinct merchants, and their trust score
+ * clears `trustFloor`. Season-scoped and verified-only so pre-season or unproven
+ * uploads never count. Fails CLOSED on error (skips the user; close is
+ * idempotent and re-runnable) so no undeserved credit slips through.
+ */
+async function isEligibleForSeasonReward(
+  username: string,
+  windowStart: string,
+  windowEnd: string,
+): Promise<boolean> {
+  if (!sql) return false;
+  const { minDays, minMerchants, trustFloor } = eligibilityParams();
+  try {
+    const rows = (await sql`
+      SELECT
+        (SELECT COALESCE(trust_score, 0) FROM user_trust_scores WHERE username = ${username}) AS trust,
+        COUNT(DISTINCT (created_at AT TIME ZONE 'UTC')::date) AS days,
+        COUNT(DISTINCT COALESCE(merchant_id::text, lower(trim(merchant_name)))) AS merchants
+      FROM receipts
+      WHERE username = ${username}
+        AND lower(status) = 'verified'
+        AND created_at >= ${windowStart}
+        AND created_at <= ${windowEnd}
+    `) as Array<{ trust: number | string | null; days: number | string; merchants: number | string }>;
+    const r = rows[0];
+    if (!r) return false;
+    const trust = Number(r.trust) || 0;
+    const days = Number(r.days) || 0;
+    const merchants = Number(r.merchants) || 0;
+    return days >= minDays && merchants >= minMerchants && trust >= trustFloor;
+  } catch (err) {
+    console.warn(`[season] eligibility check failed for ${username}:`, err);
+    return false; // fail-closed
+  }
 }
 
 /**
@@ -100,11 +149,19 @@ export async function openSeason(opts: {
   `;
   const season = (inserted as SeasonRow[])[0];
 
-  // Fresh slate for the new season.
+  // Fresh slate for the new season: season XP/level and the quest/referral bINT
+  // balance reset to zero. Receipt bINT is scoped by season start_at at read
+  // time, so it starts fresh without a write. (karar 2026-07-06: tam sıfırlama)
   await sql`
     UPDATE user_profiles
-    SET season_xp = 0, season_level = 1, current_season_number = ${opts.seasonNumber}, updated_at = now()
-    WHERE COALESCE(season_xp, 0) <> 0 OR COALESCE(current_season_number, 0) <> ${opts.seasonNumber}
+    SET season_xp = 0,
+        season_level = 1,
+        bint_balance = 0,
+        current_season_number = ${opts.seasonNumber},
+        updated_at = now()
+    WHERE COALESCE(season_xp, 0) <> 0
+       OR COALESCE(bint_balance, 0) <> 0
+       OR COALESCE(current_season_number, 0) <> ${opts.seasonNumber}
   `;
 
   return { ok: true, season };
@@ -159,7 +216,7 @@ export async function closeSeason(
     for (const p of participants) {
       const tier = getTierForXp(config, p.season_xp);
       if (!tier) continue;
-      if (!(await isEligibleForSeasonReward(p.username))) continue;
+      if (!(await isEligibleForSeasonReward(p.username, season.start_at, season.end_at))) continue;
 
       // cPoints credit into the single ledger — post-TGE the epoch engine sweeps it to bINT/INT.
       await sql`

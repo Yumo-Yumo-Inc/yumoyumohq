@@ -28,17 +28,22 @@ export async function dispatchQuestReward(
   const sql = getSql();
   if (!sql) return { ok: false, error: "Database not available" };
 
-  let transactionOpen = false;
-
   try {
     const accountXpToAdd = rewardAccountXp ?? rewardSeasonXp;
 
-    await sql`BEGIN`;
-    transactionOpen = true;
-
+    // Neon's HTTP driver autocommits every statement independently — a
+    // `BEGIN`/`COMMIT`/`ROLLBACK` issued as separate tagged calls does NOT wrap
+    // them in one transaction (each call may even run on a different pooled
+    // connection). The previous version relied on that, so a mid-sequence error
+    // left the quest stranded in an intermediate `processing_reward` state that
+    // no path ever cleared, and the quest stayed locked forever.
+    //
+    // Instead, the `active → completed` transition is the single atomic gate:
+    // exactly one caller wins the conditional UPDATE, and only that caller
+    // credits the reward. The credit writes are each idempotent or logged.
     const claimResult = await sql`
       UPDATE user_quests
-      SET status = 'processing_reward', updated_at = now()
+      SET status = 'completed', progress = target, completed_at = now(), updated_at = now()
       WHERE id = ${userQuestId}
         AND username = ${username}
         AND status = 'active'
@@ -46,8 +51,6 @@ export async function dispatchQuestReward(
     `;
     const claimRows = toRows(claimResult);
     if (claimRows.length === 0) {
-      await sql`ROLLBACK`;
-      transactionOpen = false;
       return { ok: true, alreadyProcessed: true };
     }
 
@@ -71,12 +74,6 @@ export async function dispatchQuestReward(
       UPDATE user_profiles
       SET account_level = ${newAccountLevel}, season_level = ${newSeasonLevel}, updated_at = now()
       WHERE username = ${username}
-    `;
-
-    await sql`
-      UPDATE user_quests
-      SET status = 'completed', progress = target, completed_at = now(), updated_at = now()
-      WHERE id = ${userQuestId} AND username = ${username}
     `;
 
     try {
@@ -124,17 +121,8 @@ export async function dispatchQuestReward(
       console.warn("[reward-dispatcher] contribution_point_events insert failed (reward still applied):", e);
     }
 
-    await sql`COMMIT`;
-    transactionOpen = false;
     return { ok: true };
   } catch (err: any) {
-    if (transactionOpen) {
-      try {
-        await sql`ROLLBACK`;
-      } catch (rollbackError) {
-        console.error("[reward-dispatcher] rollback failed:", rollbackError);
-      }
-    }
     console.error("[reward-dispatcher] dispatchQuestReward error:", err);
     return { ok: false, error: err?.message ?? String(err) };
   }

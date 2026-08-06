@@ -31,7 +31,7 @@ export type SourceGroupKey =
   | "referencePrices"
   | "indices";
 
-export interface SourceGroup {
+interface SourceGroup {
   key: SourceGroupKey;
   rows: SourceRow[];
 }

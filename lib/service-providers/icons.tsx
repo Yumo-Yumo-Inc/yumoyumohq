@@ -53,7 +53,7 @@ export const CATEGORY_COLOR: Record<
  * Stroke + bg combined into a single string — used by call sites like
  * `service-providers-card.tsx` that merge classes with `cn(...)`.
  */
-export const CATEGORY_TAILWIND: Record<ServiceProviderCategory, string> = {
+const CATEGORY_TAILWIND: Record<ServiceProviderCategory, string> = {
   electricity: "bg-[#BA7517]/18 text-[#FAC775]",
   water: "bg-[#378ADD]/18 text-[#85B7EB]",
   gas: "bg-[#E85A3C]/18 text-[#FF8A6B]",
@@ -65,6 +65,6 @@ export const CATEGORY_TAILWIND: Record<ServiceProviderCategory, string> = {
   other: "bg-[#5F5E5A]/18 text-[#8A867E]",
 };
 
-export function categoryIcon(category: ServiceProviderCategory): LucideIcon {
+function categoryIcon(category: ServiceProviderCategory): LucideIcon {
   return CATEGORY_ICON[category] ?? CATEGORY_ICON.other;
 }

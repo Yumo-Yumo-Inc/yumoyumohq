@@ -418,7 +418,12 @@ export async function resolveCanonicalObservations(
       obs.category_lvl2 = cat2;
       // Carry the v3 path so brand-status classification works on the v1 path too.
       if (llm.category_path) obs.category_path = llm.category_path;
-      obs.unit_type = mapUnitTypeToObservation(llm.unit_type);
+      // The observation's unit_type is what the vision extraction read off the
+      // receipt (a piece-priced banana is "adet" even though the product concept
+      // usually sells by kg). The normalization LLM's unit describes the product,
+      // not this purchase — it feeds pack_size and canonical metadata above but
+      // never overwrites the observed unit.
+      if (!obs.unit_type) obs.unit_type = mapUnitTypeToObservation(llm.unit_type);
       obs.confidence_score = guardedCategory ? Math.max(llm.confidence, 0.92) : llm.confidence;
     }
   }

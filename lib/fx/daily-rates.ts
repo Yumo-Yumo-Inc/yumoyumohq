@@ -18,7 +18,7 @@ import { getSql } from "@/lib/db/client";
 // ---------------------------------------------------------------------------
 
 /** $300 USD threshold for payment proof requirement */
-export const PAYMENT_PROOF_THRESHOLD_USD = 300;
+const PAYMENT_PROOF_THRESHOLD_USD = 300;
 
 /** How long a cached rate stays valid (25 hours — covers timezone drift) */
 const RATE_TTL_MS = 25 * 60 * 60 * 1000;
@@ -183,7 +183,7 @@ const FALLBACK_RATES_TO_USD: Record<string, number> = {
  * Get the USD equivalent of an amount in the given currency.
  * Resolution order: in-memory cache → DB → static fallback.
  */
-export async function convertToUSD(
+async function convertToUSD(
   amount: number | null | undefined,
   currency: string | null | undefined
 ): Promise<number | null> {
@@ -223,7 +223,7 @@ export async function convertToUSD(
  * Returns true if amount >= PAYMENT_PROOF_THRESHOLD_USD.
  * Returns false (skip threshold) when currency cannot be converted.
  */
-export async function exceedsPaymentProofThreshold(
+async function exceedsPaymentProofThreshold(
   amount: number | null | undefined,
   currency: string | null | undefined
 ): Promise<boolean> {

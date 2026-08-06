@@ -6,7 +6,7 @@ import { dispatchQuestReward } from "@/lib/quests/reward-dispatcher";
 // Legacy exports (backward compat)
 export const WEEKLY_TYPES: WeeklyReceiptType[] = ["W1A", "W1B", "W1C", "W2", "W3", "W4", "W5", "W6"];
 // V2: bonus account XP types (social weekly quests + W2/W5)
-export const WEEKLY_ACCOUNT_XP_TYPES = new Set<string>(["W2", "W5", "WC1", "WC2", "WC3", "WC4", "WC5", "WC6", "WC7", "WC8"]);
+const WEEKLY_ACCOUNT_XP_TYPES = new Set<string>(["W2", "W5", "WC1", "WC2", "WC3", "WC4", "WC5", "WC6", "WC7", "WC8"]);
 
 type WeeklyQuestMetrics = {
   receiptCount: number;
@@ -211,7 +211,7 @@ async function getWeeklyQuestMetrics(
   };
 }
 
-export function getWeeklyQuestTargetForType(
+function getWeeklyQuestTargetForType(
   type: string,
   metrics: WeeklyQuestMetrics
 ): number {
@@ -260,7 +260,7 @@ export function getWeeklyQuestTargetForType(
   }
 }
 
-export function getWeeklyQuestProgressForType(
+function getWeeklyQuestProgressForType(
   type: string,
   metrics: WeeklyQuestMetrics
 ): number {

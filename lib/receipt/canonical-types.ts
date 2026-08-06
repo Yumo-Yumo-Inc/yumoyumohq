@@ -3,7 +3,7 @@
  * Used for product-level hidden cost calculation in post-process.
  */
 
-export type CanonicalUnitType = "adet" | "kg" | "g" | "l" | "ml" | "pack" | "set" | string | null;
+type CanonicalUnitType = "adet" | "kg" | "g" | "l" | "ml" | "pack" | "set" | string | null;
 
 export interface CanonicalMerchant {
   canonical_name: string;
@@ -50,6 +50,11 @@ export interface CanonicalObservation {
   // the final classification persisted to receipt_line_items.brand_status.
   brand_verdict?: "BRAND" | "UNBRANDED" | "UNKNOWN" | null;
   brand_status?: "resolved" | "unbranded" | "needs_user" | "user_provided" | null;
+
+  // Write-path classification (lib/receipt/line-kind.ts). Only "product" rows
+  // enter canonical matching and brand resolution; the rest are persisted for
+  // receipt totals only. Missing (older payloads) means "product".
+  line_kind?: import("./line-kind").LineKind | null;
 }
 
 export interface CanonicalPayload {

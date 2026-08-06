@@ -23,12 +23,12 @@ import { categoryLabel } from "@/lib/i18n/taxonomy";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import type { YumoLocale } from "@/lib/product-architecture/dashboard-contract";
 
-export interface CategoryOption {
+interface CategoryOption {
   key: string; // canonical category or "other"
   count: number;
 }
 
-export const CATEGORY_ICON: Record<string, LucideIcon> = {
+const CATEGORY_ICON: Record<string, LucideIcon> = {
   cafe: Coffee,
   restaurant: UtensilsCrossed,
   grocery: ShoppingCart,

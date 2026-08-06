@@ -1,6 +1,6 @@
 # 04 — Tokenomics Mechanics
 
-This section covers the economic mechanics of the Yumo Yumo protocol: the roles carried by INT, bINT, ePoints, and the Foundation NFT; the emission and conversion lifecycle; reward ceilings; staking, treasury, and buy-back/burn mechanics; supply allocation; circulating supply projections; and INT utility.
+This section covers the economic mechanics of the Yumo Yumo protocol: the roles carried by INT, bINT, and the proof-of-expense SBT; the emission and conversion lifecycle; reward ceilings; staking, treasury, and buy-back/burn mechanics; supply allocation; circulating supply projections; and INT utility.
 
 Jurisdiction-specific legal opinions are managed in the legal layer.
 
@@ -10,8 +10,7 @@ Jurisdiction-specific legal opinions are managed in the legal layer.
 |---|---|
 | INT | Main on-chain token and circulation accounting |
 | bINT | Pre-settlement reward representation for verified contribution |
-| ePoints | In-app progress and seasonal activity layer |
-| Foundation NFT | Early contribution and level representation |
+| Proof-of-expense SBT | Verified contributor marker |
 | Staking | Lock, accrual, and protocol participation semantics |
 | Treasury | Relationship between revenue inflows, operations, reserves, and token economy |
 | Supply & allocation | Total supply, rail percentages, token amounts (4.16–4.18) |

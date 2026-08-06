@@ -42,7 +42,7 @@ export type TraitConfidence = "high" | "low" | "none";
  * Per-trait evidence counts. The UI composes localized sentences from these;
  * the backend never produces user-facing prose. All fields are raw observations.
  */
-export interface TraitEvidence {
+interface TraitEvidence {
   impulse?: {
     weekendNightShare: number; // 0..1 of spend on weekend OR evening/night
     receiptsWithTime: number;

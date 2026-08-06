@@ -11,6 +11,7 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { getClientEndpoint } from "@/lib/solana/rpc";
+import { registerMobileWalletAdapter } from "@/lib/solana/register-mwa";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 const isUserRejectedWalletRequest = (error: unknown): boolean => {
@@ -60,14 +61,20 @@ export function SolanaWalletProvider({
     };
   }, []);
 
+  // Put the Mobile Wallet Adapter into the Wallet Standard registry once, on the
+  // client. The registry is reactive, so registering here (after mount) still makes
+  // a phone's installed wallet show up in the modal before the user opens it.
+  useEffect(() => {
+    registerMobileWalletAdapter();
+  }, []);
+
   const wallets = useMemo(() => {
-    // Create wallet adapters explicitly - only Solana wallets
-    // We only want Phantom and Solflare, no auto-detection
+    // Explicit extension adapters for desktop and for iOS deeplink. MWA is NOT
+    // listed here — registerMwa above puts it into the Wallet Standard registry,
+    // which WalletProvider merges with this list automatically, so it shows up on
+    // a phone without us hard-coding it. Android uses MWA; iOS/desktop use these.
     const phantom = new PhantomWalletAdapter();
     const solflare = new SolflareWalletAdapter();
-    
-    // Return only the wallets we explicitly create
-    // This prevents any auto-detection issues
     return [phantom, solflare];
   }, []);
 

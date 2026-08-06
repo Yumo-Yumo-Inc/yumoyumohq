@@ -52,7 +52,7 @@ export function WalletAddressLink({ locale }: { locale: string }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError((data as any)?.error || l("Adres kaydedilemedi.", "Could not save address."));
+        setError(l("Adres kaydedilemedi.", "Could not save address."));
         return;
       }
       setCurrent({ walletAddress: (data as any).walletAddress ?? addr, walletVerified: Boolean((data as any).walletVerified) });

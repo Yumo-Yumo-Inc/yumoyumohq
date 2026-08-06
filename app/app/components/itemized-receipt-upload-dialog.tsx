@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Plus, Trash2, Upload } from "lucide-react";
-import { useAppLocale } from "@/lib/i18n/app-context";
+import { useAppLocale, translateApiError } from "@/lib/i18n/app-context";
 
 type ManualItemRow = { name: string; totalPrice: string };
 
@@ -77,7 +77,7 @@ export function ItemizedReceiptUploadDialog({
       await onUploadComplete?.();
       onOpenChange(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("errors.upload.unknown"));
+      setError(translateApiError(e instanceof Error ? e.message : null, t, true) || t("errors.upload.unknown"));
     } finally {
       setBusy(false);
     }
@@ -135,7 +135,7 @@ export function ItemizedReceiptUploadDialog({
       await onUploadComplete?.();
       onOpenChange(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("errors.upload.unknown"));
+      setError(translateApiError(e instanceof Error ? e.message : null, t, true) || t("errors.upload.unknown"));
     } finally {
       setBusy(false);
     }

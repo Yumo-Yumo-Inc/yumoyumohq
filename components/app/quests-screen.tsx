@@ -19,6 +19,8 @@ import {
   Users,
 } from "lucide-react";
 import { questXpToCPoints } from "@/config/contribution-config";
+import { Surface } from "@/components/ui/surface";
+import { StaggerReveal, Reveal } from "@/components/ui/stagger-reveal";
 import { toast } from "sonner";
 import type { LucideIcon } from "lucide-react";
 import { QuestCompleteOverlay, type QuestCompleteData } from "@/components/app/quest-complete-overlay";
@@ -33,6 +35,12 @@ import { syncMobileData } from "@/lib/sync";
 import { applyMobileActionResult } from "@/lib/mobile/action-result-client";
 import type { MobileActionResult } from "@/lib/mobile/action-result-types";
 import { useAppProfile } from "@/lib/app/profile-context";
+import { getCountryByCode, normalizeCountryCode } from "@/lib/shared/countries";
+
+/** Local currency symbol for a country code (฿ for TH, ₺ for TR); default ₺. */
+function currencySymbolForCountry(country?: string | null): string {
+  return getCountryByCode(normalizeCountryCode(country) ?? "")?.symbol ?? "₺";
+}
 interface CompleteApiResponse {
   ok: boolean;
   levelUp?: "account" | "season" | "both" | null;
@@ -76,7 +84,9 @@ interface QuestCardData {
 
 interface QuestsData {
   daily: QuestCardData[];
-  weekly: QuestCardData | null;
+  // All active weekly quests for the current week (one per tier, up to 4). The
+  // server assigns and rewards each of them, so the board shows each of them.
+  weeklies: QuestCardData[];
   weeklyOptions: QuestCardData[];
   dailyTotalRyumo: number;
   dailyTotalSeasonXp: number;
@@ -190,14 +200,13 @@ async function readQuestCacheSnapshot(locale: string = "en"): Promise<QuestsData
     .map(mapQuestRecord)
     .map(localizeTitle);
 
-  const weekly =
-    records
-      .filter((r) => r.questKind === "weekly" && r.weekStart === currentWeekStart && r.weekEnd === currentWeekEnd)
-      .sort((a, b) => b.version - a.version)
-      .map(mapQuestRecord)
-      .map(localizeTitle)[0] ?? null;
+  const weeklies = records
+    .filter((r) => r.questKind === "weekly" && r.weekStart === currentWeekStart && r.weekEnd === currentWeekEnd)
+    .sort((a, b) => a.type.localeCompare(b.type))
+    .map(mapQuestRecord)
+    .map(localizeTitle);
 
-  const weeklyOptions = weekly
+  const weeklyOptions = weeklies.length > 0
     ? []
     : records
         .filter((r) => r.questKind === "weekly_option" && r.weekStart === currentWeekStart && r.weekEnd === currentWeekEnd)
@@ -211,7 +220,7 @@ async function readQuestCacheSnapshot(locale: string = "en"): Promise<QuestsData
 
   return {
     daily,
-    weekly,
+    weeklies,
     weeklyOptions,
     dailyTotalRyumo: daily.reduce((s, q) => s + (q.status === "completed" ? 0 : questXpToCPoints(q.rewardSeasonXp)), 0),
     dailyTotalSeasonXp: daily.reduce((s, q) => s + (q.status === "completed" ? 0 : q.rewardSeasonXp), 0),
@@ -310,11 +319,12 @@ function ProgressDial({ pct, tone, done, locked }: { pct: number; tone: (typeof 
 }
 
 function RewardRail({ quest, tone, done }: { quest: QuestCardData; tone: (typeof QUEST_TONES)[number]; done: boolean }) {
+  const { locale } = useAppLocale();
   return (
     <div className="grid grid-cols-2 gap-3 border-t pt-3" style={{ borderColor: done ? "rgba(154,165,175,0.08)" : "rgba(255,255,255,0.08)" }}>
       <div>
         <p className="text-[10px] font-bold uppercase" style={{ color: done ? "#4F5964" : "#84909A" }}>
-          POINTS
+          {L(locale, "Puan", "Points", "Поинты", "แต้ม", "Puntos", "积分")}
         </p>
         <p className="mt-0.5 font-mono text-[16px] font-black tabular-nums" style={{ color: done ? "#68727D" : tone.accent }}>
           +{questXpToCPoints(quest.rewardSeasonXp)}
@@ -322,7 +332,7 @@ function RewardRail({ quest, tone, done }: { quest: QuestCardData; tone: (typeof
       </div>
       <div>
         <p className="text-[10px] font-bold uppercase" style={{ color: done ? "#4F5964" : "#84909A" }}>
-          XP
+          {L(locale, "Sezon XP", "Season XP", "Сезон XP", "ซีซัน XP", "XP de temporada", "赛季 XP")}
         </p>
         <p className="mt-0.5 font-mono text-[16px] font-black tabular-nums" style={{ color: done ? "#747D87" : "#F4EFE2" }}>
           +{quest.rewardSeasonXp}
@@ -334,6 +344,8 @@ function RewardRail({ quest, tone, done }: { quest: QuestCardData; tone: (typeof
 
 function QuestVisualCard({ quest, tone, index = 0, footer, justCompleted = false, featured = false }: QuestVisualCardProps) {
   const { locale } = useAppLocale();
+  const { profile } = useAppProfile();
+  const curSymbol = currencySymbolForCountry(profile?.country);
   const pct = clampPct(quest.progress, quest.target);
   const done = quest.status === "completed";
   const locked = quest.status === "locked";
@@ -388,7 +400,7 @@ function QuestVisualCard({ quest, tone, index = 0, footer, justCompleted = false
               {L(locale, tone.labelTr, tone.labelEn, tone.labelEn, tone.labelEn, tone.labelEn, tone.labelEn)} / {quest.type}
             </p>
             <h3 className="mt-2 text-[18px] font-black leading-tight" style={{ color: done ? "#6E7883" : locked ? "#9AA5AF" : "#F4EFE2" }}>
-              {getQuestTitle(quest.type, locale, quest.title)}
+              {getQuestTitle(quest.type, locale, quest.title, curSymbol)}
             </h3>
             <p className="mt-2 text-[12px] font-semibold leading-5" style={{ color: done ? "#5B646E" : "#9AA5AF" }}>
               {done
@@ -471,8 +483,7 @@ function SectionHeader({ eyebrow, title, meta }: { eyebrow: string; title: strin
 
 function QuestBoardHero({
   daily,
-  weekly,
-  weeklyOptions,
+  weeklies,
   dailyTotalRyumo,
   dailyTotalSeasonXp,
   weekStart,
@@ -480,131 +491,66 @@ function QuestBoardHero({
   locale,
 }: {
   daily: QuestCardData[];
-  weekly: QuestCardData | null;
-  weeklyOptions: QuestCardData[];
+  weeklies: QuestCardData[];
   dailyTotalRyumo: number;
   dailyTotalSeasonXp: number;
   weekStart: string;
   weekEnd: string;
   locale: AppLocale;
 }) {
-  const totalCount = daily.length + (weekly ? 1 : 0);
-  const completedCount = daily.filter((q) => q.status === "completed").length + (weekly?.status === "completed" ? 1 : 0);
+  const totalCount = daily.length + weeklies.length;
+  const completedCount = daily.filter((q) => q.status === "completed").length + weeklies.filter((q) => q.status === "completed").length;
   const progressPct = totalCount > 0 ? completedCount / totalCount : 0;
-  const weeklyReward = weekly ? (weekly.status === "completed" ? 0 : questXpToCPoints(weekly.rewardSeasonXp)) : Math.max(0, ...weeklyOptions.map((q) => questXpToCPoints(q.rewardSeasonXp)));
+  const allDone = totalCount > 0 && completedCount === totalCount;
 
+  // Compact, action-first header: a slim value strip that states today's standing
+  // and reward at a glance, then gets out of the way so the quest cards lead.
   return (
-    <section
-      className="relative overflow-hidden rounded-lg border px-4 py-5 lg:grid lg:min-h-[300px] lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-8 lg:py-7"
-      style={{
-        background: "linear-gradient(135deg,#101713,#17150F 52%,#161214)",
-        borderColor: "#2F3B31",
-        boxShadow: "0 18px 44px rgba(0,0,0,0.24)",
-      }}
-    >
-      <div className="absolute inset-x-0 top-0 h-1" style={{ background: "linear-gradient(90deg,#D8B653,#6CCB96,#C87968)" }} />
-      <div className="relative z-10">
-        <p className="text-[11px] font-black uppercase" style={{ color: "#D8B653" }}>
-          {L(locale, "Görev merkezi", "Task center", "Центр задач", "ศูนย์ภารกิจ", "Centro de tareas", "任务中心")}
-        </p>
-        <h1 className="mt-3 max-w-[620px] text-[28px] font-black leading-tight lg:text-[42px]" style={{ color: "#F4EFE2" }}>
-          {L(locale, "Bugünün görevlerini tamamla, ödüllerini kazan.", "Complete today's tasks and earn your rewards.", "Заверши задания на сегодня и получи награды.", "ทำภารกิจวันนี้ให้ครบ แล้วรับรางวัลของคุณ", "Completa las tareas de hoy y gana tus recompensas.", "完成今日任务，领取你的奖励。")}
-        </h1>
-        <p className="mt-3 max-w-[560px] text-[13px] font-semibold leading-6 lg:text-[15px]" style={{ color: "#9AA5AF" }}>
-          {L(locale, "Fiş yükleme, keşif, gizli maliyet ve haftalık hedefler burada tek bakışta takip edilir.", "Track receipt uploads, discovery, hidden cost, and weekly goals in one clear view.", "Отслеживайте загрузки чеков, открытия, скрытые затраты и еженедельные цели.", "ติดตามการอัปโหลดใบเสร็จ การค้นพบ ต้นทุนที่ซ่อนอยู่ และเป้าหมายรายสัปดาห์", "Rastrea cargas de recibos, descubrimientos, costos ocultos y metas semanales.", "在这里一目了然地追踪收据上传、发现、隐性成本和每周目标。")}
-        </p>
-
-        <div className="mt-6 grid grid-cols-3 gap-4 border-y py-4" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-          <div>
-            <p className="text-[10px] font-black uppercase" style={{ color: "#84909A" }}>
-              {L(locale, "Tamamlanan", "Completed", "Выполнено", "สำเร็จแล้ว", "Completado", "已完成")}
-            </p>
-            <p className="mt-1 font-mono text-[22px] font-black" style={{ color: "#F4EFE2" }}>
-              {completedCount}/{totalCount || 0}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase" style={{ color: "#84909A" }}>
-              {L(locale, "Günlük ödül", "Daily reward", "Награда за день", "รางวัลรายวัน", "Recompensa diaria", "每日奖励")}
-            </p>
-            <p className="mt-1 font-mono text-[22px] font-black" style={{ color: "#D8B653" }}>
-              +{dailyTotalRyumo}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase" style={{ color: "#84909A" }}>
-              {L(locale, "Hafta", "Week", "Неделя", "สัปดาห์", "Semana", "本周")}
-            </p>
-            <p className="mt-1 font-mono text-[22px] font-black" style={{ color: "#6CCB96" }}>
-              +{weeklyReward}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap items-center gap-3 text-[12px] font-black" style={{ color: "#9AA5AF" }}>
-          <span className="inline-flex items-center gap-2">
-            <CalendarDays className="h-4 w-4" style={{ color: "#D8B653" }} />
-            {formatShortDate(weekStart, locale)} - {formatShortDate(weekEnd, locale)}
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <BadgeCheck className="h-4 w-4" style={{ color: "#6CCB96" }} />
-            +{dailyTotalSeasonXp} XP
-          </span>
-        </div>
-      </div>
-
-      <div className="relative mt-7 lg:mt-0">
-        <div className="rounded-lg border p-5 lg:h-full lg:p-6" style={{ background: "#111714", borderColor: "#2F3B31" }}>
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-black uppercase" style={{ color: "#84909A" }}>
-                {L(locale, "Genel ilerleme", "Overall progress", "Общий прогресс", "ความคืบหน้ารวม", "Progreso general", "总体进度")}
-              </p>
-              <p className="mt-2 font-mono text-[34px] font-black leading-none" style={{ color: "#F4EFE2" }}>
-                {Math.round(progressPct * 100)}%
-              </p>
-            </div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-lg border" style={{ background: "rgba(108,203,150,0.1)", borderColor: "#254737", color: "#6CCB96" }}>
-              <Target className="h-6 w-6" />
-            </div>
-          </div>
-
-          <div className="mt-6 h-3 overflow-hidden rounded-full" style={{ background: "#20271F" }}>
-            <div className="h-full rounded-full" style={{ width: `${progressPct * 100}%`, background: "linear-gradient(90deg,#D8B653,#6CCB96)" }} />
-          </div>
-
-          <p className="mt-4 text-[13px] font-bold leading-6" style={{ color: "#9AA5AF" }}>
-            {L(locale,
-              `${completedCount}/${totalCount || 0} görev tamamlandı. Günlük ve haftalık ödüller ilerlemene göre güncellenir.`,
-              `${completedCount}/${totalCount || 0} tasks completed. Daily and weekly rewards update with your progress.`,
-              `${completedCount}/${totalCount || 0} задач выполнено. Ежедневные и еженедельные награды обновляются.`,
-              `${completedCount}/${totalCount || 0} งานเสร็จสิ้น รางวัลรายวันและรายสัปดาห์อัปเดตตามความคืบหน้า`,
-              `${completedCount}/${totalCount || 0} tareas completadas. Las recompensas diarias y semanales se actualizan.`,
-              `${completedCount}/${totalCount || 0} 个任务已完成。每日和每周奖励随进度更新。`
-            )}
+    <Surface variant="value" accent="gold" glow radius="lg" className="px-4 py-4 sm:px-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[10.5px] font-black uppercase tracking-[0.16em]" style={{ color: "var(--app-gold)" }}>
+            {L(locale, "Görev merkezi", "Task center", "Центр задач", "ศูนย์ภารกิจ", "Centro de tareas", "任务中心")}
           </p>
-
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <div className="rounded-lg border p-3" style={{ borderColor: "#3E3520", background: "#151411" }}>
-              <p className="text-[10px] font-black uppercase" style={{ color: "#84909A" }}>
-                {L(locale, "Bugün", "Today", "Сегодня", "วันนี้", "Hoy", "今天")}
-              </p>
-              <p className="mt-1 font-mono text-[18px] font-black" style={{ color: "#D8B653" }}>
-                +{dailyTotalRyumo}
-              </p>
-            </div>
-            <div className="rounded-lg border p-3" style={{ borderColor: "#254737", background: "#101713" }}>
-              <p className="text-[10px] font-black uppercase" style={{ color: "#84909A" }}>
-                {L(locale, "Haftalık", "Weekly", "Еженедельно", "รายสัปดาห์", "Semanal", "每周")}
-              </p>
-              <p className="mt-1 font-mono text-[18px] font-black" style={{ color: "#6CCB96" }}>
-                +{weeklyReward}
-              </p>
-            </div>
-          </div>
+          <p className="mt-1.5 flex items-baseline gap-2">
+            <span className="scanui-hero-num text-[34px] tabular-nums">{completedCount}</span>
+            <span className="text-[15px] font-black" style={{ color: "var(--app-text-secondary)" }}>/ {totalCount || 0}</span>
+            <span className="text-[13px] font-bold" style={{ color: "var(--app-text-muted)" }}>
+              {allDone
+                ? L(locale, "hepsi tamam", "all done", "все готово", "เสร็จทั้งหมด", "todo listo", "全部完成")
+                : L(locale, "görev", "tasks", "задач", "งาน", "tareas", "任务")}
+            </span>
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className="rounded-full px-2.5 py-1 font-mono text-[13px] font-black tabular-nums" style={{ background: "var(--app-gold-glow)", color: "var(--app-gold)" }}>
+            +{dailyTotalRyumo} {L(locale, "puan", "pts", "поинты", "แต้ม", "pts", "积分")}
+          </span>
+          <span className="inline-flex items-center gap-1.5 font-mono text-[12px] font-black tabular-nums" style={{ color: "var(--app-text-secondary)" }}>
+            <BadgeCheck className="h-3.5 w-3.5" style={{ color: "var(--app-success)" }} />
+            +{dailyTotalSeasonXp} {L(locale, "Sezon XP", "Season XP", "Сезон XP", "ซีซัน XP", "XP temporada", "赛季 XP")}
+          </span>
         </div>
       </div>
-    </section>
+
+      <div className="mt-3.5 h-2 overflow-hidden rounded-full" style={{ background: "var(--app-border)" }}>
+        <div
+          className="h-full rounded-full transition-[width] duration-700 ease-out"
+          style={{
+            width: `${Math.max(2, progressPct * 100)}%`,
+            background: allDone
+              ? "linear-gradient(90deg, var(--app-success), var(--app-gold-light))"
+              : "linear-gradient(90deg, var(--app-gold-dim), var(--app-gold-light))",
+            boxShadow: "0 0 12px var(--app-gold-glow)",
+          }}
+        />
+      </div>
+
+      <div className="mt-3 flex items-center gap-2 text-[11px] font-bold" style={{ color: "var(--app-text-muted)" }}>
+        <CalendarDays className="h-3.5 w-3.5" style={{ color: "var(--app-gold-dim)" }} />
+        {formatShortDate(weekStart, locale)} – {formatShortDate(weekEnd, locale)}
+      </div>
+    </Surface>
   );
 }
 
@@ -614,7 +560,8 @@ async function fetchQuestSnapshot(locale: string): Promise<QuestsData> {
 
 export function QuestsScreen({ className, refreshKey = 0, preview = false }: QuestsScreenProps) {
   const { t, locale } = useAppLocale();
-  const { announceLevelUp } = useAppProfile();
+  const { announceLevelUp, profile: appProfile } = useAppProfile();
+  const curSymbol = currencySymbolForCountry(appProfile?.country);
   const queryClient = useQueryClient();
 
   const [completeQueue, setCompleteQueue] = useState<QuestCompleteData[]>([]);
@@ -631,7 +578,7 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
   });
 
   const daily = useMemo(() => data?.daily ?? [], [data?.daily]);
-  const weekly = data?.weekly ?? null;
+  const weeklies = useMemo(() => data?.weeklies ?? [], [data?.weeklies]);
   const weeklyOptions = useMemo(() => data?.weeklyOptions ?? [], [data?.weeklyOptions]);
   const dailyTotalRyumo = data?.dailyTotalRyumo ?? 0;
   const dailyTotalSeasonXp = data?.dailyTotalSeasonXp ?? 0;
@@ -711,9 +658,9 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
           quest: q,
           isWeekly: false,
         })),
-      ...(weekly && weekly.questId && weekly.status === "active" && weekly.progress >= weekly.target
-        ? [{ key: weekly.id, endpoint: "/api/quests/weekly/complete" as const, questId: weekly.questId, quest: weekly, isWeekly: true }]
-        : []),
+      ...weeklies
+        .filter((w) => w.questId && w.status === "active" && w.progress >= w.target)
+        .map((w) => ({ key: w.id, endpoint: "/api/quests/weekly/complete" as const, questId: w.questId as number, quest: w, isWeekly: true })),
     ].filter((item) => !autoCompletedRef.current.has(item.key));
 
     if (completable.length === 0) return;
@@ -734,7 +681,7 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
         const item = completable[index];
         newJustCompleted.add(item.key);
         queue.push({
-          questTitle: getQuestTitle(item.quest.type, locale, item.quest.title),
+          questTitle: getQuestTitle(item.quest.type, locale, item.quest.title, curSymbol),
           rewardRyumo: item.quest.rewardRyumo,
           rewardSeasonXp: item.quest.rewardSeasonXp,
           isWeekly: item.isWeekly,
@@ -746,7 +693,7 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
         setCompleteQueue(queue);
       }
     });
-  }, [daily, weekly, loading, handleCompleteQuest, locale]);
+  }, [daily, weeklies, loading, handleCompleteQuest, locale, curSymbol]);
 
   const handleSelectWeeklyQuest = useCallback(
     async (questType: string) => {
@@ -779,7 +726,7 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
           if (found) {
             setCompleteQueue([
               {
-                questTitle: getQuestTitle(found.type, locale, found.title),
+                questTitle: getQuestTitle(found.type, locale, found.title, curSymbol),
                 rewardRyumo: found.rewardRyumo,
                 rewardSeasonXp: found.rewardSeasonXp,
                 isWeekly: true,
@@ -821,17 +768,17 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
   const visibleDaily = preview ? daily.slice(0, 2) : daily;
   const showDaily = visibleDaily.length > 0;
   const showDailyEmpty = !loading && daily.length === 0;
-  const showWeekly = weekly !== null;
-  const showWeeklyOptions = !preview && weekly === null && weeklyOptions.length > 0;
-  const showWeeklyPreviewPrompt = preview && weekly === null && weeklyOptions.length > 0;
+  const showWeekly = weeklies.length > 0;
+  const showWeeklyOptions = !preview && weeklies.length === 0 && weeklyOptions.length > 0;
+  const showWeeklyPreviewPrompt = preview && weeklies.length === 0 && weeklyOptions.length > 0;
 
   if (loading) {
     return (
       <div className={cn("space-y-4", className)}>
-        <div className="h-[260px] animate-pulse rounded-lg border" style={{ background: "#111714", borderColor: "#2F3B31" }} />
+        <div className="h-[92px] animate-pulse rounded-[var(--app-radius-lg)]" style={{ background: "var(--app-bg-elevated)" }} />
         <div className="grid gap-3 lg:grid-cols-2">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-[210px] animate-pulse rounded-lg border" style={{ background: "#141712", borderColor: "#2C3329", opacity: 1 - i * 0.12 }} />
+            <div key={i} className="h-[210px] animate-pulse rounded-[var(--app-radius-md)]" style={{ background: "var(--app-bg-elevated)", opacity: 1 - i * 0.12 }} />
           ))}
         </div>
       </div>
@@ -840,9 +787,9 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
 
   if (isError) {
     return (
-      <div className={cn("rounded-lg border py-10 text-center", className)} style={{ color: "#9AA5AF", borderColor: "#2F3B31", background: "#111714" }}>
+      <Surface variant="flat" radius="lg" className={cn("py-10 text-center text-sm font-semibold", className)} style={{ color: "var(--app-text-secondary)" }}>
         {t("quests.loadError")}
-      </div>
+      </Surface>
     );
   }
 
@@ -854,8 +801,7 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
         {!preview ? (
           <QuestBoardHero
             daily={daily}
-            weekly={weekly}
-            weeklyOptions={weeklyOptions}
+            weeklies={weeklies}
             dailyTotalRyumo={dailyTotalRyumo}
             dailyTotalSeasonXp={dailyTotalSeasonXp}
             weekStart={weekStart}
@@ -870,11 +816,11 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
             title={L(locale, "Bugünün kartları", "Today's cards", "Карты на сегодня", "การ์ดของวันนี้", "Tarjetas de hoy", "今日卡片")}
             meta={
               <div className="text-right">
-                <p className="font-mono text-[15px] font-black" style={{ color: allDailyDone ? "#6CCB96" : "#D8B653" }}>
-                  {allDailyDone ? L(locale, "Hepsi tamam", "All done", "Все выполнено", "เสร็จทั้งหมด", "Todo listo", "全部完成") : `${dailyTotalRyumo} cPoints`}
+                <p className="font-mono text-[15px] font-black tabular-nums" style={{ color: allDailyDone ? "var(--app-success)" : "var(--app-gold)" }}>
+                  {allDailyDone ? L(locale, "Hepsi tamam", "All done", "Все выполнено", "เสร็จทั้งหมด", "Todo listo", "全部完成") : `${dailyTotalRyumo} ${L(locale, "puan", "points", "поинты", "แต้ม", "puntos", "积分")}`}
                 </p>
-                <p className="text-[11px] font-bold" style={{ color: "#84909A" }}>
-                  +{dailyTotalSeasonXp} XP
+                <p className="text-[11px] font-bold tabular-nums" style={{ color: "var(--app-text-muted)" }}>
+                  +{dailyTotalSeasonXp} {L(locale, "Sezon XP", "Season XP", "Сезон XP", "ซีซัน XP", "XP temporada", "赛季 XP")}
                 </p>
               </div>
             }
@@ -924,16 +870,16 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
               ))}
             </div>
           ) : showDailyEmpty ? (
-            <div className="rounded-lg border p-5 text-center text-sm font-semibold" style={{ background: "#111714", borderColor: "#2F3B31", color: "#9AA5AF" }}>
+            <Surface variant="flat" radius="md" className="p-5 text-center text-sm font-semibold" style={{ color: "var(--app-text-secondary)" }}>
               {t("quests.noDailyQuests")}
-            </div>
+            </Surface>
           ) : null}
         </section>
 
         <section className="space-y-4">
           <SectionHeader
             eyebrow={L(locale, "Haftalık hedef", "Weekly goal", "Недельная цель", "เป้าหมายรายสัปดาห์", "Meta semanal", "每周目标")}
-            title={showWeekly ? L(locale, "Seçili haftalık hedef", "Selected weekly goal", "Выбранная недельная цель", "เป้าหมายรายสัปดาห์ที่เลือก", "Objetivo semanal seleccionado", "已选每周目标") : L(locale, "Haftalık hedefini seç", "Choose your weekly goal", "Выбери недельную цель", "เลือกเป้าหมายรายสัปดาห์ของคุณ", "Elige tu objetivo semanal", "选择你的每周目标")}
+            title={showWeekly ? L(locale, "Haftalık görevler", "Weekly quests", "Недельные квесты", "ภารกิจรายสัปดาห์", "Misiones semanales", "每周任务") : L(locale, "Haftalık hedefini seç", "Choose your weekly goal", "Выбери недельную цель", "เลือกเป้าหมายรายสัปดาห์ของคุณ", "Elige tu objetivo semanal", "选择你的每周目标")}
             meta={
               showWeekly ? (
                 <span className="inline-flex items-center gap-2 text-[12px] font-black" style={{ color: "#84909A" }}>
@@ -945,30 +891,35 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
           />
 
           {showWeekly ? (
-            <QuestVisualCard
-              quest={weekly}
-              tone={getQuestTone(weekly, daily.length)}
-              index={daily.length}
-              featured
-              justCompleted={justCompletedIds.has(weekly.id)}
-            />
+            <div className={cn("grid gap-3", preview ? "grid-cols-1" : "lg:grid-cols-2")}>
+              {weeklies.map((quest, index) => (
+                <QuestVisualCard
+                  key={quest.id}
+                  quest={quest}
+                  tone={getQuestTone(quest, daily.length + index)}
+                  index={daily.length + index}
+                  featured={weeklies.length === 1}
+                  justCompleted={justCompletedIds.has(quest.id)}
+                />
+              ))}
+            </div>
           ) : showWeeklyOptions ? (
             <div className="space-y-3">
-              <div className="rounded-lg border p-4" style={{ background: "#111714", borderColor: "#2F3B31" }}>
+              <Surface variant="glass" accent="gold" radius="md" className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border" style={{ color: "#D8B653", borderColor: "#3E3520", background: "rgba(216,182,83,0.12)" }}>
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ color: "var(--app-gold)", background: "var(--app-gold-glow)" }}>
                     <Target className="h-5 w-5" />
-                  </div>
+                  </span>
                   <div>
-                    <p className="text-[14px] font-black" style={{ color: "#F4EFE2" }}>
+                    <p className="text-[14px] font-black" style={{ color: "var(--app-text-primary)" }}>
                       {t("quests.selectGoalThisWeek")}
                     </p>
-                    <p className="mt-1 text-[12px] font-semibold leading-5" style={{ color: "#9AA5AF" }}>
+                    <p className="mt-1 text-[12px] font-semibold leading-5" style={{ color: "var(--app-text-secondary)" }}>
                       {L(locale, "Seçtiğin hedef bu hafta boyunca burada görünür.", "Your selected goal stays here throughout the week.", "Выбранная цель остаётся здесь на всю неделю.", "เป้าหมายที่เลือกจะแสดงที่นี่ตลอดสัปดาห์", "Tu meta seleccionada permanece aquí durante toda la semana.", "您选择的目标将在整周内显示在此处。")}
                     </p>
                   </div>
                 </div>
-              </div>
+              </Surface>
               <div className="grid gap-3 lg:grid-cols-2">
                 {weeklyOptions.map((quest, index) => (
                   <WeeklyOptionCard
@@ -982,57 +933,71 @@ export function QuestsScreen({ className, refreshKey = 0, preview = false }: Que
               </div>
             </div>
           ) : showWeeklyPreviewPrompt ? (
-            <div className="rounded-lg border p-4 text-sm font-semibold" style={{ background: "#111714", borderColor: "#2F3B31", color: "#9AA5AF" }}>
+            <Surface variant="flat" radius="md" className="p-4 text-sm font-semibold" style={{ color: "var(--app-text-secondary)" }}>
               {t("quests.selectGoalThisWeek")}
-            </div>
+            </Surface>
           ) : (
-            <div className="rounded-lg border p-5 text-center text-sm font-semibold" style={{ background: "#111714", borderColor: "#2F3B31", color: "#9AA5AF" }}>
+            <Surface variant="flat" radius="md" className="p-5 text-center text-sm font-semibold" style={{ color: "var(--app-text-secondary)" }}>
               {t("quests.noWeeklyGoal")}
-            </div>
+            </Surface>
           )}
         </section>
 
         {!preview ? (
-          <section className="grid gap-3 lg:grid-cols-3">
-            <div className="rounded-lg border p-4" style={{ background: "#151411", borderColor: "#3E3520" }}>
-              <Trophy className="h-5 w-5" style={{ color: "#D8B653" }} />
-              <p className="mt-3 text-[14px] font-black" style={{ color: "#F4EFE2" }}>
-                {L(locale, "Ödüller hazır", "Rewards ready", "Награды готовы", "รางวัลพร้อมแล้ว", "Recompensas listas", "奖励已就绪")}
-              </p>
-              <p className="mt-1 text-[12px] font-semibold leading-5" style={{ color: "#9AA5AF" }}>
-                {L(locale, "Kartları tamamladıkça puan ve XP kazanırsın.", "Complete cards to earn points and XP.", "Завершай карточки и получай очки и XP.", "ทำการ์ดให้ครบเพื่อรับแต้มและ XP", "Completa tarjetas para ganar puntos y XP.", "完成卡片即可获得积分和 XP。")}
-              </p>
-            </div>
-            <div className="rounded-lg border p-4" style={{ background: "#101713", borderColor: "#254737" }}>
-              <ShieldCheck className="h-5 w-5" style={{ color: "#6CCB96" }} />
-              <p className="mt-3 text-[14px] font-black" style={{ color: "#F4EFE2" }}>
-                {L(locale, "İlerleme korunur", "Progress is preserved", "Прогресс сохраняется", "ความคืบหน้าจะถูกเก็บไว้", "El progreso se conserva", "进度会被保留")}
-              </p>
-              <p className="mt-1 text-[12px] font-semibold leading-5" style={{ color: "#9AA5AF" }}>
-                {L(locale, "Fiş ve keşif katkıların görev ilerlemeni günceller.", "Receipt and discovery contributions update your task progress.", "Вклад из чеков и открытий обновляет прогресс задач.", "ใบเสร็จและการค้นพบของคุณจะอัปเดตความคืบหน้าภารกิจ", "Las contribuciones de recibos y descubrimientos actualizan tu progreso.", "收据与发现贡献会更新你的任务进度。")}
-              </p>
-            </div>
-            <div className="rounded-lg border p-4" style={{ background: "#17131B", borderColor: "#3F3150" }}>
-              <Users className="h-5 w-5" style={{ color: "#B99BE4" }} />
-              <p className="mt-3 text-[14px] font-black" style={{ color: "#F4EFE2" }}>
-                {L(locale, "Haftalık meydan okuma", "Weekly challenge", "Недельный челлендж", "ความท้าทายรายสัปดาห์", "Desafío semanal", "每周挑战")}
-              </p>
-              <p className="mt-1 text-[12px] font-semibold leading-5" style={{ color: "#9AA5AF" }}>
-                {L(locale, "Büyük hedefin haftalık ritmi belirler.", "Your big goal sets the weekly rhythm.", "Большая цель задает ритм недели.", "เป้าหมายใหญ่ของคุณกำหนดจังหวะของสัปดาห์", "Tu gran objetivo marca el ritmo semanal.", "你的大目标决定每周节奏。")}
-              </p>
-            </div>
-          </section>
+          <StaggerReveal className="grid gap-3 lg:grid-cols-3">
+            {[
+              {
+                icon: Trophy,
+                color: "var(--app-gold)",
+                soft: "var(--app-gold-glow)",
+                title: L(locale, "Ödüller hazır", "Rewards ready", "Награды готовы", "รางวัลพร้อมแล้ว", "Recompensas listas", "奖励已就绪"),
+                body: L(locale, "Kartları tamamladıkça puan ve XP kazanırsın.", "Complete cards to earn points and XP.", "Завершай карточки и получай очки и XP.", "ทำการ์ดให้ครบเพื่อรับแต้มและ XP", "Completa tarjetas para ganar puntos y XP.", "完成卡片即可获得积分和 XP。"),
+              },
+              {
+                icon: ShieldCheck,
+                color: "var(--app-success)",
+                soft: "rgba(108,203,150,0.14)",
+                title: L(locale, "İlerleme korunur", "Progress is preserved", "Прогресс сохраняется", "ความคืบหน้าจะถูกเก็บไว้", "El progreso se conserva", "进度会被保留"),
+                body: L(locale, "Fiş ve keşif katkıların görev ilerlemeni günceller.", "Receipt and discovery contributions update your task progress.", "Вклад из чеков и открытий обновляет прогресс задач.", "ใบเสร็จและการค้นพบของคุณจะอัปเดตความคืบหน้าภารกิจ", "Las contribuciones de recibos y descubrimientos actualizan tu progreso.", "收据与发现贡献会更新你的任务进度。"),
+              },
+              {
+                icon: Users,
+                color: "#B99BE4",
+                soft: "rgba(185,155,228,0.14)",
+                title: L(locale, "Haftalık meydan okuma", "Weekly challenge", "Недельный челлендж", "ความท้าทายรายสัปดาห์", "Desafío semanal", "每周挑战"),
+                body: L(locale, "Büyük hedefin haftalık ritmi belirler.", "Your big goal sets the weekly rhythm.", "Большая цель задает ритм недели.", "เป้าหมายใหญ่ของคุณกำหนดจังหวะของสัปดาห์", "Tu gran objetivo marca el ritmo semanal.", "你的大目标决定每周节奏。"),
+              },
+            ].map((card) => (
+              <Reveal key={card.title}>
+                <Surface variant="elevated" radius="md" className="h-full p-4">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: card.soft, color: card.color }}>
+                    <card.icon className="h-5 w-5" />
+                  </span>
+                  <p className="mt-3 text-[14px] font-black" style={{ color: "var(--app-text-primary)" }}>
+                    {card.title}
+                  </p>
+                  <p className="mt-1 text-[12px] font-semibold leading-5" style={{ color: "var(--app-text-secondary)" }}>
+                    {card.body}
+                  </p>
+                </Surface>
+              </Reveal>
+            ))}
+          </StaggerReveal>
         ) : null}
 
-        {preview && (daily.length > 0 || weekly !== null || weeklyOptions.length > 0) ? (
-          <Link
+        {preview && (daily.length > 0 || weeklies.length > 0 || weeklyOptions.length > 0) ? (
+          <Surface
+            as={Link}
             href="/app/tasks"
-            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border text-[12px] font-black transition-opacity hover:opacity-80"
-            style={{ color: "#F4EFE2", borderColor: "#2F3B31", background: "#111714" }}
+            variant="flat"
+            radius="md"
+            interactive
+            className="flex min-h-11 w-full items-center justify-center gap-2 text-[12px] font-black"
+            style={{ color: "var(--app-text-primary)" }}
           >
             {t("quests.viewAll")}
             <ChevronRight className="h-4 w-4" />
-          </Link>
+          </Surface>
         ) : null}
       </div>
     </>

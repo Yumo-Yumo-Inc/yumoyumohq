@@ -8,14 +8,14 @@ import type { ReceiptSummary } from "./types";
 /**
  * Get spend amount from receipt (prefer totalPaid, else paidExTax, else 0)
  */
-export function getReceiptSpend(receipt: ReceiptSummary): number {
+function getReceiptSpend(receipt: ReceiptSummary): number {
   return receipt.totalPaid || receipt.paidExTax || 0;
 }
 
 /**
  * Group receipts by day (YYYY-MM-DD -> { spendSum, count })
  */
-export function groupByDay(
+function groupByDay(
   receipts: ReceiptSummary[]
 ): Map<string, { spendSum: number; count: number }> {
   const dayMap = new Map<string, { spendSum: number; count: number }>();
@@ -48,7 +48,7 @@ export function groupByDay(
 /**
  * Compute daily burn rate (average spend per day within selected range)
  */
-export function computeDailyBurnRate(
+function computeDailyBurnRate(
   receipts: ReceiptSummary[],
   daysInRange: number
 ): number {
@@ -61,7 +61,7 @@ export function computeDailyBurnRate(
 /**
  * Compute receipt frequency (average receipts per day)
  */
-export function computeReceiptFrequency(
+function computeReceiptFrequency(
   receipts: ReceiptSummary[],
   daysInRange: number
 ): number {
@@ -72,7 +72,7 @@ export function computeReceiptFrequency(
 /**
  * Cumulative series data point
  */
-export interface CumulativePoint {
+interface CumulativePoint {
   dayLabel: string; // "Day 1", "Day 2", etc.
   date: string; // YYYY-MM-DD
   daySpend: number; // Spend on this day
@@ -83,7 +83,7 @@ export interface CumulativePoint {
  * Compute cumulative series for current month
  * Returns array of points for each day of the month
  */
-export function computeCumulativeSeriesForMonth(
+function computeCumulativeSeriesForMonth(
   receipts: ReceiptSummary[],
   monthStart: Date,
   monthEnd: Date
@@ -121,7 +121,7 @@ export function computeCumulativeSeriesForMonth(
  * Compute projection series (dashed line)
  * Simple linear projection: projectedEnd = (cumulativeSoFar / daysElapsed) * monthDays
  */
-export function computeProjection(
+function computeProjection(
   series: CumulativePoint[],
   todayIndex: number,
   monthDays: number
@@ -174,7 +174,7 @@ export function getCurrentMonthRange(): { start: Date; end: Date; days: number }
 /**
  * Get month range for a specific date
  */
-export function getMonthRange(date: Date): { start: Date; end: Date; days: number } {
+function getMonthRange(date: Date): { start: Date; end: Date; days: number } {
   const start = new Date(date.getFullYear(), date.getMonth(), 1);
   const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
   const days = end.getDate();
@@ -185,7 +185,7 @@ export function getMonthRange(date: Date): { start: Date; end: Date; days: numbe
 /**
  * Get last month range (for comparison)
  */
-export function getLastMonthRange(): { start: Date; end: Date; days: number } {
+function getLastMonthRange(): { start: Date; end: Date; days: number } {
   const now = new Date();
   const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   return getMonthRange(lastMonth);
@@ -194,7 +194,7 @@ export function getLastMonthRange(): { start: Date; end: Date; days: number } {
 /**
  * Compute spending pulse data
  */
-export interface SpendingPulseData {
+interface SpendingPulseData {
   dailyBurnRate: number;
   receiptFrequency: number;
   projectedMonthEnd: number;
@@ -205,7 +205,7 @@ export interface SpendingPulseData {
   insight: string;
 }
 
-export function computeSpendingPulse(
+function computeSpendingPulse(
   receipts: ReceiptSummary[],
   filters?: { timeRange?: "7d" | "30d" | "90d" | "all" }
 ): SpendingPulseData {

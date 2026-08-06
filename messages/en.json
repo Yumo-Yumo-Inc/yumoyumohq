@@ -242,7 +242,7 @@
       },
       {
         "question": "How do I earn rewards? Tell me the fun part!",
-        "answer": "Two super sweet ways: cPoints 🍪 → app records from eligible real-life receipts, and cPoints 🎈 → app records from eligible community activity (quests). They are non-transferable unless and until a future token program is enabled, and any claim will be subject to eligibility, updated terms, and legal checks."
+        "answer": "Two super sweet ways: points 🍪 → app records from eligible real-life receipts, and points 🎈 → app records from eligible community activity (quests). They are non-transferable unless and until a future token program is enabled, and any claim will be subject to eligibility, updated terms, and legal checks."
       },
       {
         "question": "What's YUMO token? Is it going to the moon? 🚀",
@@ -449,7 +449,7 @@
       },
       {
         "title": "3. What can you do here?",
-        "content": "Upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see cute spending insights, and collect non-transferable cPoints app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
+        "content": "Upload eligible receipts, discover hidden costs with Proof of Expense (PoE), see cute spending insights, and collect non-transferable points app records when you qualify. Future token features, if enabled, will require separate eligibility and terms."
       },
       {
         "title": "4. Receipts & your stuff",
@@ -458,7 +458,7 @@
       {
         "title": "5. Rewards & YUMO tokens",
         "content": [
-          "cPoints are non-transferable in-app records tied to eligible activity.",
+          "Points are non-transferable in-app records tied to eligible activity.",
           "They do not guarantee any token claim, airdrop, transfer, listing, cash value, profit, or exchangeability.",
           "YUMO is planned as a utility token for eligible app functionality — not investment advice, a security offering, or a \"get rich quick\" ticket.",
           "Eligibility rules may change. We may withhold, reverse, or suspend rewards for fraud, duplicate activity, sanctions risk, legal restrictions, or policy violations. Any taxes on rewards are your responsibility."
@@ -707,6 +707,41 @@
     }
   },
   "app": {
+    "contribute": {
+      "title": "Contribution Center",
+      "subtitle": "Receipts shorten product names. You know what you bought — help name it.",
+      "meaning": "Every product you identify makes real price comparison possible across stores.",
+      "stats": {
+        "impactEyebrow": "Your impact",
+        "receiptsFixed": "receipts fixed",
+        "identified": "identified",
+        "today": "Today"
+      },
+      "card": {
+        "appearsIn": "on {count} receipts",
+        "question": "Which product is this?",
+        "other": "Other — let me type it",
+        "otherPlaceholder": "Type the product name…",
+        "otherSubmit": "Send",
+        "dontKnow": "I don't know"
+      },
+      "flash": {
+        "thanks": "Thanks — recorded",
+        "receiptsFixed": "receipts fixed",
+        "points": "points"
+      },
+      "done": {
+        "emptyTitle": "All caught up",
+        "emptyBody": "No products to identify right now. Upload a receipt and new ones will appear.",
+        "quotaTitle": "That's your set for today",
+        "quotaBody": "You've hit today's limit. Come back tomorrow for more — or scan a receipt.",
+        "scanCta": "Scan a receipt"
+      },
+      "toast": {
+        "quotaReached": "You've reached today's limit. Nice work!",
+        "answerFailed": "Could not save your answer. Please try again."
+      }
+    },
     "scanReveal": {
       "itemsRead": "{count} items read",
       "receiptRead": "Receipt read",
@@ -781,13 +816,13 @@
           "giveTip": "Give me a tip",
           "showLastReceipt": "Show my last receipt",
           "monthSpend": "What did I spend this month?",
-          "myCpoints": "How many cPoints do I have?",
+          "myPoints": "How many points do I have?",
           "whatsHere": "What's on this page?",
           "help": "Help me"
         }
       },
       "daily": {
-        "yesterdayReceiptsPoints": "You added {receipts} receipts yesterday, +{points} cPoints.",
+        "yesterdayReceiptsPoints": "You added {receipts} receipts yesterday, +{points} points.",
         "yesterdayReceipts": "You added {receipts} receipts yesterday — nice work.",
         "streak": "{days} days in a row — we're doing great together.",
         "topCategory": "Lately your biggest shelf is {label}.",
@@ -831,7 +866,7 @@
         "pill": "Weekly recap",
         "intro": "Let's look back at your week together.",
         "topCategory": "Biggest: {label} at {pct}%.",
-        "weekPoints": "You earned +{points} cPoints this week.",
+        "weekPoints": "You earned +{points} points this week.",
         "streak": "{days} days in a row — that effort counts.",
         "closing": "A good week. See you tomorrow."
       },
@@ -877,8 +912,8 @@
         },
         "wallet": {
           "counting": "Counting the vault",
-          "collecting": "Collecting cPoints",
-          "picked": "cPoint collected",
+          "collecting": "Collecting points",
+          "picked": "Point collected",
           "toVault": "Carrying to the vault",
           "stacking": "Stacking…",
           "polishing": "Polishing a coin"
@@ -918,7 +953,7 @@
         },
         "fx": {
           "plusReceipt": "+1 receipt",
-          "plusCPoint": "+1 cPoint",
+          "plusCPoint": "+1 point",
           "archived": "archived",
           "plusTrend": "+trend",
           "scanFailed": "couldn't read"
@@ -1055,7 +1090,36 @@
       "quests": {
         "notActive": "⚠️ Not active"
       },
-      "totalReceipts": "You have uploaded {count} receipt(s) in total."
+      "totalReceipts": "You have uploaded {count} receipt(s) in total.",
+      "genesisPatchNotes": {
+        "badge": "NEW SEASON",
+        "duration": "4 weeks",
+        "title": "Genesis Season is live",
+        "subtitle": "Everyone starts fresh at level 1. Your earlier contribution stays on record.",
+        "rewardPointsLabel": "Points",
+        "rewardPointsHint": "Instant reward on each receipt",
+        "rewardXpLabel": "Experience",
+        "rewardXpHint": "Climb the season ladder",
+        "rule1Title": "Your past work is safe",
+        "rule1Desc": "Season points and experience reset. Contribution points you earned before are not deleted.",
+        "rule2Title": "Two rewards per receipt",
+        "rule2Desc": "Every rewarded scan shows points right away and experience toward your season tier.",
+        "rule4Title": "Higher level, bigger receipts",
+        "rule4Desc": "Your daily experience receipt limit stays the same. As you level up, each receipt can earn more points.",
+        "limitsTitle": "Daily limits",
+        "limitXpValue": "5 receipts",
+        "limitXpDesc": "For experience",
+        "limitPointsValue": "By level",
+        "limitPointsDesc": "Points ceiling",
+        "limitFootnote": "Receipts after the 5th are still saved and analysed; no rewards that day.",
+        "tiersTitle": "Season tiers",
+        "tierSpark": "Spark",
+        "tierEmber": "Ember",
+        "tierFlame": "Flame",
+        "tierForge": "Forge",
+        "dontShowAgain": "Don't show this again",
+        "cta": "Let's go"
+      }
     },
     "receipts": {
       "title": "Receipts",
@@ -1214,10 +1278,10 @@
         "forgotPassword": "Forgot password?",
         "resetSuccess": "Your password has been updated. Sign in with your new password.",
         "noAccount": "Don't have an account?",
-        "registerLink": "Create one"
+        "registerLink": "Create one",
+        "captchaLabel": "Human verification"
       },
       "register": {
-        "badge": "Protected onboarding",
         "headline": "Create your Yumo Yumo account and start from a trusted profile.",
         "subheadline": "Your account starts with secure verification, country-aware defaults, and a clean path into the app.",
         "featureSecureTitle": "Protected against bots",
@@ -1256,11 +1320,13 @@
         "acceptTermsSuffix": ".",
         "acceptPrivacyPrefix": "I have read the",
         "acceptPrivacyLink": "Privacy Notice / KVKK Disclosure",
-        "acceptPrivacySuffix": "."
+        "acceptPrivacySuffix": ".",
+        "invitedBy": "invited you — you'll both earn a bonus after your first verified receipt."
       },
       "verify": {
         "pendingTitle": "Verify your email",
-        "pendingBody": "We sent a verification link to your inbox. Confirm it to unlock the app.",
+        "pendingBody": "We sent a verification link to {email}. Confirm it to unlock the app.",
+        "pendingBodyFallback": "We sent a verification link to your inbox. Confirm it to unlock the app.",
         "pendingEmailFailedBody": "Your account was created, but we could not send the verification email automatically. Use the resend button below.",
         "verifiedTitle": "Email verified",
         "verifiedBody": "Your account is now verified. You can continue straight into the app.",
@@ -1534,7 +1600,7 @@
         "reward": {
           "short": "Reward",
           "title": "Calculating your reward",
-          "sub": "We convert hidden costs into cPoints and finalize your result."
+          "sub": "We convert hidden costs into points and finalize your result."
         }
       }
     },
@@ -1717,8 +1783,8 @@
     "rewards": {
       "title": "Rewards",
       "description": "Account balances and transaction history",
-      "cPointsTotal": "Total cPoints",
-      "cPointsBreakdown": "cPoints Breakdown",
+      "cPointsTotal": "Total points",
+      "cPointsBreakdown": "Points Breakdown",
       "totalEarned": "Total Earned",
       "activity": "Activity Log",
       "receiptVerified": "Receipt verified",
@@ -1747,6 +1813,7 @@
       "hiddenCostLabel": "hidden cost",
       "uploadToRank": "Upload receipts to get on the board.",
       "yourRank": "Your rank",
+      "prestigeBadge": "Prestige member",
       "you": "You",
       "rank": "Rank",
       "user": "User",
@@ -1756,10 +1823,10 @@
       "days": "days",
       "badges": "Badges",
       "honor": "Honor",
-      "totalAyumo": "Total receipt cPoints",
-      "totalRyumo": "Total quest cPoints",
-      "totalAyumoAdminHint": "All-time receipt cPoints earned (admin only)",
-      "totalRyumoAdminHint": "All-time quest cPoints earned (admin only)",
+      "totalAyumo": "Total receipt points",
+      "totalRyumo": "Total quest points",
+      "totalAyumoAdminHint": "All-time receipt points earned (admin only)",
+      "totalRyumoAdminHint": "All-time quest points earned (admin only)",
       "error": "Failed to load leaderboard",
       "empty": "No leaderboard data available",
       "seasonLabel": "Season"
@@ -2189,6 +2256,7 @@
     "potentialReward": {
       "honorEffect": "Reward rate",
       "title": "Your Potential Reward",
+      "pointsUnit": "points",
       "potential": "(potential)",
       "description": "Your potential reward has been calculated from this analysis.",
       "rewardNote": "Reward estimate ready.",
@@ -2281,6 +2349,18 @@
       "mineAnother": "Analyze New Receipt",
       "viewHistory": "View History",
       "totalPotential": "Potential Reward"
+    },
+    "restriction": {
+      "badge": "Account restricted",
+      "title": "Your receipt upload allowance is temporarily limited",
+      "body": "Documents that break the upload rules were found on your account.",
+      "perDay": "receipts / day",
+      "endsLabel": "Restriction ends",
+      "note": "Your account returns to normal on its own after this date. Yumo Yumo applies the same rules to everyone who contributes, in every country.",
+      "acknowledge": "Understood",
+      "appealPrefix": "If you believe this is a mistake,",
+      "appealLink": "contact us",
+      "close": "Close"
     }
   },
   "dashboard": {
@@ -2523,6 +2603,14 @@
     "deleteGoal": "Delete goal",
     "goalTarget": "Target {amount}",
     "addGoalButton": "Add financial goal",
+    "trustChecks": {
+      "image_quality": "Clear image",
+      "date_time": "Date & time",
+      "total": "Total amount",
+      "merchant": "Merchant name",
+      "verified_merchant": "Verified merchant",
+      "ocr_confidence": "OCR confidence"
+    },
     "trustCard": {
       "title": "Receipt quality",
       "desc": "Clear receipts raise your trust score and unlock better rewards.",
@@ -2565,6 +2653,16 @@
     "tryNow": "See your journey",
     "later": "Later"
   },
+  "seasonComplete": {
+    "aria": "Season complete",
+    "kicker": "{name} · COMPLETE",
+    "title": "Congratulations!",
+    "rankLine": "You finished #{rank}",
+    "xpLine": "{xp} season XP",
+    "rewardLine": "+{points} pts · {tier}",
+    "cta": "Continue",
+    "dismiss": "Dismiss"
+  },
   "rewardsPage": {
     "journeyLink": "Unlock Journey",
     "journeyLinkDesc": "Your permanent account ladder — every unlock from level 1 to 50",
@@ -2575,8 +2673,8 @@
     "totalProof": "Your total proof contribution",
     "fromReceipts": "From receipts",
     "fromQuests": "From quests",
-    "receiptCPoints": "Receipt cPoints",
-    "bonusCPoints": "Bonus cPoints",
+    "receiptCPoints": "Receipt points",
+    "bonusCPoints": "Bonus points",
     "earnedFromReceipts": "Earned from verified receipts",
     "earnedFromQuests": "Earned from completed quests",
     "nextUnlocks": "Next Unlocks",
@@ -2584,13 +2682,13 @@
     "reached": "✓ Reached",
     "howYouEarn": "How You Earn",
     "earnReceiptLabel": "Receipt upload",
-    "earnReceiptDesc": "Season XP · Account XP · Contribution · cPoints",
+    "earnReceiptDesc": "Season XP · Account XP · Points",
     "earnVerifyLabel": "Verify and earn",
-    "earnVerifyDesc": "Verify others' receipts → earn cPoints + Season XP",
+    "earnVerifyDesc": "Verify others' receipts → earn points + Season XP",
     "earnDailyLabel": "Daily quests",
-    "earnDailyDesc": "cPoints · Season XP",
+    "earnDailyDesc": "Points · Season XP",
     "earnWeeklyLabel": "Weekly quests",
-    "earnWeeklyDesc": "More cPoints · Season XP",
+    "earnWeeklyDesc": "More points · Season XP",
     "earnQualityLabel": "High quality receipts",
     "earnQualityDesc": "Better reward outcome",
     "activity": "Activity",
@@ -2598,12 +2696,10 @@
     "receipts": "Receipts",
     "quests": "Quests",
     "noActivity": "No activity yet",
-    "invitesTitle": "Your invites",
-    "invitesSubtitle": "Activity and earnings of the people you invited",
     "seasonRecap": "This Season So Far",
     "receiptsVerified": "Receipts verified",
     "questsCompleted": "Quests completed",
-    "cPointsEarned": "cPoints earned",
+    "cPointsEarned": "Points earned",
     "seasonXp": "Season XP",
     "currentLevel": "Current level",
     "rewardBoost": "Reward boost",
@@ -2620,7 +2716,22 @@
     "claiming": "Claiming…",
     "claimDone": "Claimed",
     "claimOpensAtTge": "Claim opens at TGE",
-    "claimWalletMismatch": "The connected wallet differs from the wallet on this allocation. Connect the allocation wallet to claim."
+    "claimWalletMismatch": "The connected wallet differs from the wallet on this allocation. Connect the allocation wallet to claim.",
+    "leaderboardTitle": "Leaderboard",
+    "leaderboardTabGenesis": "Genesis",
+    "leaderboardTabAlpha": "Alpha",
+    "leaderboardPoints": "points",
+    "leaderboardYou": "You",
+    "leaderboardGenesisSubtitle": "Live Genesis-season standings — ranked by season XP from proof of expense and quests.",
+    "leaderboardGenesisFinalSubtitle": "Final Genesis standings — the official close snapshot.",
+    "leaderboardAlphaSubtitle": "Frozen Early Alpha standings — a permanent record of pre-Genesis contribution.",
+    "leaderboardEmpty": "No entries yet.",
+    "leaderboardLeader": "Leader",
+    "leaderboardLive": "Live",
+    "leaderboardFrozen": "Frozen",
+    "leaderboardYourRank": "Your position",
+    "leaderboardYouLead": "You're leading the season",
+    "leaderboardToPass": "{points} pts to pass {name}"
   },
   "notificationsPage": {
     "eyebrow": "INBOX",
@@ -2767,9 +2878,12 @@
   },
   "rewardCard": {
     "title": "Potential Reward",
-    "subtitle": "cPoints earned for this receipt",
-    "totalPoints": "cPoints earned",
-    "calculating": "Calculating cPoints…",
+    "subtitle": "Points earned for this receipt",
+    "totalPoints": "Points earned",
+    "pointsUnit": "points",
+    "calculating": "Calculating…",
+    "calculatingXp": "Calculating XP…",
+    "xpDailyLimit": "Daily XP limit reached — no XP for further receipts today.",
     "receipt": "Receipt",
     "quest": "Quest",
     "honorBonus": "Honor Bonus 1.2x applied",
@@ -2780,10 +2894,27 @@
     "appliedLimits": "Applied limits:",
     "partial": {
       "title": "Payment confirmed — {pct}% of the reward for now",
-      "fullEstimate": "Estimated full reward after itemized receipt: {amount} cPoints",
+      "fullEstimate": "Estimated full reward after itemized receipt: {amount} points",
       "followUp": "Upload the itemized store receipt listing products to claim the rest of your reward.",
       "uploadCta": "Upload itemized receipt",
-      "ceiling": "You earned {current} cPoints now — complete the items to earn up to {full} cPoints."
+      "ceiling": "You earned {current} points now — complete the items to earn up to {full} points."
+    },
+    "breakdown": {
+      "toggle": "How were these points calculated?",
+      "hide": "Hide calculation",
+      "title": "Points breakdown",
+      "base": "Base reward (hidden-cost share)",
+      "scanBonus": "Scan bonus",
+      "firstScanOfDay": "First receipt of the day",
+      "itemized": "Itemized receipt",
+      "streak": "Daily streak",
+      "cpi": "Inflation (CPI) multiplier",
+      "seasonLevel": "Season level",
+      "honor": "Account health applied",
+      "cap": "Reward cap applied",
+      "total": "Total points",
+      "capNote": "A reward cap was applied, so the total is lower than the raw product.",
+      "honorNote": "Your account health scaled this reward."
     },
     "itemizedDialog": {
       "title": "Itemized store receipt",
@@ -2818,6 +2949,7 @@
       "amount_inconsistent": "The total doesn't match the listed items, so the reward is on hold. Check the amount and correct it if it's wrong.",
       "duplicate_same_user": "You already uploaded this receipt. Duplicate receipts do not earn rewards.",
       "duplicate_other_user": "This receipt was already uploaded. Duplicate receipts do not earn rewards.",
+      "cancelled_receipt": "This is a cancelled/voided receipt, not a completed purchase, so it does not qualify for rewards.",
       "generic": "This document was saved without a reward."
     }
   },
@@ -2841,5 +2973,133 @@
     "successToast": "Thanks — your pick will be reviewed.",
     "errorToast": "Could not submit. Please try again.",
     "reviewNote": "Your choice goes to review and is applied after approval."
+  },
+  "weeklyLedger": {
+    "eyebrow": "WEEKLY LEDGER",
+    "closed": "Closed ledger",
+    "loading": "Opening the ledger…",
+    "error": "The ledger could not be opened. Please try again.",
+    "archetype": {
+      "night_shift": {
+        "title": "The Night Shift Week",
+        "line": "Your receipts kept arriving after dark."
+      },
+      "early_bird": {
+        "title": "The Early Run Week",
+        "line": "The registers heard from you before nine."
+      },
+      "single_fort": {
+        "title": "The One-Stronghold Week",
+        "line": "One place carried most of your week."
+      },
+      "explorer": {
+        "title": "The Explorer Week",
+        "line": "Your money visited more places than usual."
+      },
+      "weekend_run": {
+        "title": "The Weekend Run",
+        "line": "This week saved itself for Saturday and Sunday."
+      },
+      "category_week": {
+        "title": "The {category} Week",
+        "line": "One aisle set the week's tone."
+      },
+      "steady_log": {
+        "title": "The Steady Log",
+        "line": "A week recorded end to end."
+      }
+    },
+    "section": {
+      "volume": "Volume",
+      "entries": "The entries",
+      "reveal": "The reveal",
+      "moment": "The moment",
+      "wildcard": "This week's find",
+      "items": "Basket highlights",
+      "rewards": "The finale",
+      "outlook": "Ahead"
+    },
+    "entries": {
+      "more": "+{count} more receipts"
+    },
+    "items": {
+      "times": "{count}×"
+    },
+    "volume": {
+      "receipts": "{count} receipts",
+      "captured": "captured as proof of expense",
+      "aboveAvg": "{pct}% above your own three-week pace.",
+      "belowAvg": "{pct}% below your own three-week pace.",
+      "onPace": "Right on your own three-week pace.",
+      "noBaseline": "Your first recorded week — the baseline starts here.",
+      "places": "{count} places",
+      "priorWeeks": "The last four weeks, side by side"
+    },
+    "reveal": {
+      "lead": "Of the {total} you paid this week,",
+      "trail": "never reached a producer.",
+      "note": "Taxes, margins and the layers in between — read from your own receipts.",
+      "vat": "VAT printed on the week's receipts: {vat}"
+    },
+    "moment": {
+      "title": "Biggest basket of the week"
+    },
+    "wildcard": {
+      "price_repeat_up": "{item} — you paid {prev} before ({date}); this week it rang up at {now}.",
+      "price_repeat_down": "{item} — {prev} before ({date}); this week it dropped to {now}.",
+      "night_share": "of the week's spend happened after dark ({count} receipts).",
+      "loyalty": "{merchant} saw you {visits} times this week — {total} in total.",
+      "category_pulse_up": "{category} ran above its own three-week average.",
+      "category_pulse_down": "{category} ran below its own three-week average."
+    },
+    "rewards": {
+      "points": "points",
+      "pointsLine": "earned from this week's receipts",
+      "xp": "{xp} season XP",
+      "quests": "{count} quests completed",
+      "level": "Season level {level}"
+    },
+    "outlook": {
+      "line": "At this pace, the month closes near",
+      "soFar": "{amount} recorded so far this month.",
+      "cta": "Open the full analysis"
+    },
+    "single": {
+      "intro": "One receipt carried this week — so the ledger reads all of it.",
+      "hiddenLead": "Of this {total},",
+      "hiddenTrail": "stayed in the system.",
+      "items": "Inside the basket"
+    },
+    "empty": {
+      "title": "A quiet week",
+      "body": "No receipts were recorded this week. The ledger opens again with your next scan."
+    },
+    "locked": {
+      "title": "The Weekly Ledger opens at level {level}",
+      "body": "Every Monday your previous week is sealed into a single report: what you paid, what stayed hidden, what you earned. You are at level {current}.",
+      "cta": "See the journey"
+    },
+    "nav": {
+      "prev": "Previous week",
+      "next": "Next week"
+    },
+    "category": {
+      "groceries": "Grocery",
+      "restaurant": "Food & Drink",
+      "alcohol": "Alcohol",
+      "fuel": "Fuel",
+      "apparel": "Fashion",
+      "cosmetics": "Personal Care",
+      "electronics": "Electronics",
+      "home": "Home & Living",
+      "tobacco": "Tobacco",
+      "pharmacy": "Health",
+      "services": "Services",
+      "hospitality": "Accommodation",
+      "sports": "Sports",
+      "pets": "Pets",
+      "baby": "Baby & Kids",
+      "other": "Other"
+    }
   }
 }

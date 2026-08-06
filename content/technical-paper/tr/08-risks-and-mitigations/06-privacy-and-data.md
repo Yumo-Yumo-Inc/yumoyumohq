@@ -13,7 +13,7 @@ Yumo Yumo iki veri sınıfıyla çalışır: kullanıcı verisi ve aggregate ver
 
 ## 8.15 Kontrol modeli
 
-**Zincir dışı fiş içeriği.** Fiş satır kalemleri zincir dışı defterde tutulur (04 §4.16). Zincir üstü katman bINT mint olaylarını ve Merkle kök taahhütlerini taşır; içerik veri katmanında işlenir.
+**Zincir dışı fiş içeriği.** Fiş satır kalemleri zincir dışı defterde tutulur (04 §4.16). Zincir üstü katman INT talep transferlerini ve Merkle kök taahhütlerini taşır; içerik veri katmanında işlenir.
 
 **Aggregate yayın disiplini.** B2B veri ürünü, k-anonimlik ve yayın grubu kurallarıyla çalışır (05 §5.8). Yayın grupları bölge, kategori ve dönem düzeyinde yeterli yoğunluğa ulaşan kümelerden oluşur.
 
@@ -23,4 +23,4 @@ Yumo Yumo iki veri sınıfıyla çalışır: kullanıcı verisi ve aggregate ver
 
 ## 8.16 Evrim
 
-Veri saklama sorumluluğu, aşamalı yerelleşme ve bölgesel yapı kararlarıyla birlikte gelişir. Mimari hedef aynı kalır: kullanıcı fiş içeriği zincir dışı kalır, aggregate veri ürünleşir, bütünlük kanıtı zincir üstü taahhütle sağlanır.
+Veri saklama sorumluluğu, bölgesel yapı ve olası yetki devri kararları için ayrı değerlendirilir. Mimari hedef aynı kalır: kullanıcı fiş içeriği zincir dışı kalır, aggregate veri ürünleşir, bütünlük kanıtı zincir üstü taahhütle sağlanır.

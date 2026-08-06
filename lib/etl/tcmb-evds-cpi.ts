@@ -49,7 +49,7 @@ const CPI_SERIES_MAP: Record<string, string> = {
   "12": "TP.TUKFIY2025.12",
 };
 
-export interface CpiIndexRow {
+interface CpiIndexRow {
   country: string;
   indexType: string;
   series: string;
@@ -243,4 +243,4 @@ export async function runEvdsCpiEtl(opts: {
   return { prepared: rows.length, written, seriesCount, latestMonth, samples, dryRun };
 }
 
-export { SOURCE as EVDS_CPI_SOURCE, CPI_SERIES_MAP };
+;

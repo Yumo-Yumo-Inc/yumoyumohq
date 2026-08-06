@@ -1,19 +1,18 @@
 # Katkı Ekonomisi ve Token Tasarımı
 
-Yumo Yumo'nun ekonomik omurgası, gündelik kullanım ile açık koordinasyon arasında katmanlı bir köprü kurar. Harcama Kanıtı, mağaza doğrulamaları, ürün iyileştirmeleri ve topluluk görevleri önce bINT katmanında muhasebeleşir. Bu katman katkının kalitesini, güvenini ve zaman içindeki sürekliliğini görünür kılar. INT katmanı daha açık ekonomik koordinasyonun, varlık kilitlemenin ve ilerleyen yönetişim yüzeylerinin taşıyıcısıdır. Bunların yanında ePoints her doğrulanmış fişin ortaya çıkardığı saklı maliyetin dolar bazlı kaydını tutar; Yumbie ise — kullanıcının taşınabilir dijital kimliği olan Kuruluş NFT'si — sistem içindeki yolculuğun görünen yüzüdür.
+Yumo Yumo'nun ekonomik omurgası, gündelik kullanım ile açık koordinasyon arasında katmanlı bir köprü kurar. Harcama Kanıtı, mağaza doğrulamaları, ürün iyileştirmeleri ve topluluk görevleri önce bINT katmanında muhasebeleşir. Bu katman katkının kalitesini, güvenini ve zaman içindeki sürekliliğini görünür kılar. INT katmanı daha açık ekonomik koordinasyonun, varlık kilitlemenin ve ilerleyen yönetişim yüzeylerinin taşıyıcısıdır. Her doğrulanmış fiş kullanıcıya saklı maliyet içgörüsü gösterir — harcama baskısı ve fiyat hareketinin analiz sonucudur. Yumbie ise — kullanıcının taşınabilir dijital kimliği olan Kuruluş NFT'si — sistem içindeki yolculuğun görünen yüzüdür.
 
-Bu ayrım önemlidir; çünkü katkı, değer ve kimlik farklı kapılardan akar. Sisteme değer katan kullanıcı önce bINT biriktirir. Zaman, elde tutma davranışı ve güven seviyesi bu birikimin INT tarafına nasıl geçeceğini belirler. Her doğrulanmış fiş aynı zamanda saklı maliyetin dolar ölçüsünü ePoints olarak kayda alır. Kullanıcının Yumbie'si bu yolculuğun görünür hafızasını taşır. Sonuç: düzenli ve güvenilir katılımı ödüllendiren, değeri uzun vadeli katkıyla hizalı tutan bir ekonomi.
+Bu ayrım önemlidir; çünkü katkı, değer ve kimlik farklı kapılardan akar. Sisteme değer katan kullanıcı önce bINT biriktirir. Zaman, elde tutma davranışı ve güven seviyesi bu birikimin INT tarafına nasıl geçeceğini belirler. Kullanıcının Yumbie'si bu yolculuğun görünür hafızasını taşır. Her doğrulanmış fiş bir katkı sinyali oluştururken aynı zamanda kullanıcıya saklı maliyeti gösterir — harcama baskısının ne kadar hızlandığını ve fiyatların hangi yöne doğru hareket ettiğini. Sonuç: düzenli ve güvenilir katılımı ödüllendiren, değeri uzun vadeli katkıyla hizalı tutan bir ekonomi.
 
 ## Token Katmanları
 
 | Katman | Form | Devredilebilir mi? | Amacı |
 | --- | --- | --- | --- |
 | **INT** | Zincir üstü SPL token | Evet | Ekonomik koordinasyon, varlık kilitleme, ekosistem teşvikleri |
-| **bINT** | Zincir üstü, devredilemez (donmuş ATA) | Hayır — kullanıcı isteğiyle INT'e dönüşür | Katkı muhasebesi; iş ile ödül arasındaki yumuşak katman |
-| **ePoints** | Zincir üstü, devredilemez (donmuş ATA) | Hayır | Her doğrulanmış fişte ortaya çıkan saklı maliyetin dolar bazlı kaydı |
+| **bINT** | Zincir dışı muhasebe birimi (operasyon katmanı) | Hayır — tanımlı yaşam döngüsüyle INT'e dönüşür | Katkı muhasebesi; iş ile ödül arasındaki yumuşak katman |
 | **Kuruluş NFT'si (Yumbie)** | Token-2022 NonTransferable | Hayır | Kalıcı dijital kimlik; kullanıcıyla birlikte gelişen görsel yoldaş |
 
-bINT ve ePoints aynı fişten iki farklı sinyal yakalar. bINT, Yumo ekonomisi içindeki katkı yoğunluğunu ölçer. ePoints, kullanıcıya geri verilen saklı maliyet kavrayışının dolar değerini ölçer. Birbirlerinin yerine geçmezler ve farklı mantıkla dönüşürler.
+bINT, her doğrulanmış fişten ortaya çıkan katkı sinyalidir. Yumo Yumo ekonomisi içindeki katkı yoğunluğunu ölçer ve tanımlanmış mantık aracılığıyla zaman, elde tutma davranışı ve güvene bağlı olarak INT'e dönüşür.
 
 ## INT Dağılımı
 
@@ -95,21 +94,20 @@ Kullanıcı 30. seviyeye ulaştığında Yumbie, Kuruluş formundan Akıllı Aja
 
 ## TGE Öncesi Muhasebe
 
-Token Üretim Etkinliği'nden önce platform katkıyı cPoints adlı kapalı sistemli bir itibar ölçüsüyle izler. cPoints yalnızca TGE öncesi aşamada vardır. TGE anında başlangıç airdrop ve onboarding ağırlıklarını besler, ardından kullanım dışı kalır. TGE sonrasında bINT ve ePoints katmanları daha güçlü katkı semantiği ve zincir üstü muhasebe ile cPoints'in rolünü devralır.
+Token Üretim Etkinliği'nden önce platform katkıyı cPoints adlı kapalı sistemli bir itibar ölçüsüyle izler. cPoints yalnızca TGE öncesi aşamada vardır. TGE anında başlangıç airdrop ve onboarding ağırlıklarını besler, ardından kullanım dışı kalır. TGE sonrasında bINT katmanı daha güçlü katkı semantiği ile cPoints'in rolünü devralır; bINT off-zincir bir muhasebe birimi olarak kalmakta ve tanımlanmış yaşam döngüsü aracılığıyla INT'e dönüşmektedir.
 
 ## Katmanlar Nasıl Birleşir
 
 ```mermaid
 flowchart LR
     A[Doğrulanmış PoE] --> B[bINT alacağı]
-    A --> C[ePoints kaydı]
-    A --> D[Yumbie seviye + sağlık güncellemesi]
-    B -->|yıl-bağlı oran| E[INT dönüşümü]
-    E --> F[Kilitle / tut / transfer et]
-    D -->|30. seviye| G[Akıllı Ajan evrimi]
-    F --> H[Hazineden geri alım ve yakma]
+    A --> C[Yumbie seviye + sağlık güncellemesi]
+    B -->|yıl-bağlı oran| D[INT dönüşümü]
+    D --> E[Kilitle / tut / transfer et]
+    C -->|30. seviye| F[Akıllı Ajan evrimi]
+    E --> G[Hazineden geri alım ve yakma]
 ```
 
-Doğrulanmış her fiş aynı anda bINT katmanına katkı, ePoints katmanına saklı maliyet kavrayışı ve Yumbie'ye kimlik ilerlemesi yazar. bINT'ten INT'e dönüşüm, erken katılımı kayıran ve zamanla dengelenen bir oranla değeri katkı katmanından ekonomik katmana taşır. Varlık kilitleme uzun vadeli tutuculara değer geri verir. Hazine yönetimindeki geri alım ve yakma, gerçek platform gelirini token kıtlığına bağlayarak döngüyü kapatır.
+Doğrulanmış her fiş aynı anda bINT katmanına katkı, kullanıcıya saklı maliyet içgörüsü ve Yumbie'ye kimlik ilerlemesi taşır. bINT'ten INT'e dönüşüm, erken katılımı kayıran ve zamanla dengelenen bir oranla değeri katkı katmanından ekonomik katmana taşır. Varlık kilitleme uzun vadeli tutuculara değer geri verir. Hazine yönetimindeki geri alım ve yakma, gerçek platform gelirini token kıtlığına bağlayarak döngüyü kapatır.
 
 Bu yapı spam baskısını zayıflatır; çünkü katkı kalite, güven ve zamanla birlikte değer kazanır. Güçlü kullanıcıları ve düzenli emek veren katkıcıları öne çıkarır; çünkü ağ yüzeysel hacimle değil, tarihsel değeri olan sürekli katkıyla zenginleşir. Token tasarımı bu nedenle ürünün hafıza, fiyat ve rehberlik omurgasının ekonomik karşılığını kurar.

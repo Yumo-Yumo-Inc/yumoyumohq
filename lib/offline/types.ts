@@ -42,6 +42,12 @@ export interface CachedUserProfileRecord extends LocalRecordBase {
   country: string | null;
   website: string | null;
   bio: string | null;
+  nameColor: string | null;
+  profileFrame: string | null;
+  themeAccent: string | null;
+  profileBg: string | null;
+  avatarSticker: string | null;
+  seal: string | null;
   declaredMonthlyIncomeBand: string | null;
   honor: number;
   isAdmin: boolean;
@@ -65,6 +71,8 @@ export interface CachedProgressRecord extends LocalRecordBase {
 
 export interface CachedWalletRecord extends LocalRecordBase {
   address: string | null;
+  /** bINT balance — the user-facing "points" total. */
+  pointsBalance: number;
   contributionTotal: number;
   contributionFromReceipts: number;
   contributionFromQuests: number;
@@ -72,7 +80,7 @@ export interface CachedWalletRecord extends LocalRecordBase {
   lastContributionAt: string | null;
 }
 
-export type CachedQuestKind = "daily" | "weekly" | "weekly_option";
+type CachedQuestKind = "daily" | "weekly" | "weekly_option";
 
 export interface CachedQuestRecord extends LocalRecordBase {
   questKind: CachedQuestKind;
@@ -129,7 +137,7 @@ export interface CachedInsightsRecord extends LocalRecordBase {
   topMerchants: MerchantInsightSummary[];
 }
 
-export type BudgetPeriod = "monthly" | "weekly";
+type BudgetPeriod = "monthly" | "weekly";
 
 export interface CachedBudgetRecord extends LocalRecordBase {
   category: string;

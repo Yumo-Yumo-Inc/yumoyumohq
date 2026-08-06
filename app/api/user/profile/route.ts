@@ -9,6 +9,14 @@ import { getAccountLevelFromXp } from "@/config/account-level-config";
 import { getSeasonLevelFromXp } from "@/config/season-level-config";
 import { normalizeCountryCode } from "@/lib/shared/countries";
 import { normalizeIncomeBandKey } from "@/config/income-bands";
+import { normalizeNameColorKey } from "@/config/name-colors";
+import { normalizeProfileFrameKey } from "@/config/profile-frames";
+import { normalizeThemeAccentKey } from "@/config/theme-accents";
+import { normalizeProfileBgKey } from "@/config/profile-backgrounds";
+import { normalizeAvatarStickerKey } from "@/config/avatar-stickers";
+import { normalizeSealKey } from "@/config/proof-seals";
+import { getSeasonPassGrants, syncSeasonPassGrants } from "@/lib/season/pass-grants";
+import { getCurrentSeasonNumber } from "@/lib/oracle/account-season-level";
 import { isAdultBirthDate } from "@/lib/legal/age";
 import { getUserLocalTodayStr } from "@/lib/streak/record-check-in";
 import { formatDateOnly } from "@/lib/shared/date-only";
@@ -47,6 +55,12 @@ export async function GET() {
       country: normalizeCountryCode(storedCountry) || normalizeCountryCode(profile?.country) || null,
       website: profile?.website || null,
       bio: profile?.bio || null,
+      nameColor: normalizeNameColorKey(profile?.nameColor),
+      profileFrame: normalizeProfileFrameKey(profile?.profileFrame),
+      themeAccent: normalizeThemeAccentKey(profile?.themeAccent),
+      profileBg: normalizeProfileBgKey(profile?.profileBg),
+      avatarSticker: normalizeAvatarStickerKey(profile?.avatarSticker),
+      seal: normalizeSealKey(profile?.seal),
     };
 
     if (!(process.env.NEW_DB_DATABASE_URL || process.env.DATABASE_URL) || !sql) {
@@ -171,13 +185,6 @@ export async function GET() {
         streak: p?.streak ?? 0,
         checkedInToday: checkedInToday ?? false,
         declaredMonthlyIncomeBand: normalizeIncomeBandKey(p?.declared_monthly_income_band ?? null) || null,
-        contributionPoints: {
-          total: totalContributionPoints,
-          fromReceipts: receiptContributionPoints,
-          fromQuests: questContributionPoints,
-          contributionReceipts,
-          lastContributionAt,
-        },
         recentPointEvents: pointEvents,
         currentSeason: season
           ? {
@@ -229,7 +236,22 @@ export async function POST(req: Request) {
       country,
       website,
       bio,
+      nameColor,
+      profileFrame,
+      themeAccent,
+      profileBg,
+      avatarSticker,
+      seal,
     } = body;
+    // Only touch the cosmetic columns when the client explicitly sends the field
+    // — partial profile saves that omit them must not wipe the stored cosmetic.
+    const hasNameColor = Object.prototype.hasOwnProperty.call(body, "nameColor");
+    const normalizedNameColor = normalizeNameColorKey(nameColor); // null = default/invalid
+    const hasProfileFrame = Object.prototype.hasOwnProperty.call(body, "profileFrame");
+    const hasThemeAccent = Object.prototype.hasOwnProperty.call(body, "themeAccent");
+    const hasProfileBg = Object.prototype.hasOwnProperty.call(body, "profileBg");
+    const hasAvatarSticker = Object.prototype.hasOwnProperty.call(body, "avatarSticker");
+    const hasSeal = Object.prototype.hasOwnProperty.call(body, "seal");
 
     // Validate displayName
     if (!displayName || !displayName.trim()) {
@@ -288,6 +310,151 @@ export async function POST(req: Request) {
         SET declared_monthly_income_band = ${normalizedIncomeBand}, updated_at = CURRENT_TIMESTAMP
         WHERE username = ${username}
       `;
+
+      // Cosmetic unlocks (name color L4, profile frame L2+). Server-gated:
+      // clearing to default is always allowed, but setting a cosmetic requires
+      // the unlock level derived from XP — never trust a client-claimed level.
+      // Level is resolved once and reused by both cosmetics.
+      if (hasNameColor || hasProfileFrame || hasThemeAccent || hasProfileBg || hasAvatarSticker || hasSeal) {
+        const xpRow = await sql`
+          SELECT account_xp FROM user_profiles WHERE username = ${username}
+        `.then((r) => toRows(r)[0] as { account_xp?: number } | undefined);
+        const level = getAccountLevelFromXp(Number(xpRow?.account_xp ?? 0) || 0);
+        // Season-pass cosmetics are owned via a grant row, not the account level;
+        // fetch them once and OR them into every cosmetic gate below.
+        // Catch-up first so users who already earned levels before the grant
+        // writer existed can equip from profile settings too.
+        const seasonNumber = getCurrentSeasonNumber();
+        const seasonRow = await sql`
+          SELECT COALESCE(season_level, 1) AS season_level FROM user_profiles WHERE username = ${username} LIMIT 1
+        `.then((r) => toRows(r)[0] as { season_level?: number } | undefined);
+        await syncSeasonPassGrants(username, seasonNumber, Number(seasonRow?.season_level ?? 1) || 1);
+        const grants = await getSeasonPassGrants(username);
+
+        if (hasNameColor) {
+          const nameKey = normalizeNameColorKey(normalizedNameColor, level, grants);
+          if (normalizedNameColor === null) {
+            await sql`
+              UPDATE user_profiles
+              SET name_color = NULL, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else if (nameKey) {
+            await sql`
+              UPDATE user_profiles
+              SET name_color = ${nameKey}, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else {
+            console.warn(`[user/profile] name_color rejected for ${username}: not owned at level ${level}`);
+          }
+        }
+
+        if (hasProfileFrame) {
+          const rawFrame = typeof profileFrame === "string" ? profileFrame.trim().toLowerCase() : "";
+          const isExplicitDefault = profileFrame == null || rawFrame === "" || rawFrame === "none";
+          const frameKey = normalizeProfileFrameKey(profileFrame, level, grants); // null when default/unknown/not owned
+          if (frameKey) {
+            await sql`
+              UPDATE user_profiles
+              SET profile_frame = ${frameKey}, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else if (isExplicitDefault) {
+            await sql`
+              UPDATE user_profiles
+              SET profile_frame = NULL, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else {
+            console.warn(`[user/profile] profile_frame rejected for ${username}: invalid or above account level ${level}`);
+          }
+        }
+
+        if (hasThemeAccent) {
+          const rawAccent = typeof themeAccent === "string" ? themeAccent.trim().toLowerCase() : "";
+          const isExplicitDefault = themeAccent == null || rawAccent === "" || rawAccent === "default";
+          const accentKey = normalizeThemeAccentKey(themeAccent, level, grants); // null when default/unknown/not owned
+          if (accentKey) {
+            await sql`
+              UPDATE user_profiles
+              SET theme_accent = ${accentKey}, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else if (isExplicitDefault) {
+            await sql`
+              UPDATE user_profiles
+              SET theme_accent = NULL, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else {
+            console.warn(`[user/profile] theme_accent rejected for ${username}: invalid or above account level ${level}`);
+          }
+        }
+
+        if (hasProfileBg) {
+          const rawBg = typeof profileBg === "string" ? profileBg.trim().toLowerCase() : "";
+          const isExplicitDefault = profileBg == null || rawBg === "" || rawBg === "default";
+          const bgKey = normalizeProfileBgKey(profileBg, level, grants); // null when default/unknown/not owned
+          if (bgKey) {
+            await sql`
+              UPDATE user_profiles
+              SET profile_bg = ${bgKey}, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else if (isExplicitDefault) {
+            await sql`
+              UPDATE user_profiles
+              SET profile_bg = NULL, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else {
+            console.warn(`[user/profile] profile_bg rejected for ${username}: invalid or above account level ${level}`);
+          }
+        }
+
+        if (hasAvatarSticker) {
+          const rawSticker = typeof avatarSticker === "string" ? avatarSticker.trim().toLowerCase() : "";
+          const isExplicitDefault = avatarSticker == null || rawSticker === "" || rawSticker === "none";
+          const stickerKey = normalizeAvatarStickerKey(avatarSticker, level, grants); // null when default/unknown/not owned
+          if (stickerKey) {
+            await sql`
+              UPDATE user_profiles
+              SET avatar_sticker = ${stickerKey}, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else if (isExplicitDefault) {
+            await sql`
+              UPDATE user_profiles
+              SET avatar_sticker = NULL, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else {
+            console.warn(`[user/profile] avatar_sticker rejected for ${username}: invalid or above account level ${level}`);
+          }
+        }
+
+        if (hasSeal) {
+          const rawSeal = typeof seal === "string" ? seal.trim().toLowerCase() : "";
+          const isExplicitDefault = seal == null || rawSeal === "" || rawSeal === "none";
+          const sealKey = normalizeSealKey(seal, level, grants); // null when default/unknown/not owned
+          if (sealKey) {
+            await sql`
+              UPDATE user_profiles
+              SET proof_seal = ${sealKey}, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else if (isExplicitDefault) {
+            await sql`
+              UPDATE user_profiles
+              SET proof_seal = NULL, updated_at = CURRENT_TIMESTAMP
+              WHERE username = ${username}
+            `;
+          } else {
+            console.warn(`[user/profile] proof_seal rejected for ${username}: not owned`);
+          }
+        }
+      }
     }
 
     return NextResponse.json({

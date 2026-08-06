@@ -42,5 +42,5 @@ Altı ray, arzın yüzde yüzünü kapsar. Bu haritanın dışında ayrı bir ek
 - **Katkı İspatı** — hakediş süreli, rubrik puanlı periyodik dağıtımlar (4.13). Ekip teşviklerini ölçülebilir iş çıktısıyla hizalar.
 - **Staking Teşvikleri** — 5 yıllık ufukta serbest bırakılır. Kademe ağırlıklı birikim 4.6'da açıklanır.
 - **Likidite** — 1 milyar INT, TGE'de likidite başlatma havuzu aracılığıyla piyasayı besler (LP 12 ay kilitli). 3,95 milyar topluluk yönetimli dağıtımlar için rezervde tutulur.
-- **Airdrop** — tek seferde değil, yıllara yayılan birden fazla dönem boyunca, katılım tabanlı pazarlama dağıtımları olarak serbest bırakılır. Her dağıtım, zamanlaması sürpriz ama ispatlanabilir niteliktedir: alıcı kümesi, tokenler hareket etmeden önce zincire taahhüt edilir. Dağıtım oranlaması operasyon katmanında yönetilir.
+- **Airdrop** — tek seferde değil, birden fazla dönem boyunca kampanya dağıtımı olarak serbest bırakılır. Her dağıtım için alıcı kümesi ve hesaplama yöntemi token hareketinden önce zincire taahhüt edilir. Dağıtım oranlaması ilgili kampanya kaydında yayımlanır.
 - **Referans** — olay güdümlü: başarılı bir davet, davet edilen kullanıcı anlamlı bir katkı eşiğini aştığında davet eden kullanıcıya bir birim açılış tetikler. Eşik koşulları üretimde kalibre edilir ve yayınlanmaz.

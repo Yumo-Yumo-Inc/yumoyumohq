@@ -10,7 +10,7 @@ import {
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24;
 export const EMAIL_RESEND_COOLDOWN_MS = 1000 * 60;
 
-export function createEmailVerificationSecret() {
+function createEmailVerificationSecret() {
   const token = crypto.randomBytes(32).toString("hex");
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
   const now = new Date();
@@ -23,7 +23,7 @@ export function createEmailVerificationSecret() {
   };
 }
 
-export function buildVerificationUrl(token: string): string {
+function buildVerificationUrl(token: string): string {
   const url = new URL("/api/auth/verify-email", getEmailLinkBaseUrl());
   url.searchParams.set("token", token);
   return url.toString();

@@ -22,7 +22,7 @@ export function ReferralShareCard({ accountLevel }: { accountLevel: number }) {
       const res = await fetch("/api/referral/link");
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || l("Bağlantı alınamadı", "Failed to fetch link", "Не удалось получить ссылку", "ไม่สามารถดึงลิงก์ได้", "No se pudo obtener el enlace", "获取链接失败"));
+        setError(l("Bağlantı alınamadı", "Failed to fetch link", "Не удалось получить ссылку", "ไม่สามารถดึงลิงก์ได้", "No se pudo obtener el enlace", "获取链接失败"));
         return;
       }
       setLink(data.link);
@@ -51,20 +51,11 @@ export function ReferralShareCard({ accountLevel }: { accountLevel: number }) {
 
   const share = async () => {
     if (!link) return;
+    // URL only — no title/text. Share targets that merge the fields would
+    // otherwise glue the copy onto the link and break the ref code.
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: l("Yumo'ya katıl!", "Join Yumo!", "Присоединяйся к Yumo!", "มาร่วมกับ Yumo!", "¡Únete a Yumo!", "加入 Yumo！"),
-          text: l(
-            "Yumo'ya davet linkimle katıl ve birlikte kazan!",
-            "Join Yumo with my referral link and earn together!",
-            "Присоединяйся к Yumo по моей ссылке и зарабатывай вместе со мной!",
-            "เข้าร่วม Yumo ด้วยลิงก์แนะนำของฉัน แล้วมาเก็บรางวัลไปด้วยกัน!",
-            "Únete a Yumo con mi enlace y ganemos juntos.",
-            "通过我的邀请链接加入 Yumo，一起赚奖励！",
-          ),
-          url: link,
-        });
+        await navigator.share({ url: link });
       } catch { /* user cancelled */ }
     } else {
       copyToClipboard();
@@ -81,8 +72,8 @@ export function ReferralShareCard({ accountLevel }: { accountLevel: number }) {
       </div>
       <p className="text-xs leading-5" style={{ color: "var(--app-text-secondary)" }}>
         {locale === "tr"
-          ? "Arkadaşlarını davet et, onların fiş kazanımlarından 30 gün boyunca %5 bonus kazan."
-          : "Invite friends and earn 5% bonus from their receipt rewards for 30 days."}
+          ? "Bir arkadaşınla fiyat hafızası kur. Arkadaşın ilk fişini doğrulattığında ikiniz de bonus kazanırsınız."
+          : "Build price memory with a friend. You both unlock a contribution bonus after their first verified receipt."}
       </p>
 
       {loading && (

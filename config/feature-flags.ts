@@ -27,6 +27,8 @@ export const FLAGS = {
   airdrop: flag("FEATURE_AIRDROP"),
   /** Daily season rollover cron — ships dark until Genesis is live. */
   seasonRollover: flag("FEATURE_SEASON_ROLLOVER"),
+  /** Public price ledger (Faz 1 Merkle-anchor) — daily build cron ships dark. */
+  priceLedger: flag("FEATURE_PRICE_LEDGER"),
 } as const;
 
 export type FeatureFlag = keyof typeof FLAGS;

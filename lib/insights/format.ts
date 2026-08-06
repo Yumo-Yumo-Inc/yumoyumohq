@@ -41,7 +41,7 @@ export function formatCurrency(amount: number, currency: string): string {
 /**
  * Format currency amount compact (for charts)
  */
-export function formatCurrencyCompact(amount: number, currency: string): string {
+function formatCurrencyCompact(amount: number, currency: string): string {
   const symbol = CURRENCY_SYMBOLS[currency] || currency;
   
   if (amount >= 1000000) {

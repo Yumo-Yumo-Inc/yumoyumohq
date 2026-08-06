@@ -4,6 +4,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, WifiOff, RefreshCw } from "lucide-react";
+import { getCrashCopy } from "@/lib/i18n/error-messages";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -25,6 +26,10 @@ function isChunkLoadError(error: Error | null | undefined): boolean {
     error.name === "ChunkLoadError" ||
     /Loading chunk [\w-]+ failed/i.test(m) ||
     /Loading CSS chunk/i.test(m) ||
+    // Turbopack/webpack runtime: "Failed to load chunk .../_next/static/chunks/xxx.js from module 964893"
+    /Failed to load chunk/i.test(m) ||
+    /Failed to load (?:script|module)/i.test(m) ||
+    /ChunkLoadError/i.test(m) ||
     /failed to fetch dynamically imported module/i.test(m) ||
     /error loading dynamically imported module/i.test(m) ||
     /importing a module script failed/i.test(m)
@@ -152,6 +157,11 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   render() {
     if (this.state.hasError) {
+      // Localized crash copy, read from the app_locale cookie. Never depends on
+      // the i18n provider (which may be part of what crashed) and never renders
+      // the raw error.message — that would leak technical / JS text to the user.
+      const copy = getCrashCopy();
+
       // Chunk error self-heals (caches purged + reload in componentDidCatch).
       // Show a calm "updating" state instead of a scary error during the reload.
       if (this.state.isChunkError) {
@@ -161,9 +171,9 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                  <CardTitle>Güncelleniyor…</CardTitle>
+                  <CardTitle>{copy.updatingTitle}</CardTitle>
                 </div>
-                <CardDescription>Yeni sürüm yükleniyor, sayfa birazdan yenilenecek.</CardDescription>
+                <CardDescription>{copy.updatingDescription}</CardDescription>
               </CardHeader>
             </Card>
           </div>
@@ -186,33 +196,25 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                   <AlertCircle className="h-6 w-6 text-red-500" />
                 )}
                 <CardTitle>
-                  {this.state.isNetworkError ? "No Internet Connection" : "Something Went Wrong"}
+                  {this.state.isNetworkError ? copy.networkTitle : copy.title}
                 </CardTitle>
               </div>
               <CardDescription>
-                {this.state.isNetworkError
-                  ? "Please check your internet connection and try again."
-                  : "An unexpected error occurred. Please try refreshing the page."}
+                {this.state.isNetworkError ? copy.networkDescription : copy.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!this.state.isNetworkError && (
-                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-                  <p className="font-medium mb-1">Error details:</p>
-                  <p className="font-mono text-xs">{this.state.error?.message || "Unknown error"}</p>
-                </div>
-              )}
               <div className="flex gap-2">
                 <Button onClick={this.resetError} variant="outline" className="flex-1">
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Try Again
+                  {copy.tryAgain}
                 </Button>
                 <Button
                   onClick={() => window.location.reload()}
                   variant="default"
                   className="flex-1"
                 >
-                  Reload Page
+                  {copy.reload}
                 </Button>
               </div>
             </CardContent>

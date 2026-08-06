@@ -160,7 +160,7 @@
         "title": "Fase 1: Génesis — El Despertar de la Conciencia\nEl viaje comienza",
         "items": [
           "Lanzamiento Justo (Fair Launch): Descubrimiento de precio y liquidez impulsados 100% por la comunidad.",
-          "Contribución de Datos PoE: Empieza a transformar tus recibos en recompensas de datos cPoints.",
+          "Contribución de Datos PoE: Empieza a transformar tus recibos en recompensas de datos points.",
           "Identidad Digital: Reclama tu Foundation NFT y asegura tu lugar en el origen del ecosistema."
         ]
       },
@@ -241,7 +241,7 @@
       },
       {
         "question": "5. ¿Cómo gano recompensas? ¡Cuéntame lo divertido!",
-        "answer": "cPoints and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
+        "answer": "Points and bINT are non-transferable in-app records from eligible receipt and community activity. A future token program, if enabled, will require eligibility, updated terms, and legal checks."
       },
       {
         "question": "6. ¿Qué es el token INT? ¿Se va a la luna? 🚀",
@@ -423,7 +423,7 @@
       },
       {
         "title": "3. ¿Qué hacemos aquí?",
-        "content": "Sube tus recibos, descubre costos ocultos con Proof of Expense (PoE) y gana recompensas cPoints/bINT que pueden convertirse en tokens $INT. Hacemos que tus gastos diarios tengan un toque de magia."
+        "content": "Sube tus recibos, descubre costos ocultos con Proof of Expense (PoE) y gana recompensas points/bINT que pueden convertirse en tokens $INT. Hacemos que tus gastos diarios tengan un toque de magia."
       },
       {
         "title": "4. Tus datos y recibos",
@@ -432,7 +432,7 @@
       {
         "title": "5. Recompensas y $INT",
         "content": [
-          "Ganas cPoints por vivir tu vida (recibos reales) y bINT por ayudar a la comunidad.",
+          "Ganas points por vivir tu vida (recibos reales) y bINT por ayudar a la comunidad.",
           "No es una inversión: $INT es un token de utilidad para divertirse en la app, no un boleto para \"hacerse rico rápido\".",
           "Impuestos: Declarar tus ganancias es tu responsabilidad (¡la vida adulta tiene estas cosas!)."
         ]
@@ -801,7 +801,36 @@
       "quests": {
         "notActive": "⚠️ No activo"
       },
-      "totalReceipts": "Has subido un total de {count} recibo(s)."
+      "totalReceipts": "Has subido un total de {count} recibo(s).",
+      "genesisPatchNotes": {
+        "badge": "NUEVA TEMPORADA",
+        "duration": "4 semanas",
+        "title": "La temporada Genesis ha comenzado",
+        "subtitle": "Todos empiezan en nivel 1 con saldo cero. Tu contribución anterior sigue registrada.",
+        "rewardPointsLabel": "Puntos",
+        "rewardPointsHint": "Recompensa instantánea por recibo",
+        "rewardXpLabel": "Experiencia",
+        "rewardXpHint": "Escala la temporada",
+        "rule1Title": "Tu historial está a salvo",
+        "rule1Desc": "Los puntos y la experiencia de temporada se reinician. Los contribution points acumulados no se borran.",
+        "rule2Title": "Dos recompensas por recibo",
+        "rule2Desc": "Cada escaneo premiado muestra puntos al instante y experiencia hacia tu nivel de temporada.",
+        "rule4Title": "Más nivel, más por recibo",
+        "rule4Desc": "El límite diario de recibos para experiencia no cambia. Al subir de nivel, cada recibo puede dar más puntos.",
+        "limitsTitle": "Límites diarios",
+        "limitXpValue": "5 recibos",
+        "limitXpDesc": "Para experiencia",
+        "limitPointsValue": "Según nivel",
+        "limitPointsDesc": "Techo de puntos",
+        "limitFootnote": "Del 6.º recibo en adelante se guardan y analizan; ese día no hay recompensa.",
+        "tiersTitle": "Niveles de temporada",
+        "tierSpark": "Spark",
+        "tierEmber": "Ember",
+        "tierFlame": "Flame",
+        "tierForge": "Forge",
+        "dontShowAgain": "No volver a mostrar",
+        "cta": "¡Vamos!"
+      }
     },
     "receipts": {
       "title": "Recibos",
@@ -956,7 +985,6 @@
         "registerLink": "Crea una"
       },
       "register": {
-        "badge": "Onboarding protegido",
         "headline": "Crea tu cuenta de Yumo Yumo y empieza con un perfil de confianza.",
         "subheadline": "Tu cuenta comienza con una verificación segura, configuraciones predeterminadas según tu país y un acceso limpio a la app.",
         "featureSecureTitle": "Protegido contra bots",
@@ -992,11 +1020,13 @@
         "acceptPrivacyPrefix": "He leído el",
         "acceptPrivacyLink": "Aviso de Privacidad / Divulgación KVKK",
         "acceptPrivacySuffix": ".",
-        "passwordHint": "Mín. 8 caracteres, incluyendo mayúsculas, minúsculas, un número y un carácter especial"
+        "passwordHint": "Mín. 8 caracteres, incluyendo mayúsculas, minúsculas, un número y un carácter especial",
+        "invitedBy": "te invitó — ambos ganarán un bono tras tu primer recibo verificado."
       },
       "verify": {
         "pendingTitle": "Verifica tu correo",
-        "pendingBody": "Hemos enviado un enlace de verificación a tu bandeja de entrada. Confírmalo para desbloquear la app.",
+        "pendingBody": "Hemos enviado un enlace de verificación a {email}. Confírmalo para desbloquear la app.",
+        "pendingBodyFallback": "Hemos enviado un enlace de verificación a tu bandeja de entrada. Confírmalo para desbloquear la app.",
         "pendingEmailFailedBody": "Tu cuenta fue creada, pero no pudimos enviar el correo de verificación automáticamente. Usa el botón de reenvío abajo.",
         "verifiedTitle": "Correo verificado",
         "verifiedBody": "Tu cuenta ahora está verificada. Puedes continuar directamente en la app.",
@@ -1262,7 +1292,7 @@
         "reward": {
           "short": "Recompensa",
           "title": "Calculando tu recompensa",
-          "sub": "Convertimos los Hidden Costs en cPoints y finalizamos tu resultado."
+          "sub": "Convertimos los Hidden Costs en points y finalizamos tu resultado."
         }
       }
     },
@@ -1445,8 +1475,8 @@
     "rewards": {
       "title": "Recompensas",
       "description": "Saldos de cuenta e historial de transacciones",
-      "cPointsTotal": "Total de cPoints",
-      "cPointsBreakdown": "Desglose de cPoints",
+      "cPointsTotal": "Total de points",
+      "cPointsBreakdown": "Desglose de points",
       "totalEarned": "Total Ganado",
       "activity": "Registro de Actividad",
       "receiptVerified": "Recibo verificado",
@@ -1484,10 +1514,10 @@
       "days": "días",
       "badges": "Insignias",
       "honor": "Honor",
-      "totalAyumo": "Total de cPoints por recibos",
-      "totalRyumo": "Total de cPoints por Quests",
-      "totalAyumoAdminHint": "cPoints por recibos ganados de todos los tiempos (solo admin)",
-      "totalRyumoAdminHint": "cPoints por Quests ganados de todos los tiempos (solo admin)",
+      "totalAyumo": "Total de points por recibos",
+      "totalRyumo": "Total de points por Quests",
+      "totalAyumoAdminHint": "Points por recibos ganados de todos los tiempos (solo admin)",
+      "totalRyumoAdminHint": "Points por Quests ganados de todos los tiempos (solo admin)",
       "error": "No se pudo cargar la tabla de clasificación",
       "empty": "No hay datos disponibles de la tabla de clasificación",
       "seasonLabel": "Temporada"
@@ -2059,6 +2089,14 @@
     "deleteGoal": "Eliminar objetivo",
     "goalTarget": "Objetivo {amount}",
     "addGoalButton": "Añadir objetivo financiero",
+    "trustChecks": {
+      "image_quality": "Imagen nítida",
+      "date_time": "Fecha y hora",
+      "total": "Importe total",
+      "merchant": "Nombre del comercio",
+      "verified_merchant": "Comercio verificado",
+      "ocr_confidence": "Confianza OCR"
+    },
     "trustCard": {
       "title": "Calidad del recibo",
       "desc": "Los recibos claros aumentan tu puntuación de confianza y desbloquean mejores recompensas.",
@@ -2093,8 +2131,8 @@
     "totalProof": "Tu contribución total verificada",
     "fromReceipts": "De recibos",
     "fromQuests": "De misiones",
-    "receiptCPoints": "cPoints de recibos",
-    "bonusCPoints": "Bonus cPoints",
+    "receiptCPoints": "Points de recibos",
+    "bonusCPoints": "Bonus points",
     "earnedFromReceipts": "Ganado por recibos verificados",
     "earnedFromQuests": "Ganado por misiones completadas",
     "nextUnlocks": "Próximos desbloqueos",
@@ -2102,13 +2140,13 @@
     "reached": "✓ Alcanzado",
     "howYouEarn": "Cómo ganas",
     "earnReceiptLabel": "Subida de recibo",
-    "earnReceiptDesc": "Season XP · XP de cuenta · Contribución · cPoints",
+    "earnReceiptDesc": "Season XP · XP de cuenta · points",
     "earnVerifyLabel": "Verifica y gana",
-    "earnVerifyDesc": "Verifica recibos de otros → gana cPoints + Season XP",
+    "earnVerifyDesc": "Verifica recibos de otros → gana points + Season XP",
     "earnDailyLabel": "Misiones diarias",
-    "earnDailyDesc": "cPoints · Season XP",
+    "earnDailyDesc": "points · Season XP",
     "earnWeeklyLabel": "Misiones semanales",
-    "earnWeeklyDesc": "Más cPoints · Season XP",
+    "earnWeeklyDesc": "Más points · Season XP",
     "earnQualityLabel": "Recibos de alta calidad",
     "earnQualityDesc": "Mejor resultado de recompensa",
     "activity": "Actividad",
@@ -2116,12 +2154,10 @@
     "receipts": "Recibos",
     "quests": "Misiones",
     "noActivity": "Aún no hay actividad",
-    "invitesTitle": "Tus invitados",
-    "invitesSubtitle": "Actividad y ganancias de las personas que invitaste",
     "seasonRecap": "Resumen de esta temporada",
     "receiptsVerified": "Recibos verificados",
     "questsCompleted": "Misiones completadas",
-    "cPointsEarned": "cPoints ganados",
+    "cPointsEarned": "points ganados",
     "seasonXp": "Season XP",
     "currentLevel": "Nivel actual",
     "rewardBoost": "Impulso de recompensa",
@@ -2138,7 +2174,15 @@
     "claiming": "Reclamando…",
     "claimDone": "Reclamado",
     "claimOpensAtTge": "El reclamo se abre en el TGE",
-    "claimWalletMismatch": "La billetera conectada difiere de la billetera de esta asignación. Conecta la billetera de la asignación para reclamar."
+    "claimWalletMismatch": "La billetera conectada difiere de la billetera de esta asignación. Conecta la billetera de la asignación para reclamar.",
+    "supportLeaderboardTitle": "Campeones de la plataforma",
+    "supportLeaderboardSubtitle": "Clasificación por descubrimientos, correcciones y contribución de prueba — no solo points.",
+    "supportLeaderboardScore": "puntos",
+    "supportLeaderboardYou": "Tú",
+    "alphaLeaderboardTitle": "Early Alpha",
+    "alphaLeaderboardSubtitle": "Total de points en el periodo alpha — registro permanente.",
+    "alphaLeaderboardScore": "points",
+    "alphaLeaderboardYou": "Tú"
   },
   "notificationsPage": {
     "eyebrow": "BANDEJA DE ENTRADA",
@@ -2304,6 +2348,7 @@
       "reward_pending_verification": "La recompensa aún no se pudo calcular. Puede actualizarse tras verificar las líneas.",
       "duplicate_same_user": "Ya subiste este recibo. Los recibos duplicados no generan recompensa.",
       "duplicate_other_user": "Este recibo ya fue subido. Los recibos duplicados no generan recompensa.",
+      "cancelled_receipt": "Este es un recibo anulado, no una compra completada, por lo que no genera recompensas.",
       "generic": "Este documento se guardó sin recompensa."
     }
   },

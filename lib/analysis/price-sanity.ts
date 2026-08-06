@@ -22,7 +22,7 @@
 const OUTLIER_MEDIAN_MULTIPLE = 5; // beyond ~5x the median (either direction)
 const OUTLIER_MAD_Z = 6; // robust z-score cutoff when MAD is informative
 const MIN_VALID_OBSERVATIONS = 3;
-const MAX_ABS_DELTA_RATIO = 3; // |delta| > 300% → suspect data quality
+const MAX_ABS_DELTA_RATIO = 1.5; // |delta| > 150% → suspect data quality
 
 function median(values: number[]): number {
   if (values.length === 0) return 0;

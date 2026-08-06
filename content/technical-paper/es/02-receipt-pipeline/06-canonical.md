@@ -13,27 +13,29 @@ Las cuatro se resuelven al mismo `canonical_product_id`. Esta resolución es una
 
 ### Enfoque
 
-La resolución canónica es un resolvedor basado en embeddings de múltiples etapas, con desambiguación por niveles de confianza y una cola de revisión humana para casos ambiguos.
+La resolución canónica se ejecuta de forma **asíncrona** en un worker de post-procesamiento en segundo plano, después de que el flujo sincrónico ya devolvió al usuario la vista previa verificada. Esto mantiene la resolución de productos fuera de la ruta sensible a la latencia: el usuario ve su recibo de inmediato, mientras los identificadores canónicos se adjuntan al registro momentos después.
+
+El resolvedor trabaja sobre una tabla de alias que asigna el texto bruto de la línea del recibo a productos canónicos:
 
 ```mermaid
 flowchart TD
-    A["Texto bruto de línea"] --> B["Normalizar"]
-    B --> C["Recuperación vectorial"]
-    C --> D{"¿Alta confianza?"}
-    D -- sí --> E["Coincidencia · escribir canonical_product_id"]
-    D -- no --> F{"¿Confianza media?"}
-    F -- sí --> G["Desambiguación por LLM"]
-    F -- no --> H["Cola de revisión"]
-    G --> I{"¿Verificado?"}
-    I -- sí --> E
-    I -- no --> H
+    A[Raw line text] --> B[Text normalisation]
+    B --> C[Alias lookup · pg_trgm fuzzy match]
+    C --> D{Alias hit?}
+    D -- yes --> E[canonical_product_id · enriched context]
+    D -- no --> F[LLM normalisation]
+    F --> G[Upsert canonical product + alias + brand registry]
+    G --> E
 ```
 
-Los umbrales exactos de similitud, el modelo de embeddings y el prompt de desambiguación se gestionan en la capa operativa interna.
+- **Búsqueda difusa de alias** — el texto de línea normalizado se compara con alias de recibo aprendidos previamente usando la similitud de trigramas de PostgreSQL (`pg_trgm`). Un acierto se resuelve directamente al producto canónico. Los alias aprendidos en un comerciante se reutilizan entre comerciantes solo cuando el texto se lee como un nombre de producto real y no como una abreviatura interna de la tienda, lo que evita que productos distintos se fusionen bajo un mismo canónico.
+- **Respaldo LLM** — ante un fallo de búsqueda, un modelo de lenguaje normaliza el texto bruto en atributos de marca, producto y tamaño. El resultado se registra (upsert) como un nuevo producto canónico (o se asigna a uno existente) junto con una nueva fila de alias, de modo que la misma forma superficial se resuelve sin llamada al modelo la próxima vez.
 
-Un artículo de línea no resuelto se registra con una referencia canónica nula. El bINT de esa línea se calcula después de la canonización de la cola.
+Los ajustes de similitud y el prompt de normalización se gestionan en la capa de operaciones internas.
 
-### Estructura taxonómica
+Una línea de artículo sin resolver se registra con una referencia canónica nula; la resolución puede completarse en una pasada posterior a medida que crece la tabla de alias.
+
+### Estructura de taxonomía
 
 ```
 category > subcategory > brand > product > variant
@@ -47,12 +49,6 @@ Beverages > Carbonated Soft Drinks > Coca-Cola > Coca-Cola Classic > 330 ml can
 
 Cada producto canónico lleva atributos normalizados: `size_value`, `size_unit`, `package_type`, `brand_id`, `is_private_label`, `barcode_gtin` (cuando está disponible).
 
-### Arranque en frío
+### Modelo de crecimiento
 
-El índice canónico se inicializa a partir de conjuntos de datos de productos abiertos, alianzas de catálogos con licencia y cargas de usuarios sembradas desde la beta cerrada. El índice crece orgánicamente a medida que se vacía la cola de canonización.
-
-### Cola de canonización pendiente
-
-Los artículos de línea ambiguos entran en una cola de revisión. El revisor (inicialmente el equipo de Yumo Yumo, más tarde un pool comunitario que gana PoC) crea un nuevo producto canónico o asigna el texto bruto a uno existente. Esta cola es una palanca de costo principal del canal a medida que escala — 08 la enumera como un riesgo operativo central.
-
----
+El índice canónico crece a partir del propio tráfico de recibos: cada línea normalizada por LLM añade un producto canónico y un alias, y cada repetición posterior de esa forma superficial se resuelve desde la tabla de alias sin costo de modelo. Las entradas ambiguas o de baja calidad se revisan mediante las herramientas de catálogo del panel de administración.

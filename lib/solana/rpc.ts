@@ -1,13 +1,13 @@
 import { Connection } from "@solana/web3.js";
 
-export type SolanaNetwork = "mainnet-beta" | "devnet";
+type SolanaNetwork = "mainnet-beta" | "devnet";
 
 const PUBLIC_FALLBACKS: Record<SolanaNetwork, string> = {
   "mainnet-beta": "https://api.mainnet-beta.solana.com",
   devnet: "https://api.devnet.solana.com",
 };
 
-export function getNetwork(): SolanaNetwork {
+function getNetwork(): SolanaNetwork {
   const raw = process.env.NEXT_PUBLIC_SOLANA_NETWORK;
   return raw === "devnet" ? "devnet" : "mainnet-beta";
 }
@@ -19,13 +19,23 @@ export function getClientEndpoint(): string {
   return PUBLIC_FALLBACKS[getNetwork()];
 }
 
-/** Server-side connection for ops scripts and API routes. */
+/**
+ * Server-side connection for ops scripts and API routes. Network-aware: when the
+ * app runs against devnet, a devnet RPC is chosen instead of the (mainnet)
+ * SOLANA_RPC_URL, so on-chain reads like claim-confirm's getTransaction hit the
+ * same cluster the claim was sent to. Without this, a devnet claim would be
+ * verified against mainnet and always fail.
+ */
 export function getServerConnection(): Connection {
-  const url = process.env.SOLANA_RPC_URL || process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
+  const network = getNetwork();
+  const url =
+    network === "devnet"
+      ? process.env.SOLANA_RPC_URL_DEVNET || process.env.NEXT_PUBLIC_SOLANA_RPC_URL
+      : process.env.SOLANA_RPC_URL || process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
   if (!url) {
     console.warn(
-      `[solana/rpc] SOLANA_RPC_URL is not set; falling back to public ${getNetwork()} RPC (rate-limited)`,
+      `[solana/rpc] No ${network} RPC configured; falling back to public ${network} RPC (rate-limited)`,
     );
   }
-  return new Connection(url || PUBLIC_FALLBACKS[getNetwork()], "confirmed");
+  return new Connection(url || PUBLIC_FALLBACKS[network], "confirmed");
 }

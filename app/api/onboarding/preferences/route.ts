@@ -35,8 +35,12 @@ export async function POST(req: Request) {
     onboarding_language: body.onboarding_language ?? "tr",
   });
 
-  // Cookie sil
   const response = NextResponse.json({ success: true });
-  response.cookies.set("onboarding_pending", "", { maxAge: 0, path: "/" });
+  response.cookies.set("onboarding_pending", "", {
+    maxAge: 0,
+    path: "/",
+    sameSite: "lax",
+    httpOnly: false,
+  });
   return response;
 }

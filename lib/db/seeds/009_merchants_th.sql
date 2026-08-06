@@ -24,6 +24,30 @@ WHERE m.canonical_name = '7-Eleven Thailand' AND m.country_code = 'TH'
 AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = '7eleven')
 LIMIT 1;
 
+-- CP ALL PUBLIC COMPANY LIMITED is the operator of 7-Eleven Thailand; receipts
+-- print the legal name, so the aliases live on the 7-Eleven row (no separate
+-- CP All merchant — merged 2026-07-12, scripts/merge-cpall-into-7eleven.ts).
+INSERT INTO merchant_patterns (merchant_id, pattern, normalized_pattern, pattern_type, confidence_score)
+SELECT m.id, 'CP All', 'cp all', 'exact', 0.9 FROM merchants m
+WHERE m.canonical_name = '7-Eleven Thailand' AND m.country_code = 'TH'
+AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = 'cp all')
+LIMIT 1;
+
+INSERT INTO merchant_patterns (merchant_id, pattern, normalized_pattern, pattern_type, confidence_score)
+SELECT m.id, 'CPALL', 'cpall', 'exact', 0.9 FROM merchants m
+WHERE m.canonical_name = '7-Eleven Thailand' AND m.country_code = 'TH'
+AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = 'cpall')
+LIMIT 1;
+
+INSERT INTO merchant_patterns (merchant_id, pattern, normalized_pattern, pattern_type, confidence_score)
+SELECT m.id, 'CP ALL PUBLIC COMPANY', 'cp all public company', 'exact', 0.9 FROM merchants m
+WHERE m.canonical_name = '7-Eleven Thailand' AND m.country_code = 'TH'
+AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = 'cp all public company')
+LIMIT 1;
+
+UPDATE merchants SET vkn = '0107542000011'
+WHERE canonical_name = '7-Eleven Thailand' AND country_code = 'TH' AND vkn IS NULL;
+
 INSERT INTO merchants (canonical_name, display_name, category, tier, country_code)
 SELECT 'Lotus''s Thailand', 'Lotus''s', 'supermarket', 'candidate', 'TH'
 WHERE NOT EXISTS (SELECT 1 FROM merchants WHERE LOWER(TRIM(canonical_name)) = LOWER(TRIM('Lotus''s Thailand')) AND country_code = 'TH');
@@ -72,22 +96,6 @@ INSERT INTO merchant_patterns (merchant_id, pattern, normalized_pattern, pattern
 SELECT m.id, 'BIG C', 'big c', 'exact', 0.9 FROM merchants m
 WHERE m.canonical_name = 'Big C Thailand' AND m.country_code = 'TH'
 AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = 'big c')
-LIMIT 1;
-
-INSERT INTO merchants (canonical_name, display_name, category, tier, country_code)
-SELECT 'CP All Thailand', 'CP All', 'convenience', 'candidate', 'TH'
-WHERE NOT EXISTS (SELECT 1 FROM merchants WHERE LOWER(TRIM(canonical_name)) = LOWER(TRIM('CP All Thailand')) AND country_code = 'TH');
-
-INSERT INTO merchant_patterns (merchant_id, pattern, normalized_pattern, pattern_type, confidence_score)
-SELECT m.id, 'CP All', 'cp all', 'exact', 0.9 FROM merchants m
-WHERE m.canonical_name = 'CP All Thailand' AND m.country_code = 'TH'
-AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = 'cp all')
-LIMIT 1;
-
-INSERT INTO merchant_patterns (merchant_id, pattern, normalized_pattern, pattern_type, confidence_score)
-SELECT m.id, 'CP All', 'cp all', 'exact', 0.9 FROM merchants m
-WHERE m.canonical_name = 'CP All Thailand' AND m.country_code = 'TH'
-AND NOT EXISTS (SELECT 1 FROM merchant_patterns mp WHERE mp.merchant_id = m.id AND LOWER(TRIM(COALESCE(mp.normalized_pattern, mp.pattern))) = 'cp all')
 LIMIT 1;
 
 INSERT INTO merchants (canonical_name, display_name, category, tier, country_code)

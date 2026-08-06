@@ -25,7 +25,7 @@ function newVersion(): number {
   return Date.now();
 }
 
-export async function fetchGoalsFromServer(): Promise<CachedFinancialGoalRecord[] | null> {
+async function fetchGoalsFromServer(): Promise<CachedFinancialGoalRecord[] | null> {
   try {
     const res = await fetch("/api/goals", { cache: "no-store" });
     if (!res.ok) return null;
@@ -40,7 +40,7 @@ export async function fetchGoalsFromServer(): Promise<CachedFinancialGoalRecord[
   }
 }
 
-export async function listGoalsLocal(): Promise<CachedFinancialGoalRecord[]> {
+async function listGoalsLocal(): Promise<CachedFinancialGoalRecord[]> {
   return readCachedFinancialGoals();
 }
 

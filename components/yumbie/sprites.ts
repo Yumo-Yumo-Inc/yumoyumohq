@@ -6,12 +6,12 @@
  */
 import type { Mood } from "./types";
 
-export const EYE_L = 67;
-export const EYE_R = 133;
-export const EYE_Y = 79;
+const EYE_L = 67;
+const EYE_R = 133;
+const EYE_Y = 79;
 /** Walker render scale and ground baseline. Reference was 0.45; reduced 30%. */
 export const SC = 0.22;
-export const GROUND = 108;
+const GROUND = 108;
 /** Vertical offset so the scaled walker stands on the ground line. */
 export const TY = GROUND - 165 * SC;
 

@@ -18,7 +18,7 @@
 
 import { MASTER_MERCHANTS } from "./merchant-logo-master";
 
-export function foldMerchantKey(value: string | null | undefined): string {
+function foldMerchantKey(value: string | null | undefined): string {
   if (!value) return "";
   let s = value.toLowerCase();
   s = s

@@ -13,7 +13,7 @@ Yumo Yumo works with two data classes: user data and aggregate data. User data c
 
 ## 8.15 Control model
 
-**Off-chain receipt content.** Receipt line items live in the off-chain ledger (04 §4.16). The on-chain layer carries bINT mint events and Merkle root commitments; content is processed in the data layer.
+**Off-chain receipt content.** Receipt line items live in the off-chain ledger (04 §4.16). The on-chain layer carries INT claim transfers and Merkle root commitments; content is processed in the data layer.
 
 **Aggregate publication discipline.** The B2B data product follows k-anonymity and publication-group rules (05 §5.8). Publication groups are formed from region, category, and period cohorts with sufficient density.
 
@@ -23,4 +23,4 @@ Yumo Yumo works with two data classes: user data and aggregate data. User data c
 
 ## 8.16 Evolution
 
-Data-custody responsibility evolves with progressive localisation and regional-structure decisions. The architectural target stays stable: user receipt content remains off-chain, aggregate data becomes productised, and integrity proof is provided through on-chain commitment.
+Data-custody responsibility is assessed separately for regional-structure and possible authority-transfer decisions. The architectural target stays stable: user receipt content remains off-chain, aggregate data becomes productised, and integrity proof is provided through on-chain commitment.

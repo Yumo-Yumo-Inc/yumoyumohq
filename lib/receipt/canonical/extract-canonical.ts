@@ -11,11 +11,20 @@ import {
   normalizeMerchantDisplayName,
 } from "../name-normalization";
 import { resolveCategoryLvl1 } from "../category-taxonomy";
+import { classifyLineKind } from "../line-kind";
+import { fold } from "@/lib/insights/non-product-filter";
 
 const NOW_ISO = () => new Date().toISOString();
 
+/** Complimentary / on-the-house line (TR "ikram", EN complimentary/gratis). */
+export function isComplimentaryLineName(name: string | null | undefined): boolean {
+  const f = fold(name);
+  if (!f) return false;
+  return /\bikram\b/.test(f) || /\b(complimentary|gratis|on the house)\b/.test(f);
+}
+
 /** Unit — matches Gemini output and `receipt_data.geminiLineItems`. */
-export type GeminiStructuredLineUnitType = "adet" | "kg" | "g" | "l" | "ml";
+type GeminiStructuredLineUnitType = "adet" | "kg" | "g" | "l" | "ml";
 
 /** One line from Gemini receipt JSON (same shape as gemini-vision-service lineItems). */
 export type GeminiStructuredLineItem = {
@@ -31,6 +40,40 @@ export type GeminiStructuredLineItem = {
   /** Subcategory. E.g.: "Peynir", "Taze Meyve" */
   subcategory?: string | null;
 };
+
+/** Explicit receipt total of 0 (ikram / cancelled / free) — not a missing price. */
+function hasExplicitZeroTotal(item: GeminiStructuredLineItem): boolean {
+  return item.totalPrice != null && Number.isFinite(item.totalPrice) && item.totalPrice === 0;
+}
+
+/**
+ * True when the line already has a usable price signal and must not receive a
+ * fabricated share of paidExTax. Explicit 0 and "ikram" names count as usable.
+ */
+function hasUsableLinePrice(item: GeminiStructuredLineItem): boolean {
+  if (item.unitPrice != null && Number.isFinite(item.unitPrice) && item.unitPrice > 0) return true;
+  if (item.totalPrice != null && Number.isFinite(item.totalPrice) && item.totalPrice > 0) return true;
+  if (hasExplicitZeroTotal(item)) return true;
+  if (isComplimentaryLineName(item.name)) return true;
+  return false;
+}
+
+/**
+ * Pin free lines to 0 for persistence/UI. Does not overwrite a positive printed
+ * total even when the name contains "ikram".
+ */
+function pinComplimentaryOrZero(item: GeminiStructuredLineItem): GeminiStructuredLineItem {
+  if (hasExplicitZeroTotal(item)) {
+    return { ...item, totalPrice: 0, unitPrice: 0 };
+  }
+  const hasPositive =
+    (item.totalPrice != null && Number.isFinite(item.totalPrice) && item.totalPrice > 0) ||
+    (item.unitPrice != null && Number.isFinite(item.unitPrice) && item.unitPrice > 0);
+  if (isComplimentaryLineName(item.name) && !hasPositive) {
+    return { ...item, totalPrice: 0, unitPrice: 0 };
+  }
+  return item;
+}
 
 export interface ExtractCanonicalContext {
   receiptId?: string;
@@ -61,7 +104,7 @@ export interface VisionResponseLike {
 /**
  * Read geminiLineItems saved inside receipts.receipt_data JSON.
  */
-export function parseGeminiLineItemsFromReceiptData(receiptData: unknown): GeminiStructuredLineItem[] | undefined {
+function parseGeminiLineItemsFromReceiptData(receiptData: unknown): GeminiStructuredLineItem[] | undefined {
   if (receiptData == null) return undefined;
   let data: Record<string, unknown>;
   try {
@@ -161,28 +204,23 @@ export function parseStructuredLineItemsFromReceiptData(
 /**
  * Some LLM outputs contain only the product name; geminiLineToObservation requires a price.
  * When paidExTax > 0, the remaining amount is split across lines by quantity weight (for display + hidden cost).
+ *
+ * Explicit totalPrice === 0 and complimentary ("ikram") lines are kept as written —
+ * never invented from paidExTax (product rule: no fabricated prices).
  */
 export function allocateLinePricesWhenMissing(
   items: GeminiStructuredLineItem[],
   paidExTax: number
 ): GeminiStructuredLineItem[] {
-  if (!items.length || paidExTax <= 0) return items;
-  const anyMissing = items.some(
-    (i) =>
-      !(
-        (i.unitPrice != null && i.unitPrice > 0) ||
-        (i.totalPrice != null && i.totalPrice > 0)
-      )
-  );
-  if (!anyMissing) return items;
+  if (!items.length || paidExTax <= 0) return items.map(pinComplimentaryOrZero);
+  const anyMissing = items.some((i) => !hasUsableLinePrice(i));
+  if (!anyMissing) return items.map(pinComplimentaryOrZero);
   const weights = items.map((i) =>
     Math.max(1e-6, i.quantity != null && i.quantity > 0 ? i.quantity : 1)
   );
   const totalW = weights.reduce((a, b) => a + b, 0);
   return items.map((item, idx) => {
-    const hasU = item.unitPrice != null && item.unitPrice > 0;
-    const hasT = item.totalPrice != null && item.totalPrice > 0;
-    if (hasU || hasT) return item;
+    if (hasUsableLinePrice(item)) return pinComplimentaryOrZero(item);
     const share = (weights[idx] / totalW) * paidExTax;
     const q = item.quantity != null && item.quantity > 0 ? item.quantity : 1;
     return { ...item, totalPrice: share, unitPrice: share / q };
@@ -212,13 +250,33 @@ function geminiLineToObservation(
   let totalP = item.totalPrice;
   const uOk = unitP != null && Number.isFinite(unitP) && unitP > 0;
   const tOk = totalP != null && Number.isFinite(totalP) && totalP > 0;
+  const tZero = totalP != null && Number.isFinite(totalP) && totalP === 0;
+  const complimentary = isComplimentaryLineName(name);
 
   if (uOk && tOk) {
-    /* keep both */
-  } else if (uOk && !tOk) {
+    /**
+     * Both look present, so both used to be kept — which is how a 43,248 TRY fridge
+     * reached the user as a line total of 0.20, and its hidden cost as 8 kuruş.
+     *
+     * A line total below 1 against a unit price of 1 or more is arithmetically
+     * impossible once a whole unit is bought: one unit at 43,248 costs at least
+     * 43,248. What the model files there instead is the receipt's TAX RATE column,
+     * and the values name their country: 0.20/0.10/0.01 (TR), 0.05 (AE), 0.15 (SA),
+     * 0.22 (UY), 0.12 (PH), 0.0825 (US sales tax).
+     *
+     * `qty >= 1` carries the argument: buy 209g of bananas and the line legitimately
+     * costs 0.93 while the kilo price reads 4500, and there the total is the honest
+     * half. Below one unit, leave both alone.
+     */
+    if (totalP! < 1 && unitP! >= 1 && qty >= 1) totalP = unitP! * qty;
+  } else if (uOk && !tOk && !tZero) {
     totalP = unitP! * qty;
   } else if (!uOk && tOk) {
     unitP = totalP! / qty;
+  } else if (tZero || (complimentary && !uOk && !tOk)) {
+    // Explicit free / ikram line — persist as 0; do not drop the row.
+    unitP = 0;
+    totalP = 0;
   } else {
     return null;
   }
@@ -256,6 +314,9 @@ function geminiLineToObservation(
     allergens: [],
     price_tier: null,
     canonical_id: null,
+    // Classified on the ORIGINAL sign: a negative parsed total marks a
+    // discount row even though the price fields above are recomputed.
+    line_kind: classifyLineKind(name, item.totalPrice ?? item.unitPrice ?? null),
   };
 }
 

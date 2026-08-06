@@ -17,7 +17,7 @@
  * left as-is; v3 category_path already emits English lvl2.
  */
 
-export const CANONICAL_PRODUCT_CATEGORIES = [
+const CANONICAL_PRODUCT_CATEGORIES = [
   "groceries", // food + FMCG (cleaning, snacks, beverages sold at markets)
   "restaurant", // dine-in, cafe, food delivery
   "fuel",
@@ -201,10 +201,59 @@ export function normalizeProductCategoryLvl1(
   return "other";
 }
 
-export function isCanonicalProductCategory(
+function isCanonicalProductCategory(
   value: string | null | undefined
 ): value is CanonicalProductCategory {
   return value != null && CANONICAL_SET.has(value);
+}
+
+/**
+ * Reconcile category_lvl1 with the (reliable, English) category_path root.
+ *
+ * The v3 canonical resolver writes an accurate `category_path`; `category_lvl1`
+ * was historically set from a different, less reliable signal, so a restaurant
+ * meal could land on lvl1 "groceries" and be priced with the grocery producer
+ * multiplier. This makes the path the authority for the lvl1 roof.
+ *
+ * The `groceries` path root is an umbrella that legitimately splits into finer
+ * lvl1 buckets (cosmetics/alcohol/tobacco/baby/pets under personal_care,
+ * beverages, etc.), so those are preserved; only an off-umbrella lvl1 (e.g.
+ * "restaurant" under a groceries path) is pulled back to "groceries". Non-grocery
+ * roots map to their single lvl1 enum. Applied at WRITE time only — historical
+ * rows are not touched (per the reward-never-cut rule).
+ */
+const GROCERIES_LVL1 = new Set<CanonicalProductCategory>([
+  "groceries", "cosmetics", "alcohol", "tobacco", "baby", "pets",
+]);
+export function reconcileLvl1FromPath(
+  categoryPath: string | null | undefined,
+  currentLvl1: string | null | undefined
+): CanonicalProductCategory | null {
+  const current = normalizeProductCategoryLvl1(currentLvl1);
+  if (!categoryPath) return current;
+  const root = categoryPath.split(".")[0]?.toLowerCase();
+  switch (root) {
+    case "groceries":
+      // Keep a legitimate finer split; pull an off-umbrella value back to groceries.
+      return current && GROCERIES_LVL1.has(current) ? current : "groceries";
+    case "food_service":
+      return "restaurant";
+    case "fashion":
+      return "apparel";
+    case "electronics":
+      return "electronics";
+    case "home_living":
+      return "home";
+    case "health":
+      return "pharmacy";
+    case "services":
+      return "services";
+    case "transport":
+      // Only the fuel branch maps cleanly to an lvl1 enum; leave others as-is.
+      return categoryPath.startsWith("transport.fuel") ? "fuel" : current;
+    default:
+      return current;
+  }
 }
 
 /**

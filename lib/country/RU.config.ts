@@ -72,4 +72,3 @@ export const RU_CONFIG: CountryConfig = {
   ]
 };
 
-export default RU_CONFIG;

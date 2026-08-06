@@ -12,22 +12,27 @@ Cada clase tiene su propia familia de señales. La capa asume que el abuso es it
 
 ## 3.9 Categorías de señales
 
-A través de las tres clases, la capa se basa en categorías de señales nombradas aquí a alto nivel:
+A través de las tres clases, la capa se basa en categorías de señales nombradas aquí a alto nivel.
+
+Activa en la versión actual:
 
 - **Similitud perceptual** — detecta la reutilización del mismo recibo entre cargas.
+
+Categorías planificadas, no activas en la versión actual:
+
 - **Continuidad de dispositivo y sesión** — detecta patrones inusuales en cómo una cuenta interactúa con el protocolo.
 - **Correlación entre cuentas** — detecta grupos de cuentas que comparten patrones inconsistentes con hogares independientes.
 - **Autenticidad de medios sintéticos** — distingue las fotografías de recibos físicos de las imágenes generadas por máquina. Las señales se gestionan en la capa de operaciones internas.
 - **Ritmo conductual** — modela la actividad de la cuenta a lo largo del tiempo. Las señales específicas que componen esta categoría se gestionan en la capa de operaciones internas.
 
-Cada categoría produce señales que alimentan la puntuación de confianza del recibo y, donde sea relevante, la salud del usuario. Las señales específicas, los umbrales y el método de construcción de clústeres se gestionan en la capa de operaciones internas.
+Cada categoría produce señales que alimentan la evaluación de calidad del recibo y, donde sea relevante, la salud del usuario. Las señales específicas, los umbrales y el método de construcción de clústeres se gestionan en la capa de operaciones internas.
 
 ## 3.10 Tratamiento
 
 El tratamiento es graduado:
 
-- Una señal de forma aislada **reduce la banda de confianza** para el recibo afectado.
-- Un grupo de señales a través de recibos **reduce la salud del usuario**, lo que comprime el techo diario.
-- Un patrón persistente a través de usuarios **abre un caso de revisión** en la cola operacional; la resolución puede implicar revisión humana, verificación adicional o — en casos repetidos y inequívocos — acción a nivel de cuenta.
+- Una señal de forma aislada **reduce el resultado de calidad** para el recibo afectado.
+- Un grupo de señales a través de recibos **reduce la salud del usuario**, lo que disminuye la tasa de recompensa por recibo.
+- Un patrón persistente a través de usuarios **abre un caso de revisión** en la cola operacional *(mecanismo planificado; no activo en la versión actual)*; la resolución puede implicar revisión humana, verificación adicional o — en casos repetidos y inequívocos — acción a nivel de cuenta.
 
 El tratamiento graduado es intencional. Los recibos y los usuarios se sitúan en un espectro de confianza, y la lógica económica del protocolo depende de mantener ese espectro legible.

@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from "react";
 import { getTier, type ThemeMode, type TierTheme } from "./tiers";
+import { useThemeAccentKey } from "./accent-store";
+import { resolveThemeAccentHex } from "@/config/theme-accents";
 
 const STORAGE_KEY = "app-theme";
 
@@ -28,7 +30,7 @@ export function useTheme(): ThemeContextValue {
   return ctx;
 }
 
-export function useThemeLevel(): number {
+function useThemeLevel(): number {
   const level = useContext(ThemeLevelContext);
   return level ?? 1;
 }
@@ -132,5 +134,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
  *  To re-enable later: restore the `getTier(level, theme)` line. */
 export function useTier(_accountLevel?: number): TierTheme {
   const { theme } = useTheme();
-  return useMemo(() => getTier(1, theme), [theme]);
+  const accentKey = useThemeAccentKey();
+  return useMemo(() => {
+    const tier = getTier(1, theme);
+    // Theme-accent cosmetic (L9+): override the highlight color app-wide when the
+    // user has chosen one; otherwise keep the brand accent.
+    const accent = resolveThemeAccentHex(accentKey, theme);
+    return accent ? { ...tier, accent } : tier;
+  }, [theme, accentKey]);
 }

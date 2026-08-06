@@ -19,7 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { buildClaimInstructions } from "@/lib/solana/distributor";
 import { getClientEndpoint } from "@/lib/solana/rpc";
-import { useAppLocale } from "@/lib/i18n/app-context";
+import { useAppLocale, translateApiError } from "@/lib/i18n/app-context";
 
 interface ClaimProof {
   ok: boolean;
@@ -88,7 +88,7 @@ export function ClaimButton() {
       if (!confirm.ok) throw new Error((await confirm.json()).error ?? "confirm failed");
       await load();
     } catch (e: any) {
-      setError(e?.message ?? String(e));
+      setError(translateApiError(e?.message, t, true));
     } finally {
       setClaiming(false);
     }

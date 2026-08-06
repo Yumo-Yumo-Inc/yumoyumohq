@@ -1,44 +1,43 @@
-# 收據記錄（規範）
+# 收据记录（规范）
 
-## 5.3 收據記錄（規範）
+## 5.3 收据记录（规范）
 
-完整的生命週期 JSON。這是 `/v1/receipts/{id}` 讀取所回傳的內容。
+收据记录以应用自身 API 返回的形态呈现（`/api/receipts` 下经会话鉴权的读取）。所示字段名代表存储记录的形态。
 
 ```json
 // Receipt
 {
-  "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-  "user_id": "01HXY8K3F9A2QZ0M1B7N4PQR00",
-  "wallet_address": "5Hg2...8fpA",
+  "receipt_id": "6f2b8c1e-4a7d-4f2b-9c41-0e5d8a3b7f10",
+  "user": "yumo_user",
   "uploaded_at": "2026-05-17T14:23:11Z",
-  "captured_at": "2026-05-17T14:21:00Z",
+  "receipt_date": "2026-05-17",
   "currency": "TRY",
   "merchant": {
-    "merchant_id": "01HXY...",
-    "chain_id": "chain.migros",
-    "name_raw": "MIGROS T.A.S. ŞUBE 4521",
+    "merchant_id": "f3b1c2d4-...",
+    "display_name": "Migros",
     "city": "Istanbul",
-    "tax_id_hash": "sha256:7f3a..."
+    "tax_id": "6200278131"
   },
   "totals": {
-    "subtotal_minor": 23450,
-    "tax_total_minor": 4221,
-    "grand_total_minor": 27671,
+    "subtotal": "234.50",
+    "tax_total": "42.21",
+    "grand_total": "276.71",
     "currency": "TRY"
   },
   "tax_lines": [
-    { "rate_pct": 18.0, "base_minor": 20000, "amount_minor": 3600 },
-    { "rate_pct": 8.0,  "base_minor": 7750,  "amount_minor": 620  }
+    { "rate_pct": 18.0, "base": "200.00", "amount": "36.00" },
+    { "rate_pct": 8.0,  "base": "77.50",  "amount": "6.20"  }
   ],
   "payment_method": "credit_card",
+  "document_type": "receipt",
+  "is_payment_proof": true,
   "line_items": [
     {
-      "line_item_id": "01HXY...01",
       "raw_text": "SUT 1L PINAR",
-      "canonical_product_id": "cp.pinar.milk.1l",
+      "canonical_product_id": "3f6a...-...",
       "qty": 2.0,
-      "unit_price_minor": 2350,
-      "line_total_minor": 4700,
+      "unit_price": "23.50",
+      "line_total": "47.00",
       "tax_rate_pct": 8.0,
       "match_confidence": "0.XX"
     }
@@ -57,40 +56,42 @@
     "signals_present": ["total_reconciliation", "merchant_consistency"]
   },
   "rewards": {
-    "bint_minor_credited": 12500,
-    "bint_settled_at": null,
-    "epoints_minor_recorded": 845,
-    "statistics_only": false
+    "bint_credited": "125.00",
+    "reward_epoch": null
   },
   "status": "verified",
-  "schema_version": "1.0.0"
+  "proof_status": null,
+  "linked_receipt_id": null
 }
 ```
 
-信心值與信任分數以佔位符表示。生產範圍、級距邊界與訊號權重由內部營運層管理。
+置信值与信任分数以占位符表示。生产范围、级距边界与信号权重由内部运营层管理。
 
-### 欄位慣例
+### 字段惯例
 
-| 慣例 | 規則 |
+| 惯例 | 规则 |
 |---|---|
-| ID | ULID（Crockford base-32，26 字元）。按時間排序，可排序。 |
-| 幣別金額 | 最小單位（TRY 為 kuruş，USD 為 cents）。避免浮點漂移。 |
-| 時間戳 | ISO 8601 並附 `Z` 後綴。一律 UTC。 |
-| 雜湊 | `sha256:` 前綴後接小寫十六進位。 |
-| 可空 | 缺失欄位使用明確的 `null`。 |
-| 狀態列舉 | `pending`、`verified`、`rejected`、`statistics_only`、`under_review`。 |
+| ID | 收据与商家使用 UUID 主键；事件与账本表使用自增整数 id。 |
+| 币种金额 | 十进制数值，序列化为规范的十进制字符串（货币保留 2 位小数）。 |
+| 时间戳 | ISO 8601 并附 `Z` 后缀。一律 UTC。 |
+| 哈希 | 小写十六进制，算法由字段上下文命名。 |
+| 可空 | 缺失字段使用明确的 `null`。 |
+| 状态枚举 | `verified`、`saved`、`analyzed`。 |
 
-### 狀態轉換
+### 状态与付款证明处理
+
+上线中的状态值：
 
 ```
-pending
-   │
-   ├──► verified  （通過信任閘門）
-   ├──► statistics_only  （例如：訂單頁面收據，付款證明有限）
-   ├──► under_review  （邊界信任，申訴佇列）
-   └──► rejected  （硬性拒絕：反濫用訊號、手寫、合成圖像）
+analyzed  — 管线已产出结果，尚未持久化为保留记录
+saved     — 由用户保留
+verified  — 通过验证闸门；可获得奖励并进入聚合层
 ```
 
-`verified` 收據可賺取 bINT。`statistics_only` 收據計入使用者的價格記憶與家庭統計；彙總與獎勵處理遵循 5.8 規則。
+付款证明有限的文档（例如订单页面）由**一对独立字段**处理，而非状态值：`proof_status` 将记录标记为等待付款证明，`linked_receipt_id` 指向用户随后上传的、用于解决它的付款证明文档。此类记录计入用户自身统计，但不产生奖励，也不进入匿名化聚合。
+
+针对边界案例的人工审查流程属于规划项；它不在上线状态集合之中。
+
+`verified` 收据可赚取 bINT。非 verified 记录的聚合处理遵循 5.8 规则。
 
 ---

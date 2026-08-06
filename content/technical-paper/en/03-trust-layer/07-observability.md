@@ -4,15 +4,15 @@
 
 Every receipt that passes through the layer emits a record into an internal observability stream. The record contains:
 
-- The trust band assigned and the list of signal families that contributed.
-- Whether the receipt was held, rejected, or credited (full / reduced).
-- For held receipts, the reviewer's eventual action and the time-to-decision.
+- The quality tier assigned and the list of signal families that contributed.
+- Whether the receipt was rejected or credited (full / reduced).
+- Once the planned review queue activates: for held receipts, the reviewer's eventual action and the time-to-decision.
 - For credited receipts, the user's health and level at the moment of credit.
 
 This stream feeds three views:
 
 1. **Layer health dashboard** — band distribution over time, hold-queue depth, time-to-decision, reviewer override rate.
-2. **Calibration view** — paired distributions of trust band and observed downstream outcome (e.g. did a "high" band receipt later get flagged by a different signal?).
+2. **Calibration view** — paired distributions of quality tier and observed downstream outcome (e.g. did a high-tier receipt later get flagged by a different signal?).
 3. **Abuse pulse** — cluster size distribution, new-pattern emergence rate, geography of held cases.
 
 ## 3.15 Calibration cadence

@@ -1,8 +1,8 @@
-# 價格觀測（規範）
+# 价格观测（规范）
 
-## 5.6 價格觀測（規範）
+## 5.6 价格观测（规范）
 
-價格記憶表。每個 `(canonical_product_id, merchant_id, observation timestamp)` 組合一列。
+价格记忆表。每个 `(canonical_product_id, merchant_id, observation timestamp)` 组合一列。
 
 ```json
 // PriceObservation
@@ -20,12 +20,12 @@
 }
 ```
 
-此表驅動：
+此表驱动：
 
-1. **使用者價格記憶** —「你以 23.50 TL 在 Migros 購買 Pınar süt；本週中位數為 22.10 TL。」
-2. **B2B 價格指數** — 依 `(canonical_product_id, region, week)` 彙總，並強制執行 k-匿名性門檻。
-3. **通膨脈衝** — 每晚計算的高頻購物籃指數。
+1. **使用者价格记忆** —「你以 23.50 TL 在 Migros 购买 Pınar süt；本周中位数为 22.10 TL。」
+2. **B2B 价格指数** — 依 `(canonical_product_id, region, week)` 汇总，并强制执行 k-匿名性门槛。
+3. **通膨脉冲** — 每晚计算的高频购物篮指数。
 
-低於生產環境調校品質底線的列會被寫入，但排除於指數計算外。
+低于生产环境调校品质底线的列会被写入，但排除于指数计算外。
 
 ---

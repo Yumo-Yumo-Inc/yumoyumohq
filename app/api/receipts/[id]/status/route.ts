@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { getSessionUsername } from "@/lib/auth/session";
 import { isAdminUser } from "@/lib/auth/admin-users";
+import { getDailyXpReceiptLimit } from "@/lib/oracle/account-season-level";
+import { parseRewardBreakdown } from "@/lib/receipt/reward-breakdown";
 
 /**
  * Lightweight status endpoint used by the analyzing UI to poll for
@@ -38,8 +40,10 @@ export async function GET(
       status: string;
       expense_type: string | null;
       username: string;
+      hidden_cost_core: string | number | null;
+      pricing_total_paid: string | number | null;
     }>(
-      `SELECT status, expense_type, username
+      `SELECT status, expense_type, username, hidden_cost_core, pricing_total_paid
          FROM receipts
         WHERE receipt_id = $1
         LIMIT 1`,
@@ -51,30 +55,82 @@ export async function GET(
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
       const status = String(primaryRow.status || "scanned");
-      // Contribution points (cPoints) for this receipt are written by
-      // post-process (background) after analyze responds, so the upload screen
-      // polls this endpoint to surface the real per-receipt cPoints once ready.
-      let contributionPoints: number | null = null;
+      // Points (bINT) earned for this receipt — the user-visible token amount,
+      // after all multipliers and caps. Written at upload (reward_final), so it
+      // is usually ready on the first poll.
+      let bint: number | null = null;
+      let rewardBreakdown: unknown = null;
       try {
-        const cp = await db.query<{ points_delta: string | number }>(
-          `SELECT points_delta
-             FROM contribution_point_events
+        const b = await db.query<{ amount: string | number | null; breakdown: unknown }>(
+          `SELECT bint_bonus_amount AS amount, reward_breakdown AS breakdown
+             FROM receipt_rewards
+            WHERE receipt_id = $1
+            LIMIT 1`,
+          [trimmed]
+        );
+        if (b.rows?.[0]?.amount != null) bint = Number(b.rows[0].amount) || 0;
+        rewardBreakdown = parseRewardBreakdown(b.rows?.[0]?.breakdown ?? null);
+      } catch {
+        bint = null;
+        rewardBreakdown = null;
+      }
+
+      // XP earned for this receipt. Granted by trust-update in the background, so
+      // it may lag the first poll. When no XP row exists yet, distinguish
+      // "still computing" (null → keep polling) from "capped by the daily
+      // receipt limit" (0 → resolved): if the user already hit the daily XP
+      // receipt count, this receipt will never earn XP.
+      let xp: number | null = null;
+      try {
+        const xrow = await db.query<{ xp_delta: string | number }>(
+          `SELECT xp_delta
+             FROM account_xp_events
             WHERE reference_id = $1 AND source_type = 'receipt_verified'
             LIMIT 1`,
           [trimmed]
         );
-        if (cp.rows?.[0]?.points_delta != null) {
-          contributionPoints = Number(cp.rows[0].points_delta) || 0;
+        if (xrow.rows?.[0]?.xp_delta != null) {
+          xp = Number(xrow.rows[0].xp_delta) || 0;
+        } else {
+          const usedRow = await db.query<{ n: string | number }>(
+            `SELECT COUNT(DISTINCT reference_id)::int AS n
+               FROM account_xp_events
+              WHERE username = $1
+                AND source_type = 'receipt_verified'
+                AND created_at >= (now() AT TIME ZONE 'UTC')::date`,
+            [primaryRow.username]
+          );
+          const usedToday = Number(usedRow.rows?.[0]?.n) || 0;
+          xp = usedToday >= getDailyXpReceiptLimit() ? 0 : null;
         }
       } catch {
-        contributionPoints = null;
+        xp = null;
       }
+
+      // Hidden cost. Upload writes a first figure from raw OCR lines;
+      // post-process may replace it with the line-level result once canonical
+      // resolution has run (see run-post-process "DISPLAY CORRECTION"). The
+      // analyzing screen polls this so the number it shows follows that
+      // correction instead of freezing on the upload estimate. Clamped to the
+      // amount paid, mirroring displayHiddenCost.
+      let hiddenCost: number | null = null;
+      if (primaryRow.hidden_cost_core != null) {
+        const raw = Number(primaryRow.hidden_cost_core);
+        const paid = Number(primaryRow.pricing_total_paid) || 0;
+        if (Number.isFinite(raw) && raw >= 0) {
+          hiddenCost = paid > 0 ? Math.min(raw, paid) : raw;
+        }
+      }
+
       return NextResponse.json({
         status,
         expenseType: primaryRow.expense_type ?? "personal",
         visible: true,
         finished: isTerminal(status),
-        contributionPoints,
+        bint,
+        rewardBreakdown,
+        xp,
+        hiddenCost,
       });
     }
 

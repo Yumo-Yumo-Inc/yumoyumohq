@@ -70,4 +70,3 @@ export const MX_CONFIG: CountryConfig = {
   ]
 };
 
-export default MX_CONFIG;

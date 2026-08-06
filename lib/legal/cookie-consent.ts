@@ -1,5 +1,5 @@
-export const COOKIE_CONSENT_KEY = "yumo-cookie-consent";
-export const COOKIE_CONSENT_VERSION = "2026-04-20";
+const COOKIE_CONSENT_KEY = "yumo-cookie-consent";
+const COOKIE_CONSENT_VERSION = "2026-04-20";
 export const COOKIE_CONSENT_CHANGE_EVENT = "yumo-cookie-consent-change";
 export const COOKIE_CONSENT_OPEN_EVENT = "yumo-cookie-consent-open";
 
@@ -8,7 +8,7 @@ export const COOKIE_CONSENT_OPEN_EVENT = "yumo-cookie-consent-open";
  * read it (consent itself lives in localStorage, which the server cannot see).
  * Value is "1" when analytics consent is granted, "0" otherwise.
  */
-export const ANALYTICS_CONSENT_COOKIE = "yumo-analytics-consent";
+const ANALYTICS_CONSENT_COOKIE = "yumo-analytics-consent";
 
 export type CookieConsentStatus = "accepted" | "rejected" | "customized";
 
@@ -36,7 +36,7 @@ export function isGlobalPrivacyControlEnabled(): boolean {
   return (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
 }
 
-export function normalizeCookiePreferences(preferences: Partial<CookieConsentPreferences>): CookieConsentPreferences {
+function normalizeCookiePreferences(preferences: Partial<CookieConsentPreferences>): CookieConsentPreferences {
   return {
     necessary: true,
     functional: preferences.functional === true,
@@ -126,7 +126,7 @@ export function openCookiePreferences(): void {
   window.dispatchEvent(new Event(COOKIE_CONSENT_OPEN_EVENT));
 }
 
-export function getNecessaryOnlyCookieConsent(status: CookieConsentStatus = "rejected"): CookieConsent {
+function getNecessaryOnlyCookieConsent(status: CookieConsentStatus = "rejected"): CookieConsent {
   return buildCookieConsent(status, NECESSARY_ONLY);
 }
 

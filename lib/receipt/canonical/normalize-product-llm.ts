@@ -20,50 +20,7 @@ import { detectGuardedProductCategory } from "./product-category-guards";
 /** Default canonical-normalize model; overridable via CANONICAL_PRODUCT_LLM_MODEL. */
 const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 
-/** Read the Gemini key lazily — env may be loaded after this module is imported (scripts/dotenv). */
-function getGeminiKey(): string {
-  return process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || "";
-}
-
-/** Call Gemini for plain-text generation. Returns text, or null on any failure. */
-async function callGeminiText(
-  model: string,
-  systemPrompt: string,
-  userPrompt: string
-): Promise<string | null> {
-  const apiKey = getGeminiKey();
-  if (!apiKey) {
-    console.warn("[normalizeReceiptLinesWithLLM] GEMINI_API_KEY not set");
-    return null;
-  }
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        temperature: 0,
-        maxOutputTokens: 8192,
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    }),
-  });
-  const data = (await res.json()) as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    error?: { message?: string };
-  };
-  if (!res.ok) {
-    throw new Error(data.error?.message ?? `Gemini HTTP ${res.status}`);
-  }
-  return (
-    data.candidates?.[0]?.content?.parts
-      ?.map((p) => p.text ?? "")
-      .join("")
-      .trim() ?? null
-  );
-}
+import { callGeminiText } from "@/lib/canonical/gemini-text";
 
 // ─── Output type ─────────────────────────────────────────────────────────────
 
@@ -476,7 +433,7 @@ function parseVerdict(
  * inputLine.toLowerCase(). Defensive — a malformed block drops that item, never
  * the batch. Separated from the network call so it is unit-testable.
  */
-export function parseNormalizationText(
+function parseNormalizationText(
   raw: string,
   unique: string[]
 ): Map<string, LlmProductNormalization> {

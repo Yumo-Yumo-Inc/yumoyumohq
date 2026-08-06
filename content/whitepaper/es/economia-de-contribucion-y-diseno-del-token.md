@@ -1,19 +1,18 @@
 # Economía de contribución y diseño del token
 
-La columna económica de Yumo Yumo construye un puente por capas entre el uso cotidiano y la coordinación abierta. La Prueba de Gasto, la verificación de comercios, las mejoras de producto y las tareas de comunidad se asientan primero en la capa bINT. Esa capa hace visibles la calidad, la confianza y la continuidad de la contribución. La capa INT lleva la coordinación económica más amplia, el staking y las superficies de gobernanza que maduran con el tiempo. Junto a ellas, ePoints registra la huella en dólares del costo oculto que aflora en cada recibo verificado, y el NFT Fundacional — Yumbie — ancla la identidad digital portátil del usuario dentro del sistema.
+La columna económica de Yumo Yumo construye un puente por capas entre el uso cotidiano y la coordinación abierta. La Prueba de Gasto, la verificación de comercios, las mejoras de producto y las tareas de comunidad se asientan primero en la capa bINT. Esa capa hace visibles la calidad, la confianza y la continuidad de la contribución. La capa INT lleva la coordinación económica más amplia, el staking y las superficies de gobernanza que maduran con el tiempo. El NFT Fundacional — Yumbie — ancla la identidad digital portátil del usuario dentro del sistema, mientras que cada recibo verificado muestra al usuario un insight de costo oculto como resultado del análisis.
 
-Esta separación importa porque la contribución, el valor y la identidad transitan por compuertas distintas. El usuario que aporta valor al sistema acumula primero bINT. El tiempo, el comportamiento de tenencia y la confianza determinan cómo ese saldo pasa a INT. Cada recibo verificado escribe además un registro de ePoints que captura la medida en dólares del costo oculto revelado. El Yumbie del usuario lleva la memoria visible de ese trayecto. El resultado es una economía que premia la participación constante y creíble mientras alinea el valor con la contribución de largo plazo.
+Esta separación importa porque la contribución, el valor y la identidad transitan por compuertas distintas. El usuario que aporta valor al sistema acumula primero bINT. El tiempo, el comportamiento de tenencia y la confianza determinan cómo ese saldo pasa a INT. Cada recibo verificado genera un insight de costo oculto que muestra al usuario las presiones en su gasto. El Yumbie del usuario lleva la memoria visible de ese trayecto. El resultado es una economía que premia la participación constante y creíble mientras alinea el valor con la contribución de largo plazo.
 
 ## Capas del token
 
 | Capa | Forma | ¿Transferible? | Propósito |
 | --- | --- | --- | --- |
 | **INT** | Token SPL en cadena | Sí | Coordinación económica, staking, incentivos del ecosistema |
-| **bINT** | En cadena, sin transferencia (ATA congelada) | No — se convierte a INT por acción del usuario | Contabilidad de la contribución; capa blanda entre el trabajo y la recompensa |
-| **ePoints** | En cadena, sin transferencia (ATA congelada) | No | Registro en dólares del costo oculto que aflora en cada recibo verificado |
+| **bINT** | Unidad contable fuera de cadena (capa de operaciones) | No — se liquida a INT mediante un ciclo de vida definido | Contabilidad de la contribución; capa blanda entre el trabajo y la recompensa |
 | **NFT Fundacional (Yumbie)** | Token-2022 NonTransferable | No | Identidad digital persistente; compañero visual que evoluciona con el usuario |
 
-bINT y ePoints capturan dos señales distintas del mismo recibo. bINT mide la intensidad de la contribución dentro de la economía Yumo. ePoints mide el valor en dólares del costo oculto devuelto al usuario. Nunca se sobrescriben y se convierten mediante lógicas distintas.
+bINT es la señal de contribución que emerge de cada recibo verificado. Mide la intensidad de la contribución dentro de la economía Yumo Yumo y se convierte mediante una lógica definida atada al tiempo, el comportamiento de tenencia y la confianza.
 
 ## Distribución de INT
 
@@ -95,21 +94,20 @@ Cuando el usuario alcanza el Nivel 30, el Yumbie evoluciona de su forma Fundacio
 
 ## Contabilidad previa al TGE
 
-Antes del Evento de Generación del Token, la plataforma rastrea la contribución a través de cPoints, una medida de reputación de sistema cerrado. cPoints existen sólo en la fase previa al TGE. Informan los pesos iniciales de airdrop y onboarding en el TGE y luego quedan en desuso. Desde el TGE en adelante, las capas bINT y ePoints reemplazan el rol de cPoints con semántica de contribución más fuerte y contabilidad en cadena.
+Antes del Evento de Generación del Token, la plataforma rastrea la contribución a través de cPoints, una medida de reputación de sistema cerrado. cPoints existen sólo en la fase previa al TGE. Informan los pesos iniciales de airdrop y onboarding en el TGE y luego quedan en desuso. Desde el TGE en adelante, la capa bINT reemplaza el rol de cPoints con semántica de contribución más fuerte; bINT es una unidad de contabilidad fuera de la cadena que se resuelve en INT a través del ciclo de vida definido.
 
 ## Cómo se conectan las capas
 
 ```mermaid
 flowchart LR
     A[PoE verificado] --> B[Crédito bINT]
-    A --> C[Registro ePoints]
-    A --> D[Actualización de nivel y salud del Yumbie]
-    B -->|ratio por año| E[Conversión a INT]
-    E --> F[Stake / mantener / transferir]
-    D -->|Nivel 30| G[Evolución a Agente Inteligente]
-    F --> H[Recompra y quema desde tesorería]
+    A --> C[Actualización de nivel y salud del Yumbie]
+    B -->|ratio por año| D[Conversión a INT]
+    D --> E[Stake / mantener / transferir]
+    C -->|Nivel 30| F[Evolución a Agente Inteligente]
+    E --> G[Recompra y quema desde tesorería]
 ```
 
-Cada recibo verificado escribe a la vez contribución en bINT, comprensión del costo oculto en ePoints y progresión de identidad en el Yumbie del usuario. La conversión de bINT a INT mueve valor de la capa de contribución a la capa económica con un ratio que favorece la participación temprana y se equilibra con el tiempo. El staking devuelve valor a los tenedores de largo plazo. La recompra y quema desde tesorería cierra el ciclo atando el ingreso real de la plataforma a la escasez del token.
+Cada recibo verificado simultáneamente escribe contribución en bINT, muestra al usuario un insight de costo oculto y actualiza la progresión de identidad en el Yumbie del usuario. La conversión de bINT a INT mueve valor de la capa de contribución a la capa económica con un ratio que favorece la participación temprana y se equilibra con el tiempo. El staking devuelve valor a los tenedores de largo plazo. La recompra y quema desde tesorería cierra el ciclo atando el ingreso real de la plataforma a la escasez del token.
 
 Esta estructura debilita la presión de spam porque la contribución vale más cuando calidad, confianza y tiempo avanzan juntos. Favorece a los usuarios fuertes y a los contribuidores constantes porque la red crece a través de la participación con valor histórico en lugar del volumen superficial. El diseño del token queda por ello inseparable de la tesis del producto; es la expresión económica de la memoria, el precio y el motor de orientación de Yumo.

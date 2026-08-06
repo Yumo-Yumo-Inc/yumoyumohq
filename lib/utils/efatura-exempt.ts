@@ -8,7 +8,7 @@
  * During upload, OCR (Vision API) extracts text from the image to detect e-invoices.
  */
 
-export interface EfaturaExemptParams {
+interface EfaturaExemptParams {
   buffer: Buffer;
   filename?: string;
   mimeType?: string;
@@ -112,7 +112,7 @@ export function filenameSuggestsEfatura(filename: string): boolean {
  * Single Vision OCR call for the image buffer during upload; returns the extracted text.
  * Returns an empty string if there is no API key or an error occurs.
  */
-export async function runQuickOcrForExempt(imageBuffer: Buffer): Promise<string> {
+async function runQuickOcrForExempt(imageBuffer: Buffer): Promise<string> {
   const apiKey = process.env.GOOGLE_VISION_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) return "";
 
@@ -146,7 +146,7 @@ export async function runQuickOcrForExempt(imageBuffer: Buffer): Promise<string>
 /**
  * Considered "no background" when all margin values are below this threshold.
  */
-export function getNoBackgroundMarginThreshold(): number {
+function getNoBackgroundMarginThreshold(): number {
   return NO_BACKGROUND_MARGIN_THRESHOLD;
 }
 
@@ -156,7 +156,7 @@ export function getNoBackgroundMarginThreshold(): number {
  * - Image: text is extracted via Vision OCR; true if isEcommerceEfatura(text). Falls
  *   back to the filename if OCR is empty/fails.
  */
-export async function isEfaturaExemptForMarginCheck(
+async function isEfaturaExemptForMarginCheck(
   params: EfaturaExemptParams
 ): Promise<boolean> {
   const { buffer, filename, mimeType } = params;

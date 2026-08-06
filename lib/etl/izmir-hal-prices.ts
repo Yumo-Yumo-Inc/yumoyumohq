@@ -18,7 +18,7 @@ import { getSql } from "@/lib/db/client";
 const SOURCE = "IZMIR_HAL_OPENDATA";
 const BASE = "https://eislem.izmir.bel.tr/tr/HalFiyatlari/ExceleAktar/";
 
-export interface HalRow {
+interface HalRow {
   hksName: string;       // full Izmir product name (e.g. ARMUT DEVECI)
   canonicalKey: string;  // normalized base form (e.g. armut)
   type: string;          // MEYVE/SEBZE/İTHAL (fruit/vegetable/imported)
@@ -113,4 +113,4 @@ export async function runIzmirHalEtl(opts: { date?: string; lookbackDays?: numbe
   return { date: used, prepared: rows.length, written, samples: rows.slice(0, 8), dryRun: opts.dryRun ?? false };
 }
 
-export { SOURCE as IZMIR_HAL_SOURCE };
+;

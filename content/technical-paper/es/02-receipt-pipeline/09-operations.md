@@ -10,7 +10,7 @@ El canal evalúa los errores por separado de los mensajes orientados al usuario 
 | Recibo faltante o inconsistente | El usuario ve el flujo de verificación/recarga | El registro va a revisión o rechazo |
 | Tipo de documento no admitido | Se informa al usuario de que el tipo no es compatible | No se admite en la contabilidad de recompensas |
 | Sospecha de repetición o colisión | Se puede mostrar un registro existente o realizar una revisión silenciosa | La capa de confianza determina el resultado |
-| Recibo antiguo o de reembolso | Se muestra al usuario el estado apropiado | Puede afectar a la memoria/ePoints en lugar de bINT |
+| Recibo antiguo o de reembolso | Se muestra al usuario el estado apropiado | Puede afectar al historial analítico en lugar de bINT |
 | Retraso del sistema | El usuario ve el estado de espera o reintento | El evento del trabajo se preserva en la cola |
 
 ## 2.11 Costo y rendimiento

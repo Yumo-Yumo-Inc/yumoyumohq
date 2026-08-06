@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTier } from "@/lib/theme/theme-context";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import { getCategorySchemaLabel } from "@/lib/receipt/cost-layer-display";
+import { formatUnitType } from "@/lib/format/unit-type";
 import { StatusBadge } from "@/components/app/status-badge";
 import { displayHiddenCost, displayHiddenPercent } from "@/lib/receipt/display-hidden-cost";
 import { readCachedReceiptById } from "@/lib/offline/cache";
@@ -591,12 +592,12 @@ function ReceiptFullCard(props: CardProps) {
                   style={{ borderBottom: i < items.length - 1 ? "1px solid var(--app-border)" : "none" }}
                 >
                   <span className="flex-1 truncate text-[13px]" style={{ color: "var(--app-text-secondary)" }}>
-                    {it.displayName || it.rawName}
+                    {(it.rawName && it.rawName.trim()) || it.displayName}
                   </span>
                   {it.quantity != null && (
                     <span className="shrink-0 font-mono text-[10px]" style={{ color: "var(--app-text-muted)" }}>
                       ×{it.quantity}
-                      {it.unitType ? ` ${it.unitType}` : ""}
+                      {it.unitType ? ` ${formatUnitType(it.unitType, locale) ?? ""}` : ""}
                     </span>
                   )}
                   {it.lineTotal != null && (
@@ -656,7 +657,7 @@ function ReceiptFullCard(props: CardProps) {
               +{r.reward.amount.toFixed(2)}
             </div>
             <div className="mt-0.5 font-mono text-[8px] uppercase tracking-widest" style={{ color: "var(--app-text-muted)" }}>
-              cPoints
+              {byLocale("puan", "points", "поинты", "แต้ม", "puntos", "积分")}
             </div>
           </div>
         </div>

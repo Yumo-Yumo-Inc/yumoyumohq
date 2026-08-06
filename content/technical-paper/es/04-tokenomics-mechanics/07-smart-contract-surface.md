@@ -9,10 +9,10 @@ La v1 se ejecuta sobre programas auditados y ampliamente utilizados en lugar de 
 | Emisión y quema de INT | SPL Token | Autoridad de acuñación cerrada tras el génesis; quema bajo multifirma |
 | Distribución y reclamación de recompensas | Distribuidor merkle auditado | Raíz por época; la autoridad de fijación de raíz es multifirma |
 | Tesoro y autoridades | Multifirma de Squads | Aprobaciones separadas de raíz / tesoro / clawback |
-| Foundation NFT | Token-2022 (NonTransferable) | Acuñación por backend, una por billetera |
+| SBT de proof-of-expense | Token-2022 (NonTransferable) | Acuñación por backend, una por billetera |
 | Compromisos de transparencia | Programa Memo | Raíz de época y hash del conjunto de datos escritos on-chain |
 
-bINT y ePoints son unidades contables off-chain. No son tokens on-chain; sus saldos residen en la capa operativa y se liquidan en INT a través del distribuidor.
+bINT es una unidad contable off-chain. No es un token on-chain; sus saldos residen en la capa operativa. Las reclamaciones de INT derivadas de los saldos elegibles de bINT se liquidan a través del distribuidor.
 
 ## 4.16 Qué va on-chain
 
@@ -28,4 +28,4 @@ Esta separación mantiene el cálculo de recompensas, la verificación independi
 
 ## 4.18 Postura de auditoría
 
-La superficie on-chain se apoya en programas que ya están auditados y en amplio uso en producción. El motor de recompensas off-chain y el verificador independiente se revisan antes del lanzamiento, con un archivo público de informes y un canal de reporte de seguridad. El alcance y los enlaces a los informes se publican a medida que se completan las revisiones.
+La superficie on-chain se apoya en programas de código abierto de terceros; las versiones, las direcciones de programa y los enlaces de auditoría pertinentes se publican. El alcance de la revisión, los enlaces a los informes y un canal de reporte de seguridad para el motor de recompensas off-chain y el verificador deben publicarse antes del lanzamiento.

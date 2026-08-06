@@ -112,6 +112,8 @@ export function machineOutputToGeminiResult(
       data.merchant_display_name ?? data.merchant_legal_name ?? null,
     merchantLegalName: data.merchant_legal_name ?? null,
     merchantDisplayName: data.merchant_display_name ?? null,
+    merchantBrand: data.merchant_brand ?? null,
+    merchantBrandConfidence: data.merchant_brand_confidence ?? null,
     merchantNameConfidence:
       typeof data.confidence === "number" ? data.confidence : 0.85,
     merchantAddress: data.merchant_address ?? null,

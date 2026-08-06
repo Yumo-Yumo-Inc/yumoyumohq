@@ -10,7 +10,7 @@ The pipeline evaluates errors separately from user-facing messages and ledger im
 | Missing or inconsistent receipt | User sees verification/re-upload flow | Record goes to review or rejection |
 | Unsupported document type | User is told the type is unsupported | Not admitted to reward accounting |
 | Suspected repeat or collision | Existing record may be shown or silent review may occur | Trust layer determines outcome |
-| Old or refund receipt | User sees appropriate status | May affect memory/ePoints rather than bINT |
+| Old or refund receipt | User sees appropriate status | May affect analytics history rather than bINT |
 | System delay | User sees waiting or retry state | Job event is preserved in the queue |
 
 ## 2.11 Cost and Performance

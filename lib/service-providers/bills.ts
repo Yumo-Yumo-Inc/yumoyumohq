@@ -108,7 +108,7 @@ export async function insertDigitalBillStub(input: {
   };
 }
 
-export async function listBillHistoryForProvider(
+async function listBillHistoryForProvider(
   username: string,
   providerId: number,
 ): Promise<

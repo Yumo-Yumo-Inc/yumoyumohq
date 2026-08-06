@@ -2,7 +2,7 @@
 
 ## 5.8 Anonimleştirilmiş toplam ve B2B veri ürünü
 
-B2B gelirinin üretildiği ve sıkı gizlilik garantileri altında çalışan yüzeydir.
+B2B veri ürününün üretildiği yüzeydir. Yayın, bu bölümde tanımlanan anonimleştirme ve erişim kontrollerine tabidir.
 
 ### Dönüşüm kuralları
 
@@ -51,16 +51,5 @@ Her B2B yanıtı `n_distinct_contributors` taşır; alıcı k-anonimlik tabanın
 - Koordinatlar, adresler, telefon numaraları.
 - Ödeme aracı metaverisi.
 - Sorgular arası anonimleştirilmiş ama bağlanabilir ID'ler (her sorgu yeni bir oturum hash'i alır).
-
-### Mevcut panellerle karşılaştırma
-
-Yumo Yumo'nun B2B veri ürünü Nielsen, GfK, Kantar ve SimilarWeb ile aynı alıcılar için yarışır. O panellerle karşılaştırıldığında:
-
-- **Fiş düzeyi** — anket hatırlama etkisiyle karşılaştırıldığında azaltılmış ölçüm hatası.
-- **Daha yüksek yenileme sıklığı** — günlük vs. haftalık/aylık.
-- **Gelişen pazar kapsamı** — TR öncelikli; mevcut oyuncuların TR kapsamı en dar olanıdır.
-- **Kayıt başına daha düşük maliyet** — panel mevcut kullanıcı etkinliğinden inşa edilir.
-
-Takas: Yumo Yumo'nun paneli lansmanda daha küçüktür ve erken benimseyen demografisine eğilir.
 
 ---

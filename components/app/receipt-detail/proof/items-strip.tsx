@@ -5,26 +5,21 @@ import { useEffect, useState } from "react";
 import { getLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import { ChevronDown, Image as ImageIcon } from "lucide-react";
 import { useAppLocale } from "@/lib/i18n/app-context";
+import { formatQtyWithUnit } from "@/lib/format/unit-type";
 import type { Receipt, ReceiptLineItem } from "@/lib/mock/types";
 import { NOTCH, flameText } from "./primitives";
 import { CONDENSED, MONO, money } from "./theme";
 
 const INITIAL = 6;
 
-function formatQty(qty?: number | null, unitType?: string | null): string | null {
-  if (qty == null || !Number.isFinite(qty)) return null;
-  const isWhole = Number.isInteger(qty);
-  const num = isWhole ? String(qty) : qty.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
-  return unitType ? `${num} ${unitType}` : num;
-}
-
 function Row({ item, currency }: { item: ReceiptLineItem; currency: string }) {
-  // Show the human-readable name. canonicalName is a machine slug
-  // (e.g. "h_w_1500ml") meant for matching only — never surface it to the user.
-  const name = item.displayName || item.rawName || "—";
+  const { locale } = useAppLocale();
+  // Receipt proof shows the printed line (rawName). displayName is often a
+  // Turkish taxonomy label (display_name_tr) and must not replace the original.
+  const name = (item.rawName && item.rawName.trim()) || item.displayName || "—";
   const hasTotal = item.lineTotal != null && Number.isFinite(item.lineTotal);
   const hasUnit = item.unitPrice != null && Number.isFinite(item.unitPrice);
-  const meta = [item.brand || null, formatQty(item.quantity, item.unitType), hasUnit ? `× ${money(item.unitPrice as number, currency)}` : null].filter(Boolean).join(" · ");
+  const meta = [item.brand || null, formatQtyWithUnit(item.quantity, item.unitType, locale), hasUnit ? `× ${money(item.unitPrice as number, currency)}` : null].filter(Boolean).join(" · ");
   return (
     <div className="flex items-baseline gap-2 py-2">
       <span className="shrink-0 text-sm" style={{ color: "var(--pf-text)", fontFamily: MONO }}>{name}</span>

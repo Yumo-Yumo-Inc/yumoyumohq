@@ -15,39 +15,40 @@ import type {
 
 // ── Daily Pools by Tier ───────────────────────────────────
 
-export const DAILY_RECEIPT_POOL: DailyReceiptType[] = [
+const DAILY_RECEIPT_POOL: DailyReceiptType[] = [
   "D1", "D3", "D4", "D5", "D6", "D7", "D8", "D9",
   "D10", "D11", "D12", "D13", "D14", "D16",
 ];
 
-export const DAILY_DISCOVERY_POOL: DailyDiscoveryType[] = [
+const DAILY_DISCOVERY_POOL: DailyDiscoveryType[] = [
   "DD1", "DD2", "DD3", "DD4", "DD5", "DD6", "DD7", "DD8", "DD9", "DD10",
+  "DD11", "DD12", "DD13", "DD14", "DD15", "DD16", "DD17", "DD18",
 ];
 
-export const DAILY_SAVINGS_POOL: DailySavingsType[] = [
+const DAILY_SAVINGS_POOL: DailySavingsType[] = [
   "DS1", "DS2", "DS3", "DS4", "DS5", "DS6", "DS7", "DS8",
 ];
 
-export const DAILY_SOCIAL_POOL: DailySocialType[] = [
+const DAILY_SOCIAL_POOL: DailySocialType[] = [
   "DC1", "DC2", "DC3", "DC4", "DC5", "DC6",
 ];
 
 // ── Weekly Pools by Tier ──────────────────────────────────
 
-export const WEEKLY_RECEIPT_POOL: WeeklyReceiptType[] = [
+const WEEKLY_RECEIPT_POOL: WeeklyReceiptType[] = [
   "W1A", "W1B", "W1C", "W2", "W3", "W4", "W5", "W6",
   "W7", "W8", "W9", "W10", "W11", "W12",
 ];
 
-export const WEEKLY_DISCOVERY_POOL: WeeklyDiscoveryType[] = [
+const WEEKLY_DISCOVERY_POOL: WeeklyDiscoveryType[] = [
   "WD1", "WD2", "WD3", "WD4", "WD5", "WD6", "WD7", "WD8",
 ];
 
-export const WEEKLY_SAVINGS_POOL: WeeklySavingsType[] = [
+const WEEKLY_SAVINGS_POOL: WeeklySavingsType[] = [
   "WS1", "WS2", "WS3", "WS4", "WS5", "WS6",
 ];
 
-export const WEEKLY_SOCIAL_POOL: WeeklySocialType[] = [
+const WEEKLY_SOCIAL_POOL: WeeklySocialType[] = [
   "WC1", "WC2", "WC3", "WC4", "WC5", "WC6", "WC7", "WC8",
 ];
 
@@ -55,25 +56,31 @@ export const WEEKLY_SOCIAL_POOL: WeeklySocialType[] = [
 // Each segment only selects from quests appropriate to it.
 
 export const SEGMENT_DAILY_POOLS: Record<UserSegment, Record<QuestTier, string[]>> = {
+  // Only quest types with real receipt-driven progress tracking are assignable.
+  // Types that depend on unbuilt features (price comparison: DD3/DD6; catalog
+  // contribution: DC2; referral events: DC1/DC3/DC6) are kept out of the pools so
+  // no user is handed a quest that can never complete.
   dormant: {
     receipt:   ["D1", "D9", "D12", "D11", "D10"],
-    discovery: ["DD9", "DD5", "DD8", "DD4"],
+    // Fun quests DD11 (lucky 77) / DD13 (mirror hour) / DD14 (almost free) are pure luck → good for dormant
+    discovery: ["DD9", "DD5", "DD8", "DD4", "DD11", "DD13", "DD14"],
     savings:   ["DS5", "DS6", "DS1"],
-    social:    ["DC4", "DC6"],
+    social:    ["DC4"],
     streak:    [],
   },
   casual: {
     receipt:   ["D3", "D6", "D7", "D9", "D10", "D11", "D16"],
-    discovery: ["DD1", "DD2", "DD4", "DD5", "DD8"],
+    discovery: ["DD1", "DD2", "DD4", "DD5", "DD8", "DD11", "DD12", "DD13", "DD15", "DD17"],
     savings:   ["DS1", "DS2", "DS5", "DS6"],
-    social:    ["DC4", "DC5", "DC6"],
+    social:    ["DC4", "DC5"],
     streak:    [],
   },
   power: {
     receipt:   ["D4", "D5", "D7", "D8", "D13", "D14"],
-    discovery: ["DD3", "DD6", "DD7", "DD10", "DD1", "DD2"],
+    // Fun quests that reward bigger/detailed baskets → DD12/DD16/DD17/DD18
+    discovery: ["DD7", "DD10", "DD1", "DD2", "DD12", "DD16", "DD17", "DD18"],
     savings:   ["DS3", "DS4", "DS7", "DS8"],
-    social:    ["DC1", "DC2", "DC3", "DC5"],
+    social:    ["DC5"],
     streak:    [],
   },
 };
@@ -109,6 +116,20 @@ export const SEGMENT_WEEKLY_POOLS: Record<UserSegment, Record<QuestTier, string[
 
 export const DAILY_TIER_ORDER: QuestTier[] = ["receipt", "discovery", "savings", "social"];
 export const WEEKLY_TIER_ORDER: QuestTier[] = ["receipt", "discovery", "savings", "social"];
+
+// ── Daily quest slot count by account level (karar 2026-07-14) ─────────────
+// Everyone starts with 3 daily quests; the account ladder grants extra slots as
+// a permanent throughput reward (not cosmetic). Slot tiers cycle DAILY_TIER_ORDER
+// so a 5th slot reuses the first tier (receipt). This is the real mechanic behind
+// the account-unlocks daily-quest-slot nodes.
+const BASE_DAILY_QUEST_SLOTS = 3;
+/** Account levels that each grant +1 daily quest slot, ascending. L4 → 4th, L22 → 5th. */
+const DAILY_QUEST_SLOT_LEVELS: readonly number[] = [4, 22];
+
+/** How many daily quests this account level earns (3 base + one per threshold reached). */
+export function getDailyQuestSlotCount(accountLevel: number): number {
+  return BASE_DAILY_QUEST_SLOTS + DAILY_QUEST_SLOT_LEVELS.filter((l) => accountLevel >= l).length;
+}
 
 // ── Feature flags ─────────────────────────────────────────
 
@@ -164,6 +185,15 @@ export const DAILY_QUEST_TARGETS: Record<string, QuestTargetConfig> = {
   DD8:  { fixedTarget: 1 },
   DD9:  { fixedTarget: 1 },
   DD10: { fixedTarget: 1 },
+  // Tier 2 Discovery — fun / easter-egg quests
+  DD11: { fixedTarget: 1 },
+  DD12: { fixedTarget: 1 },
+  DD13: { fixedTarget: 1 },
+  DD14: { fixedTarget: 1 },
+  DD15: { fixedTarget: 1 },
+  DD16: { fixedTarget: 1 },
+  DD17: { fixedTarget: 1 },
+  DD18: { fixedTarget: 1 },
   // Tier 3 Savings
   DS1: { dynamicFn: "savingsThreshold" },
   DS2: { fixedTarget: 1 },
@@ -255,6 +285,15 @@ const QUEST_TITLES_I18N: Record<string, Record<QuestLocale, string>> = {
   DD8: { tr: "Kahvaltılık kategorisinde fiş yükle", en: "Upload a breakfast category receipt", ru: "Загрузи чек из категории завтрака", th: "อัปโหลดใบเสร็จหมวดอาหารเช้า", es: "Sube un recibo de categoría desayuno", zh: "上传早餐类别收据" },
   DD9: { tr: "En düşük tutarlı fişini yükle", en: "Upload your lowest-value receipt", ru: "Загрузи чек с наименьшей суммой", th: "อัปโหลดใบเสร็จที่มีมูลค่าต่ำที่สุด", es: "Sube tu recibo de menor valor", zh: "上传金额最低的收据" },
   DD10: { tr: "10+ kalemli fiş yükle", en: "Upload a receipt with 10+ items", ru: "Загрузи чек с 10+ товарами", th: "อัปโหลดใบเสร็จที่มี 10+ รายการ", es: "Sube un recibo con 10+ artículos", zh: "上传含10个以上商品的收据" },
+  // Fun / easter-egg quests
+  DD11: { tr: "🍀 Şanslı 77: toplamında 77 geçen fiş yükle", en: "🍀 Lucky 77: upload a receipt whose total contains 77", ru: "🍀 Счастливые 77: загрузи чек, в сумме которого есть 77", th: "🍀 เลข 77 นำโชค: อัปโหลดใบเสร็จที่ยอดรวมมีเลข 77", es: "🍀 77 de la suerte: sube un recibo cuyo total contenga 77", zh: "🍀 幸运77：上传总额中含有77的收据" },
+  DD12: { tr: "🥚 Düzine: tam 12 kalemli fiş yükle", en: "🥚 Dozen: upload a receipt with exactly 12 items", ru: "🥚 Дюжина: загрузи чек ровно с 12 товарами", th: "🥚 หนึ่งโหล: อัปโหลดใบเสร็จที่มี 12 รายการพอดี", es: "🥚 Docena: sube un recibo con exactamente 12 artículos", zh: "🥚 一打：上传正好12件商品的收据" },
+  DD13: { tr: "🕚 Şanslı saat: 11:11 gibi aynalı bir saatte fiş", en: "🕚 Mirror hour: a receipt timed at a mirror hour like 11:11", ru: "🕚 Зеркальный час: чек со временем вроде 11:11", th: "🕚 เวลากระจก: ใบเสร็จเวลาสวยอย่าง 11:11", es: "🕚 Hora espejo: un recibo a una hora espejo como las 11:11", zh: "🕚 镜像时刻：时间为11:11这类镜像时刻的收据" },
+  DD14: { tr: "🎁 Bedava gibi: 5 {cur} altında bir kalem içeren fiş", en: "🎁 Almost free: a receipt with an item under 5 {cur}", ru: "🎁 Почти даром: чек с товаром дешевле 5 {cur}", th: "🎁 เกือบฟรี: ใบเสร็จที่มีสินค้าราคาต่ำกว่า 5 {cur}", es: "🎁 Casi gratis: un recibo con un artículo de menos de 5 {cur}", zh: "🎁 几乎免费：含有低于5 {cur}商品的收据" },
+  DD15: { tr: "🪙 Kuruşsuz: küsuratsız (tam sayı) fiyatlı bir kalem içeren fiş", en: "🪙 No change: a receipt with a whole-number priced item", ru: "🪙 Без сдачи: чек с товаром по целой цене", th: "🪙 ไม่มีเศษ: ใบเสร็จที่มีสินค้าราคาเลขกลม", es: "🪙 Sin cambio: un recibo con un artículo de precio entero", zh: "🪙 不用找零：含有整数价格商品的收据" },
+  DD16: { tr: "🧮 Tertemiz hesap: 10'dan fazla küsuratsız kalemli fiş", en: "🧮 Clean books: a receipt with 10+ whole-number priced items", ru: "🧮 Чистый счёт: чек с 10+ товарами по целым ценам", th: "🧮 บัญชีสะอาด: ใบเสร็จที่มีสินค้าราคาเลขกลม 10+ รายการ", es: "🧮 Cuentas claras: un recibo con 10+ artículos de precio entero", zh: "🧮 账目清爽：含有10个以上整数价格商品的收据" },
+  DD17: { tr: "📦 Stokçu: aynı üründen 5+ adet aldığın fiş", en: "📦 Stockpiler: a receipt with 5+ units of the same product", ru: "📦 Запасливый: чек с 5+ единицами одного товара", th: "📦 นักตุน: ใบเสร็จที่มีสินค้าเดียวกัน 5+ ชิ้น", es: "📦 Acaparador: un recibo con 5+ unidades del mismo producto", zh: "📦 囤货者：同一商品购买5件以上的收据" },
+  DD18: { tr: "🎨 Monokrom: en az 5 kalem, hepsi aynı kategoriden", en: "🎨 Monochrome: 5+ items, all from the same category", ru: "🎨 Монохром: 5+ товаров из одной категории", th: "🎨 โมโนโครม: 5+ รายการ ทั้งหมดหมวดเดียวกัน", es: "🎨 Monocromo: 5+ artículos, todos de la misma categoría", zh: "🎨 单色：5件以上商品，全部同一类别" },
   DS1: { tr: "Gizli maliyet eşiğinin altında kal", en: "Stay below the hidden cost threshold", ru: "Оставайся ниже порога скрытых расходов", th: "อยู่ต่ำกว่าเกณฑ์ต้นทุนซ่อน", es: "Mantente por debajo del umbral de costes ocultos", zh: "保持在隐藏成本阈值以下" },
   DS2: { tr: "Fiyat karşılaştırması yap", en: "Do a price comparison", ru: "Сравни цены", th: "เปรียบเทียบราคา", es: "Haz una comparación de precios", zh: "进行价格比较" },
   DS3: { tr: "En ucuz ürünü bularak tasarruf et", en: "Save by finding the cheapest option", ru: "Сэкономь, найдя самый дешёвый вариант", th: "ประหยัดโดยหาตัวเลือกที่ถูกที่สุด", es: "Ahorra encontrando la opción más barata", zh: "通过寻找最便宜的选项来省钱" },
@@ -309,14 +348,17 @@ const QUEST_TITLES_I18N: Record<string, Record<QuestLocale, string>> = {
   D_ADMIN_FREE_300XP: { tr: "Admin bedava XP", en: "Admin free XP", ru: "Бесплатный XP для администратора", th: "XP ฟรีสำหรับแอดมิน", es: "XP gratis para admin", zh: "管理员免费XP" },
 };
 
-export function getQuestTitle(type: string, locale: string, dbTitle?: string): string {
+export function getQuestTitle(type: string, locale: string, dbTitle?: string, currencySymbol?: string): string {
+  // `{cur}` placeholder in a title is replaced with the user's local currency
+  // symbol (e.g. ฿ for a Thailand account); defaults to ₺ for older callers.
+  const withCur = (s: string) => s.replace(/\{cur\}/g, currencySymbol || "₺");
   const titles = QUEST_TITLES_I18N[type];
   if (titles) {
     const loc = (locale in titles ? locale : "en") as QuestLocale;
-    return titles[loc];
+    return withCur(titles[loc]);
   }
   // Type not present in QUEST_TITLES_I18N: use the DB title for EN/TR, return the type code for other locales
-  if (dbTitle && dbTitle.length >= 3) return dbTitle;
+  if (dbTitle && dbTitle.length >= 3) return withCur(dbTitle);
   return type;
 }
 

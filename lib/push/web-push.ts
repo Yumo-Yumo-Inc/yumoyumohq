@@ -54,7 +54,7 @@ export async function deletePushSubscription(endpoint: string): Promise<void> {
   await sql`DELETE FROM push_subscriptions WHERE endpoint = ${endpoint}`;
 }
 
-export async function getPushSubscriptionsForUser(
+async function getPushSubscriptionsForUser(
   username: string
 ): Promise<PushSubscription[]> {
   const sql = getSql();
@@ -164,7 +164,7 @@ export async function sendPushToUser(
   return { sent, failed, skipped: false };
 }
 
-export async function broadcastPushToUsers(
+async function broadcastPushToUsers(
   usernames: string[],
   payload: PushPayload
 ): Promise<{ sent: number; failed: number; skipped: number }> {

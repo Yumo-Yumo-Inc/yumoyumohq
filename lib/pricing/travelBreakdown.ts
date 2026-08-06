@@ -5,10 +5,10 @@
 
 import { SeededRNG } from "./dirichlet";
 
-export type Country = "TR" | "TH";
-export type Channel = "OTA" | "direct";
-export type DistanceBand = "short" | "medium" | "long";
-export type OperatorType = "lowcost" | "legacy";
+type Country = "TR" | "TH";
+type Channel = "OTA" | "direct";
+type DistanceBand = "short" | "medium" | "long";
+type OperatorType = "lowcost" | "legacy";
 
 export interface TravelBreakdownInputs {
   paidTotal: number;
@@ -23,7 +23,7 @@ export interface TravelBreakdownInputs {
   operatorType?: OperatorType;
 }
 
-export interface TravelBreakdownBucket {
+interface TravelBreakdownBucket {
   label: string;
   amount: number;
   percentOfPaidTotal: number;

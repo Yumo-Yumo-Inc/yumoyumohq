@@ -10,7 +10,7 @@ export interface CountryInfo {
   symbol: string;
 }
 
-export const COUNTRIES: CountryInfo[] = [
+const COUNTRIES: CountryInfo[] = [
   { code: "AE", name: "United Arab Emirates", currency: "AED", symbol: "د.إ" },
   { code: "AR", name: "Argentina", currency: "ARS", symbol: "$" },
   { code: "BD", name: "Bangladesh", currency: "BDT", symbol: "৳" },
@@ -52,6 +52,7 @@ export const COUNTRIES: CountryInfo[] = [
   { code: "KR", name: "South Korea", currency: "KRW", symbol: "₩" },
   { code: "MY", name: "Malaysia", currency: "MYR", symbol: "RM" },
   { code: "MX", name: "Mexico", currency: "MXN", symbol: "$" },
+  { code: "NG", name: "Nigeria", currency: "NGN", symbol: "₦" },
   { code: "NL", name: "Netherlands", currency: "EUR", symbol: "€" },
   { code: "NZ", name: "New Zealand", currency: "NZD", symbol: "NZ$" },
   { code: "NO", name: "Norway", currency: "NOK", symbol: "kr" },
@@ -67,6 +68,7 @@ export const COUNTRIES: CountryInfo[] = [
   { code: "SE", name: "Sweden", currency: "SEK", symbol: "kr" },
   { code: "CH", name: "Switzerland", currency: "CHF", symbol: "CHF" },
   { code: "TW", name: "Taiwan", currency: "TWD", symbol: "NT$" },
+  { code: "UA", name: "Ukraine", currency: "UAH", symbol: "₴" },
   { code: "TH", name: "Thailand", currency: "THB", symbol: "฿" },
   { code: "TR", name: "Turkey", currency: "TRY", symbol: "₺" },
   { code: "US", name: "United States", currency: "USD", symbol: "$" },
@@ -85,13 +87,15 @@ export const COUNTRIES: CountryInfo[] = [
  * + South Asia + South America + Central Asia. Same set as supported_countries
  * (migration 096).
  */
-export const ENABLED_COUNTRY_CODES: ReadonlySet<string> = new Set([
+const ENABLED_COUNTRY_CODES: ReadonlySet<string> = new Set([
   "TR",
   // North America
   "US", "CA",
   // Europe
   "DE", "EE", "RO", "GB", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "IE", "GR",
-  "PL", "CZ", "HU", "DK", "FI", "SE", "NO", "CH",
+  "PL", "CZ", "HU", "DK", "FI", "SE", "NO", "CH", "UA",
+  // Africa (added 2026-07-20, crypto × social expansion)
+  "NG",
   // South Asia
   "IN", "PK", "BD", "LK",
   // South America
@@ -117,7 +121,7 @@ export function isOtherCountry(code: string | null | undefined): boolean {
 }
 
 /** Whether a country code is enabled (selectable) for users. */
-export function isCountryEnabled(code: string | null | undefined): boolean {
+function isCountryEnabled(code: string | null | undefined): boolean {
   if (!code) return false;
   return ENABLED_COUNTRY_CODES.has(code.trim().toUpperCase());
 }
@@ -138,7 +142,7 @@ export function getEnabledCountries(): CountryInfo[] {
  * appears in the list. This way an existing user in a paused country doesn't
  * see their country blank or wrong (data is preserved).
  */
-export function getSelectableCountries(currentCode?: string | null): CountryInfo[] {
+function getSelectableCountries(currentCode?: string | null): CountryInfo[] {
   const list = getEnabledCountries();
   const cur = currentCode?.trim().toUpperCase();
   if (cur && !ENABLED_COUNTRY_CODES.has(cur)) {
@@ -155,7 +159,7 @@ export function getCountryByCode(code: string): CountryInfo | undefined {
   return COUNTRIES.find(c => c.code.toUpperCase() === code.toUpperCase());
 }
 
-export function getCountryByName(name: string): CountryInfo | undefined {
+function getCountryByName(name: string): CountryInfo | undefined {
   const normalized = name.trim().toLowerCase();
   return COUNTRIES.find((country) => country.name.toLowerCase() === normalized);
 }
@@ -180,7 +184,7 @@ export function normalizeCountryCode(value: string | null | undefined): string |
 /**
  * Get countries sorted alphabetically by name
  */
-export function getCountriesSorted(): CountryInfo[] {
+function getCountriesSorted(): CountryInfo[] {
   return [...COUNTRIES].sort((a, b) => a.name.localeCompare(b.name));
 }
 

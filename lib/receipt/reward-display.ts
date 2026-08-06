@@ -30,14 +30,17 @@ export type ResolveNoRewardOptions = {
   currentUsername?: string | null;
 };
 
-export function getBintAmount(reward?: RewardDisplayFields | null): number {
+function getBintAmount(reward?: RewardDisplayFields | null): number {
   return Number(reward?.final ?? reward?.amount ?? 0) || 0;
 }
 
 export function getTotalRewardAmount(reward?: RewardDisplayFields | null): number {
-  const bint = getBintAmount(reward);
-  const bintBonus = reward?.ryumo != null ? Number(reward.ryumo) : 0;
-  return bint + bintBonus;
+  // `ryumo` is the user-visible points (base reward × multipliers) and `final`
+  // is the same reward in its base unit — two representations of ONE amount.
+  // They were summed here, which doubled the number on the result screen
+  // (e.g. 114 + 119 shown as 233 while history showed 119).
+  const bintBonus = reward?.ryumo != null ? Number(reward.ryumo) || 0 : 0;
+  return bintBonus > 0 ? bintBonus : getBintAmount(reward);
 }
 
 function resolveNoRewardCode(

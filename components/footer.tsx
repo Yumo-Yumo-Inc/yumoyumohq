@@ -18,6 +18,7 @@ export function Footer() {
       community: 'Community',
       terms: 'Terms & Conditions',
       privacy: 'Privacy Policy',
+      about: 'About',
       faq: 'FAQ',
       support: 'Support',
       cookies: 'Cookie Preferences',
@@ -33,6 +34,7 @@ export function Footer() {
       community: 'Сообщество',
       terms: 'Условия использования',
       privacy: 'Политика конфиденциальности',
+      about: 'О нас',
       faq: 'FAQ',
       support: 'Поддержка',
       cookies: 'Настройки cookie',
@@ -48,6 +50,7 @@ export function Footer() {
       community: 'Topluluk',
       terms: 'Kullanım Koşulları',
       privacy: 'Gizlilik Politikası',
+      about: 'Hakkımızda',
       faq: 'SSS',
       support: 'Destek',
       cookies: 'Çerez Tercihleri',
@@ -63,6 +66,7 @@ export function Footer() {
       community: 'ชุมชน',
       terms: 'ข้อกำหนดและเงื่อนไข',
       privacy: 'นโยบายความเป็นส่วนตัว',
+      about: 'เกี่ยวกับเรา',
       faq: 'คำถามที่พบบ่อย',
       support: 'สนับสนุน',
       cookies: 'การตั้งค่าคุกกี้',
@@ -78,6 +82,7 @@ export function Footer() {
       community: '社区',
       terms: '条款和条件',
       privacy: '隐私政策',
+      about: '关于我们',
       faq: '常见问题',
       support: '支持',
       cookies: 'Cookie 偏好设置',
@@ -93,6 +98,7 @@ export function Footer() {
       community: 'Comunidad',
       terms: 'Términos y Condiciones',
       privacy: 'Política de Privacidad',
+      about: 'Sobre nosotros',
       faq: 'Preguntas Frecuentes',
       support: 'Soporte',
       cookies: 'Preferencias de cookies',
@@ -147,6 +153,11 @@ export function Footer() {
               <li>
                 <Link href="/privacy/" className="text-gray-400 hover:text-primary transition-colors">
                   {t.privacy}
+                </Link>
+              </li>
+              <li>
+                <Link href="/about/" className="text-gray-400 hover:text-primary transition-colors">
+                  {t.about}
                 </Link>
               </li>
               <li>

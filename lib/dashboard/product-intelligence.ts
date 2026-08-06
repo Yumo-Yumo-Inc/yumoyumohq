@@ -9,7 +9,7 @@ export type DashboardProductSource = {
   updatedAt: string | null;
 };
 
-export type DashboardProductKind =
+type DashboardProductKind =
   | "prepared_meal"
   | "ready_drink"
   | "pantry_item"
@@ -21,9 +21,9 @@ export type DashboardProductKind =
   | "apparel"
   | "other";
 
-export type DashboardProductGroup = "meal" | "drink" | "product" | "home" | "care" | "wear" | "other";
+type DashboardProductGroup = "meal" | "drink" | "product" | "home" | "care" | "wear" | "other";
 
-export type DashboardProductHeroMode = "recipe_search" | "none";
+type DashboardProductHeroMode = "recipe_search" | "none";
 
 export type DashboardShoppingProduct = {
   name: string;
@@ -194,7 +194,7 @@ function isSpecificPreparedMealName(value: string): boolean {
   return !GENERIC_PREPARED_MEAL_NAMES.has(normalized);
 }
 
-export function getDashboardProductDisplayName(
+function getDashboardProductDisplayName(
   item: Pick<DashboardProductSource, "rawName" | "canonicalName" | "brand" | "categoryLvl1" | "categoryLvl2" | "merchantCategory">
 ): string {
   const candidates = [item.rawName, item.canonicalName, item.brand]
@@ -230,7 +230,7 @@ export function getDashboardProductDisplayName(
   return best;
 }
 
-export function classifyDashboardProduct(item: DashboardProductSource): {
+function classifyDashboardProduct(item: DashboardProductSource): {
   kind: DashboardProductKind;
   group: DashboardProductGroup;
   heroEligible: boolean;

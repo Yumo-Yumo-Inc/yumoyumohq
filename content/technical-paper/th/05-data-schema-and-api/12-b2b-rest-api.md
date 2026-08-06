@@ -1,24 +1,22 @@
-# B2B REST API
+# B2B API (วางแผน)
 
-## 5.11 B2B REST API
+## 5.11 B2B API (วางแผน)
 
-ฐานข้อมูลแยกต่างหาก การตรวจสอบสิทธิแยกต่างหาก การจำกัดอัตราแยกต่างหาก
+API ของผลิตภัณฑ์ข้อมูล B2B เป็น**งานในอนาคต**ไม่มีจุดปลายทาง B2B ที่ใช้งานได้ในปัจจุบัน ข้อมูลที่เกี่ยวข้องกับ B2B ปัจจุบันเข้าถึงโลกภายนอกผ่านบัญชีแยกประเภทราคาสาธารณะ (5.10) และแมนิเฟสต์ Arweave ของมัน
 
-```
-Base: https://b2b-api.yumo.io/v1
-Auth: API key + คำขอที่ตรวจสอบสิทธิพร้อมการป้องกันการเล่นซ้ำ แผนการลงนามและหน้าต่างการเล่นซ้ำจัดการอยู่ในชั้นปฏิบัติการภายใน
-Rate limit: ขึ้นอยู่กับ tier · โควต้าแยกจาก public API
-```
+ร่างการออกแบบสำหรับพื้นผิวที่วางแผนไว้ — เส้นทางฐานแยกต่างหาก ข้อมูลรับรองแยกต่างหาก โควต้าแยกจาก public API:
 
-| Method | Path | จุดประสงค์ |
+| Method | Path | Purpose |
 |---|---|---|
-| GET | `/inflation-pulse` | ชุดข้อมูล TR Inflation Pulse |
-| GET | `/basket-panel` | การสืบค้น Basket Panel |
-| GET | `/merchant-benchmarks` | เกณฑ์เปรียบเทียบผู้ค้า |
-| POST | `/cohort-query` | กลุ่มที่กำหนดเองพร้อมการบังคับใช้พื้น k |
-| GET | `/catalog` | ผลิตภัณฑ์ที่มีจำหน่าย + ความสดใหม่ + ราคา |
-| GET | `/methodology/{version}` | เอกสารวิธีการสำหรับเวอร์ชันที่กำหนด |
+| GET | `/inflation-pulse` | Inflation Pulse series |
+| GET | `/basket-panel` | Basket Panel query |
+| GET | `/merchant-benchmarks` | Merchant Benchmarks |
+| POST | `/cohort-query` | Custom cohort with k-floor enforcement |
+| GET | `/catalog` | Available products + freshness + pricing |
+| GET | `/methodology/{version}` | Methodology document for a given version |
 
-ทุกการตอบสนอง B2B รวม `methodology_version`, `k_anonymity_floor` และจำนวนผู้มีส่วนร่วมของการตอบสนอง เพื่อให้ทีม compliance ของผู้ซื้อสามารถตรวจสอบการเผยแพร่ได้
+การตรวจสอบสิทธิที่วางแผนไว้: API key พร้อมลายเซ็นคำขอที่มีการป้องกันการเล่นซ้ำ รูปแบบลายเซ็นและหน้าต่างการเล่นซ้ำยังคงอยู่ในชั้นปฏิบัติการภายใน
+
+การตอบสนอง B2B ที่วางแผนไว้ทั้งหมดรวม `methodology_version` ตัวบ่งชี้พื้น k-anonymity และจำนวนผู้มีส่วนร่วมของการตอบสนอง เพื่อให้ทีม compliance ของผู้ซื้อสามารถตรวจสอบการเผยแพร่ได้
 
 ---

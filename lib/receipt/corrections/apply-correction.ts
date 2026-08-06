@@ -15,11 +15,11 @@ import { sql, warmUpConnection } from "@/lib/db/client";
 import { isDatabaseAvailable } from "@/lib/receipt/db/connection";
 import { isAmountInconsistent } from "@/lib/receipt/quality/honor-quality";
 
-export const EDITABLE_FIELDS = ["merchant_name", "date", "time", "total", "vat"] as const;
-export type EditableField = (typeof EDITABLE_FIELDS)[number];
+const EDITABLE_FIELDS = ["merchant_name", "date", "time", "total", "vat"] as const;
+type EditableField = (typeof EDITABLE_FIELDS)[number];
 
 /** Reward-amount fields (used for value/column updates + contradiction check). */
-export const REWARD_FIELDS: ReadonlySet<EditableField> = new Set(["total", "vat"]);
+const REWARD_FIELDS: ReadonlySet<EditableField> = new Set(["total", "vat"]);
 
 /**
  * Fields that can change the reward AMOUNT or reward ELIGIBILITY → held pending
@@ -27,7 +27,7 @@ export const REWARD_FIELDS: ReadonlySet<EditableField> = new Set(["total", "vat"
  * eligible (base reward granted). `date` is here because it drives the
  * out_of_current_month eligibility gate. See decision 2026-06-03 (Faz 3, Karar A).
  */
-export const RECOMPUTE_FIELDS: ReadonlySet<EditableField> = new Set(["total", "vat", "date"]);
+const RECOMPUTE_FIELDS: ReadonlySet<EditableField> = new Set(["total", "vat", "date"]);
 
 const MERCHANT_NAME_MAX = 200;
 

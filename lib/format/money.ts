@@ -127,7 +127,7 @@ export function formatMoneyForCountry(
  * Render just the currency symbol for the user's country.
  * Useful as a suffix in compact contexts (cards, hero rows).
  */
-export function currencySymbolForCountry(
+function currencySymbolForCountry(
   countryCode: string | null | undefined
 ): string {
   return currencyForCountry(countryCode).symbol;

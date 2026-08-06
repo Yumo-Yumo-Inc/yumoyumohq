@@ -6,21 +6,19 @@ A receipt's journey runs in two phases.
 
 **Phase A — Synchronous (the user is waiting):**
 
-1. The client compresses the image, strips EXIF, and requests a presigned upload URL.
-2. The image lands in object storage. The server checks a perceptual-hash deduplication index.
-3. The OCR layer (02 Stage 1) extracts text + bounding boxes.
-4. The LLM router (02 Stage 2) extracts a structured `ReceiptExtraction` JSON.
-5. The regex/rule layer (02 Stage 3) reconciles totals and validates dates.
-6. The canonical matcher (02 Stage 4) resolves each line item to a canonical product ID.
-7. The merchant resolver (02 Stage 5) attaches a merchant identity.
-8. The trust scorer (03) emits a trust score in [0, 1] and the system shows the user a verified preview.
+1. The client sends the file to the upload endpoint. The server compresses the image, strips EXIF metadata, and stores the result in object storage. A perceptual-hash deduplication index is checked before analysis.
+2. For image input, the vision LLM (02 Stage 2) reads the receipt directly from the image in a single call. For PDF input, an OCR layer (02 Stage 1) first extracts the text, which then feeds the same LLM stage.
+3. The LLM returns **labeled plain text**: a block of `FIELD: value` lines for merchant, date, totals, and payment fields, plus a pipe-separated table for line items. Parsing is defensive — a missing or malformed line leaves that field `null` and the pipeline continues.
+4. The regex/rule layer (02 Stage 3) reconciles totals and validates dates.
+5. The merchant resolver (02 Stage 5) attaches a merchant identity.
+6. The trust layer (03) classifies the receipt's quality, and the reward is computed within the same request, so the user sees the verified preview and the reward together.
 
 **Phase B — Asynchronous (background settlement):**
 
-9. If the trust score clears the threshold, a `bINT.pending` row is written to the ledger.
-10. The settlement worker hourly batch aggregates pending credits, computes daily ceilings (03), and mints bINT on Solana to the user's frozen ATA.
-11. The indexer picks up the on-chain mint event and confirms back to the off-chain ledger.
+7. A background post-process worker resolves each line item to a canonical product ID (02 Stage 4) using database-side fuzzy matching with an LLM fallback, and folds the receipt's quality classification into the user's cumulative trust score.
+8. The settlement worker aggregates eligible bINT credits, applies daily ceilings, and produces an epoch distribution root for the corresponding INT claims.
+9. The distribution root is committed on-chain. The indexer confirms INT claim transfers from the distributor back to the off-chain ledger.
 
-The user sees Phase A in seconds. Phase B finalises invisibly. The contract between the two phases is: **the off-chain ledger is the source of truth until on-chain settlement**, after which the on-chain state is the source of truth and the ledger is a fast-read mirror.
+The user sees Phase A in seconds. Phase B finalises asynchronously. The off-chain bINT ledger remains the source of truth for contribution credits; the on-chain root and claim transfers record the corresponding INT distribution.
 
 ---

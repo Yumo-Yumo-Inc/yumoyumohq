@@ -11,6 +11,7 @@ import { getSessionUsername } from "@/lib/auth/session";
 import { sql } from "@/lib/db/client";
 import { getActiveSeason } from "@/lib/season/lifecycle";
 import { getSeasonConfig, getTierForXp, getNextTier } from "@/config/seasons";
+import { syncSeasonPassGrants } from "@/lib/season/pass-grants";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -32,6 +33,9 @@ export async function GET() {
   const seasonXp = Number((rows as Array<{ season_xp: number }>)[0]?.season_xp ?? 0);
   const seasonLevel = Number((rows as Array<{ season_level: number }>)[0]?.season_level ?? 1);
 
+  // Catch-up grants for users who reached levels before the grant writer existed.
+  await syncSeasonPassGrants(username, Number(season.season_number), seasonLevel);
+
   const endMs = new Date(season.end_at).getTime();
   const daysLeft = Math.max(0, Math.ceil((endMs - Date.now()) / (24 * 60 * 60 * 1000)));
 
@@ -51,10 +55,10 @@ export async function GET() {
       seasonXp,
       seasonLevel,
       currentTier: currentTier
-        ? { index: currentTier.index, key: currentTier.key, cpointsReward: currentTier.cpointsReward }
+        ? { index: currentTier.index, key: currentTier.key, pointsReward: currentTier.cpointsReward }
         : null,
       nextTier: nextTier
-        ? { index: nextTier.index, key: nextTier.key, minSeasonXp: nextTier.minSeasonXp, cpointsReward: nextTier.cpointsReward }
+        ? { index: nextTier.index, key: nextTier.key, minSeasonXp: nextTier.minSeasonXp, pointsReward: nextTier.cpointsReward }
         : null,
     },
     serverNow: new Date().toISOString(),

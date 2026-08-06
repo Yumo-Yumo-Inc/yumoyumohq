@@ -19,7 +19,7 @@ import { isCoreUtilityBill } from "@/lib/receipt/vision-post-rules";
 const PROVIDER_MATCH_MIN_SIMILARITY = 0.4;
 
 /** Derive the service provider category from bill text signals. */
-export function utilityCategoryFromText(text: string): "electricity" | "water" | "gas" | "other" {
+function utilityCategoryFromText(text: string): "electricity" | "water" | "gas" | "other" {
   if (/ELEKTR[İI]K|ELECTRICITY|\bkWh\b/i.test(text)) return "electricity";
   if (/DO[GĞ]AL\s*GAZ|DO[GĞ]ALGAZ|NATURAL\s*GAS/i.test(text)) return "gas";
   if (/SU\s*(T[ÜU]KET[İI]M|FATURA)|[İI][ÇC]ME\s*SUYU|ATIK\s*SU|WATER\s*(BILL|SUPPLY|USAGE)/i.test(text)) {

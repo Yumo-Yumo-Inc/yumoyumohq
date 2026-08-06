@@ -22,7 +22,7 @@
  * real receipts but are missing here get added with source='frequency'.
  */
 
-export type MerchantCategory =
+type MerchantCategory =
   | "grocery"
   | "cafe"
   | "restaurant"

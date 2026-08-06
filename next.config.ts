@@ -11,11 +11,13 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Speed Insights injects https://va.vercel-scripts.com/.../script.js (or .debug.js in dev).
-      // 'unsafe-eval' intentionally omitted — the app does not need runtime eval
-      // (smoke-test in a browser after CSP changes; revert this line if a needed
-      // script relies on eval/new Function). 'unsafe-inline' stays for Next's
-      // inline bootstrap.
-      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://va.vercel-scripts.com",
+      // 'unsafe-eval' intentionally omitted in PRODUCTION — the app does not need
+      // runtime eval (smoke-test in a browser after CSP changes; revert this line
+      // if a needed script relies on eval/new Function). 'unsafe-inline' stays for
+      // Next's inline bootstrap. Dev builds allow eval: React/Turbopack use it for
+      // debugging features (source-mapped callstacks) and log a console error
+      // without it.
+      `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com https://va.vercel-scripts.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data: https://fonts.gstatic.com",

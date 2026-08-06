@@ -61,7 +61,7 @@ export function YumbieInsight() {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[10000]">
+    <div className="fixed inset-0 z-[10020]">
       <div className="absolute inset-0 bg-black/55" onClick={close} aria-hidden />
       <div
         role="dialog"

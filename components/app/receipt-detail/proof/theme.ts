@@ -11,7 +11,7 @@ export const CONDENSED = "var(--font-barlow-condensed), 'Arial Narrow', ui-sans-
 export const MONO = "var(--font-jetbrains-mono), ui-monospace, monospace";
 
 /** Cost-layer colors — same family the receipts list/feed uses. */
-export const LAYER_COLOR = {
+const LAYER_COLOR = {
   productValue: "#34D399", // real value — emerald
   importSystem: "#0EA5E9", // supply — sky (--receipt-category-supply)
   retailBrand: "#A78BFA", // retail — violet (--receipt-category-retail)

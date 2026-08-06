@@ -91,7 +91,7 @@ export async function subscribeToPush(): Promise<PushSubscribeResult> {
   }
 }
 
-export async function unsubscribeFromPush(): Promise<void> {
+async function unsubscribeFromPush(): Promise<void> {
   if (!pushSupported()) return;
   try {
     const reg = await navigator.serviceWorker.ready;

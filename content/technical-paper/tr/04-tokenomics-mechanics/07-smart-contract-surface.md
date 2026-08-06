@@ -9,10 +9,10 @@ v1, özel protokol kodu yerine denetlenmiş ve yaygın kullanılan programlar ü
 | INT ihracı ve yakım | SPL Token | Mint yetkisi genesis sonrası kapatılır; yakım çoklu imza altında |
 | Ödül dağıtımı ve talep | Denetlenmiş merkle dağıtıcı | Epoch başına kök; kök-belirleme yetkisi çoklu imza |
 | Hazine ve yetkiler | Squads çoklu imza | Ayrılmış kök / hazine / geri çağırma onayları |
-| Foundation NFT | Token-2022 (NonTransferable) | Arka uç mint, cüzdan başına bir adet |
+| Proof-of-expense SBT | Token-2022 (NonTransferable) | Arka uç mint, cüzdan başına bir adet |
 | Şeffaflık taahhütleri | Memo programı | Epoch kökü ve veri kümesi özeti zincire yazılır |
 
-bINT ve ePoints zincir dışı muhasebe birimleridir. Zincir üstü token değildirler; bakiyeleri operasyon katmanında yaşar ve dağıtıcı üzerinden INT'e mutabakat eder.
+bINT, zincir dışı bir muhasebe birimidir. Zincir üstü bir token değildir; bakiyeleri operasyon katmanında yaşar. Uygun bINT bakiyelerinden üretilen INT talepleri, dağıtıcı üzerinden mutabakat eder.
 
 ## 4.16 Zincire ne gider
 
@@ -28,4 +28,4 @@ Bu ayrım; ödül hesaplamasını, bağımsız doğrulamayı ve fon hareketini a
 
 ## 4.18 Denetim duruşu
 
-Zincir üstü yüzey, hâlihazırda denetlenmiş ve yaygın üretimde kullanılan programlara dayanır. Zincir dışı ödül motoru ve bağımsız doğrulayıcı, lansmandan önce, açık bir rapor arşivi ve bir güvenlik bildirim kanalıyla incelenir. Kapsam ve rapor bağlantıları, incelemeler tamamlandıkça yayınlanır.
+Zincir üstü yüzey, üçüncü taraf açık kaynak programlara dayanır; kullanılan sürüm, program adresi ve ilgili denetim bağlantıları yayınlanır. Zincir dışı ödül motoru ve doğrulayıcı için inceleme kapsamı, rapor bağlantıları ve güvenlik bildirim kanalı lansman öncesi yayımlanmalıdır.

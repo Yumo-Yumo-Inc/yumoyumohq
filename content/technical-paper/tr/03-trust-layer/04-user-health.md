@@ -2,24 +2,24 @@
 
 ## 3.5 Kullanıcı seviyesi sağlık
 
-Her kullanıcının yakın katkı kalitesini yansıtan `[0, 1]` aralığında bir **sağlık** değeri vardır. Sağlık yavaş değişir: temiz fişlerden oluşan uzun bir dizi onu yukarı iter; tutulmuş veya reddedilmiş fişlerden oluşan bir dizi onu aşağı çeker. Sağlık, kullanıcının günlük katkı tavanı üzerinde çarpan olarak işler; dolayısıyla aynı fişin farklı kullanıcılar için ne kadar bINT kazanabileceğini doğrudan etkiler.
+Her kullanıcı, katkılarının kalitesini yansıtan bir **sağlık** duruşu taşır. Sağlık kademeli hareket eder: temiz, eksiksiz fişlerden oluşan bir dizi onu yukarı iter; düşük kaliteli veya tutarsız fişlerden oluşan bir dizi onu aşağı çeker. Sağlık, **fiş başına ödül oranı** üzerinde çarpan olarak işler; dolayısıyla aynı fiş, farklı duruşa sahip kullanıcılar için farklı bINT miktarları kazandırabilir.
 
 Sağlığın üç önemli özelliği vardır:
 
-- **Sınırlı.** Toparlanmakta olan bir kullanıcının kalıcı hasar olmadan geri tırmanmasına izin veren yapılandırılmış bir aralıkta kalır. Yeni kullanıcılar nötr bir orta noktada başlar.
-- **Gecikmeli.** Günlük yığın katmanında yeniden hesaplanır. Tekil fiş etkileri zamana yayılır.
-- **Sönümlü.** Katkı penceresi içinde eski katkılar yenilerden daha az önemlidir.
+- **Sınırlı.** Toparlanmakta olan bir kullanıcının geri tırmanmasına izin veren yapılandırılmış bir aralıkta kalır. Yeni kullanıcılar nötr bir orta noktada başlar.
+- **Eşzamanlı.** Her fiş işlenirken, fiş kalitesini değerlendiren aynı geçişte (3.3) güncellenir.
+- **Sönümlü** *(planlanan)*. Eski katkıların yenilerden daha az önemli olduğu bir zaman sönümü bileşeni planlanmıştır ve mevcut sürümde aktif değildir.
 
-Tam yarı-ömür, taban ve tavan değerleri ve sağlığı günlük tavanlara eşleyen bant sınırları iç operasyon katmanında yönetilir.
+Sağlık aralığı, oran bantları ve sağlıktan ödül oranına eşleme iç operasyon katmanında yönetilir.
 
 ## 3.6 Seviye
 
-Sağlık kısa ufukludur; **seviye** uzun ufukludur. Seviye, kümülatif yüksek kaliteli katkıyla büyüyen bir tamsayıdır. Seviyeler ürün yüzeylerini açar ve *Vision Paper — Yumbie Ürün Yüzeyi* bölümünde tanımlanan kilometre taşında, kullanıcının Foundation NFT'si Smart Agent'a evrilir (tek yönlü bir mint olayı).
+Sağlık davranış ufkundadır; **seviye** katkı ufkundadır. Seviye, kümülatif yüksek kaliteli katkıyla büyüyen bir tamsayıdır. Seviyeler ürün yüzeylerini açar.
 
-Seviye monoton — geri gitmez. Katkı vermeyi bırakan bir kullanıcı seviyesini korur ama sağlığı nötr orta noktaya doğru kayar.
+Seviye monotondur. Katkı vermeye ara veren bir kullanıcı seviyesini korur; sağlığı ise nötr orta noktaya doğru kayar.
 
-Seviye ve sağlık birlikte etkin günlük bINT tavanını belirler. Mevcut MVP uygulaması seviye başına tablo kullanır (04 §4.22); hedef mimari `base_cap × level_multiplier × health_score` formül tabanlı tavan kullanır (04 §4.23).
+Seviye ve sağlık, ödül hesabının farklı bölümlerinde etkilidir: **seviye günlük bINT tavanını belirler** (04 §4.22), **sağlık bu tavan içinde fiş başına ödül oranını çarpar**.
 
 ## 3.7 Günlük tavan, sade dille
 
-Bir kullanıcı her gün, (a) protokolde ne kadar aktif olduğunu ve (b) yakın katkılarının ne kadar temiz olduğunu yansıtan bir tavana kadar bINT kazanabilir. Yeni kullanıcılar seviyeyle büyüyen mütevazı bir tavanla başlar. Tavan, kullanıcıya ürün yüzeyinde bir ilerleme göstergesi olarak iletilir; değer zaman içinde ve pazarlar arasında yeniden ayarlanır.
+Bir kullanıcı her gün, protokolde ne kadar aktif olduğunu yansıtan hesap seviyesinin belirlediği bir tavana kadar bINT kazanabilir. Bu tavan içinde, her bir fişin kazandırdığı miktar kullanıcının sağlık duruşuyla şekillenir. Yeni kullanıcılar seviyeyle büyüyen mütevazı bir tavanla başlar. Tavan, kullanıcıya ürün yüzeyinde bir ilerleme göstergesi olarak iletilir; değerler zaman içinde ve pazarlar arasında yeniden ayarlanır.

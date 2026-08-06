@@ -41,6 +41,27 @@ const eslintConfig = defineConfig([
       "react-hooks/immutability": "warn",
     },
   },
+  // Product surfaces use the signature <Surface> primitive, not shadcn Card
+  // (which is a flat 1px-border box, reserved for admin/dev tools). Warn on new
+  // Card imports under the /app product shell so future work reaches for Surface.
+  {
+    files: ["app/app/**/*.ts", "app/app/**/*.tsx"],
+    ignores: ["app/app/admin/**"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          paths: [
+            {
+              name: "@/components/ui/card",
+              message:
+                "Use <Surface> from @/components/ui/surface for product surfaces — shadcn Card is a flat box reserved for admin/dev tools.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

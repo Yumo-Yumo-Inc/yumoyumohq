@@ -131,6 +131,7 @@ function RegisterForm() {
 
       const verifyUrl = new URL("/app/verify-email", window.location.origin);
       verifyUrl.searchParams.set("status", "pending");
+      verifyUrl.searchParams.set("email", email.trim());
       if (data.emailSent === false) {
         verifyUrl.searchParams.set("emailSent", "0");
       }
@@ -154,10 +155,8 @@ function RegisterForm() {
 
   return (
     <AuthShell
-      badge={t("auth.register.badge")}
       headline={t("auth.register.headline")}
       subheadline={t("auth.register.subheadline")}
-      icon={<UserPlus className="h-6 w-6" />}
       title={t("auth.register.title")}
       description={t("auth.register.description")}
       features={[
@@ -176,6 +175,18 @@ function RegisterForm() {
       ]}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        {refCode ? (
+          <div className="flex items-center gap-2.5 rounded-2xl border border-app-gold/30 bg-app-gold/10 px-3.5 py-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-app-gold/30 bg-app-gold/15">
+              <UserPlus className="h-4 w-4 text-app-gold" />
+            </span>
+            <p className="text-sm leading-5 text-white/80">
+              <span className="font-bold text-app-gold-light">@{refCode}</span>{" "}
+              {t("auth.register.invitedBy")}
+            </p>
+          </div>
+        ) : null}
+
         <div className="space-y-2">
           <Label htmlFor="register-locale">{t("auth.register.locale")}</Label>
           <Select

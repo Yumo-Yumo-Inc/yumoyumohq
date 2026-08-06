@@ -2,43 +2,42 @@
 
 ## 5.3 Receipt record (normative)
 
-The full lifecycle JSON. This is what reads of `/v1/receipts/{id}` return.
+The receipt record as the application's own API returns it (session-authenticated reads under `/api/receipts`). Field names shown are representative of the stored record.
 
 ```json
 // Receipt
 {
-  "receipt_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-  "user_id": "01HXY8K3F9A2QZ0M1B7N4PQR00",
-  "wallet_address": "5Hg2...8fpA",
+  "receipt_id": "6f2b8c1e-4a7d-4f2b-9c41-0e5d8a3b7f10",
+  "user": "yumo_user",
   "uploaded_at": "2026-05-17T14:23:11Z",
-  "captured_at": "2026-05-17T14:21:00Z",
+  "receipt_date": "2026-05-17",
   "currency": "TRY",
   "merchant": {
-    "merchant_id": "01HXY...",
-    "chain_id": "chain.migros",
-    "name_raw": "MIGROS T.A.S. ŞUBE 4521",
+    "merchant_id": "f3b1c2d4-...",
+    "display_name": "Migros",
     "city": "Istanbul",
-    "tax_id_hash": "sha256:7f3a..."
+    "tax_id": "6200278131"
   },
   "totals": {
-    "subtotal_minor": 23450,
-    "tax_total_minor": 4221,
-    "grand_total_minor": 27671,
+    "subtotal": "234.50",
+    "tax_total": "42.21",
+    "grand_total": "276.71",
     "currency": "TRY"
   },
   "tax_lines": [
-    { "rate_pct": 18.0, "base_minor": 20000, "amount_minor": 3600 },
-    { "rate_pct": 8.0,  "base_minor": 7750,  "amount_minor": 620  }
+    { "rate_pct": 18.0, "base": "200.00", "amount": "36.00" },
+    { "rate_pct": 8.0,  "base": "77.50",  "amount": "6.20"  }
   ],
   "payment_method": "credit_card",
+  "document_type": "receipt",
+  "is_payment_proof": true,
   "line_items": [
     {
-      "line_item_id": "01HXY...01",
       "raw_text": "SUT 1L PINAR",
-      "canonical_product_id": "cp.pinar.milk.1l",
+      "canonical_product_id": "3f6a...-...",
       "qty": 2.0,
-      "unit_price_minor": 2350,
-      "line_total_minor": 4700,
+      "unit_price": "23.50",
+      "line_total": "47.00",
       "tax_rate_pct": 8.0,
       "match_confidence": "0.XX"
     }
@@ -57,13 +56,12 @@ The full lifecycle JSON. This is what reads of `/v1/receipts/{id}` return.
     "signals_present": ["total_reconciliation", "merchant_consistency"]
   },
   "rewards": {
-    "bint_minor_credited": 12500,
-    "bint_settled_at": null,
-    "epoints_minor_recorded": 845,
-    "statistics_only": false
+    "bint_credited": "125.00",
+    "reward_epoch": null
   },
   "status": "verified",
-  "schema_version": "1.0.0"
+  "proof_status": null,
+  "linked_receipt_id": null
 }
 ```
 
@@ -73,24 +71,27 @@ Confidence values and trust score are shown as placeholders. Production ranges, 
 
 | Convention | Rule |
 |---|---|
-| IDs | ULID (Crockford base-32, 26 chars). Time-ordered, sortable. |
-| Currency amounts | Minor units (kuruş for TRY, cents for USD). Avoids float drift. |
+| IDs | UUID primary keys for receipts and merchants; serial integer ids on event and ledger tables. |
+| Currency amounts | Decimal values, serialised as canonical decimal strings (2 dp for money). |
 | Timestamps | ISO 8601 with `Z` suffix. UTC always. |
-| Hashes | `sha256:` prefix followed by lowercase hex. |
+| Hashes | Lowercase hex, algorithm named by the field's context. |
 | Nullable | Missing fields use explicit `null`. |
-| Status enum | `pending`, `verified`, `rejected`, `statistics_only`, `under_review`. |
+| Status enum | `verified`, `saved`, `analyzed`. |
 
-### Status transitions
+### Status and payment-proof handling
+
+Live status values:
 
 ```
-pending
-   │
-   ├──► verified  (passes trust gate)
-   ├──► statistics_only  (e.g., order-page receipt with limited payment proof)
-   ├──► under_review  (borderline trust, appeal queue)
-   └──► rejected  (hard reject: anti-abuse signal, hand-written, synthetic image)
+analyzed  — pipeline output produced, not yet persisted as a kept record
+saved     — kept by the user
+verified  — passed the verification gates; eligible for rewards and the aggregate layer
 ```
 
-A `verified` receipt earns bINT. A `statistics_only` receipt is counted in the user's price memory and household statistics; aggregate and reward handling follows the 5.8 rules.
+Documents with limited payment proof (an order page, for example) are handled by a **separate field pair**, not by a status value: `proof_status` marks the record as awaiting payment proof, and `linked_receipt_id` points to the payment-proof document that resolves it once the user uploads one. Such records are computed into the user's own statistics but earn no reward and stay out of the anonymised aggregate.
+
+A manual review flow for borderline cases is planned; it is not part of the live status set.
+
+A `verified` receipt earns bINT. Aggregate handling of non-verified records follows the 5.8 rules.
 
 ---

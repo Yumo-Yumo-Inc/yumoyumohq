@@ -6,19 +6,19 @@ El recorrido de un recibo se ejecuta en dos fases.
 
 **Fase A — Sincrónica (el usuario está esperando):**
 
-1. El cliente comprime la imagen, elimina el EXIF y solicita una URL de carga previamente firmada.
-2. La imagen llega al almacenamiento de objetos. El servidor verifica un índice de deduplicación por hash perceptual.
-3. La capa OCR (02 Etapa 1) extrae texto y cuadros delimitadores.
-4. El enrutador LLM (02 Etapa 2) extrae un JSON estructurado `ReceiptExtraction`.
-5. La capa de expresiones regulares/reglas (02 Etapa 3) concilia totales y valida fechas.
-6. El matching canónico (02 Etapa 4) resuelve cada línea a un ID de producto canónico.
-7. El resolvedor de comerciante (02 Etapa 5) adjunta una identidad de comerciante.
-8. El scoring de confianza (03) emite un puntaje de confianza en [0, 1] y el sistema muestra al usuario una vista previa verificada.
+1. El cliente envía el archivo al endpoint de carga. El servidor comprime la imagen, elimina los metadatos EXIF y guarda el resultado en el almacenamiento de objetos. Antes del análisis se consulta un índice de deduplicación por hash perceptual.
+2. Para entradas de imagen, el LLM de visión (02 Etapa 2) lee el recibo directamente desde la imagen en una sola llamada. Para entradas PDF, una capa OCR (02 Etapa 1) extrae primero el texto, que luego alimenta la misma etapa LLM.
+3. El LLM devuelve **texto plano etiquetado**: un bloque de líneas `FIELD: value` para comerciante, fecha, totales y campos de pago, más una tabla separada por barras verticales para las líneas de artículos. El parseo es defensivo: una línea ausente o malformada deja ese campo en `null` y el canal continúa.
+4. La capa de expresiones regulares/reglas (02 Etapa 3) concilia totales y valida fechas.
+5. El resolvedor de comerciante (02 Etapa 5) adjunta una identidad de comerciante.
+6. La capa de confianza (03) clasifica la calidad del recibo y la recompensa se calcula dentro de la misma solicitud, de modo que el usuario ve juntas la vista previa verificada y la recompensa.
 
 **Fase B — Asincrónica (liquidación en segundo plano):**
 
-9. Si el puntaje de confianza supera el umbral, se escribe una fila `bINT.pending` en el libro mayor.
-10. El worker de liquidación en lotes horarios agrega créditos pendientes, calcula los techos diarios (03) y acuña bINT en Solana en el ATA congelado del usuario.
-11. El indexador detecta el evento de acuñación en cadena y confirma de vuelta al libro mayor fuera de la cadena.
+7. Un worker de post-procesamiento en segundo plano resuelve cada línea de artículo a un ID de producto canónico (02 Etapa 4) mediante matching difuso en la base de datos con un respaldo LLM, e incorpora la clasificación de calidad del recibo al puntaje de confianza acumulado del usuario.
+8. El worker de liquidación agrupa los créditos bINT elegibles, aplica los techos diarios y genera una raíz de distribución por época para las reclamaciones de INT correspondientes.
+9. La raíz de distribución se compromete en cadena. El indexador confirma en el libro mayor fuera de la cadena las transferencias de INT reclamadas desde el distribuidor.
 
-El usuario ve la Fase A en segundos. La Fase B finaliza de forma invisible. El contrato entre las dos fases es: **el libro mayor fuera de la cadena es la fuente de verdad hasta la liquidación en cadena**, tras la cual el estado en cadena es la fuente de verdad y el libro mayor se convierte en un espejo de lectura rápida.
+El usuario ve la Fase A en segundos. La Fase B finaliza de forma asíncrona. El libro mayor bINT fuera de la cadena sigue siendo la fuente de verdad para los créditos de contribución; la raíz en cadena y las transferencias de reclamación registran la distribución de INT correspondiente.
+
+---

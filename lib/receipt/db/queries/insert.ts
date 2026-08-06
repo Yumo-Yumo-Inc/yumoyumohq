@@ -3,6 +3,7 @@
  * SERVER-ONLY: Do not import in client components
  */
 
+import { after } from "next/server";
 import { sql, warmUpConnection } from "@/lib/db/client";
 import type { ReceiptAnalysis } from "../../types";
 import { saveReceipt as saveReceiptFile } from "../../storage";
@@ -32,54 +33,22 @@ async function runPostProcessInProcess(receiptId: string): Promise<void> {
   }
 }
 
-function getVercelProtectionBypassSecret(): string | null {
-  return process.env.VERCEL_AUTOMATION_BYPASS_SECRET || process.env.VERCEL_PROTECTION_BYPASS || null;
-}
-
 function enqueuePostProcess(receiptId: string): void {
   if (!isFaz2Enabled()) return;
 
-  // Local development: avoid network roundtrip fragility, run worker in-process.
-  if (process.env.NODE_ENV === "development") {
-    queueMicrotask(() => {
-      void runPostProcessInProcess(receiptId);
-    });
-    return;
+  // Run the worker in-process after the response is sent. The previous HTTP
+  // self-call (fetch to https://$VERCEL_URL/api/internal/post-process) silently
+  // died in production: VERCEL_URL is the deployment URL, which Vercel
+  // Deployment Protection answers with a 302 to SSO, so the worker never ran
+  // and receipts piled up in post_process_state='pending'. after() keeps the
+  // function alive until the worker finishes (same mechanism the analyze route
+  // already relies on), with no network hop and no auth surface.
+  try {
+    after(() => runPostProcessInProcess(receiptId));
+  } catch {
+    // after() throws outside a request scope (e.g. scripts); run directly.
+    void runPostProcessInProcess(receiptId);
   }
-
-  const base = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const url = `${base}/api/internal/post-process?receiptId=${encodeURIComponent(receiptId)}`;
-  const internalSecret = process.env.INTERNAL_SECRET;
-  const bypassSecret = getVercelProtectionBypassSecret();
-
-  if (!internalSecret || (process.env.VERCEL === "1" && process.env.VERCEL_ENV !== "production" && !bypassSecret)) {
-    queueMicrotask(() => {
-      void runPostProcessInProcess(receiptId);
-    });
-    return;
-  }
-
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${internalSecret}`,
-    ...(bypassSecret ? { "x-vercel-protection-bypass": bypassSecret } : {}),
-  };
-
-  fetch(url, {
-    method: "POST",
-    cache: "no-store",
-    headers,
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status} ${res.statusText || "request failed"}`.trim());
-      }
-    })
-    .catch((err) => {
-      console.warn("[storage-db] enqueuePostProcess failed, falling back to in-process:", err?.message);
-      void runPostProcessInProcess(receiptId);
-    });
 }
 
 /**
@@ -439,7 +408,7 @@ export async function insertReceipt(
   }
 }
 
-export async function persistReceiptSecondaryArtifacts(receipt: ReceiptAnalysis): Promise<void> {
+async function persistReceiptSecondaryArtifacts(receipt: ReceiptAnalysis): Promise<void> {
   if (!isDatabaseAvailable() || !sql) {
     return;
   }

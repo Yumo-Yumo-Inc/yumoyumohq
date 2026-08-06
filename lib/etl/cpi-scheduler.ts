@@ -191,7 +191,7 @@ export function shouldCheckCPI(country: string): boolean {
 /**
  * Get all countries that should be checked today
  */
-export function getCountriesToCheckToday(): string[] {
+function getCountriesToCheckToday(): string[] {
   return CPI_SCHEDULES
     .filter(schedule => shouldCheckCPI(schedule.country))
     .map(schedule => schedule.country);

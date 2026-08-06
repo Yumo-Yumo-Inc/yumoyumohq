@@ -48,7 +48,6 @@ export async function POST(req: Request) {
       JOIN quest_templates qt ON uq.quest_template_id = qt.id
       WHERE uq.id = ${questId}
         AND uq.username = ${username}
-        AND qt.type IN ('W1A','W1B','W1C','W2','W3','W4','W5','W6')
         AND uq.expires_at >= ${start}::date
         AND uq.expires_at < (${end}::date + INTERVAL '1 day')
       LIMIT 1

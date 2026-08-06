@@ -136,7 +136,7 @@ export interface WeeklyQuestSlot {
   tier: QuestTier;
 }
 
-export async function generateWeeklyQuests(
+async function generateWeeklyQuests(
   username: string,
   dateStr: string,
   seasonNumber: number

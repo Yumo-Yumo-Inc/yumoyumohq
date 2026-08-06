@@ -28,7 +28,7 @@ flowchart LR
     B --> C["Living price memory"]
     B --> D["Yumbie guidance + Foundation NFT identity"]
     B --> E["Contribution economy"]
-    E --> F["bINT and ePoints"]
+    E --> F["bINT"]
     F --> G["INT, staking, and governance"]
 ```
 

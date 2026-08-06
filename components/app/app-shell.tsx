@@ -6,6 +6,7 @@ import { Topbar } from "./topbar";
 import { BottomNav } from "./bottom-nav";
 import { DesktopSidebar } from "./desktop-sidebar";
 import { ThemeBg } from "./theme-bg";
+import { SeasonThemeLayer } from "./season/season-theme-layer";
 import { useAppProfile } from "@/lib/app/profile-context";
 import { useNotifications } from "@/lib/app/use-notifications";
 import { ThemeLevelProvider, TierVarsInjector } from "@/lib/theme/theme-context";
@@ -86,8 +87,6 @@ const AppShellInner = memo(function AppShellInner({
   const avatarUrl = ctxProfile?.avatarUrl ?? undefined;
   const displayName = ctxProfile?.displayName || ctxProfile?.username || "User";
   const streak = ctxProfile?.streak ?? 0;
-  const healthScore = Math.max(0, Math.min(100, Number(ctxProfile?.honor ?? 50) || 0));
-  const cPoints = Math.round(ctxProfile?.contributionPoints?.total ?? 0);
   const isDesktop = useIsDesktop();
   const isMenuPage = pathname === "/app/menu";
   const isDashboardPage = pathname === "/app" || pathname === "/app/dashboard";
@@ -148,6 +147,7 @@ const AppShellInner = memo(function AppShellInner({
           )}
         >
           {!isDashboardPage && <ThemeBg accountLevel={accountLevel} />}
+          <SeasonThemeLayer />
           <DesktopSidebar />
           <div className={cn("lg:pl-64 flex flex-col", fixedViewport ? "h-[100dvh] overflow-hidden" : "min-h-screen")}>
             <Topbar
@@ -161,11 +161,9 @@ const AppShellInner = memo(function AppShellInner({
               onMenu={!isDashboardPage && showMenuButton && !isMenuPage ? () => router.push("/app/menu") : undefined}
               accountLevel={accountLevel}
               streak={streak}
-              healthScore={healthScore}
               initials={initials}
               avatarUrl={avatarUrl}
               displayName={displayName}
-              cPoints={cPoints}
               xpProgress={xpProgress}
               hasXpInCurrentLevel={hasXpInCurrentLevel}
               unreadCount={unreadCount}

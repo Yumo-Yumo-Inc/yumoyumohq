@@ -3,15 +3,21 @@
 /**
  * /app/analysis — "Analysis"
  *
- * Three layers over the user's own receipt data:
- *   Essentials — price tracking, merchant comparison, unit-price traps,
- *                time-of-day heatmap, loyalty cost.
- *   Deep      — personal inflation vs official CPI, shrinkflation,
- *                purchasing power, category inflation league.
- *   Community — anonymous city-level basket comparison.
+ * Two layers over the user's own receipt data:
+ *   Spending — the plain, easily verifiable views moved from the old Wallet
+ *              page: overview, category breakdown, top products, top places,
+ *              brands (SpendingPanel).
+ *   Deep     — price tracking, merchant comparison, unit-price traps,
+ *              time-of-day heatmap, loyalty cost, personal inflation vs
+ *              official CPI, shrinkflation, purchasing power, category
+ *              inflation league and the anonymous city comparison.
  *
- * Every section renders real data from /api/analysis; when a section's data
- * is missing or insufficient it shows an empty state — no fabricated values.
+ * Layout language: open bands on the page background separated by hairlines —
+ * card surfaces are reserved for the two signature moments (price-track chart,
+ * inflation gauge). Sections without enough data collapse into a single
+ * compact "on the way" strip instead of a stack of empty boxes.
+ *
+ * Every figure comes from /api/analysis real data; nothing is fabricated.
  */
 
 import type { ReactNode } from "react";
@@ -19,7 +25,6 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   Clock3,
-  Coffee,
   Gauge,
   LineChart,
   MapPin,
@@ -27,15 +32,21 @@ import {
   PackageMinus,
   Repeat,
   Scale,
+  ShoppingBasket,
   Sparkles,
   Store,
   TrendingDown,
   TrendingUp,
   Users,
+  type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { AppShell } from "@/components/app/app-shell";
-import { useAppLocale } from "@/lib/i18n/app-context";
+import { SpendingPanel } from "@/components/insights/spending-sections";
+import { useAppLocale, type AppLocale } from "@/lib/i18n/app-context";
+import { formatUnitType } from "@/lib/format/unit-type";
+import { DeepInsightsPanel } from "@/components/insights/deep-insights-panel";
+import { ProductPriceDetail } from "@/components/insights/product-price-detail";
 import type {
   AnalysisPayload,
   CategoryInflationRow,
@@ -44,12 +55,7 @@ import type {
   ShrinkflationHit,
   UnitTrap,
 } from "@/lib/analysis/types";
-import {
-  TXT_MINI_CAPS,
-  TXT_SECTION_LABEL,
-  TXT_SECTION_TITLE,
-  NUM_FEAT,
-} from "@/components/insights/typography";
+import { TXT_MINI_CAPS, TXT_SECTION_LABEL, NUM_FEAT } from "@/components/insights/typography";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Data hook
@@ -106,6 +112,10 @@ function fmtPct(ratio: number, locale: string, signed = true) {
   return locale === "tr" ? `${sign}%${pct}` : `${sign}${pct}%`;
 }
 
+function unitLabel(unitType: string | null | undefined, locale: string): string | null {
+  return formatUnitType(unitType, locale as AppLocale);
+}
+
 const UP = "#F87171";
 const DOWN = "#34D399";
 
@@ -113,27 +123,26 @@ const DOWN = "#34D399";
 // Page
 // ────────────────────────────────────────────────────────────────────────────
 
-type TabKey = "essentials" | "deep" | "community";
+type TabKey = "spending" | "deep";
 
 export default function AnalysisPage() {
   const { locale } = useAppLocale();
   const { data, loading } = useAnalysis();
   const reduced = useReducedMotion();
-  const [tab, setTab] = useState<TabKey>("essentials");
+  const [tab, setTab] = useState<TabKey>("spending");
   const tr = locale === "tr";
 
   const currency = data?.currency ?? "TRY";
   const money = (n: number, digits = 0) => fmtCurrency(n, currency, locale, digits);
 
   const tabs: Array<{ key: TabKey; label: string }> = [
-    { key: "essentials", label: tr ? "Temel" : "Essentials" },
+    { key: "spending", label: tr ? "Harcama" : "Spending" },
     { key: "deep", label: tr ? "Derin" : "Deep" },
-    { key: "community", label: tr ? "Topluluk" : "Community" },
   ];
 
   return (
     <AppShell>
-      <div className="space-y-4 pb-24 lg:pb-8">
+      <div className="pb-24 lg:pb-8">
         {/* Header */}
         <header className="flex items-center gap-3 px-1 pt-2">
           <div
@@ -160,7 +169,7 @@ export default function AnalysisPage() {
 
         {/* Tabs — segmented, gold active pill */}
         <div
-          className="sticky top-2 z-10 flex gap-1 rounded-2xl border p-1 backdrop-blur-md"
+          className="sticky top-2 z-10 mt-4 flex gap-1 rounded-2xl border p-1 backdrop-blur-md"
           style={{
             background: "color-mix(in srgb, var(--app-bg-elevated) 82%, transparent)",
             borderColor: "var(--app-border)",
@@ -203,11 +212,23 @@ export default function AnalysisPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduced ? undefined : { opacity: 0, y: -6 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="space-y-4"
           >
-            {tab === "essentials" && <EssentialsPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />}
-            {tab === "deep" && <DeepPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />}
-            {tab === "community" && <CommunityPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />}
+            {tab === "spending" && (
+              <div className="mt-4">
+                <SpendingPanel />
+              </div>
+            )}
+            {tab === "deep" && (
+              <>
+                <DeepInsightsPanel />
+                <Hairline />
+                <EssentialsPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />
+                <Hairline />
+                <DeepPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />
+                <Hairline />
+                <CommunityPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -216,7 +237,7 @@ export default function AnalysisPage() {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Shared shells
+// Layout primitives — open bands, hairline dividers, one pending strip
 // ────────────────────────────────────────────────────────────────────────────
 
 interface PanelProps {
@@ -227,86 +248,84 @@ interface PanelProps {
   locale: string;
 }
 
-function Card({
-  icon,
+/** Gradient hairline between bands — the separator is light, not a box. */
+function Hairline() {
+  return (
+    <div
+      className="my-7 h-px w-full"
+      style={{
+        background: "linear-gradient(90deg, transparent, var(--app-border-strong) 18%, var(--app-border-strong) 82%, transparent)",
+      }}
+    />
+  );
+}
+
+/** Open section band: typographic head + content on the page background. */
+function Band({
+  icon: Icon,
   eyebrow,
   title,
   subtitle,
   children,
 }: {
-  icon: ReactNode;
+  icon: LucideIcon;
   eyebrow: string;
   title: string;
   subtitle?: ReactNode;
   children: ReactNode;
 }) {
-  return (
-    <section
-      className="relative overflow-hidden rounded-3xl border"
-      style={{
-        background: "linear-gradient(165deg, var(--app-bg-surface), var(--app-bg-elevated) 70%)",
-        borderColor: "var(--app-border)",
-        boxShadow: "var(--app-shadow-card), inset 0 1px 0 var(--app-border-strong)",
-      }}
-    >
-      <div className="px-5 pb-5 pt-5 sm:px-6">
-        <div className="flex items-start gap-3">
-          <span
-            className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl"
-            style={{
-              background: "linear-gradient(160deg, rgba(232,201,122,0.20), rgba(201,168,76,0.05))",
-              border: "1px solid var(--app-gold-border)",
-              boxShadow: "inset 0 1px 0 rgba(232,201,122,0.16)",
-              color: "var(--app-gold-light)",
-            }}
-          >
-            {icon}
-          </span>
-          <div className="min-w-0">
-            <div className={TXT_MINI_CAPS} style={{ color: "var(--app-gold)" }}>
-              {eyebrow}
-            </div>
-            <h2 className={"mt-0.5 " + TXT_SECTION_TITLE}>{title}</h2>
-            {subtitle && <div className="mt-0.5 text-[12px] leading-snug text-app-text-secondary">{subtitle}</div>}
-          </div>
-        </div>
-        <div className="mt-4">{children}</div>
-      </div>
-    </section>
-  );
-}
-
-/** Consistent empty state — explains what unlocks the section. */
-function EmptyState({ tr, hint }: { tr: boolean; hint: string }) {
-  return (
-    <div
-      className="flex flex-col items-center gap-2 rounded-2xl border border-dashed px-4 py-7 text-center"
-      style={{ borderColor: "var(--app-border-strong)", background: "rgba(255,255,255,0.015)" }}
-    >
-      <Sparkles size={18} style={{ color: "var(--app-text-muted)" }} />
-      <div className="text-[13px] font-medium text-app-text-secondary">
-        {tr ? "Henüz yeterli veri yok" : "Not enough data yet"}
-      </div>
-      <div className="max-w-[300px] text-[12px] leading-snug text-app-text-muted">{hint}</div>
-    </div>
-  );
-}
-
-function StaggerList({ children }: { children: ReactNode[] }) {
   const reduced = useReducedMotion();
   return (
-    <div>
-      {children.map((child, i) => (
-        <motion.div
-          key={i}
-          initial={reduced ? false : { opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: reduced ? 0 : i * 0.045, duration: 0.25, ease: "easeOut" }}
-        >
-          {child}
-        </motion.div>
-      ))}
-    </div>
+    <motion.section
+      className="px-1"
+      initial={reduced ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+    >
+      <div className="flex items-center gap-2">
+        <Icon size={13} strokeWidth={2.2} style={{ color: "var(--app-gold)" }} />
+        <span className={TXT_MINI_CAPS} style={{ color: "var(--app-gold)" }}>
+          {eyebrow}
+        </span>
+      </div>
+      <h2 className="mt-1.5 text-[19px] font-bold leading-tight tracking-[-0.015em] text-app-text-primary">{title}</h2>
+      {subtitle && <div className="mt-1 text-[12.5px] leading-snug text-app-text-secondary">{subtitle}</div>}
+      <div className="mt-4">{children}</div>
+    </motion.section>
+  );
+}
+
+/**
+ * Sections whose data hasn't accumulated yet collapse into one quiet strip —
+ * a promise of what unlocks next, instead of a stack of empty boxes.
+ */
+function PendingStrip({ tr, entries }: { tr: boolean; entries: Array<{ icon: LucideIcon; label: string; hint: string }> }) {
+  if (entries.length === 0) return null;
+  return (
+    <section className="px-1">
+      <div className="flex items-center gap-2">
+        <Sparkles size={13} strokeWidth={2.2} style={{ color: "var(--app-text-muted)" }} />
+        <span className={TXT_MINI_CAPS}>{tr ? "Fiş taradıkça açılacaklar" : "Unlocks as you scan"}</span>
+      </div>
+      <div
+        className="mt-3 overflow-hidden rounded-2xl border"
+        style={{ borderColor: "var(--app-border)", background: "color-mix(in srgb, var(--app-bg-elevated) 55%, transparent)" }}
+      >
+        {entries.map(({ icon: Icon, label, hint }, i) => (
+          <div
+            key={label}
+            className="flex items-center gap-3 px-4 py-3"
+            style={i > 0 ? { borderTop: "1px solid var(--app-border)" } : undefined}
+          >
+            <Icon size={15} strokeWidth={2} style={{ color: "var(--app-text-muted)" }} />
+            <div className="min-w-0">
+              <div className="text-[13px] font-semibold text-app-text-secondary">{label}</div>
+              <div className="text-[11.5px] leading-snug text-app-text-muted">{hint}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -320,7 +339,7 @@ function MetricBar({
 }: {
   label: ReactNode;
   valueText: string;
-  ratio: number; // 0..1 of track width
+  ratio: number;
   color?: string;
   bold?: boolean;
 }) {
@@ -328,25 +347,20 @@ function MetricBar({
   return (
     <div className="mb-2.5 flex items-center gap-3 last:mb-0">
       <span
-        className={"w-[92px] shrink-0 truncate text-[12.5px] " + (bold ? "font-bold text-app-text-primary" : "text-app-text-secondary")}
+        className={"w-[96px] shrink-0 truncate text-[12.5px] " + (bold ? "font-bold text-app-text-primary" : "text-app-text-secondary")}
       >
         {label}
       </span>
-      <div
-        className="h-[9px] flex-1 overflow-hidden rounded-full"
-        style={{ background: "var(--app-bg-surface3)" }}
-      >
+      <div className="h-[9px] flex-1 overflow-hidden rounded-full" style={{ background: "var(--app-bg-surface3)" }}>
         <motion.div
           className="h-full rounded-full"
           initial={reduced ? false : { width: 0 }}
           animate={{ width: `${Math.max(0, Math.min(1, ratio)) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          style={{
-            background: color ?? "linear-gradient(90deg, var(--app-gold-dim), var(--app-gold-light))",
-          }}
+          style={{ background: color ?? "linear-gradient(90deg, var(--app-gold-dim), var(--app-gold-light))" }}
         />
       </div>
-      <span className="w-[64px] shrink-0 text-right font-mono text-[12.5px] font-semibold text-app-text-primary" style={NUM_FEAT}>
+      <span className="w-[70px] shrink-0 text-right font-mono text-[12.5px] font-semibold text-app-text-primary" style={NUM_FEAT}>
         {valueText}
       </span>
     </div>
@@ -359,172 +373,274 @@ function MetricBar({
 
 function EssentialsPanel({ data, loading, money, tr, locale }: PanelProps) {
   const ov = data?.overview ?? null;
-  const monthDelta =
-    ov && ov.prevMonthTotal != null && ov.prevMonthTotal > 0
-      ? (ov.monthTotal - ov.prevMonthTotal) / ov.prevMonthTotal
-      : null;
+  const tracks = data?.priceTracks ?? [];
+  const mc = data?.merchantComparison ?? null;
+  const traps = data?.unitTraps ?? [];
+  const hm = data?.timeHeatmap ?? null;
+  const loyalty = data?.loyalty ?? [];
+
+  const [selectedProductKey, setSelectedProductKey] = useState<string | null>(null);
+
+  const pending: Array<{ icon: LucideIcon; label: string; hint: string }> = [];
+  if (tracks.length === 0)
+    pending.push({
+      icon: Activity,
+      label: tr ? "Kalem fiyat takibi" : "Price tracking",
+      hint: tr ? "Aynı ürünü birkaç hafta arayla 3+ kez tara." : "Scan the same product 3+ times across a few weeks.",
+    });
+  if (!mc || mc.rows.length < 2)
+    pending.push({
+      icon: Store,
+      label: tr ? "Market karşılaştırması" : "Store comparison",
+      hint: tr ? "Aynı ürünleri iki farklı markette al." : "Buy the same products at two different stores.",
+    });
+  if (traps.length === 0)
+    pending.push({
+      icon: Scale,
+      label: tr ? "Küçük paket tuzağı" : "Small-pack trap",
+      hint: tr ? "Aynı ürünün farklı boylarını tara." : "Scan different sizes of the same product.",
+    });
+  if (!hm || hm.sampleSize === 0)
+    pending.push({
+      icon: Clock3,
+      label: tr ? "Zaman alışkanlığı" : "Time habits",
+      hint: tr ? "Saat bilgisi okunabilen fişler gerekir." : "Needs receipts with a readable time of day.",
+    });
+  if (loyalty.length === 0)
+    pending.push({
+      icon: Repeat,
+      label: tr ? "Sadakat maliyeti" : "Loyalty cost",
+      hint: tr ? "Düzenli aldığın ürünler netleşince açılır." : "Opens once your regular purchases build up.",
+    });
 
   return (
-    <>
-      {/* Stat duo */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatTile
-          label={tr ? "Bu ay toplam" : "This month"}
-          value={ov ? money(ov.monthTotal) : "—"}
-          sub={
-            monthDelta != null ? (
-              <span style={{ color: monthDelta > 0 ? UP : DOWN }}>
-                {monthDelta > 0 ? "▲" : "▼"} {fmtPct(monthDelta, locale, false)}{" "}
-                {tr ? "geçen aya göre" : "vs last month"}
-              </span>
-            ) : (
-              <span>{tr ? "önceki ay verisi yok" : "no prior month data"}</span>
-            )
-          }
-          loading={loading}
-        />
-        <StatTile
-          label={tr ? "Gizli maliyet (bu ay)" : "Hidden cost (this month)"}
-          value={ov?.hiddenCostMonth != null ? money(ov.hiddenCostMonth) : "—"}
-          gold
-          sub={
-            ov?.hiddenCostMonth != null ? (
-              <span>{tr ? "fişlerinden hesaplandı" : "computed from your receipts"}</span>
-            ) : (
-              <span>{tr ? "bu ay hesaplanmadı" : "not computed this month"}</span>
-            )
-          }
-          loading={loading}
-        />
-      </div>
+    <div className="mt-6">
+      <OverviewHero ov={ov} money={money} tr={tr} locale={locale} loading={loading} />
 
-      <PriceTrackCard tracks={data?.priceTracks ?? []} money={money} tr={tr} locale={locale} />
-      <MerchantCompareCard data={data} money={money} tr={tr} />
-      <UnitTrapCard traps={data?.unitTraps ?? []} money={money} tr={tr} locale={locale} />
-      <HeatmapCard data={data} tr={tr} locale={locale} />
-      <LoyaltyCard items={data?.loyalty ?? []} money={money} tr={tr} locale={locale} />
-    </>
-  );
-}
+      {tracks.length > 0 && (
+        <>
+          <Hairline />
+          <PriceTrackSection
+            tracks={tracks}
+            money={money}
+            tr={tr}
+            locale={locale}
+            onSelectTrack={setSelectedProductKey}
+          />
+        </>
+      )}
 
-function StatTile({
-  label,
-  value,
-  sub,
-  gold,
-  loading,
-}: {
-  label: string;
-  value: string;
-  sub: ReactNode;
-  gold?: boolean;
-  loading?: boolean;
-}) {
-  return (
-    <div
-      className="rounded-3xl border px-4 py-4"
-      style={{
-        background: gold
-          ? "linear-gradient(160deg, rgba(201,168,76,0.10), var(--app-bg-elevated) 65%)"
-          : "linear-gradient(165deg, var(--app-bg-surface), var(--app-bg-elevated) 70%)",
-        borderColor: gold ? "var(--app-gold-border)" : "var(--app-border)",
-        boxShadow: "var(--app-shadow-card), inset 0 1px 0 var(--app-border-strong)",
-      }}
-    >
-      <div className={TXT_MINI_CAPS}>{label}</div>
-      <div
-        className={"mt-1.5 font-mono text-[22px] font-bold leading-none tracking-[-0.02em] " + (loading ? "animate-pulse" : "")}
-        style={{ ...NUM_FEAT, color: gold ? "var(--app-gold-light)" : "var(--app-text-primary)" }}
-      >
-        {loading ? "···" : value}
-      </div>
-      <div className="mt-1.5 text-[11.5px] leading-snug text-app-text-muted">{sub}</div>
+      {mc && mc.rows.length >= 2 && (
+        <>
+          <Hairline />
+          <MerchantCompareSection mc={mc} money={money} tr={tr} />
+        </>
+      )}
+
+      {traps.length > 0 && (
+        <>
+          <Hairline />
+          <UnitTrapSection traps={traps} money={money} tr={tr} locale={locale} />
+        </>
+      )}
+
+      {hm && hm.sampleSize > 0 && (
+        <>
+          <Hairline />
+          <HeatmapSection hm={hm} tr={tr} locale={locale} />
+        </>
+      )}
+
+      {loyalty.length > 0 && (
+        <>
+          <Hairline />
+          <LoyaltySection items={loyalty} money={money} tr={tr} locale={locale} />
+        </>
+      )}
+
+      {pending.length > 0 && (
+        <>
+          <Hairline />
+          <PendingStrip tr={tr} entries={pending} />
+        </>
+      )}
+
+      {selectedProductKey && (
+        <ProductPriceDetail
+          productKey={selectedProductKey}
+          money={money}
+          tr={tr}
+          locale={locale}
+          onClose={() => setSelectedProductKey(null)}
+        />
+      )}
     </div>
   );
 }
 
-/** Signature sparkline for the top tracked product + compact list of the rest. */
-function PriceTrackCard({
+/** Typographic hero — no boxes. Month total, delta, hidden cost in one breath. */
+function OverviewHero({
+  ov,
+  money,
+  tr,
+  locale,
+  loading,
+}: {
+  ov: AnalysisPayload["overview"] | null;
+  money: (n: number, digits?: number) => string;
+  tr: boolean;
+  locale: string;
+  loading: boolean;
+}) {
+  const reduced = useReducedMotion();
+  const monthDelta =
+    ov && ov.prevMonthTotal != null && ov.prevMonthTotal > 0 && ov.monthTotal > 0
+      ? (ov.monthTotal - ov.prevMonthTotal) / ov.prevMonthTotal
+      : null;
+  const noReceiptsThisMonth = !!ov && ov.monthTotal === 0;
+
+  return (
+    <section className="px-1">
+      <div className={TXT_MINI_CAPS}>{tr ? "Bu ay" : "This month"}</div>
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1"
+      >
+        <span
+          className={"font-mono text-[40px] font-bold leading-none tracking-[-0.03em] " + (loading ? "animate-pulse" : "")}
+          style={{
+            ...NUM_FEAT,
+            background: "linear-gradient(140deg, var(--app-text-primary), var(--app-text-secondary))",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+          }}
+        >
+          {loading ? "···" : ov ? (noReceiptsThisMonth ? money(0) : money(ov.monthTotal)) : "—"}
+        </span>
+        {monthDelta != null && (
+          <span className="font-mono text-[13px] font-semibold" style={{ ...NUM_FEAT, color: monthDelta > 0 ? UP : DOWN }}>
+            {monthDelta > 0 ? "▲" : "▼"} {fmtPct(monthDelta, locale, false)} {tr ? "geçen aya göre" : "vs last month"}
+          </span>
+        )}
+      </motion.div>
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px] text-app-text-secondary">
+        {noReceiptsThisMonth && ov?.prevMonthTotal != null && ov.prevMonthTotal > 0 && (
+          <span>
+            {tr ? "Bu ay henüz fiş yok · geçen ay " : "No receipts this month yet · last month "}
+            <b className="font-mono text-app-text-primary" style={NUM_FEAT}>
+              {money(ov.prevMonthTotal)}
+            </b>
+          </span>
+        )}
+        {ov?.hiddenCostMonth != null && ov.hiddenCostMonth > 0 && (
+          <span>
+            {tr ? "Gizli maliyet: " : "Hidden cost: "}
+            <b className="font-mono" style={{ ...NUM_FEAT, color: "var(--app-gold-light)" }}>
+              {money(ov.hiddenCostMonth)}
+            </b>
+          </span>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/** Signature surface #1 — the price-track chart card. */
+function PriceTrackSection({
   tracks,
   money,
   tr,
   locale,
+  onSelectTrack,
 }: {
   tracks: PriceTrack[];
   money: (n: number, digits?: number) => string;
   tr: boolean;
   locale: string;
+  onSelectTrack: (productKey: string) => void;
 }) {
-  const top = tracks[0] ?? null;
+  const top = tracks[0];
   const rest = tracks.slice(1, 4);
 
   return (
-    <Card
-      icon={<Activity size={16} strokeWidth={2} />}
-      eyebrow={tr ? "Kalem takibi" : "Price tracking"}
-      title={top ? trackLabel(top) : tr ? "Tekrar aldığın ürünler" : "Products you rebuy"}
+    <Band
+      icon={Activity}
+      eyebrow={tr ? "Kalem fiyat takibi" : "Price tracking"}
+      title={trackLabel(top, locale)}
       subtitle={
-        top
-          ? (tr ? "Fişlerinden otomatik eşleştirildi · " : "Auto-matched from your receipts · ") +
-            `${top.sampleSize} ${tr ? "alım" : "purchases"}`
-          : undefined
+        (tr ? "Birim fiyat, kendi fişlerinden · " : "Unit price, from your receipts · ") +
+        `${top.sampleSize} ${tr ? "alım" : "purchases"}`
       }
     >
-      {top ? (
-        <>
-          <div className="mb-2 flex items-baseline justify-between">
-            <span
-              className="rounded-full px-2.5 py-1 font-mono text-[12px] font-bold"
-              style={{
-                ...NUM_FEAT,
-                color: top.deltaRatio > 0 ? UP : DOWN,
-                background: top.deltaRatio > 0 ? "rgba(248,113,113,0.10)" : "rgba(52,211,153,0.10)",
-              }}
+      <div
+        className="relative cursor-pointer overflow-hidden rounded-3xl border px-4 pb-3 pt-4 transition-transform active:scale-[0.98]"
+        onClick={() => onSelectTrack(top.productKey)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelectTrack(top.productKey); }}
+        style={{
+          background: "linear-gradient(160deg, var(--app-bg-surface), var(--app-bg-elevated) 75%)",
+          borderColor: "var(--app-border)",
+          boxShadow: "var(--app-shadow-card), inset 0 1px 0 var(--app-border-strong)",
+        }}
+      >
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+          {/* What moved, spelled out: unit price from → to */}
+          <span className="font-mono text-[14px] font-bold text-app-text-primary" style={NUM_FEAT}>
+            {money(top.baselineUnitPrice, 2)}
+            <span className="mx-1 text-app-text-muted">→</span>
+            {money(top.latestUnitPrice, 2)}
+            <span className="ml-1 text-[10.5px] font-medium text-app-text-muted">/{unitLabel(top.unitType, locale) ?? (tr ? "birim" : "unit")}</span>
+          </span>
+          <span
+            className="rounded-full px-2.5 py-1 font-mono text-[12px] font-bold"
+            style={{
+              ...NUM_FEAT,
+              color: top.deltaRatio > 0 ? UP : DOWN,
+              background: top.deltaRatio > 0 ? "rgba(248,113,113,0.10)" : "rgba(52,211,153,0.10)",
+            }}
+          >
+            {fmtPct(top.deltaRatio, locale)} {tr ? "birim fiyat" : "unit price"}
+          </span>
+        </div>
+        <Sparkline points={top.series.map((p) => p.unitPrice)} rising={top.deltaRatio > 0} />
+      </div>
+
+      {rest.length > 0 && (
+        <div className="mt-3">
+          {rest.map((t) => (
+            <div
+              key={t.name + String(t.packSize)}
+              className="flex cursor-pointer items-center justify-between border-b py-2 transition-colors last:border-b-0 hover:bg-app-bg-surface/50"
+              onClick={() => onSelectTrack(t.productKey)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelectTrack(t.productKey); }}
+              style={{ borderColor: "var(--app-border)" }}
             >
-              {fmtPct(top.deltaRatio, locale)} · {Math.round(top.spanDays / 30)} {tr ? "ay" : "mo"}
-            </span>
-            <span className="font-mono text-[13px] font-bold text-app-text-primary" style={NUM_FEAT}>
-              {money(top.latestUnitPrice, 2)}
-              <span className="ml-1 text-[10.5px] font-medium text-app-text-muted">
-                /{top.unitType ?? (tr ? "birim" : "unit")}
+              <span className="truncate text-[13px] font-medium text-app-text-primary">{trackLabel(t, locale)}</span>
+              <span className="ml-3 flex shrink-0 items-baseline gap-2">
+                <span className="font-mono text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
+                  {money(t.baselineUnitPrice, 2)} → {money(t.latestUnitPrice, 2)}
+                </span>
+                <span className="font-mono text-[12px] font-bold" style={{ ...NUM_FEAT, color: t.deltaRatio > 0 ? UP : DOWN }}>
+                  {fmtPct(t.deltaRatio, locale)}
+                </span>
               </span>
-            </span>
-          </div>
-          <Sparkline points={top.series.map((p) => p.unitPrice)} rising={top.deltaRatio > 0} />
-          {rest.length > 0 && (
-            <div className="mt-4 border-t pt-3" style={{ borderColor: "var(--app-border)" }}>
-              <StaggerList>
-                {rest.map((t) => (
-                  <div key={t.name + String(t.packSize)} className="flex items-center justify-between py-1.5">
-                    <span className="truncate text-[13px] font-medium text-app-text-primary">{trackLabel(t)}</span>
-                    <span
-                      className="ml-3 shrink-0 font-mono text-[12px] font-bold"
-                      style={{ ...NUM_FEAT, color: t.deltaRatio > 0 ? UP : DOWN }}
-                    >
-                      {fmtPct(t.deltaRatio, locale)}
-                    </span>
-                  </div>
-                ))}
-              </StaggerList>
             </div>
-          )}
-        </>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Aynı ürünü birkaç hafta arayla 3+ kez taradığında fiyat serisi burada belirir."
-              : "Scan the same product 3+ times across a few weeks and its price series appears here."
-          }
-        />
+          ))}
+        </div>
       )}
-    </Card>
+    </Band>
   );
 }
 
-function trackLabel(t: PriceTrack): string {
-  const pack = t.packSize && t.unitType ? ` ${t.packSize}${t.unitType}` : "";
+function trackLabel(t: PriceTrack, locale: string): string {
+  const unit = unitLabel(t.unitType, locale);
+  const pack = t.packSize && unit ? ` ${t.packSize}${unit}` : "";
   return `${t.name}${pack}`;
 }
 
@@ -545,7 +661,6 @@ function Sparkline({ points, rising }: { points: number[]; rising: boolean }) {
 
   if (!path) return null;
   const last = path.coords[path.coords.length - 1];
-  const stroke = rising ? "url(#spark-up)" : "url(#spark-down)";
 
   return (
     <svg viewBox="0 0 320 88" className="block w-full" role="img" aria-hidden>
@@ -567,7 +682,7 @@ function Sparkline({ points, rising }: { points: number[]; rising: boolean }) {
       <motion.path
         d={path.d}
         fill="none"
-        stroke={stroke}
+        stroke={rising ? "url(#spark-up)" : "url(#spark-down)"}
         strokeWidth={2.5}
         strokeLinecap="round"
         initial={reduced ? false : { pathLength: 0 }}
@@ -579,85 +694,65 @@ function Sparkline({ points, rising }: { points: number[]; rising: boolean }) {
   );
 }
 
-function MerchantCompareCard({ data, money, tr }: { data: AnalysisPayload | null; money: (n: number, digits?: number) => string; tr: boolean }) {
-  const mc = data?.merchantComparison ?? null;
-  // Density rule: never render a wall — cheapest 3 + priciest 3 tell the story.
-  const sorted = useMemo(
-    () => (mc ? [...mc.rows].sort((a, b) => a.avgUnitPrice - b.avgUnitPrice) : []),
-    [mc]
-  );
+function MerchantCompareSection({
+  mc,
+  money,
+  tr,
+}: {
+  mc: NonNullable<AnalysisPayload["merchantComparison"]>;
+  money: (n: number, digits?: number) => string;
+  tr: boolean;
+}) {
+  const sorted = useMemo(() => [...mc.rows].sort((a, b) => a.avgUnitPrice - b.avgUnitPrice), [mc]);
   const rows = sorted.length > 6 ? [...sorted.slice(0, 3), ...sorted.slice(-3)] : sorted;
   const hiddenCount = sorted.length - rows.length;
   const max = rows.length > 0 ? Math.max(...rows.map((r) => r.avgUnitPrice)) : 0;
 
   return (
-    <Card
-      icon={<Store size={16} strokeWidth={2} />}
+    <Band
+      icon={Store}
       eyebrow={tr ? "Nerede daha ucuz?" : "Where is it cheaper?"}
       title={tr ? "Aynı ürünler, farklı market" : "Same products, different stores"}
-      subtitle={
-        mc
-          ? tr
-            ? `${mc.itemCount} ortak ürün üzerinden, senin fişlerinden`
-            : `Across ${mc.itemCount} shared products, from your receipts`
-          : undefined
-      }
+      subtitle={tr ? `${mc.itemCount} ortak ürün üzerinden, senin fişlerinden` : `Across ${mc.itemCount} shared products, from your receipts`}
     >
-      {mc && rows.length >= 2 ? (
-        <>
-          {mc.items.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-1.5">
-              {mc.items.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border px-2.5 py-1 text-[11px] font-medium text-app-text-secondary"
-                  style={{ borderColor: "var(--app-border-strong)", background: "var(--app-bg-surface3)" }}
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          )}
-          <StaggerList>
-            {rows.map((row, i) => (
-              <MetricBar
-                key={row.merchant}
-                label={row.merchant}
-                valueText={money(row.avgUnitPrice, 2)}
-                ratio={max > 0 ? row.avgUnitPrice / max : 0}
-                color={
-                  i === 0
-                    ? "linear-gradient(90deg, #0d9488, #34D399)"
-                    : i === rows.length - 1
-                      ? "linear-gradient(90deg, #b91c1c, #F87171)"
-                      : undefined
-                }
-              />
-            ))}
-          </StaggerList>
-          {hiddenCount > 0 && (
-            <div className="mt-2 text-[11px] text-app-text-muted" style={NUM_FEAT}>
-              {tr
-                ? `+ aradaki ${hiddenCount} market gizlendi — uçlar gösteriliyor`
-                : `+ ${hiddenCount} stores in between hidden — showing the extremes`}
-            </div>
-          )}
-        </>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Aynı ürünü iki farklı markette aldığında karşılaştırma burada belirir."
-              : "Buy the same product at two different stores and the comparison appears here."
+      {mc.items.length > 0 && (
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          {mc.items.map((item) => (
+            <span
+              key={item}
+              className="rounded-full border px-2.5 py-1 text-[11px] font-medium text-app-text-secondary"
+              style={{ borderColor: "var(--app-border-strong)", background: "var(--app-bg-surface3)" }}
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      )}
+      {rows.map((row, i) => (
+        <MetricBar
+          key={row.merchant}
+          label={row.merchant}
+          valueText={money(row.avgUnitPrice, 2)}
+          ratio={max > 0 ? row.avgUnitPrice / max : 0}
+          color={
+            i === 0
+              ? "linear-gradient(90deg, #0d9488, #34D399)"
+              : i === rows.length - 1
+                ? "linear-gradient(90deg, #b91c1c, #F87171)"
+                : undefined
           }
         />
+      ))}
+      {hiddenCount > 0 && (
+        <div className="mt-2 text-[11px] text-app-text-muted" style={NUM_FEAT}>
+          {tr ? `+ aradaki ${hiddenCount} market gizlendi — uçlar gösteriliyor` : `+ ${hiddenCount} stores in between hidden — showing the extremes`}
+        </div>
       )}
-    </Card>
+    </Band>
   );
 }
 
-function UnitTrapCard({
+function UnitTrapSection({
   traps,
   money,
   tr,
@@ -669,121 +764,93 @@ function UnitTrapCard({
   locale: string;
 }) {
   return (
-    <Card
-      icon={<Scale size={16} strokeWidth={2} />}
+    <Band
+      icon={Scale}
       eyebrow={tr ? "Birim fiyat" : "Unit price"}
       title={tr ? "Küçük paket tuzağı" : "The small-pack trap"}
       subtitle={tr ? "Birim bazında pahalıya gelen alımların" : "Purchases that cost more per unit"}
     >
-      {traps.length > 0 ? (
-        <StaggerList>
-          {traps.map((trap) => (
-            <div
-              key={trap.name + String(trap.packSize)}
-              className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
-              style={{ borderColor: "var(--app-border)" }}
-            >
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: "var(--app-bg-surface3)", color: "var(--app-text-secondary)" }}
-              >
-                <Package size={15} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[13.5px] font-semibold text-app-text-primary">
-                  {trap.name} {trap.packSize}
-                  {trap.unitType}
-                </div>
-                <div className="text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
-                  {tr
-                    ? `Birimde ${money(trap.perUnitPaid, 2)} · ${trap.altPackSize}${trap.unitType} boyu ${fmtPct(trap.savingsRatio, locale, false)} ucuz`
-                    : `${money(trap.perUnitPaid, 2)} per unit · ${trap.altPackSize}${trap.unitType} size is ${fmtPct(trap.savingsRatio, locale, false)} cheaper`}
-                </div>
-              </div>
-              <span className="shrink-0 font-mono text-[12px] font-bold" style={{ ...NUM_FEAT, color: UP }}>
-                {fmtPct(trap.savingsRatio, locale, false)}
-              </span>
+      {traps.map((trap) => (
+        <div
+          key={trap.name + String(trap.packSize)}
+          className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
+          style={{ borderColor: "var(--app-border)" }}
+        >
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "var(--app-bg-surface3)", color: "var(--app-text-secondary)" }}
+          >
+            <Package size={15} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13.5px] font-semibold text-app-text-primary">
+              {trap.name} {trap.packSize}
+              {unitLabel(trap.unitType, locale)}
             </div>
-          ))}
-        </StaggerList>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Aynı ürünün farklı boylarını taradığında birim fiyat karşılaştırması burada belirir."
-              : "Scan different sizes of the same product and the per-unit comparison appears here."
-          }
-        />
-      )}
-    </Card>
+            <div className="text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
+              {tr
+                ? `Birimde ${money(trap.perUnitPaid, 2)} · ${trap.altPackSize}${unitLabel(trap.unitType, locale)} boyu ${fmtPct(trap.savingsRatio, locale, false)} ucuz`
+                : `${money(trap.perUnitPaid, 2)} per unit · ${trap.altPackSize}${unitLabel(trap.unitType, locale)} size is ${fmtPct(trap.savingsRatio, locale, false)} cheaper`}
+            </div>
+          </div>
+          <span className="shrink-0 font-mono text-[12px] font-bold" style={{ ...NUM_FEAT, color: UP }}>
+            {fmtPct(trap.savingsRatio, locale, false)}
+          </span>
+        </div>
+      ))}
+    </Band>
   );
 }
 
-function HeatmapCard({ data, tr, locale }: { data: AnalysisPayload | null; tr: boolean; locale: string }) {
-  const hm = data?.timeHeatmap ?? null;
+function HeatmapSection({ hm, tr, locale }: { hm: NonNullable<AnalysisPayload["timeHeatmap"]>; tr: boolean; locale: string }) {
   const days = tr ? ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"] : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const slots = tr ? ["Sabah", "Öğlen", "Akşam", "Gece"] : ["Morning", "Noon", "Evening", "Night"];
-  const max = hm ? Math.max(1, ...hm.grid.flat()) : 1;
+  const max = Math.max(1, ...hm.grid.flat());
 
   return (
-    <Card
-      icon={<Clock3 size={16} strokeWidth={2} />}
+    <Band
+      icon={Clock3}
       eyebrow={tr ? "Zaman alışkanlığı" : "Time habits"}
       title={tr ? "Ne zaman harcıyorsun?" : "When do you spend?"}
       subtitle={
-        hm?.nightShare != null
+        hm.nightShare != null
           ? tr
             ? `Alışverişlerinin ${fmtPct(hm.nightShare, locale, false)} kadarı 21:00 sonrası`
             : `${fmtPct(hm.nightShare, locale, false)} of your purchases happen after 9pm`
           : undefined
       }
     >
-      {hm && hm.sampleSize > 0 ? (
-        <div className="grid grid-cols-[52px_repeat(7,1fr)] gap-1.5 text-[10px] text-app-text-muted">
-          <div />
-          {days.map((d) => (
-            <div key={d} className="text-center">
-              {d}
-            </div>
-          ))}
-          {hm.grid.map((row, ri) => (
-            <Fragment key={ri}>
-              <div className="flex items-center">{slots[ri]}</div>
-              {row.map((count, ci) => {
-                const intensity = count / max;
-                return (
-                  <div
-                    key={`${ri}-${ci}`}
-                    className="aspect-square rounded-md"
-                    title={`${count}`}
-                    style={{
-                      background:
-                        count === 0
-                          ? "var(--app-bg-surface3)"
-                          : `rgba(201,168,76,${0.14 + intensity * 0.72})`,
-                    }}
-                  />
-                );
-              })}
-            </Fragment>
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Fişlerinde saat bilgisi okunabildiğinde harcama saatlerin burada belirir."
-              : "When your receipts carry a readable time of day, your spending hours appear here."
-          }
-        />
-      )}
-    </Card>
+      <div className="grid grid-cols-[52px_repeat(7,1fr)] gap-1.5 text-[10px] text-app-text-muted">
+        <div />
+        {days.map((d) => (
+          <div key={d} className="text-center">
+            {d}
+          </div>
+        ))}
+        {hm.grid.map((row, ri) => (
+          <Fragment key={ri}>
+            <div className="flex items-center">{slots[ri]}</div>
+            {row.map((count, ci) => {
+              const intensity = count / max;
+              return (
+                <div
+                  key={`${ri}-${ci}`}
+                  className="aspect-square rounded-md"
+                  title={`${count}`}
+                  style={{
+                    background: count === 0 ? "var(--app-bg-surface3)" : `rgba(201,168,76,${0.14 + intensity * 0.72})`,
+                  }}
+                />
+              );
+            })}
+          </Fragment>
+        ))}
+      </div>
+    </Band>
   );
 }
 
-function LoyaltyCard({
+function LoyaltySection({
   items,
   money,
   tr,
@@ -795,59 +862,40 @@ function LoyaltyCard({
   locale: string;
 }) {
   return (
-    <Card
-      icon={<Repeat size={16} strokeWidth={2} />}
+    <Band
+      icon={Repeat}
       eyebrow={tr ? "Sadakat maliyeti" : "Loyalty cost"}
       title={tr ? "En sık aldıkların" : "Your most frequent buys"}
       subtitle={tr ? "Yıllıklandırılmış harcama, kendi fişlerinden" : "Annualised spend, from your receipts"}
     >
-      {items.length > 0 ? (
-        <StaggerList>
-          {items.map((item) => (
-            <div
-              key={item.name}
-              className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
-              style={{ borderColor: "var(--app-border)" }}
-            >
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: "var(--app-bg-surface3)", color: "var(--app-text-secondary)" }}
-              >
-                <Coffee size={15} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[13.5px] font-semibold text-app-text-primary">{item.name}</div>
-                <div className="text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
-                  {tr
-                    ? `Ayda ${Math.round(item.purchasesPerMonth)} kez`
-                    : `${Math.round(item.purchasesPerMonth)}× per month`}
-                </div>
-              </div>
-              <div className="shrink-0 text-right">
-                <div className="font-mono text-[13px] font-bold text-app-text-primary" style={NUM_FEAT}>
-                  {money(item.annualizedSpend)}
-                  <span className="text-[10.5px] font-medium text-app-text-muted">/{tr ? "yıl" : "yr"}</span>
-                </div>
-                {item.deltaRatio != null && (
-                  <div className="font-mono text-[11px] font-semibold" style={{ ...NUM_FEAT, color: item.deltaRatio > 0 ? UP : DOWN }}>
-                    {item.deltaRatio > 0 ? "▲" : "▼"} {fmtPct(item.deltaRatio, locale, false)}
-                  </div>
-                )}
-              </div>
+      {items.map((item) => (
+        <div key={item.name} className="flex items-center gap-3 border-b py-2.5 last:border-b-0" style={{ borderColor: "var(--app-border)" }}>
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "var(--app-bg-surface3)", color: "var(--app-text-secondary)" }}
+          >
+            <ShoppingBasket size={15} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13.5px] font-semibold text-app-text-primary">{item.name}</div>
+            <div className="text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
+              {tr ? `Ayda ${Math.round(item.purchasesPerMonth)} kez` : `${Math.round(item.purchasesPerMonth)}× per month`}
             </div>
-          ))}
-        </StaggerList>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Düzenli aldığın ürünler netleştikçe yıllık maliyetleri burada belirir."
-              : "As your regular purchases build up, their yearly cost appears here."
-          }
-        />
-      )}
-    </Card>
+          </div>
+          <div className="shrink-0 text-right">
+            <div className="font-mono text-[13px] font-bold text-app-text-primary" style={NUM_FEAT}>
+              {money(item.annualizedSpend)}
+              <span className="text-[10.5px] font-medium text-app-text-muted">/{tr ? "yıl" : "yr"}</span>
+            </div>
+            {item.deltaRatio != null && item.deltaRatio !== 0 && (
+              <div className="font-mono text-[11px] font-semibold" style={{ ...NUM_FEAT, color: item.deltaRatio > 0 ? UP : DOWN }}>
+                {item.deltaRatio > 0 ? "▲" : "▼"} {fmtPct(item.deltaRatio, locale, false)} {tr ? "birim fiyat" : "unit price"}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </Band>
   );
 }
 
@@ -855,22 +903,84 @@ function LoyaltyCard({
 // DEEP
 // ────────────────────────────────────────────────────────────────────────────
 
-function DeepPanel({ data, loading, money, tr, locale }: PanelProps) {
+function DeepPanel({ data, money, tr, locale }: PanelProps) {
+  const pi = data?.personalInflation ?? null;
+  const hits = data?.shrinkflation ?? [];
+  const pp = data?.purchasingPower ?? null;
+  const league = (data?.categoryLeague ?? []).filter((r) => r.personalPct != null || r.officialPct != null);
+
+  const pending: Array<{ icon: LucideIcon; label: string; hint: string }> = [];
+  if (!pi)
+    pending.push({
+      icon: Gauge,
+      label: tr ? "Kişisel enflasyon" : "Personal inflation",
+      hint: tr ? "En az 3 aylık tekrar-alım verisiyle açılır." : "Opens with 3+ months of repeat-purchase data.",
+    });
+  if (hits.length === 0)
+    pending.push({
+      icon: PackageMinus,
+      label: tr ? "Gramaj takibi" : "Shrink tracking",
+      hint: tr ? "Paket boyu okunabilen tekrar alımlar gerekir." : "Needs repeat purchases with readable pack sizes.",
+    });
+
   return (
-    <>
-      <InflationGauge data={data} tr={tr} locale={locale} />
-      <ShrinkflationCard hits={data?.shrinkflation ?? []} tr={tr} locale={locale} />
-      <PurchasingPowerCard data={data} money={money} tr={tr} locale={locale} />
-      <CategoryLeagueCard rows={data?.categoryLeague ?? []} tr={tr} locale={locale} />
-    </>
+    <div className="mt-6">
+      {pi ? <InflationGauge pi={pi} tr={tr} locale={locale} /> : null}
+
+      {hits.length > 0 && (
+        <>
+          {pi && <Hairline />}
+          <ShrinkflationSection hits={hits} tr={tr} locale={locale} />
+        </>
+      )}
+
+      {pp && pp.steps.length > 0 && (
+        <>
+          {(pi || hits.length > 0) && <Hairline />}
+          <Band
+            icon={TrendingDown}
+            eyebrow={tr ? "Satın alma gücü" : "Purchasing power"}
+            title={tr ? "Zaman makinesi" : "Time machine"}
+            subtitle={
+              tr
+                ? `Bugünkü ${money(pp.baseAmount)} geçmişte neye denkti · kaynak: ${pp.source}`
+                : `What today's ${money(pp.baseAmount)} was worth before · source: ${pp.source}`
+            }
+          >
+            <MetricBar label={tr ? "Bugün" : "Today"} valueText={money(pp.baseAmount)} ratio={1} bold />
+            {pp.steps.map((step) => (
+              <MetricBar
+                key={step.monthsAgo}
+                label={tr ? `${step.monthsAgo} ay önce` : `${step.monthsAgo} mo ago`}
+                valueText={money(step.equivalentValue)}
+                ratio={step.equivalentValue / pp.baseAmount}
+                color="linear-gradient(90deg, var(--app-bg-surface3), var(--app-gold-dim))"
+              />
+            ))}
+          </Band>
+        </>
+      )}
+
+      {league.length > 0 && (
+        <>
+          <Hairline />
+          <CategoryLeagueSection rows={league} tr={tr} locale={locale} />
+        </>
+      )}
+
+      {pending.length > 0 && (
+        <>
+          <Hairline />
+          <PendingStrip tr={tr} entries={pending} />
+        </>
+      )}
+    </div>
   );
 }
 
-/** Signature surface — personal inflation vs the official index. */
-function InflationGauge({ data, tr, locale }: { data: AnalysisPayload | null; tr: boolean; locale: string }) {
-  const pi = data?.personalInflation ?? null;
+/** Signature surface #2 — personal inflation vs the official index. */
+function InflationGauge({ pi, tr, locale }: { pi: NonNullable<AnalysisPayload["personalInflation"]>; tr: boolean; locale: string }) {
   const reduced = useReducedMotion();
-
   return (
     <section
       className="relative overflow-hidden rounded-3xl border px-5 pb-5 pt-5 sm:px-6"
@@ -884,208 +994,118 @@ function InflationGauge({ data, tr, locale }: { data: AnalysisPayload | null; tr
         className="pointer-events-none absolute -left-16 -top-24 h-64 w-64 rounded-full"
         style={{ background: "radial-gradient(closest-side, var(--app-gold-glow), transparent)" }}
       />
-      <div className="flex items-center gap-3">
-        <span
-          className="flex h-9 w-9 items-center justify-center rounded-2xl"
-          style={{
-            background: "linear-gradient(160deg, rgba(232,201,122,0.24), rgba(201,168,76,0.06))",
-            border: "1px solid var(--app-gold-border)",
-            color: "var(--app-gold-light)",
-          }}
-        >
-          <Gauge size={16} strokeWidth={2} />
-        </span>
-        <div className={TXT_MINI_CAPS} style={{ color: "var(--app-gold)" }}>
+      <div className="flex items-center gap-2">
+        <Gauge size={14} strokeWidth={2.2} style={{ color: "var(--app-gold)" }} />
+        <span className={TXT_MINI_CAPS} style={{ color: "var(--app-gold)" }}>
           {tr ? "Kişisel enflasyon" : "Personal inflation"}
-        </div>
+        </span>
       </div>
 
-      {pi ? (
-        <>
-          <motion.div
-            className="mt-3 flex items-baseline gap-2"
-            initial={reduced ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <span
-              className="font-mono text-[44px] font-bold leading-none tracking-[-0.03em]"
-              style={{
-                ...NUM_FEAT,
-                background: "linear-gradient(140deg, var(--app-gold-light), var(--app-gold-dim))",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              {fmtPct(pi.personalPct, locale, false)}
-            </span>
-            <span className="text-[13px] text-app-text-secondary">
-              {tr
-                ? `senin sepetin · son ${Math.round(pi.windowDays / 30)} ay, yıllıklandırılmış`
-                : `your basket · last ${Math.round(pi.windowDays / 30)} months, annualised`}
-            </span>
-          </motion.div>
+      <motion.div
+        className="mt-3 flex items-baseline gap-2"
+        initial={reduced ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <span
+          className="font-mono text-[44px] font-bold leading-none tracking-[-0.03em]"
+          style={{
+            ...NUM_FEAT,
+            background: "linear-gradient(140deg, var(--app-gold-light), var(--app-gold-dim))",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+          }}
+        >
+          {fmtPct(pi.personalPct, locale, false)}
+        </span>
+        <span className="text-[13px] text-app-text-secondary">
+          {tr
+            ? `senin sepetin · son ${Math.round(pi.windowDays / 30)} ay, yıllıklandırılmış`
+            : `your basket · last ${Math.round(pi.windowDays / 30)} months, annualised`}
+        </span>
+      </motion.div>
 
-          {pi.officialPct != null && (
-            <div className="mt-4">
-              <div className="relative h-[12px] rounded-full" style={{ background: "var(--app-bg-surface3)" }}>
-                <motion.div
-                  className="absolute bottom-0 left-0 top-0 rounded-full"
-                  initial={reduced ? false : { width: 0 }}
-                  animate={{
-                    width: `${Math.min(100, (pi.personalPct / Math.max(pi.personalPct, pi.officialPct) || 1) * 100)}%`,
-                  }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  style={{ background: "linear-gradient(90deg, var(--app-gold-dim), var(--app-gold-light))" }}
-                />
-                <div
-                  className="absolute -bottom-1 -top-1 w-[2px] rounded-full"
-                  style={{
-                    left: `${Math.min(98, (pi.officialPct / Math.max(pi.personalPct, pi.officialPct)) * 100)}%`,
-                    background: "#34D399",
-                  }}
-                />
-              </div>
-              <div className="mt-2 flex justify-between text-[12px] text-app-text-secondary" style={NUM_FEAT}>
-                <span>
-                  {tr ? "Sen" : "You"}:{" "}
-                  <b style={{ color: "var(--app-gold-light)" }}>{fmtPct(pi.personalPct, locale, false)}</b>
-                </span>
-                <span>
-                  {pi.officialSource ?? "CPI"}:{" "}
-                  <b style={{ color: "#34D399" }}>{fmtPct(pi.officialPct, locale, false)}</b>
-                </span>
-              </div>
-              <p className="mt-3 text-[11.5px] leading-relaxed text-app-text-muted">
-                {tr
-                  ? `Gerçek fişlerinden, ${pi.productCount} ürün serisi üzerinden hesaplandı. Resmî endeksle fark ${fmtPct(Math.abs(pi.personalPct - pi.officialPct), locale, false)}.`
-                  : `Computed from your real receipts across ${pi.productCount} product series. The gap to the official index is ${fmtPct(Math.abs(pi.personalPct - pi.officialPct), locale, false)}.`}
-              </p>
-            </div>
-          )}
-        </>
-      ) : (
+      {pi.officialPct != null && (
         <div className="mt-4">
-          <EmptyState
-            tr={tr}
-            hint={
-              tr
-                ? "Kişisel enflasyon için en az 3 ay boyunca tekrar alınan ürün verisi gerekir. Tarama sürdükçe burada belirir."
-                : "Personal inflation needs at least 3 months of repeat-purchase data. Keep scanning and it appears here."
-            }
-          />
+          <div className="relative h-[12px] rounded-full" style={{ background: "var(--app-bg-surface3)" }}>
+            <motion.div
+              className="absolute bottom-0 left-0 top-0 rounded-full"
+              initial={reduced ? false : { width: 0 }}
+              animate={{ width: `${Math.min(100, (pi.personalPct / Math.max(pi.personalPct, pi.officialPct) || 1) * 100)}%` }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              style={{ background: "linear-gradient(90deg, var(--app-gold-dim), var(--app-gold-light))" }}
+            />
+            <div
+              className="absolute -bottom-1 -top-1 w-[2px] rounded-full"
+              style={{
+                left: `${Math.min(98, (pi.officialPct / Math.max(pi.personalPct, pi.officialPct)) * 100)}%`,
+                background: "#34D399",
+              }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-[12px] text-app-text-secondary" style={NUM_FEAT}>
+            <span>
+              {tr ? "Sen" : "You"}: <b style={{ color: "var(--app-gold-light)" }}>{fmtPct(pi.personalPct, locale, false)}</b>
+            </span>
+            <span>
+              {pi.officialSource ?? "CPI"}: <b style={{ color: "#34D399" }}>{fmtPct(pi.officialPct, locale, false)}</b>
+            </span>
+          </div>
+          <p className="mt-3 text-[11.5px] leading-relaxed text-app-text-muted">
+            {tr
+              ? `Gerçek fişlerinden, ${pi.productCount} ürün serisi üzerinden hesaplandı. Resmî endeksle fark ${fmtPct(Math.abs(pi.personalPct - pi.officialPct), locale, false)}.`
+              : `Computed from your real receipts across ${pi.productCount} product series. The gap to the official index is ${fmtPct(Math.abs(pi.personalPct - pi.officialPct), locale, false)}.`}
+          </p>
         </div>
       )}
     </section>
   );
 }
 
-function ShrinkflationCard({ hits, tr, locale }: { hits: ShrinkflationHit[]; tr: boolean; locale: string }) {
+function ShrinkflationSection({ hits, tr, locale }: { hits: ShrinkflationHit[]; tr: boolean; locale: string }) {
   return (
-    <Card
-      icon={<PackageMinus size={16} strokeWidth={2} />}
+    <Band
+      icon={PackageMinus}
       eyebrow={tr ? "Gramaj takibi" : "Shrink tracking"}
       title={tr ? "Gizli zamlar" : "Hidden increases"}
       subtitle={tr ? "Fiyat sabit kaldı, paket küçüldü" : "The price held while the pack shrank"}
     >
-      {hits.length > 0 ? (
-        <StaggerList>
-          {hits.map((hit) => (
-            <div
-              key={hit.name + hit.observedAt}
-              className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
-              style={{ borderColor: "var(--app-border)" }}
-            >
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: "rgba(248,113,113,0.08)", color: UP }}
-              >
-                <PackageMinus size={15} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[13.5px] font-semibold text-app-text-primary">
-                  {hit.brand ? `${hit.brand} ` : ""}
-                  {hit.name}
-                </div>
-                <div className="text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
-                  {hit.oldPackSize}
-                  {hit.unitType} → {hit.newPackSize}
-                  {hit.unitType} · {hit.observedAt.slice(0, 7)}
-                </div>
-              </div>
-              <span className="shrink-0 font-mono text-[12px] font-bold" style={{ ...NUM_FEAT, color: UP }}>
-                {tr ? "gizli " : "hidden "}
-                {fmtPct(hit.impliedPct, locale)}
-              </span>
+      {hits.map((hit) => (
+        <div key={hit.name + hit.observedAt} className="flex items-center gap-3 border-b py-2.5 last:border-b-0" style={{ borderColor: "var(--app-border)" }}>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(248,113,113,0.08)", color: UP }}>
+            <PackageMinus size={15} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13.5px] font-semibold text-app-text-primary">
+              {hit.brand ? `${hit.brand} ` : ""}
+              {hit.name}
             </div>
-          ))}
-        </StaggerList>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Aynı ürünün paket boyu senin fişlerinde küçülürse burada yakalanır."
-              : "If a product's pack size shrinks across your receipts, it gets caught here."
-          }
-        />
-      )}
-    </Card>
-  );
-}
-
-function PurchasingPowerCard({ data, money, tr, locale }: { data: AnalysisPayload | null; money: (n: number, digits?: number) => string; tr: boolean; locale: string }) {
-  const pp = data?.purchasingPower ?? null;
-  return (
-    <Card
-      icon={<TrendingDown size={16} strokeWidth={2} />}
-      eyebrow={tr ? "Satın alma gücü" : "Purchasing power"}
-      title={tr ? "Zaman makinesi" : "Time machine"}
-      subtitle={
-        pp
-          ? tr
-            ? `Bugünkü ${money(pp.baseAmount)} geçmişte neye denkti · kaynak: ${pp.source}`
-            : `What today's ${money(pp.baseAmount)} was worth before · source: ${pp.source}`
-          : undefined
-      }
-    >
-      {pp && pp.steps.length > 0 ? (
-        <StaggerList>
-          {[
-            <MetricBar key="now" label={tr ? "Bugün" : "Today"} valueText={money(pp.baseAmount)} ratio={1} bold />,
-            ...pp.steps.map((step) => (
-              <MetricBar
-                key={step.monthsAgo}
-                label={tr ? `${step.monthsAgo} ay önce` : `${step.monthsAgo} mo ago`}
-                valueText={money(step.equivalentValue)}
-                ratio={step.equivalentValue / pp.baseAmount}
-                color="linear-gradient(90deg, var(--app-bg-surface3), var(--app-gold-dim))"
-              />
-            )),
-          ]}
-        </StaggerList>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Ülkenin resmî fiyat endeksi bağlandığında bu karşılaştırma burada belirir."
-              : "Once your country's official price index is connected, this comparison appears here."
-          }
-        />
-      )}
-    </Card>
+            <div className="text-[11.5px] text-app-text-muted" style={NUM_FEAT}>
+              {hit.oldPackSize}
+              {unitLabel(hit.unitType, locale)} → {hit.newPackSize}
+              {unitLabel(hit.unitType, locale)} · {hit.observedAt.slice(0, 7)}
+            </div>
+          </div>
+          <span className="shrink-0 font-mono text-[12px] font-bold" style={{ ...NUM_FEAT, color: UP }}>
+            {tr ? "gizli " : "hidden "}
+            {fmtPct(hit.impliedPct, locale)}
+          </span>
+        </div>
+      ))}
+    </Band>
   );
 }
 
 const CATEGORY_LABELS: Record<string, { tr: string; en: string }> = {
   grocery: { tr: "Market", en: "Grocery" },
+  groceries: { tr: "Market", en: "Grocery" },
   food_drink: { tr: "Yeme & İçme", en: "Food & drink" },
   restaurant: { tr: "Restoran", en: "Restaurant" },
   cafe: { tr: "Kafe", en: "Café" },
   fuel: { tr: "Yakıt", en: "Fuel" },
   pharmacy_health: { tr: "Sağlık", en: "Health" },
+  pharmacy: { tr: "Sağlık", en: "Health" },
   health: { tr: "Sağlık", en: "Health" },
   electronics: { tr: "Elektronik", en: "Electronics" },
   apparel: { tr: "Giyim", en: "Apparel" },
@@ -1093,6 +1113,10 @@ const CATEGORY_LABELS: Record<string, { tr: string; en: string }> = {
   services: { tr: "Hizmetler", en: "Services" },
   home: { tr: "Ev", en: "Home" },
   entertainment: { tr: "Eğlence", en: "Entertainment" },
+  cosmetics: { tr: "Kozmetik", en: "Cosmetics" },
+  alcohol: { tr: "Alkollü içecek", en: "Alcohol" },
+  tobacco: { tr: "Tütün", en: "Tobacco" },
+  pets: { tr: "Evcil hayvan", en: "Pets" },
   other: { tr: "Diğer", en: "Other" },
 };
 
@@ -1112,48 +1136,32 @@ const LEAGUE_PALETTE = [
   "linear-gradient(90deg, #64748b, #94a3b8)", // slate
 ];
 
-function CategoryLeagueCard({ rows, tr, locale }: { rows: CategoryInflationRow[]; tr: boolean; locale: string }) {
-  const usable = rows.filter((r) => r.personalPct != null || r.officialPct != null);
-  const max = Math.max(0.01, ...usable.map((r) => Math.abs(r.personalPct ?? r.officialPct ?? 0)));
-
+function CategoryLeagueSection({ rows, tr, locale }: { rows: CategoryInflationRow[]; tr: boolean; locale: string }) {
+  const max = Math.max(0.01, ...rows.map((r) => Math.abs(r.personalPct ?? r.officialPct ?? 0)));
   return (
-    <Card
-      icon={<TrendingUp size={16} strokeWidth={2} />}
+    <Band
+      icon={TrendingUp}
       eyebrow={tr ? "Kategori ligi" : "Category league"}
       title={tr ? "Senin verinde en hızlı zamlananlar" : "Fastest risers in your data"}
       subtitle={tr ? "Yıllık, kendi fişlerinden" : "Yearly, from your receipts"}
     >
-      {usable.length > 0 ? (
-        <StaggerList>
-          {usable
-            .slice()
-            .sort((a, b) => (b.personalPct ?? b.officialPct ?? 0) - (a.personalPct ?? a.officialPct ?? 0))
-            .slice(0, 6)
-            .map((row, i) => {
-              const val = row.personalPct ?? row.officialPct ?? 0;
-              return (
-                <MetricBar
-                  key={row.category}
-                  label={categoryLabel(row.category, tr)}
-                  valueText={fmtPct(val, locale, false)}
-                  ratio={Math.abs(val) / max}
-                  // Chart color rule (2026-06-20): every bar gets its own positional color.
-                  color={LEAGUE_PALETTE[i % LEAGUE_PALETTE.length]}
-                />
-              );
-            })}
-        </StaggerList>
-      ) : (
-        <EmptyState
-          tr={tr}
-          hint={
-            tr
-              ? "Kategori bazlı enflasyon için birkaç aylık tarama geçmişi gerekir."
-              : "Category-level inflation needs a few months of scanning history."
-          }
-        />
-      )}
-    </Card>
+      {rows
+        .slice()
+        .sort((a, b) => (b.personalPct ?? b.officialPct ?? 0) - (a.personalPct ?? a.officialPct ?? 0))
+        .slice(0, 6)
+        .map((row, i) => {
+          const val = row.personalPct ?? row.officialPct ?? 0;
+          return (
+            <MetricBar
+              key={row.category}
+              label={categoryLabel(row.category, tr)}
+              valueText={fmtPct(val, locale, false)}
+              ratio={Math.abs(val) / max}
+              color={LEAGUE_PALETTE[i % LEAGUE_PALETTE.length]}
+            />
+          );
+        })}
+    </Band>
   );
 }
 
@@ -1164,62 +1172,55 @@ function CategoryLeagueCard({ rows, tr, locale }: { rows: CategoryInflationRow[]
 function CommunityPanel({ data, money, tr }: PanelProps) {
   const com = data?.community ?? null;
   const rows = com?.cities ?? [];
+  const hasData = rows.length >= 2 && com?.userAvgBasket != null;
   const max = Math.max(0.01, ...rows.map((c) => c.avgBasket), com?.userAvgBasket ?? 0);
 
   return (
-    <>
-      <Card
-        icon={<Users size={16} strokeWidth={2} />}
-        eyebrow={tr ? "Topluluk karşılaştırması" : "Community comparison"}
-        title={tr ? "Ortalama sepete kim ne ödüyor?" : "What does the average basket cost?"}
-        subtitle={tr ? "Anonim, şehir bazlı Yumo Yumo verisi" : "Anonymous, city-level Yumo Yumo data"}
-      >
-        {rows.length >= 2 && com?.userAvgBasket != null ? (
-          <>
-            <StaggerList>
-              {[
-                ...rows.map((c) => (
-                  <MetricBar
-                    key={c.city}
-                    label={
-                      <span className="flex items-center gap-1.5">
-                        <MapPin size={11} style={{ color: "var(--app-text-muted)" }} />
-                        {c.city}
-                      </span>
-                    }
-                    valueText={money(c.avgBasket)}
-                    ratio={c.avgBasket / max}
-                    color="linear-gradient(90deg, var(--app-text-muted), var(--app-text-secondary))"
-                  />
-                )),
-                <MetricBar
-                  key="you"
-                  label={tr ? "Sen" : "You"}
-                  valueText={money(com.userAvgBasket)}
-                  ratio={com.userAvgBasket / max}
-                  bold
-                />,
-              ]}
-            </StaggerList>
-            {com.city && (
-              <p className="mt-3 text-[11.5px] leading-relaxed text-app-text-muted">
-                {tr
-                  ? `Karşılaştırma yalnız yeterli katkıcısı olan şehirleri içerir. Senin şehrin: ${com.city}.`
-                  : `The comparison only includes cities with enough contributors. Your city: ${com.city}.`}
-              </p>
-            )}
-          </>
-        ) : (
-          <EmptyState
-            tr={tr}
-            hint={
-              tr
-                ? "Şehir karşılaştırması, yeterli sayıda katkıcı toplandığında açılır. Fiş taradıkça topluluğu sen de büyütürsün."
-                : "City comparison opens once enough contributors join. Every receipt you scan grows the pool."
-            }
-          />
-        )}
-      </Card>
-    </>
+    <div className="mt-6">
+      {hasData ? (
+        <Band
+          icon={Users}
+          eyebrow={tr ? "Topluluk karşılaştırması" : "Community comparison"}
+          title={tr ? "Ortalama sepete kim ne ödüyor?" : "What does the average basket cost?"}
+          subtitle={tr ? "Anonim, şehir bazlı Yumo Yumo verisi" : "Anonymous, city-level Yumo Yumo data"}
+        >
+          {rows.map((c) => (
+            <MetricBar
+              key={c.city}
+              label={
+                <span className="flex items-center gap-1.5">
+                  <MapPin size={11} style={{ color: "var(--app-text-muted)" }} />
+                  {c.city}
+                </span>
+              }
+              valueText={money(c.avgBasket)}
+              ratio={c.avgBasket / max}
+              color="linear-gradient(90deg, var(--app-text-muted), var(--app-text-secondary))"
+            />
+          ))}
+          <MetricBar label={tr ? "Sen" : "You"} valueText={money(com!.userAvgBasket!)} ratio={com!.userAvgBasket! / max} bold />
+          {com?.city && (
+            <p className="mt-3 text-[11.5px] leading-relaxed text-app-text-muted">
+              {tr
+                ? `Karşılaştırma yalnız yeterli katkıcısı olan şehirleri içerir. Senin şehrin: ${com.city}.`
+                : `The comparison only includes cities with enough contributors. Your city: ${com.city}.`}
+            </p>
+          )}
+        </Band>
+      ) : (
+        <PendingStrip
+          tr={tr}
+          entries={[
+            {
+              icon: Users,
+              label: tr ? "Şehir karşılaştırması" : "City comparison",
+              hint: tr
+                ? "Yeterli sayıda katkıcı toplandığında açılır — her fiş havuzu büyütür."
+                : "Opens once enough contributors join — every receipt grows the pool.",
+            },
+          ]}
+        />
+      )}
+    </div>
   );
 }

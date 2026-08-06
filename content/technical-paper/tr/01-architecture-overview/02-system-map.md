@@ -16,7 +16,7 @@ flowchart LR
 
     subgraph Data["Zincir dışı veri"]
         E[("Fiş kayıtları")]
-        F[("bINT / ePoints defteri")]
+        F[("bINT defteri")]
         G["Anonim toplamlar"]
     end
 
@@ -30,9 +30,9 @@ flowchart LR
     D --> E
     D --> F
     E --> G
-    F -. "gruplu mutabakat" .-> H
+    F -. "epoch dağıtım kökü" .-> H
     F -. "taahhüt" .-> J
     H --> I
 ```
 
-Harita açık mimari sınırını gösterir: kullanıcıya dönen önizleme eşzamanlıdır; bINT ve ePoints muhasebesi deftere yazıldıktan sonra mutabakat işçileri tarafından zincir üstü katmana taşınır. Diyagram, protokol bileşenlerini ve veri hareketini gösterir.
+Harita açık mimari sınırını gösterir: kullanıcıya dönen önizleme eşzamanlıdır; bINT muhasebesi zincir dışında kalır. Uygun bINT kredilerinden üretilen INT dağıtım kökü, mutabakat işçileri tarafından zincir üstü katmana taahhüt edilir. Diyagram, protokol bileşenlerini ve veri hareketini gösterir.

@@ -54,6 +54,12 @@ const USER_PROFILE_MERGE_FIELDS: Array<
     | "country"
     | "website"
     | "bio"
+    | "nameColor"
+    | "profileFrame"
+    | "themeAccent"
+    | "profileBg"
+    | "avatarSticker"
+    | "seal"
     | "declaredMonthlyIncomeBand"
     | "honor"
     | "isAdmin"
@@ -69,6 +75,12 @@ const USER_PROFILE_MERGE_FIELDS: Array<
   "country",
   "website",
   "bio",
+  "nameColor",
+  "profileFrame",
+  "themeAccent",
+  "profileBg",
+  "avatarSticker",
+  "seal",
   "declaredMonthlyIncomeBand",
   "honor",
   "isAdmin",
@@ -215,11 +227,17 @@ export type CachedProfilePatch = Partial<
     | "country"
     | "website"
     | "bio"
+    | "nameColor"
+    | "profileFrame"
+    | "themeAccent"
+    | "profileBg"
+    | "avatarSticker"
+    | "seal"
     | "declaredMonthlyIncomeBand"
   >
 >;
 
-export async function patchCachedProfile(patch: CachedProfilePatch): Promise<void> {
+async function patchCachedProfile(patch: CachedProfilePatch): Promise<void> {
   const current = await localDb.get("user_profile", CURRENT_PROFILE_ID);
   if (!current) return;
 
@@ -297,7 +315,7 @@ export async function readCachedProfile(): Promise<{
   return { profile, progress, wallet };
 }
 
-export async function readCachedDashboardSummary(): Promise<CachedDashboardSummaryRecord | null> {
+async function readCachedDashboardSummary(): Promise<CachedDashboardSummaryRecord | null> {
   return localDb.get("dashboard_summary", MONTHLY_DASHBOARD_ID);
 }
 
@@ -324,7 +342,7 @@ export async function readCachedInsights(): Promise<CachedInsightsRecord | null>
   return localDb.get("insights", CURRENT_INSIGHTS_ID);
 }
 
-export async function readCachedAppConfig(): Promise<CachedAppConfigRecord | null> {
+async function readCachedAppConfig(): Promise<CachedAppConfigRecord | null> {
   return localDb.get("app_config", CURRENT_APP_CONFIG_ID);
 }
 
@@ -378,12 +396,12 @@ export async function readBootstrapSnapshot(): Promise<BootstrapSnapshot> {
   };
 }
 
-export async function readCachedBudgets(): Promise<CachedBudgetRecord[]> {
+async function readCachedBudgets(): Promise<CachedBudgetRecord[]> {
   const records = await localDb.list("budgets");
   return records.sort((left, right) => left.category.localeCompare(right.category));
 }
 
-export async function readCachedSubscriptions(): Promise<CachedSubscriptionRecord[]> {
+async function readCachedSubscriptions(): Promise<CachedSubscriptionRecord[]> {
   const records = await localDb.list("subscriptions");
   return records.sort((left, right) => left.merchantName.localeCompare(right.merchantName));
 }
@@ -414,7 +432,7 @@ export async function readCachedReceiptLineItems(limit?: number): Promise<Cached
  * Line items for a single receipt, in stable `lineIndex` order. Used by the
  * receipt detail screen and by certain diagnostic panels.
  */
-export async function readCachedLineItemsForReceipt(
+async function readCachedLineItemsForReceipt(
   receiptId: string
 ): Promise<CachedReceiptLineItem[]> {
   const records = await localDb.list("receipt_line_items");
@@ -423,12 +441,12 @@ export async function readCachedLineItemsForReceipt(
     .sort((left, right) => left.lineIndex - right.lineIndex);
 }
 
-export async function writeCachedBudgets(records: CachedBudgetRecord[]): Promise<void> {
+async function writeCachedBudgets(records: CachedBudgetRecord[]): Promise<void> {
   await localDb.clear("budgets");
   if (records.length > 0) await localDb.bulkSet("budgets", records);
 }
 
-export async function writeCachedSubscriptions(records: CachedSubscriptionRecord[]): Promise<void> {
+async function writeCachedSubscriptions(records: CachedSubscriptionRecord[]): Promise<void> {
   await localDb.clear("subscriptions");
   if (records.length > 0) await localDb.bulkSet("subscriptions", records);
 }
@@ -438,7 +456,7 @@ export async function writeCachedFinancialGoals(records: CachedFinancialGoalReco
   if (records.length > 0) await localDb.bulkSet("financial_goals", records);
 }
 
-export async function writeCachedReceiptLineItems(records: CachedReceiptLineItem[]): Promise<void> {
+async function writeCachedReceiptLineItems(records: CachedReceiptLineItem[]): Promise<void> {
   await localDb.clear("receipt_line_items");
   if (records.length > 0) await localDb.bulkSet("receipt_line_items", records);
 }
@@ -447,7 +465,7 @@ export async function writeCachedReceiptLineItems(records: CachedReceiptLineItem
  * Commitments — sorted with active first, then most recently updated. The UI
  * renders `active` and `paused` rows above `completed`/`dismissed` history.
  */
-export async function readCachedCommitments(): Promise<CachedCommitmentRecord[]> {
+async function readCachedCommitments(): Promise<CachedCommitmentRecord[]> {
   const records = await localDb.list("commitments");
   const statusRank = (status: string): number => {
     if (status === "active") return 0;
@@ -462,7 +480,7 @@ export async function readCachedCommitments(): Promise<CachedCommitmentRecord[]>
   });
 }
 
-export async function writeCachedCommitments(records: CachedCommitmentRecord[]): Promise<void> {
+async function writeCachedCommitments(records: CachedCommitmentRecord[]): Promise<void> {
   await localDb.clear("commitments");
   if (records.length > 0) await localDb.bulkSet("commitments", records);
 }
@@ -471,7 +489,7 @@ export async function writeCachedCommitments(records: CachedCommitmentRecord[]):
  * Insight events — ordered by `detectedAt` DESC so the signal stream feed can
  * slice the freshest items for the user without resorting client-side.
  */
-export async function readCachedInsightEvents(
+async function readCachedInsightEvents(
   options?: { limit?: number; stateFilter?: string[] }
 ): Promise<CachedInsightEventRecord[]> {
   const records = await localDb.list("insight_events");
@@ -484,7 +502,7 @@ export async function readCachedInsightEvents(
   return typeof options?.limit === "number" ? sorted.slice(0, options.limit) : sorted;
 }
 
-export async function writeCachedInsightEvents(
+async function writeCachedInsightEvents(
   records: CachedInsightEventRecord[]
 ): Promise<void> {
   await localDb.clear("insight_events");

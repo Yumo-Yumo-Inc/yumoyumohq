@@ -35,7 +35,7 @@ import {
 
 // Multiplier values live in vision-post-rules.ts (the reward model's single
 // source); re-exported here so the bonus-stack callers have one import site.
-export { getItemizedMultiplier, getManualItemsMultiplier };
+export { getItemizedMultiplier,  };
 
 function envNumber(name: string, fallback: number): number {
   const raw = process.env[name];
@@ -43,15 +43,15 @@ function envNumber(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
-export function getScanBonus(): number {
+function getScanBonus(): number {
   return envNumber("REWARD_SCAN_BONUS", 75);
 }
 
-export function getFirstScanOfDayBonus(): number {
+function getFirstScanOfDayBonus(): number {
   return envNumber("REWARD_FIRST_SCAN_OF_DAY_BONUS", 15);
 }
 
-export function getStreakMultiplier(): number {
+function getStreakMultiplier(): number {
   const value = envNumber("REWARD_STREAK_MULTIPLIER", 1.1);
   return value >= 1 ? value : 1;
 }
@@ -62,7 +62,7 @@ export function getStreakMultiplier(): number {
  * the [×1.0, ×2.0] band — high-inflation countries earn more, but the
  * cross-country gap from inflation alone never exceeds 2×.
  */
-export function getCpiBandCapPercent(): number {
+function getCpiBandCapPercent(): number {
   const value = envNumber("REWARD_CPI_BAND_CAP_PERCENT", 30);
   return value > 0 ? value : 30;
 }
@@ -72,6 +72,17 @@ export function cpiMultiplierFromInflationPercent(inflationPercent: number): num
   const capPct = getCpiBandCapPercent();
   const clamped = Math.min(Math.max(inflationPercent, 0), capPct);
   return Math.round((1 + clamped / capPct) * 10000) / 10000;
+}
+
+/**
+ * Reward-parity policy: Thailand uses the same sourced CPI reward reference as
+ * Türkiye. Hidden cost and FX remain country-specific; only the inflation
+ * bonus is shared so a low-inflation TH receipt is not structurally paid less
+ * than an equivalent TR receipt.
+ */
+export function getRewardCpiReferenceCountry(country: string | null | undefined): string {
+  const code = (country ?? "").trim().toUpperCase().slice(0, 2);
+  return code === "TH" ? "TR" : code || "TR";
 }
 
 export interface BonusStackInput {

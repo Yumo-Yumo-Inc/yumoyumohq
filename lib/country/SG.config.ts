@@ -74,4 +74,3 @@ export const SG_CONFIG: CountryConfig = {
   ]
 };
 
-export default SG_CONFIG;

@@ -91,6 +91,9 @@ export default function MinePage() {
   const [rejectionNoBackground, setRejectionNoBackground] = useState(false);
   const [isMining, setIsMining] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // Real outcome of the background save, surfaced on the Done screen so it never
+  // claims "saved" when the write actually failed or was a duplicate.
+  const [saveState, setSaveState] = useState<"saving" | "saved" | "error" | "duplicate">("saving");
   const [syntheticReceiptUrl, setSyntheticReceiptUrl] = useState<string | null>(null);
   const [receiptNumber, setReceiptNumber] = useState<string>("");
   const [originalAnalysis, setOriginalAnalysis] = useState<(ReceiptAnalysis & { actionResult?: MobileActionResult }) | null>(null);
@@ -156,20 +159,15 @@ export default function MinePage() {
     
     // Store original analysis
     setOriginalAnalysis(updatedAnalysis);
-    await localDb.set("receipts", createReceiptRecordFromAnalysis(updatedAnalysis));
-    await rebuildLocalInsightsFromReceipts().catch(() => {});
-    if (updatedAnalysis.actionResult) {
-      await applyMobileActionResult(updatedAnalysis.actionResult, queryClient, { onLevelEvent: announceLevelUp });
-    }
-    
+
     // Update receipt with full analysis data
     const fullReceipt = convertReceiptAnalysisToReceipt(updatedAnalysis, imageUrl);
-    
+
     // Add time to receipt if provided (override extraction time)
     if (time) {
       fullReceipt.time = time;
     }
-    
+
     setReceipt((prev) => {
       if (!prev) return fullReceipt;
       return {
@@ -178,10 +176,23 @@ export default function MinePage() {
         time: fullReceipt.time || prev.time, // Preserve time from fullReceipt or keep previous
       };
     });
-    
+
+    // Reveal the real numbers the moment they exist — the analyzing screen's
+    // data cards read from `receipt` via revealReady, so every await that runs
+    // before this line is a frame the cards spend empty. Persistence and the
+    // synthetic image are deferred below; they do not feed the reveal.
+    setCanLeaveAnalyzeScreen(false);
+    setRevealReady(true);
+
+    await localDb.set("receipts", createReceiptRecordFromAnalysis(updatedAnalysis));
+    await rebuildLocalInsightsFromReceipts().catch(() => {});
+    if (updatedAnalysis.actionResult) {
+      await applyMobileActionResult(updatedAnalysis.actionResult, queryClient, { onLevelEvent: announceLevelUp });
+    }
+
     // Generate synthetic receipt
     console.log("[mine] Full analysis completed, generating synthetic receipt...");
-    
+
     try {
       const syntheticReceiptBlob = await generateSyntheticReceiptBlob({
         merchantName: fullReceipt.merchantName,
@@ -200,11 +211,6 @@ export default function MinePage() {
     } catch (err) {
       console.error("[mine] Failed to generate synthetic receipt:", err);
     }
-    
-    setCanLeaveAnalyzeScreen(false);
-    // Hold on step 1 and play the cinematic reveal with the real numbers; the
-    // analyzing screen advances to the result step via onRevealComplete.
-    setRevealReady(true);
   };
   
   // Handle time selection from modal
@@ -348,7 +354,20 @@ export default function MinePage() {
       // Start location fetch in parallel (used for analyze; optional for upload)
       const locationPromise = getLocation();
 
-      // Upload + analyze in background while user sees the "Analyzing receipt" screen
+      // Upload + analyze in background while user sees the "Analyzing receipt" screen.
+      // A client-side watchdog bounds the analyze request: if the server never
+      // responds (or the stream hangs before it can emit an error), the abort
+      // rejects the fetch, which surfaces in the chain's .catch as a normal error
+      // instead of leaving the user on an eternal analyzing screen. The budget is
+      // set generously above the server's own stream wall-budget (~50s).
+      let analyzeAbort: AbortController | null = null;
+      let analyzeTimeoutId: ReturnType<typeof setTimeout> | null = null;
+      const clearAnalyzeWatchdog = () => {
+        if (analyzeTimeoutId) {
+          clearTimeout(analyzeTimeoutId);
+          analyzeTimeoutId = null;
+        }
+      };
       const formData = new FormData();
       formData.append("file", fileToUpload);
       // Personal vs Other (bulk/business) — backend uses this to set
@@ -438,11 +457,14 @@ export default function MinePage() {
           analyzeBody.stream = true;
           analyzeRunIdRef.current += 1;
           const thisRunId = analyzeRunIdRef.current;
+          analyzeAbort = new AbortController();
+          analyzeTimeoutId = setTimeout(() => analyzeAbort?.abort(), 120000);
           return fetch("/api/receipt/analyze", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(analyzeBody),
+            signal: analyzeAbort.signal,
           }).then((res) => ({ response: res, runId: thisRunId }));
         })
         .then(async (value: { response: Response; runId: number } | undefined) => {
@@ -661,6 +683,9 @@ export default function MinePage() {
             duration: 5000,
           });
         })
+        .finally(() => {
+          clearAnalyzeWatchdog();
+        })
       } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : t("mine.error.processImage");
       const isMemoryError = /bellek\s*yetersiz|insufficient\s*memory|out\s*of\s*memory|quotaexceeded/i.test(String(errorMessage));
@@ -733,13 +758,16 @@ export default function MinePage() {
         description: t("mine.duplicateNotSavedDesc"),
         duration: 5000,
       });
-      // Still navigate to complete step but don't save
+      // Navigate to the Done step, but tell it this was a duplicate so it shows
+      // an honest "already recorded / not saved again" state, not a success tick.
+      setSaveState("duplicate");
       setCurrentStep(4);
       return;
     }
 
     setIsSaving(true);
     setError(null);
+    setSaveState("saving");
 
     // Optimistic UI: Navigate to complete step (Done)
     setCurrentStep(4);
@@ -804,8 +832,10 @@ export default function MinePage() {
         }
         console.log("Receipt saved successfully:", saved.receiptId);
         await applySaved(saved);
+        setSaveState("saved");
       } catch (err: unknown) {
         console.error("Failed to save receipt (both attempts):", err);
+        setSaveState("error");
       } finally {
         setIsSaving(false);
       }
@@ -825,6 +855,7 @@ export default function MinePage() {
     setRejectionNoBackground(false);
     setIsMining(false);
     setIsSaving(false);
+    setSaveState("saving");
     setCanLeaveAnalyzeScreen(false);
   };
 
@@ -956,6 +987,8 @@ export default function MinePage() {
             onViewReceipts={() => router.push("/app/receipts")}
             locale={locale}
             accountLevel={accountLevel}
+            saveStatus={saveState}
+            onRetrySave={handleSaveReceipt}
           />
         )}
       </div>

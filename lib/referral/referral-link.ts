@@ -7,13 +7,14 @@
 export const REFERRAL_REF_STORAGE_KEY = "yumo_referral_ref";
 
 /**
- * Build a referral registration URL for the given username.
+ * Build a short referral link for the given username, e.g. `.../r/mark`.
+ * The `/r/[code]` route redirects to `/app/register?ref=<code>`, keeping the
+ * shared URL clean and memorable for social posts.
  * @param username - The referrer's username
  * @param baseUrl  - Application base URL (e.g. https://app.yumoyumo.com)
  */
 export function buildReferralLink(username: string, baseUrl: string): string {
-  const url = new URL("/app/register", baseUrl);
-  url.searchParams.set("ref", username);
+  const url = new URL(`/r/${encodeURIComponent(username)}`, baseUrl);
   return url.toString();
 }
 

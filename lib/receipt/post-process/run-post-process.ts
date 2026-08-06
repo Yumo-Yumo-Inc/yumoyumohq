@@ -11,8 +11,10 @@
  */
 
 import { getSql } from "@/lib/db/client";
-import { resolveCategoryLvl1 } from "@/lib/receipt/category-taxonomy";
+import { pipelineLog } from "@/lib/logger/pipeline-log";
+import { resolveCategoryLvl1, reconcileLvl1FromPath } from "@/lib/receipt/category-taxonomy";
 import { isTrustWorkerEnabled } from "@/config/oracle-phases";
+import { applyTrustUpdate } from "@/lib/oracle/trust-update";
 import { writeReceiptContributionPoints } from "@/lib/receipt/db/contribution-points";
 import {
   computeReceiptQuality,
@@ -20,14 +22,23 @@ import {
   isAmountInconsistent,
 } from "@/lib/receipt/quality/honor-quality";
 import { updateUserHonor } from "@/lib/receipt/db/user-honor";
-import { matchProofToPendingReceipts, matchItemizedReceiptToPendingSlip, matchSlipToExistingItemizedReceipt } from "@/lib/receipt/proof-matching";
+import {
+  matchProofToPendingReceipts,
+  matchItemizedReceiptToPendingSlip,
+  matchSlipToExistingItemizedReceipt,
+  linkPaymentProofToRestaurantTab,
+  markReceiptAsPendingProof,
+} from "@/lib/receipt/proof-matching";
 import {
   mergeGrantedRewardIntoReceiptData,
   resolveGrantedReward,
 } from "@/lib/receipt/resolve-granted-reward";
+import {
+  augmentRewardBreakdownPostProcess,
+  parseRewardBreakdown,
+} from "@/lib/receipt/reward-breakdown";
 import { autoLinkUtilityReceipt } from "@/lib/service-providers/auto-link";
-import { checkAndActivateReferral } from "@/lib/referral/referral-activation";
-import { applyReferralBonus } from "@/lib/referral/referral-bonus";
+import { processReferralMilestones } from "@/lib/referral/referral-activation";
 import {
   extractCanonicalFromVision,
   parseStructuredLineItemsFromReceiptData,
@@ -42,6 +53,7 @@ import {
   resolveCanonicalObservationsV3,
 } from "@/lib/receipt/canonical";
 import type { VisionResponseLike } from "@/lib/receipt/canonical";
+import { isCanonicalizableLineKind } from "@/lib/receipt/line-kind";
 import { resolveObservationBrands } from "@/lib/receipt/canonical/resolve-brand";
 import { getUsdRate, getUsdRateAsync, getCpiSeriesForCategory } from "@/config/reward-formula";
 import {
@@ -49,10 +61,15 @@ import {
   computeRewardFromHiddenSlice,
 } from "@/lib/receipt/reward-from-hidden-slice";
 import { getSeasonLevelMultiplier } from "@/config/season-level-config";
-import { cpiMultiplierFromInflationPercent } from "@/lib/receipt/reward-bonus";
+import {
+  cpiMultiplierFromInflationPercent,
+  getRewardCpiReferenceCountry,
+} from "@/lib/receipt/reward-bonus";
 import {
   capBonusToPerReceiptHeadroom,
   resolveAccountLevel,
+  getDailyRewardReceiptLimit,
+  getMaxDailyRewardForLevel,
 } from "@/lib/receipt/reward-caps";
 import { getTuikReferencePriceBulk } from "@/lib/mining/tuikReferencePrice";
 import {
@@ -63,6 +80,7 @@ import {
 } from "@/lib/receipt/validation";
 import { upsertOtherExpenseReceipt } from "@/lib/receipt/db/other-expense";
 import { evaluateAchievements } from "@/lib/achievements/evaluate";
+import { screenAndRecordAuthenticity } from "@/lib/fraud/authenticity-screening";
 import {
   gptFullReceiptToGeminiLineItems,
   parseFullReceiptWithGemini,
@@ -83,6 +101,27 @@ function merchantCategoryToInternal(category: string | null | undefined): string
     konaklama: "hospitality_lodging", hotel: "hospitality_lodging",
   };
   return map[raw] ?? "other";
+}
+
+/**
+ * Self-heal: receipt_line_items.line_kind (write-path classification,
+ * lib/receipt/line-kind.ts). NULL on rows written before the column existed —
+ * readers treat NULL as "product".
+ */
+let lineKindColumnEnsured = false;
+async function ensureLineKindColumn(
+  sql: NonNullable<ReturnType<typeof getSql>>
+): Promise<void> {
+  if (lineKindColumnEnsured) return;
+  try {
+    await sql`ALTER TABLE receipt_line_items ADD COLUMN IF NOT EXISTS line_kind TEXT`;
+    lineKindColumnEnsured = true;
+  } catch (err) {
+    console.warn(
+      "[run-post-process] ensureLineKindColumn failed (will retry next run):",
+      (err as Error)?.message
+    );
+  }
 }
 
 /** Migration 110 adds `source`; keep post-process working until it is applied. */
@@ -116,6 +155,7 @@ interface ReceiptRow {
   post_process_state: string | null;
   username: string | null;
   hidden_cost_core: number;
+  image_phash: string | null;
   merchant_name: string | null;
   merchant_id: string | null;
   extraction_date_value: string | null;
@@ -137,9 +177,14 @@ interface ReceiptRow {
   receipt_data: unknown;
   expense_type: string | null;
   ocr_raw_text: string | null;
+  created_at: string | Date | null;
 }
 
 type SqlClient = NonNullable<ReturnType<typeof getSql>>;
+
+// A receipt processed more than this long after upload counts as a backfill:
+// normal processing completes in seconds, the retry cron within a day.
+const BACKFILL_AGE_MS = 48 * 60 * 60 * 1000;
 
 async function receiptRowExists(sql: SqlClient, receiptId: string): Promise<boolean> {
   const rows = await sql`
@@ -207,7 +252,7 @@ async function ensureLineItemsForPostProcess(
   const ocrText = readStoredOcrText(receiptData, row.ocr_raw_text);
   if (!ocrText) return receiptData;
 
-  console.log(`[run-post-process] ${receiptId}: structured lines missing; extracting line items in background post-process`);
+  pipelineLog.debug(`[run-post-process] ${receiptId}: structured lines missing; extracting line items in background post-process`);
   const gptResult = await parseFullReceiptWithGemini(ocrText, {
     countryCode: country,
     preferHighAccuracy: true,
@@ -237,7 +282,7 @@ async function ensureLineItemsForPostProcess(
     WHERE receipt_id = ${receiptId}
   `;
 
-  console.log(`[run-post-process] ${receiptId}: background line-item extraction stored ${geminiLineItems.length} line(s)`);
+  pipelineLog.debug(`[run-post-process] ${receiptId}: background line-item extraction stored ${geminiLineItems.length} line(s)`);
   return nextData;
 }
 
@@ -271,6 +316,7 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       SELECT
         r.receipt_id,
         r.post_process_state,
+        r.image_phash,
         r.username,
         COALESCE(r.hidden_cost_core, 0)::float as hidden_cost_core,
         r.merchant_name,
@@ -293,7 +339,8 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
         v.vision_json as vision_from_raw,
         r.receipt_data,
         r.ocr_raw_text,
-        r.expense_type
+        r.expense_type,
+        r.created_at
       FROM receipts r
       LEFT JOIN receipt_vision_raw v ON v.receipt_id = r.receipt_id
       WHERE r.receipt_id = ${receiptId}
@@ -366,6 +413,8 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       : new Date().toISOString().slice(0, 7);
 
     let totalHiddenCanonical: number | null = null;
+    /** Gross value of the lines the engine actually priced — gates the display correction below. */
+    let lineTotalCovered: number | null = null;
     let lineItemsWritten = 0;
     const visionJson = (row.vision_from_raw ?? row.vision_json) as VisionResponseLike | null | undefined;
     const rawStructured = parseStructuredLineItemsFromReceiptData(receiptDataForProcessing);
@@ -391,27 +440,69 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           paidExTax: paidExTax || undefined,
           date: row.extraction_date_value ?? undefined,
           currency: row.pricing_currency ?? undefined,
-          category: row.merchant_category ?? undefined,
+          // A restaurant tab is a pre-payment document. Its line taxonomy can
+          // contain food/product labels such as groceries, but the receipt-level
+          // restaurant model must remain authoritative for hidden cost.
+          category:
+            row.document_type === "restaurant_tab"
+              ? "restaurant"
+              : row.merchant_category ?? undefined,
           geminiLineItems,
         });
+
+        // Write-path gate: only "product" rows enter canonical matching and
+        // brand resolution. Discount/tax/payment/bag/fee/department/other rows
+        // are still persisted below (receipt totals need them) but can no
+        // longer become canonical_products or brand_registry entries.
+        const productObservations = payload.observations.filter(
+          (o) => isCanonicalizableLineKind(o.line_kind)
+        );
+        const nonProductCount = payload.observations.length - productObservations.length;
+        if (nonProductCount > 0) {
+          pipelineLog.debug(
+            `[run-post-process] ${receiptId}: ${nonProductCount} non-product line(s) excluded from canonical/brand resolution`
+          );
+          for (const o of payload.observations) {
+            if (!isCanonicalizableLineKind(o.line_kind)) {
+              o.brand = null;
+              o.brand_status = null;
+            }
+          }
+        }
 
         // Taxonomy fuzzy match (pg_trgm) → LLM fallback → upsert new canonical rows.
         // RAC mode (USE_RAC_PRODUCT=true) shows existing canonical_products to LLM
         // as candidates → matches instead of creating duplicates. Default OFF.
-        const useV3 = process.env.USE_TAXONOMY_V3 === "true";
+        //
+        // v3 is the DEFAULT since 2026-07-11: the opt-in flag silently fell out
+        // of production around 2026-04 and every line item since then was
+        // written without canonical_id (0% linked Apr–Jul vs 74–99% before).
+        // Set USE_TAXONOMY_V3=false to fall back to the legacy resolver.
+        const useV3 = process.env.USE_TAXONOMY_V3 !== "false";
         if (useV3) {
-          await resolveCanonicalObservationsV3(payload.observations, {
+          await resolveCanonicalObservationsV3(productObservations, {
             merchantId: row.merchant_id ?? null,
             language: row.merchant_country ?? undefined,
           });
         } else {
-          await resolveCanonicalObservations(payload.observations);
+          await resolveCanonicalObservations(productObservations);
+        }
+
+        // Reconcile the lvl1 roof with the (reliable v3) category_path BEFORE
+        // hidden cost is computed, so a restaurant meal is priced with the
+        // restaurant model rather than the grocery producer multiplier. Write
+        // time only — historical rows are left as-is (reward-never-cut rule).
+        for (const o of productObservations) {
+          const reconciled = reconcileLvl1FromPath(o.category_path, o.category_lvl1);
+          if (reconciled) o.category_lvl1 = reconciled;
         }
 
         // Brand resolution + classification (registry match → status), shared by
         // both resolve paths. Fills missing brands deterministically and marks
         // brand-expected gaps as 'needs_user' for the result-screen prompt.
-        await resolveObservationBrands(sql, payload.observations);
+        await resolveObservationBrands(sql, productObservations, {
+          merchantName: row.merchant_name,
+        });
 
         const fallbackHiddenRate =
           paidExTax > 0 && categoryHidden >= 0 ? categoryHidden / paidExTax : 0.35;
@@ -440,9 +531,9 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
               payload.observations.map((o) => o.canonical_name || o.raw_name)
             );
 
-        // Fresh-produce wholesale reference — current İzmir wholesale market (real data; scraping REMOVED)
-        const { fetchIzmirHalBulk } = await import("@/lib/receipt/canonical/line-hidden-cost");
-        const halPrices = await fetchIzmirHalBulk();
+        // Fresh-produce wholesale reference — per-country wholesale market (real data; scraping REMOVED)
+        const { fetchWholesaleBulk } = await import("@/lib/receipt/canonical/line-hidden-cost");
+        const halPrices = await fetchWholesaleBulk(country);
 
         const { results, totalHiddenCanonical: total } = computeLineHiddenCosts({
           payload,
@@ -458,6 +549,10 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           hiddenCostTier,
         });
         totalHiddenCanonical = total;
+        lineTotalCovered = results.reduce(
+          (s, r) => s + (Number(r.observation.line_total_gross) || 0),
+          0
+        );
 
         if (!(await receiptRowExists(sql, receiptId))) {
           console.warn(
@@ -477,6 +572,7 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
 
         // user_manual rows are user-typed completions, not OCR output — a
         // re-analyze must not wipe them.
+        await ensureLineKindColumn(sql);
         await deleteOcrLineItemsForReceipt(sql, receiptId);
         lineItemsWritten = 0;
         for (const r of results) {
@@ -498,14 +594,19 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           // When lvl1 resolves to "other", recover from the lvl2 subcategory signal
           // (e.g. doctor_visit → pharmacy) so services are not stored as "other".
           const finalCategoryLvl2 = taxRow?.category_lvl2 || o.category_lvl2 || null;
-          const finalCategoryLvl1 = resolveCategoryLvl1(rawCategoryLvl1, finalCategoryLvl2);
+          // Path root is authoritative for the lvl1 roof (matches the value hidden
+          // cost was computed with above); fall back to the taxonomy/lvl2 recovery
+          // only when the path implies nothing.
+          const finalCategoryLvl1 =
+            reconcileLvl1FromPath(o.category_path, rawCategoryLvl1) ??
+            resolveCategoryLvl1(rawCategoryLvl1, finalCategoryLvl2);
           await sql`
             INSERT INTO receipt_line_items (
               receipt_id, raw_name, canonical_name, brand, brand_status, category_lvl1, category_lvl2,
               pack_size, unit_type, quantity, unit_price, line_total, unit_price_gross, line_total_gross,
               discount_amount, vat_rate, confidence_score, reference_price, hidden_cost_line,
               category_path, display_name_tr, attributes, lifestyle_tags, consumption_occasions,
-              allergens, price_tier, canonical_id
+              allergens, price_tier, canonical_id, line_kind
             )
             VALUES (
               ${receiptId},
@@ -534,7 +635,8 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
               ${o.consumption_occasions ?? null},
               ${o.allergens ?? null},
               ${o.price_tier ?? null},
-              ${o.canonical_id ?? null}
+              ${o.canonical_id ?? null},
+              ${o.line_kind ?? "product"}
             )
           `;
           lineItemsWritten += 1;
@@ -561,13 +663,99 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
     let extraReward = 0;
     let finalHiddenCost = categoryHidden;
 
-    // SINGLE COMPUTE (product decision): hidden cost + reward were computed via
-    // cascade at UPLOAD time (categoryHidden = receipts.hidden_cost_core). Post-process
-    // does NOT recompute it — it only writes the line items (receipt_line_items).
-    // No extraReward; finalHiddenCost = the upload-time value.
-    // Note: if the upload cascade did not run (old/edge-case receipt), categoryHidden
-    // is already 0/fallback.
-    void totalHiddenCanonical;
+    // DISPLAY CORRECTION (product decision, Uğur 2026-07-19 — "option A").
+    //
+    // The REWARD stays computed from the upload-time cascade value
+    // (categoryHidden) and is never recomputed here: baseBint above already
+    // used it, and resolveGrantedReward keeps the stored reward_final locked.
+    // Nobody's points move because of this block.
+    //
+    // What DOES change is the number the user is shown. The upload cascade runs
+    // on raw OCR line text before canonical resolution, so its category guesses
+    // are coarse; the line-level engine re-runs after resolution with reconciled
+    // categories and is the better figure. Measured on 1412 TR receipts, the two
+    // disagreed by more than 20% on roughly two thirds of them.
+    //
+    // Guards, because the line sum is only trustworthy when the lines actually
+    // cover the receipt:
+    //   - the engine produced a positive total
+    //   - the priced lines add up to somewhere near what was paid (partial OCR
+    //     or department-total receipts fail this and keep the upload value)
+    //   - the same 0.92-of-paid ceiling the upload path applies
+    // Write time only — historical receipts are left alone.
+    const totalPaidGross = Number(row.pricing_total_paid) || 0;
+    let correctedHidden: number | null = null;
+    if (
+      totalHiddenCanonical != null &&
+      totalHiddenCanonical > 0 &&
+      paidExTax > 0 &&
+      totalPaidGross > 0 &&
+      lineTotalCovered != null &&
+      lineTotalCovered >= totalPaidGross * 0.8 &&
+      lineTotalCovered <= totalPaidGross * 1.2
+    ) {
+      const capped = Math.min(totalHiddenCanonical, paidExTax * 0.92);
+      const rounded = Math.round(capped * 100) / 100;
+      if (rounded > 0 && Math.abs(rounded - categoryHidden) >= 0.01) {
+        correctedHidden = rounded;
+      }
+    }
+    if (correctedHidden != null) {
+      finalHiddenCost = correctedHidden;
+      const correctedReference = Math.round((paidExTax - correctedHidden) * 100) / 100;
+      const correctedRate = paidExTax > 0 ? correctedHidden / paidExTax : 0;
+      // The columns and receipt_data.hiddenCost are two copies of the same
+      // figure, and the result screen reads the JSON one. Updating only the
+      // columns left 205 receipts (12.6% of July uploads) showing the stale
+      // upload-time number while the corrected one sat in hidden_cost_core.
+      // Layer amounts are rescaled by the same factor so shareOfHidden — which
+      // is a ratio, not a total — stays valid.
+      const layerScale = categoryHidden > 0 ? correctedHidden / categoryHidden : null;
+      await sql`
+        UPDATE receipts
+        SET hidden_cost_core = ${correctedHidden},
+            hidden_cost_reference_price = ${correctedReference},
+            pricing_retail_hidden_rate = ${correctedRate},
+            receipt_data = jsonb_set(
+              jsonb_set(
+                jsonb_set(
+                  jsonb_set(
+                    jsonb_set(
+                      COALESCE(receipt_data, '{}'::jsonb),
+                      '{hiddenCost,totalHidden}', to_jsonb(${correctedHidden}::numeric)
+                    ),
+                    '{hiddenCost,hiddenCostCore}', to_jsonb(${correctedHidden}::numeric)
+                  ),
+                  '{hiddenCost,referencePrice}', to_jsonb(${correctedReference}::numeric)
+                ),
+                '{hiddenCost,hiddenRate}', to_jsonb(${correctedRate}::numeric)
+              ),
+              '{hiddenCost,provenance}', to_jsonb('line_engine'::text)
+            )
+        WHERE receipt_id = ${receiptId}
+      `;
+      if (layerScale != null && Number.isFinite(layerScale)) {
+        // Scale each layer amount in place; keys absent from the payload are skipped.
+        for (const layerKey of ["retailBrand", "supplyChain", "storeOperations"]) {
+          await sql`
+            UPDATE receipts
+            SET receipt_data = jsonb_set(
+              receipt_data,
+              ARRAY['hiddenCost','layers',${layerKey},'amount'],
+              to_jsonb(ROUND((
+                (receipt_data->'hiddenCost'->'layers'->${layerKey}->>'amount')::numeric
+                * ${layerScale}::numeric
+              ), 2))
+            )
+            WHERE receipt_id = ${receiptId}
+              AND receipt_data->'hiddenCost'->'layers'->${layerKey}->>'amount' IS NOT NULL
+          `;
+        }
+      }
+      pipelineLog.debug(
+        `[run-post-process] ${receiptId}: hidden cost display corrected ${categoryHidden} → ${correctedHidden} (reward unchanged)`
+      );
+    }
 
     const bintTotal = baseBint + extraReward;
     // CPI multiplier — product decision (Uğur, 2026-07-06): high-inflation
@@ -576,7 +764,13 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
     // (from the CPI/GENEL YoY factor) maps into the [×1.0, ×2.0] band; the
     // band top is reached at the configured cap percent. Deflation and
     // missing data stay at ×1.0 — a reward is never reduced.
-    const rewardYoY = await fetchEconomicYoYMap(country, yearMonth);
+    // Country-parity policy: TH uses the same sourced CPI reward reference as
+    // TR. The hidden-cost model and FX conversion remain country-specific;
+    // only the inflation bonus is shared.
+    const rewardYoY = await fetchEconomicYoYMap(
+      getRewardCpiReferenceCountry(country),
+      yearMonth
+    );
     const cpiGenelYoY = rewardYoY.get("CPI/GENEL");
     const inflationPercent = cpiGenelYoY ? (cpiGenelYoY - 1) * 100 : 0;
     const cpiMultiplier = cpiMultiplierFromInflationPercent(inflationPercent);
@@ -608,7 +802,40 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       usdRate,
       storedRewardFinal,
     });
-    const grantedBaseBint = granted.grantedBint;
+    // Daily reward RECEIPT-COUNT cap (karar 2026-07-07, Uğur): at most
+    // DAILY_REWARD_RECEIPT_LIMIT receipts per UTC day earn a reward. Receipts
+    // beyond the limit still process (hidden cost, line items) but grant 0 bINT.
+    // Enforced here — the single authoritative writer of receipt_rewards.
+    // The window is the RECEIPT'S OWN upload day (not NOW): a backlogged receipt
+    // re-processed days later still counts against the day it was uploaded,
+    // otherwise draining the retry queue would grant unlimited retroactive
+    // rewards. A receipt that already holds a reward keeps it (idempotent).
+    let blockedByDailyReceiptCount = false;
+    if (row.username && granted.grantedBint > 0) {
+      const dailyRewardReceiptLimit = getDailyRewardReceiptLimit();
+      const priorRows = await sql`
+        SELECT
+          COUNT(*) FILTER (WHERE r2.receipt_id <> ${receiptId})::int AS prior,
+          COUNT(*) FILTER (WHERE r2.receipt_id = ${receiptId})::int AS self_rewarded
+        FROM receipts r2
+        JOIN receipt_rewards rr2 ON rr2.receipt_id = r2.receipt_id
+        WHERE r2.username = ${row.username}
+          AND rr2.bint_amount > 0
+          AND r2.created_at >= date_trunc('day', (SELECT created_at FROM receipts WHERE receipt_id = ${receiptId}) AT TIME ZONE 'UTC')
+          AND r2.created_at <  date_trunc('day', (SELECT created_at FROM receipts WHERE receipt_id = ${receiptId}) AT TIME ZONE 'UTC') + interval '1 day'
+      `;
+      const prior = Number((priorRows[0] as { prior?: number } | undefined)?.prior ?? 0);
+      const selfAlreadyRewarded =
+        Number((priorRows[0] as { self_rewarded?: number } | undefined)?.self_rewarded ?? 0) > 0;
+      if (prior >= dailyRewardReceiptLimit && !selfAlreadyRewarded) {
+        blockedByDailyReceiptCount = true;
+        console.warn(
+          `[run-post-process] ${receiptId}: daily reward receipt limit (${dailyRewardReceiptLimit}) reached for ${row.username} — reward zeroed (prior=${prior})`
+        );
+      }
+    }
+
+    const grantedBaseBint = blockedByDailyReceiptCount ? 0 : granted.grantedBint;
     const grantedBintTotal =
       grantedBaseBint > 0
         ? Math.round((grantedBaseBint + extraReward) * 100) / 100
@@ -620,18 +847,86 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
     // The bonus row also respects the per-receipt band ceiling: reward_final +
     // bonus stays within the account-level decade cap (karar 2026-07-06).
     const accountLevel = await resolveAccountLevel(row.username ?? "", 1);
-    const grantedBintBonus = capBonusToPerReceiptHeadroom({
+    let grantedBintBonus = capBonusToPerReceiptHeadroom({
       grantedReward: grantedBintTotal,
       bonus: grantedBintBonusRaw,
       accountLevel,
     });
+
+    // Daily bINT AMOUNT cap, enforced in the SAME unit it accumulates
+    // (bint_bonus_amount = the user-visible points). Previously the daily decade
+    // cap was only checked at upload against the base bINT — a unit mismatch that
+    // let a day's points overshoot the ceiling (e.g. 5×per-receipt at L1 = 2500 >
+    // 1500). Here, the single authoritative writer, we clamp the bonus to the
+    // level's remaining daily allowance so the points-per-day never exceed the
+    // decade cap. The window is the receipt's own upload day and excludes the
+    // receipt itself, so a re-processed receipt stays within that day's cap.
+    let dailyBintAmountReached = false;
+    if (row.username && grantedBintBonus > 0 && !blockedByDailyReceiptCount) {
+      const dailyBintCap = getMaxDailyRewardForLevel(accountLevel);
+      const priorBonusRows = await sql`
+        SELECT COALESCE(SUM(rr2.bint_bonus_amount), 0)::float AS prior
+        FROM receipts r2
+        JOIN receipt_rewards rr2 ON rr2.receipt_id = r2.receipt_id
+        WHERE r2.username = ${row.username}
+          AND r2.receipt_id <> ${receiptId}
+          AND r2.created_at >= date_trunc('day', (SELECT created_at FROM receipts WHERE receipt_id = ${receiptId}) AT TIME ZONE 'UTC')
+          AND r2.created_at <  date_trunc('day', (SELECT created_at FROM receipts WHERE receipt_id = ${receiptId}) AT TIME ZONE 'UTC') + interval '1 day'
+      `;
+      const priorBonus = Number((priorBonusRows[0] as { prior?: number } | undefined)?.prior ?? 0);
+      const remainingDaily = Math.round(Math.max(0, dailyBintCap - priorBonus) * 100) / 100;
+      if (grantedBintBonus > remainingDaily) {
+        console.warn(
+          `[run-post-process] ${receiptId}: daily bINT cap (${dailyBintCap}) for ${row.username} — bonus clamped ${grantedBintBonus} -> ${remainingDaily} (prior=${priorBonus})`
+        );
+        grantedBintBonus = remainingDaily;
+        dailyBintAmountReached = remainingDaily <= 0;
+      }
+    }
+    // Points breakdown for the result screen: take the upload-pass decomposition
+    // stored on receipt_data.reward.breakdown and append the CPI/season factors
+    // and the final displayed points (grantedBintBonus).
+    const uploadBreakdown = parseRewardBreakdown(
+      ((receiptDataForProcessing as { reward?: { breakdown?: unknown } } | null)?.reward ?? {})
+        .breakdown
+    );
+    const rewardBreakdown =
+      grantedBintBonus > 0
+        ? augmentRewardBreakdownPostProcess({
+            uploadBreakdown,
+            rewardFinal: grantedBintTotal,
+            cpiMultiplier,
+            seasonLevelMultiplier,
+            categoryCatalyzer,
+            finalPoints: grantedBintBonus,
+          })
+        : null;
+
+    // When the daily receipt-count limit blocked the reward, merge a zeroed
+    // grant so receipt_data.reward reflects 0 (and surfaces the daily-cap
+    // reason), consistent with the zeroed receipt_rewards row written below.
+    // Either daily ceiling (receipt-count or bINT-amount) zeroes the grant the
+    // same way: keep the document metadata + line items, surface daily_cap_reached.
+    const blockedByDailyCap = blockedByDailyReceiptCount || dailyBintAmountReached;
+    const blockedByDuplicate = granted.duplicateBlocked;
+    const grantedForPersist = blockedByDailyCap || blockedByDuplicate
+      ? { ...granted, grantedBint: 0, fullRewardEstimate: 0, rewardFraction: 0, pendingItemizedReceipt: false }
+      : granted;
+    if (blockedByDailyCap || blockedByDuplicate) {
+      const rd = receiptDataForProcessing as { reward?: Record<string, unknown> } | null;
+      if (rd?.reward) {
+        rd.reward.noRewardReasonCode = blockedByDuplicate ? "duplicate" : "daily_cap_reached";
+      }
+    }
+
     const mergedReceiptData = mergeGrantedRewardIntoReceiptData(
       receiptDataForProcessing,
-      granted,
-      grantedBintBonus
+      grantedForPersist,
+      grantedBintBonus,
+      rewardBreakdown
     );
 
-    if (grantedBintTotal > 0) {
+    if (grantedBintTotal > 0 && !dailyBintAmountReached) {
       const proofStatusValue = granted.proofStatus;
       await sql`
         UPDATE receipts
@@ -648,6 +943,34 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       row.is_payment_proof = granted.isPaymentProof ? true : row.is_payment_proof;
       row.proof_status = granted.proofStatus ?? row.proof_status;
       row.reward_final = grantedBintTotal;
+    } else if (blockedByDailyCap || blockedByDuplicate) {
+      // Over a daily ceiling (receipt-count OR bINT-amount): still keep the
+      // document type / payment-proof metadata and line items, but zero the
+      // reward. reward_final is cleared so a re-process is idempotent and the
+      // count query never counts this receipt against the ceiling.
+      await sql`
+        UPDATE receipts
+        SET
+          reward_final = 0,
+          document_type = COALESCE(${granted.documentType}, document_type),
+          is_payment_proof = COALESCE(${granted.isPaymentProof ? true : null}, is_payment_proof),
+          proof_status = COALESCE(${granted.proofStatus}, proof_status),
+          receipt_data = ${JSON.stringify(mergedReceiptData)}::jsonb,
+          updated_at = now()
+        WHERE receipt_id = ${receiptId}
+      `;
+      row.reward_final = 0;
+      await sql`
+        UPDATE receipt_rewards
+        SET
+          base_reward_amount = 0,
+          extra_reward_amount = 0,
+          bint_amount = 0,
+          bint_bonus_amount = 0,
+          reward_breakdown = NULL,
+          updated_at = now()
+        WHERE receipt_id = ${receiptId}
+      `;
     } else if (storedRewardFinal <= 0) {
       await sql`
         UPDATE receipt_rewards
@@ -661,8 +984,17 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       `;
     }
 
-    const bintPersist = grantedBintTotal > 0 ? grantedBintTotal : 0;
-    const bintBonusPersist = grantedBintTotal > 0 ? grantedBintBonus : 0;
+    const rewardWritten = grantedBintTotal > 0 && !dailyBintAmountReached;
+    const bintPersist = rewardWritten ? grantedBintTotal : 0;
+    const bintBonusPersist = rewardWritten ? grantedBintBonus : 0;
+
+    // Backlog drain flag (karar 2026-07-08, Uğur): a receipt processed long
+    // after its upload is a retroactive backfill. Its reward is computed and
+    // stored (audit/airdrop/cPoints), but user-facing surfaces — wallet points,
+    // season leaderboard, notifications — exclude is_backfill rows so draining
+    // the stuck queue does not move live standings.
+    const createdAtMs = row.created_at ? new Date(row.created_at).getTime() : Date.now();
+    const isBackfill = Date.now() - createdAtMs > BACKFILL_AGE_MS;
 
     if (bintPersist > 0) {
       await sql`
@@ -670,13 +1002,15 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           receipt_id, base_reward_amount, extra_reward_amount, base_hidden_cost, final_hidden_cost,
           bint_amount,
           bint_bonus_amount, cpi_multiplier_used, exchange_rate_used, season_level_multiplier_used,
-          reward_version
+          reward_breakdown,
+          reward_version, is_backfill
         )
         VALUES (
           ${receiptId}, ${grantedBaseBint}, ${extraReward}, ${categoryHidden}, ${finalHiddenCost},
           ${bintPersist},
           ${bintBonusPersist}, ${cpiMultiplier}, ${usdRate}, ${seasonLevelMultiplier},
-          2
+          ${rewardBreakdown ? JSON.stringify(rewardBreakdown) : null}::jsonb,
+          2, ${isBackfill}
         )
         ON CONFLICT (receipt_id) DO UPDATE SET
           base_reward_amount = EXCLUDED.base_reward_amount,
@@ -688,6 +1022,8 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           cpi_multiplier_used = EXCLUDED.cpi_multiplier_used,
           exchange_rate_used = EXCLUDED.exchange_rate_used,
           season_level_multiplier_used = EXCLUDED.season_level_multiplier_used,
+          reward_breakdown = EXCLUDED.reward_breakdown,
+          is_backfill = EXCLUDED.is_backfill,
           updated_at = now()
       `;
     }
@@ -822,7 +1158,9 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       WHERE receipt_id = ${receiptId}
     `;
 
-    if (row.username) {
+    // Backfilled receipts stay silent: no verified/top-up notification spam
+    // for uploads the user made days ago.
+    if (row.username && !isBackfill) {
       await sql`
         INSERT INTO user_notifications (username, type, title, body, payload, receipt_id)
         SELECT
@@ -868,6 +1206,30 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       }
     }
 
+    // A non-payment restaurant tab is a record awaiting proof, even when its
+    // amount is below the legacy high-value threshold.
+    if (row.document_type === "restaurant_tab" && row.payment_proven !== true) {
+      await markReceiptAsPendingProof(receiptId);
+      row.proof_status = "pending";
+    }
+
+    // Payment receipt uploaded after a restaurant tab: complete the proof pair.
+    // This runs for ordinary receipts with payment_proven=true, not just POS
+    // slips (is_payment_proof=true).
+    if (row.payment_proven === true && row.username && row.pricing_total_paid && row.extraction_date_value) {
+      try {
+        await linkPaymentProofToRestaurantTab(receiptId, {
+          userId: row.username,
+          merchantId: row.merchant_id,
+          merchantName: row.merchant_name,
+          total: row.pricing_total_paid,
+          date: row.extraction_date_value,
+        });
+      } catch (e) {
+        console.warn("[run-post-process] restaurant-tab payment matching failed:", e);
+      }
+    }
+
     // Proof matching — POS slip uploaded → legacy pending tabs or existing itemized receipts
     if (row.is_payment_proof === true && row.username && row.pricing_total_paid && row.extraction_date_value) {
       matchProofToPendingReceipts(receiptId, {
@@ -878,7 +1240,7 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
         date: row.extraction_date_value,
       }).then((results) => {
         if (results.length > 0) {
-          console.log(`[run-post-process] 🔗 Proof matched ${results.length} pending receipt(s) for ${receiptId}`);
+          pipelineLog.debug(`[run-post-process] 🔗 Proof matched ${results.length} pending receipt(s) for ${receiptId}`);
         }
       }).catch((e) => {
         console.warn("[run-post-process] proof matching failed (non-blocking):", e);
@@ -892,7 +1254,7 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           date: row.extraction_date_value,
         });
         if (reverseResults.length > 0) {
-          console.log(
+          pipelineLog.debug(
             `[run-post-process] 🔗 Slip ${receiptId} completed ${reverseResults.length} existing itemized receipt(s)`
           );
         }
@@ -933,7 +1295,7 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
           linkedSlipReceiptId,
         });
         if (results.length > 0) {
-          console.log(
+          pipelineLog.debug(
             `[run-post-process] 🔗 Itemized receipt ${receiptId} completed ${results.length} POS slip(s)`
           );
         }
@@ -951,51 +1313,15 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       });
     }
 
-    // Referral: activation check + bonus (fire-and-forget)
-    if (row.username) {
+    // Referral: evaluate the milestone ladder (karar 2026-07-15). Grants any
+    // newly-reached milestone to BOTH the referrer and the referee as cPoints
+    // and notifies each side. Idempotent at the ledger level. Skipped for
+    // backfills — the bonus lands in a live visible balance.
+    if (row.username && !isBackfill) {
       try {
-        const activation = await checkAndActivateReferral(row.username);
-        if (activation.activated && activation.referrerUsername) {
-          await sql`
-            INSERT INTO user_notifications (username, type, title, body, payload)
-            VALUES (
-              ${activation.referrerUsername},
-              'referral_activated',
-              'Referral activated',
-              ${`${row.username} completed activation. You earn 5% bonus for 30 days!`},
-              ${JSON.stringify({ refereeUsername: row.username })}::jsonb
-            )
-          `;
-        }
+        await processReferralMilestones(row.username);
       } catch (e) {
-        console.warn("[run-post-process] referral activation check failed:", e);
-      }
-
-      try {
-        // Base the referrer bonus on the gated amount the referee actually
-        // received, not the ungated estimate — order pages / unproven-payment
-        // receipts grant the referee 0 and must not mint a referrer bonus.
-        const bonus = await applyReferralBonus(receiptId, row.username, grantedBintBonus);
-        if (bonus.applied && bonus.referrerUsername) {
-          await sql`
-            INSERT INTO user_notifications (username, type, title, body, payload, receipt_id)
-            SELECT
-              ${bonus.referrerUsername},
-              'referral_bonus',
-              'Referral bonus earned',
-              ${`You earned ${bonus.bonusAmount.toFixed(2)} bINT from ${row.username}'s receipt.`},
-              ${JSON.stringify({ refereeUsername: row.username, bonusAmount: bonus.bonusAmount })}::jsonb,
-              ${receiptId}
-            WHERE NOT EXISTS (
-              SELECT 1 FROM user_notifications
-              WHERE username = ${bonus.referrerUsername}
-                AND receipt_id = ${receiptId}
-                AND type = 'referral_bonus'
-            )
-          `;
-        }
-      } catch (e) {
-        console.warn("[run-post-process] referral bonus failed:", e);
+        console.warn("[run-post-process] referral milestone processing failed:", e);
       }
     }
 
@@ -1047,11 +1373,11 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
             amountInconsistent: isAmountInconsistent(sumLineTotals, Number(row.pricing_total_paid)),
           });
           await updateUserHonor(row.username, honorDelta);
-          console.log(
+          pipelineLog.debug(
             `[run-post-process] ${receiptId}: quality=${quality.tier}(${quality.score}) honorDelta=${honorDelta}`
           );
         } else {
-          console.log(
+          pipelineLog.debug(
             `[run-post-process] ${receiptId}: quality=${quality.tier}(${quality.score}) recompute — honor unchanged`
           );
         }
@@ -1092,16 +1418,71 @@ export async function runPostProcess(receiptId: string): Promise<PostProcessResu
       }).catch((e) => console.warn("[run-post-process] contribution-points failed:", e));
     }
 
-    if (isTrustWorkerEnabled()) {
-      const base = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-      const internalSecret = process.env.INTERNAL_SECRET;
-      fetch(`${base}/api/internal/trust-update?receiptId=${encodeURIComponent(receiptId)}`, {
-        method: "POST",
-        cache: "no-store",
-        ...(internalSecret && { headers: { Authorization: `Bearer ${internalSecret}` } }),
-      }).catch((err) => console.warn("[run-post-process] trust-update fire-and-forget failed:", err?.message));
+    // Authenticity screening. Runs here rather than at upload time because the
+    // strongest signals are comparative — the same exact total appearing across
+    // unrelated merchants, or a burst of uploads from one account — and those
+    // need the row persisted first. Advisory only: it writes a score and routes
+    // to the admin review queue, and never rejects or moves a reward.
+    if (row.username && !isBackfill) {
+      const lineSum = lineItemsWritten > 0 ? Number(lineTotalCovered) || null : null;
+      // Read back the lines just written so the price check can compare each
+      // unit price against what we have observed for the same product.
+      let sanityLines: Array<{
+        name: string;
+        unitPrice: number | null;
+        quantity: number | null;
+        canonicalId: string | null;
+      }> = [];
+      if (lineItemsWritten > 0) {
+        try {
+          const lineRows = (await sql`
+            SELECT COALESCE(canonical_name, raw_name) AS name,
+                   unit_price_gross,
+                   quantity,
+                   canonical_id
+            FROM receipt_line_items
+            WHERE receipt_id = ${receiptId}
+              AND COALESCE(line_kind, 'product') = 'product'
+          `) as Array<Record<string, unknown>>;
+          sanityLines = lineRows
+            .map((r) => ({
+              name: String(r.name ?? "").trim(),
+              unitPrice: Number(r.unit_price_gross) || null,
+              quantity: Number(r.quantity) || null,
+              canonicalId: (r.canonical_id as string | null) ?? null,
+            }))
+            .filter((l) => l.name.length > 0);
+        } catch {
+          // Screening is advisory; a read failure must not break the pipeline.
+        }
+      }
+      await screenAndRecordAuthenticity({
+        receiptId,
+        username: row.username,
+        totalPaid: Number(row.pricing_total_paid) || null,
+        lineItemsTotal: lineSum,
+        lineItemCount: lineItemsWritten,
+        perceptualHash: row.image_phash ?? null,
+        merchantCountry: row.merchant_country ?? null,
+        currency: row.pricing_currency ?? null,
+        lines: sanityLines,
+        country: row.merchant_country ?? null,
+      }).then((r) => {
+        if (r.flagged) {
+          console.warn(
+            `[run-post-process] ${receiptId}: authenticity score ${r.score} — queued for review`
+          );
+        }
+      });
+    }
+
+    // In-process (the HTTP self-call it replaces died against Deployment
+    // Protection). Skipped for backfills: trust delta is idempotent anyway and
+    // XP/level jumps from days-old receipts must not surface to users.
+    if (isTrustWorkerEnabled() && !isBackfill) {
+      await applyTrustUpdate(receiptId).then((r) => {
+        if (!r.ok) console.warn("[run-post-process] trust-update failed:", r.error);
+      }).catch((err) => console.warn("[run-post-process] trust-update failed:", err?.message));
     }
 
     // Achievements: recompute the user's tiered tracks and grant any newly-earned

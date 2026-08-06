@@ -21,13 +21,13 @@ import { getSpendingIdentity } from "./compute-identity";
 const LEADERBOARD_LIMIT = 6;
 const DISCOVERY_LIMIT = 6;
 
-export interface TribeMember {
+interface TribeMember {
   displayName: string | null;
   explorer: number | null;
   isYou: boolean;
 }
 
-export interface DiscoveryPlace {
+interface DiscoveryPlace {
   merchant: string;
   /** Distinct cohort members who have a receipt from this merchant. */
   visitors: number;

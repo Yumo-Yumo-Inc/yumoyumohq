@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, LogOut, Mail, RefreshCcw, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
@@ -17,7 +17,23 @@ function VerifyEmailPageContent() {
   const searchParams = useSearchParams();
   const [isResending, setIsResending] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState(() => searchParams.get("email")?.trim() || "");
   const emailSent = searchParams.get("emailSent") !== "0";
+
+  useEffect(() => {
+    if (pendingEmail) return;
+    let cancelled = false;
+    void fetch("/api/auth/verify-email/status")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { email?: string | null } | null) => {
+        if (cancelled || !data?.email) return;
+        setPendingEmail(data.email.trim());
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [pendingEmail]);
 
   const status = useMemo<VerifyStatus>(() => {
     const raw = searchParams.get("status");
@@ -27,11 +43,15 @@ function VerifyEmailPageContent() {
     return "pending";
   }, [searchParams]);
 
+  const pendingBody = pendingEmail
+    ? t("auth.verify.pendingBody", { email: pendingEmail })
+    : t("auth.verify.pendingBodyFallback");
+
   const content = {
     pending: {
       icon: Mail,
       title: t("auth.verify.pendingTitle"),
-      body: emailSent ? t("auth.verify.pendingBody") : t("auth.verify.pendingEmailFailedBody"),
+      body: emailSent ? pendingBody : t("auth.verify.pendingEmailFailedBody"),
       accent: "text-app-gold",
     },
     verified: {

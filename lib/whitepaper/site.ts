@@ -9,11 +9,11 @@ export function isWhitepaperLocale(value: string): value is WhitepaperLocale {
   return whitepaperLocales.includes(value as WhitepaperLocale);
 }
 
-export function getWhitepaperLocaleRoot(locale: WhitepaperLocale) {
+function getWhitepaperLocaleRoot(locale: WhitepaperLocale) {
   return path.join(CONTENT_ROOT, locale);
 }
 
-export function getWhitepaperNavigation(locale: WhitepaperLocale): WhitepaperNavItem[] {
+function getWhitepaperNavigation(locale: WhitepaperLocale): WhitepaperNavItem[] {
   const summaryPath = path.join(getWhitepaperLocaleRoot(locale), "SUMMARY.md");
   const raw = fs.readFileSync(summaryPath, "utf8");
 
@@ -42,7 +42,7 @@ export function getWhitepaperNavigation(locale: WhitepaperLocale): WhitepaperNav
     .filter(Boolean) as WhitepaperNavItem[];
 }
 
-export function getWhitepaperOnePageDocument(locale: WhitepaperLocale) {
+function getWhitepaperOnePageDocument(locale: WhitepaperLocale) {
   const navigation = getWhitepaperNavigation(locale);
   const sections = navigation.map((item) => {
     const absolutePath = path.join(getWhitepaperLocaleRoot(locale), item.file);
@@ -60,7 +60,7 @@ export function getWhitepaperOnePageDocument(locale: WhitepaperLocale) {
   };
 }
 
-export function getWhitepaperDocument(locale: WhitepaperLocale, slug?: string[]) {
+function getWhitepaperDocument(locale: WhitepaperLocale, slug?: string[]) {
   const navigation = getWhitepaperNavigation(locale);
   const currentSlug = slug?.join("/") ?? "";
   const current =

@@ -1,14 +1,10 @@
-# 代幣與鏈上資產
+# 代币与链上资产
 
-## 代幣與鏈上資產
+## 代币与链上资产
 
-- **INT** — Yumo Yumo 的可轉移功能性代幣，於 Solana 上以 SPL 代幣發行（小數位數 = 6，總供應量 = 99,000,000,000）。*見：04 代幣經濟學機制。*
-- **bINT** — 靈魂綁定貢獻額度，於收據驗證時鑄造至使用者的凍結 Associated Token Account（ATA）。以年度索引比率轉換為 INT。*見：04 代幣經濟學機制。*
-- **ePoints** — 以美元計價的靈魂綁定洞察額度，反映家庭隨時間浮現的「隱藏成本」。*見：04 代幣經濟學機制、05 資料架構與 API。*
-- **cPoints** — TGE 前貢獻點數；於代幣生成事件時遷移至 bINT，並保留為歸檔點數記錄。*見：04 代幣經濟學機制。*
-- **Foundation NFT（Yumbie）** — 代表使用者 Yumbie 身分的 Token-2022 NonTransferable NFT。於等級 30 演化為 Smart Agent。*見：00 團隊與組織、04 代幣經濟學機制。*
-- **Smart Agent** — Foundation NFT 於等級 30 後的演化形態。單向鑄造事件。*見：04 代幣經濟學機制。*
-- **SPL Token** — Solana Program Library 代幣標準。Solana 的「ERC-20」。INT 使用此標準。
-- **Token-2022** — Solana 的擴充功能代幣標準。Foundation NFT 使用 NonTransferable 擴充功能。
-- **Frozen ATA** — 持有 bINT（或 ePoints）並由鑄造權限綁定至使用者的 Associated Token Account。於協議層強制執行靈魂綁定行為。*見：04 代幣經濟學機制。*
-- **Soulbound（靈魂綁定）** — 代幣行為於資產生命週期中綁定至單一錢包。
+- **INT** — Yumo Yumo 的可转移功能性代币，于 Solana 上以 SPL 代币发行（小数位数 = 6，总供应量 = 99,000,000,000）。*见：04 代币经济学机制。*
+- **bINT** — 用于记录使用者已验证贡献的链下帐务额度。符合条件的余额会在 epoch 结算时，按固定 1:1 比率形成 INT 领取权。*见：04 代币经济学机制。*
+- **Proof-of-expense SBT（支出证明 SBT）** — 每个帐号仅铸造一次、发送至使用者钱包的 Token-2022 NonTransferable 代币，标记该帐号为已验证的支出贡献者。*见：04 代币经济学机制、06 可验证发布。*
+- **SPL Token** — Solana Program Library 代币标准。Solana 的「ERC-20」。INT 使用此标准。
+- **Token-2022** — Solana 的扩充功能代币标准。支出证明 SBT 使用 NonTransferable 扩充功能。
+- **Soulbound（灵魂绑定）** — 代币行为于资产生命周期中绑定至单一钱包。

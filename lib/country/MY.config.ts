@@ -96,4 +96,3 @@ export const MY_CONFIG: CountryConfig = {
   ]
 };
 
-export default MY_CONFIG;

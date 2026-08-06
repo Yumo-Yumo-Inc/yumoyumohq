@@ -15,7 +15,7 @@
 import { SignJWT, jwtVerify } from "jose";
 
 export const ADMIN_UNLOCK_COOKIE = "admin_unlock";
-export const ADMIN_UNLOCK_TTL_SECONDS = 30 * 60; // 30 minutes
+const ADMIN_UNLOCK_TTL_SECONDS = 30 * 60; // 30 minutes
 
 const ALGORITHM = "HS256";
 const TOKEN_KIND = "admin_unlock";

@@ -25,7 +25,7 @@ function inputTypeFor(field: FieldKey): string {
   return "text";
 }
 
-export interface CorrectionResult {
+interface CorrectionResult {
   field: FieldKey;
   value: string;
   appliedImmediately: boolean;

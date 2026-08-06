@@ -1,37 +1,27 @@
-# bINT 分類帳（規範）
+# 奖励会计（规范）
 
-## 5.7 bINT 分類帳（規範）
+## 5.7 奖励会计（规范）
 
-bINT 額度的鏡像分類帳。僅追加。
+bINT 会计是 **事件驱动的**。三个记录族承载它：
 
-```json
-// BintLedgerEntry
-{
-  "ledger_entry_id": "01HXY...",
-  "user_id": "01HXY...",
-  "wallet_address": "5Hg2...8fpA",
-  "source": "receipt",
-  "source_id": "01HXY8K3F9A2QZ0M1B7N4PQR5W",
-  "amount_minor": 12500,
-  "currency_code": "bINT",
-  "trust_score_at_credit": "0.XX",
-  "level_at_credit": "<L>",
-  "health_at_credit": "0.XX",
-  "daily_cap_band": "<band>",
-  "created_at": "2026-05-17T14:23:12Z",
-  "settled_to_chain_at": null,
-  "onchain_tx_signature": null,
-  "previous_entry_hash": "sha256:9a01...",
-  "entry_hash": "sha256:b3f8..."
-}
+- **`contribution_point_events`** — 仅追加事件列。每个记帐都被写成带有其来源（`receipt`、推荐、任务、...）、来源记录的 id、金额与建立时间戳的事件。余额衍生自事件；事件永不就地编辑。
+- **`receipt_rewards`** — 按收据的奖励记录：特定已验证收据赚取的金额以及金额的组成方式（组成存储为与金额一同的分解）。
+- **使用者余额** — 产品中呈现的执行余额，衍生自事件历史。
+
+```text
+// contribution_point_events 列（代表性）
+id:          184223            // 序列
+user_id:     9c41...-...       // 帐号 id
+source:      receipt
+source_id:   6f2b...-...       // 收据 UUID
+amount:      125.00            // 十进制
+created_at:  2026-05-17T14:23:12Z
 ```
 
-### 為何使用密碼學鏈
+### 结算：Epoch 快照
 
-`previous_entry_hash` + `entry_hash` 在分類帳上形成雜湊鏈。這賦予 Yumo Yumo 一個**可驗證的審計日誌**：即使分類帳在營運上是一張 Postgres 資料表，雜湊鏈意味著竄改嘗試可被偵測。最新的 `entry_hash` 定期在鏈上公布（Merkle 根承諾），使外部方能驗證分類帳完整性。
+结算是周期性的。Epoch 引擎为每个合资格帐号的该期间累积余额建构快照，将其写为 `reward_epochs` + `reward_epoch_leaves`（每帐号一个叶子），将叶子折合成 **Merkle 根**，并运行独立验证步骤，在 epoch 被批准之前从存储的叶子重新计算根。已批准的根在链上以 memo 交易形式密封，INT 领取权从密封 epoch 的叶子读取。
 
-### 結算
-
-結算工作者批次處理 `settled_to_chain_at IS NULL` 的 `BintLedgerEntry` 列，並在 Solana 上鑄造彙總後的 bINT。確認後，`settled_to_chain_at` 與 `onchain_tx_signature` 會被填入。從該時刻起，鏈上狀態成為該筆記錄的真相來源。
+Epoch 快照 —— 而非按条目的链 —— 是可审计单位：已发布 epoch 的叶子、根与验证方法让任何人都能重新计算承诺并检查密封根是否与记录相符。密封后的更正被作为后续 epoch 中的新条目处理；密封历史永不被重写。
 
 ---

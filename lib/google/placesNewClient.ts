@@ -15,13 +15,13 @@ const NEW_BASE = "https://places.googleapis.com/v1";
 
 // ─── Legacy-shaped response types ──────────────────────────────────────────
 
-export interface LegacyAddressComponent {
+interface LegacyAddressComponent {
   long_name: string;
   short_name: string;
   types: string[];
 }
 
-export interface LegacyPlace {
+interface LegacyPlace {
   place_id: string;
   name: string;
   types: string[];
@@ -45,7 +45,7 @@ export interface LegacyPlaceDetailsResponse {
   error_message?: string;
 }
 
-export interface LegacyAutocompletePrediction {
+interface LegacyAutocompletePrediction {
   place_id: string;
   description: string;
   structured_formatting?: { main_text: string; secondary_text?: string };

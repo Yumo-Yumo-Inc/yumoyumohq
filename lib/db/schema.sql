@@ -13,6 +13,13 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   country VARCHAR(255),
   website VARCHAR(255),
   bio TEXT,
+  name_color VARCHAR(32),
+  profile_frame VARCHAR(32),
+  theme_accent VARCHAR(32),
+  showcased_badges TEXT,
+  profile_bg VARCHAR(32),
+  avatar_sticker VARCHAR(32),
+  proof_seal VARCHAR(32),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

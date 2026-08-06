@@ -71,7 +71,7 @@ export interface DetectedInsight {
  * A proposed commitment shape that the user can accept directly from an
  * insight card. All fields map 1:1 onto `CommitmentUpsertClientInput`.
  */
-export interface CommitmentTemplate {
+interface CommitmentTemplate {
   kind: CommitmentKind;
   title: string;
   description?: string | null;

@@ -1,21 +1,19 @@
-# 階段 6 — 寫入
+# 阶段 6 — 写入
 
-## 2.9 階段 6 — 輸出寫入
+## 2.9 阶段 6 — 输出写入
 
-單一 Postgres 交易寫入：
+写入拆分为同步流程与后台后处理工作者两部分。
 
-```sql
-INSERT INTO receipts (...) VALUES (...);
-INSERT INTO receipt_line_items (...) VALUES (...);
-INSERT INTO price_observations (...) VALUES (...);
-INSERT INTO events (event_type, payload) VALUES ('receipt.verified', {...});
-```
+**同步写入。** 当收据通过验证时，同步流程写入 `receipts` 行以及原始的 vision 提取记录。已验证预览正是基于这一状态提供：预览出现的那一刻，用户的收据已存在于数据库中。
 
-`events` 列觸發兩個下游消費者：
+**异步写入。** 随后，后台后处理工作者补全该记录：
 
-- **信任評分器**（03）— 接收事件、計算信任分數、寫入 `trust_scores`。
-- **結算工作者** — 將 `bINT.pending` 額度排入佇列。實際的鏈上鑄造發生於非同步階層（01 階段 B）。
+- `receipt_line_items` —— 品项在标准商品解析（2.7）之后写入，因此每行都携带其标准商品引用。
+- `receipt_rewards` —— 奖励会计条目，包含展示给用户的积分明细。
+- `receipt_quality` —— 供信任层（03）读取的质量评估。
 
-此交易對內部寫入鍵（internal write key）具冪等性：若工作者重試，可安全重播。
+**价格观测。** 价格观测由一个独立的每日价格 epoch 流程产生，该流程读取已验证收据、按 epoch 聚合观测，并在异步层将 epoch 根提交至链上（01 阶段 B）。它们派生自收据行，而非由收据管线自身写入。
+
+下游流程 —— 信任评分、奖励结算、价格账本 —— 直接读取收据与质量行。写入对收据标识符具幂等性：若工作者重试，可安全重放。
 
 ---

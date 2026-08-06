@@ -1,24 +1,22 @@
-# API REST B2B
+# API B2B (planificado)
 
-## 5.11 API REST B2B
+## 5.11 API B2B (planificado)
 
-Base separada, auth separado, límites de tasa separados.
+La API del producto de datos B2B es **trabajo futuro planificado**; no hay endpoints B2B activos hoy. Los datos relevantes de B2B actualmente llegan al mundo exterior a través del libro mayor de precios público (5.10) y sus manifiestos de Arweave.
 
-```
-Base: https://b2b-api.yumo.io/v1
-Auth: API key + solicitudes autenticadas con protección contra reproducción. El esquema de firma y la ventana de reproducción se gestionan en la capa operativa interna.
-Rate limit: dependiente de tier · cuota separada de la API pública
-```
+Esbozo de diseño para la superficie planificada — ruta base separada, credenciales separadas, cuotas separadas de la API pública:
 
 | Método | Ruta | Propósito |
 |---|---|---|
-| GET | `/inflation-pulse` | Serie TR Inflation Pulse |
-| GET | `/basket-panel` | Consulta Basket Panel |
+| GET | `/inflation-pulse` | Serie Inflation Pulse |
+| GET | `/basket-panel` | Consulta de Basket Panel |
 | GET | `/merchant-benchmarks` | Merchant Benchmarks |
 | POST | `/cohort-query` | Cohorte personalizada con aplicación de piso k |
-| GET | `/catalog` | Productos disponibles + frescura + precios |
+| GET | `/catalog` | Productos disponibles + antigüedad + precios |
 | GET | `/methodology/{version}` | Documento de metodología para una versión dada |
 
-Cada respuesta B2B incluye `methodology_version`, `k_anonymity_floor` y el conteo de contribuidores de la respuesta, para que el equipo de cumplimiento del comprador pueda auditar una liberación.
+Autenticación planificada: clave API con firma de solicitud protegida contra repetición; el esquema de firma y la ventana de repetición se quedan en la capa de operaciones internas.
+
+Cada respuesta B2B planificada incluye `methodology_version`, el indicador del piso de k-anonimidad y el recuento de colaboradores de la respuesta, para que el equipo de cumplimiento del comprador pueda auditar un lanzamiento.
 
 ---

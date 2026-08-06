@@ -135,16 +135,6 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
     staleTime: 5 * 60_000,
   });
 
-  const { data: cpoints } = useQuery({
-    queryKey: ["dashboard-cpoints-monthly"],
-    queryFn: async () => {
-      const res = await fetch("/api/contribution-points/monthly");
-      if (!res.ok) return { earnedThisMonth: 0 };
-      return (await res.json()) as { earnedThisMonth: number };
-    },
-    staleTime: 5 * 60_000,
-  });
-
   const monthKey = currentMonthKey();
   const month = insights?.monthly?.[monthKey];
   const prevMonth = insights?.monthly?.[previousMonthKey()];
@@ -152,7 +142,6 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
   const hidden = month?.hiddenCostTotal ?? 0;
   const receiptCount = month?.receiptCount ?? 0;
   const currency = insights?.currency || "TRY";
-  const earned = Math.round(cpoints?.earnedThisMonth ?? 0);
   const trend = insights?.spendingTrend ?? [];
 
   const prevSpent = prevMonth?.totalSpent ?? 0;
@@ -177,7 +166,6 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
   );
   const vsLastMonth = byLocale(locale, "geçen aya göre", "vs last month", "к прошлому месяцу", "เทียบเดือนก่อน", "vs mes pasado", "对比上月");
   const proofLabel = byLocale(locale, "Doğrulanmış Kanıt", "Verified Proofs", "Проверенные чеки", "หลักฐานที่ยืนยันแล้ว", "Pruebas verificadas", "已验证凭证");
-  const earnedLabel = byLocale(locale, "Bu Ay Kazanç", "Earned This Month", "Заработано за месяц", "รายได้เดือนนี้", "Ganado este mes", "本月收益");
   const hiddenLabel = byLocale(locale, "Gizli Pay", "Hidden Cost", "Скрытая доля", "ต้นทุนแฝง", "Costo oculto", "隐藏成本");
   const hiddenSub =
     hiddenPer100 > 0
@@ -274,9 +262,6 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
         </p>
         {receiptCount > 0 && (
           <StatBlock value={String(receiptCount)} label={proofLabel} tone="neutral" />
-        )}
-        {earned > 0 && (
-          <StatBlock value={`+${earned.toLocaleString()} cP`} label={earnedLabel} tone="gold" />
         )}
         {hidden > 0 && (
           <StatBlock

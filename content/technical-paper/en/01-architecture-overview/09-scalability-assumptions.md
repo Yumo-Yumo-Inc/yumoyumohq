@@ -12,6 +12,7 @@ This section expresses capacity through workload variables. The architecture eva
 | `L` | Average line items per receipt |
 | `v` | Share of verified receipts eligible for rewards |
 | `e` | Average event records per receipt |
+| `p` | Share of receipts submitted as PDF (the OCR path) |
 | `ρ_ocr` | OCR retry rate |
 | `ρ_llm` | LLM retry or self-consistency rate |
 | `B` | On-chain settlement batch size |
@@ -31,7 +32,7 @@ Rows_m ≈ 30 × R_d × (1 + L + e)
 Daily model-call volume:
 
 ```text
-OCR_d ≈ R_d × (1 + ρ_ocr)
+OCR_d ≈ R_d × p × (1 + ρ_ocr)
 LLM_d ≈ R_d × (1 + ρ_llm)
 ```
 

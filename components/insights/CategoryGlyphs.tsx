@@ -37,7 +37,7 @@ function wrap(children: React.ReactNode, p: GlyphProps) {
 }
 
 // Grocery — wheeled shopping cart
-export function GlyphGrocery(p: GlyphProps) {
+function GlyphGrocery(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -80,7 +80,7 @@ export function GlyphGrocery(p: GlyphProps) {
 }
 
 // Restaurant — crossed fork & knife
-export function GlyphRestaurant(p: GlyphProps) {
+function GlyphRestaurant(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -108,7 +108,7 @@ export function GlyphRestaurant(p: GlyphProps) {
 }
 
 // Cafe — cup + steam
-export function GlyphCafe(p: GlyphProps) {
+function GlyphCafe(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -147,7 +147,7 @@ export function GlyphCafe(p: GlyphProps) {
 }
 
 // Fuel — gas pump
-export function GlyphFuel(p: GlyphProps) {
+function GlyphFuel(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -195,7 +195,7 @@ export function GlyphFuel(p: GlyphProps) {
 }
 
 // Online marketplace — box (star-marked)
-export function GlyphMarketplace(p: GlyphProps) {
+function GlyphMarketplace(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -226,7 +226,7 @@ export function GlyphMarketplace(p: GlyphProps) {
 }
 
 // Pharmacy — cross + medicine bottle
-export function GlyphPharmacy(p: GlyphProps) {
+function GlyphPharmacy(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -244,7 +244,7 @@ export function GlyphPharmacy(p: GlyphProps) {
 }
 
 // Electronics — phone
-export function GlyphElectronics(p: GlyphProps) {
+function GlyphElectronics(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>
@@ -283,7 +283,7 @@ export function GlyphElectronics(p: GlyphProps) {
 }
 
 // Convenience store — heart + basket (local love)
-export function GlyphConvenience(p: GlyphProps) {
+function GlyphConvenience(p: GlyphProps) {
   const { size = 24, color = "currentColor", bgOpacity = 0.32, style } = p;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} style={{ color, ...style }} aria-hidden>

@@ -12,10 +12,6 @@ export interface LevelUpEvent {
     from: number;
     to: number;
   };
-  season?: {
-    from: number;
-    to: number;
-  };
 }
 
 interface LevelUpPopupProps {
@@ -48,13 +44,13 @@ export function LevelUpPopup({ event, onDismiss }: LevelUpPopupProps) {
   const reduced = useReducedMotion();
   const l = (tr: string, en: string, ru: string, th: string, es: string, zh: string) =>
     locale === "tr" ? tr : locale === "ru" ? ru : locale === "th" ? th : locale === "es" ? es : locale === "zh" ? zh : en;
-  const highestLevel = Math.max(event.account?.to ?? 1, event.season?.to ?? 1);
+  const highestLevel = event.account?.to ?? 1;
   const tier = useMemo(() => getTier(highestLevel, theme), [highestLevel, theme]);
   const panelSurface =
     theme === "light"
       ? "linear-gradient(135deg, rgba(255,255,255,0.99), rgba(246,248,252,0.99))"
       : "linear-gradient(135deg, rgba(18,23,34,0.99), rgba(9,12,20,0.99))";
-  const primaryEvent = event.account ?? event.season;
+  const primaryEvent = event.account;
 
   // Haptic punch on arrival (mobile). Replaces confetti as the "felt" celebration.
   useEffect(() => {
@@ -70,13 +66,6 @@ export function LevelUpPopup({ event, onDismiss }: LevelUpPopupProps) {
           label: l("Hesap seviyesi", "Account level", "Уровень аккаунта", "ระดับบัญชี", "Nivel de cuenta", "账户等级"),
           from: event.account.from,
           to: event.account.to,
-        }
-      : null,
-    event.season
-      ? {
-          label: l("Sezon seviyesi", "Season level", "Сезонный уровень", "ระดับซีซัน", "Nivel de temporada", "赛季等级"),
-          from: event.season.from,
-          to: event.season.to,
         }
       : null,
   ].filter((row): row is { label: string; from: number; to: number } => row !== null);

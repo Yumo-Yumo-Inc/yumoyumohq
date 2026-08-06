@@ -1,9 +1,21 @@
 import { NextResponse } from "next/server";
+import { rateLimit, getRateLimitKey } from "@/lib/auth/rate-limit";
 
 const GOOGLE_APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_URL || "";
 
 export async function POST(req: Request) {
   try {
+    // Public form proxying to Apps Script: throttle by IP against abuse.
+    const rl = await rateLimit({
+      key: getRateLimitKey(req, "anon"),
+      endpoint: "waitlist",
+      maxHits: 5,
+      windowMs: 60 * 1000,
+    });
+    if (!rl.allowed) {
+      return NextResponse.json({ success: false, error: "Too many requests" }, { status: 429 });
+    }
+
     const body = await req.json();
     const {
       email,

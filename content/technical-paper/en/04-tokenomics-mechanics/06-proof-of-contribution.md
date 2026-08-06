@@ -4,7 +4,7 @@
 
 The Proof of Contribution (PoC) rail is the share of INT allocation that rewards engineering, design, governance, and ecosystem activation work. The Vision Paper sets the allocation share. The founding team, full-time hires, contractors, and external contributors all earn through PoC, on the same impact-weighted logic.
 
-This is a deliberate structural choice. Separating "team tokens" from "contributor tokens" is the conventional pattern; it gives the team a fixed allocation regardless of impact and creates an asymmetry that depresses long-term token holder trust. The PoC rail closes that asymmetry by routing all non-user-reward issuance through the same earned-by-work mechanism.
+PoC puts distributions to the team and external contributors under the same published assessment and vesting process. This design does not by itself guarantee fair distribution; auditability depends on publishing the versioned rubric, distribution records, and vesting contracts.
 
 ## 4.12 How distributions are scored
 
@@ -17,7 +17,7 @@ PoC issuance happens in periodic distributions. Each distribution scores recent 
 - Ecosystem activation (market expansion, partner enablement, community programs).
 - Governance work as it materialises.
 
-Each contributor receives an INT distribution with vesting attached. The vesting schedule is policy; current defaults follow industry-standard cliff-plus-linear shapes for engineering contributions and shorter schedules for project-bounded work.
+The relevant distribution record specifies the cliff, vesting duration, and contract address for each contributor. The version of the assessment rubric is included in that record before the distribution is made.
 
 ## 4.13 Vesting
 
@@ -31,8 +31,6 @@ All PoC issuance carries vesting; no PoC distribution is immediately liquid. Ves
 
 Exact cliff and vesting durations are policy and are documented in each distribution's published record. Vesting contracts are on-chain and inspectable.
 
-## 4.14 cPoints → bINT migration at TGE
+## 4.14 The bINT accounting layer
 
-Before the Token Generation Event, contribution credits accrue as cPoints. At TGE, cPoints are deprecated and migrated into bINT at a published conversion ratio. The migration is a one-shot event with a snapshot date. The conversion ratio is part of the published TGE schedule and is set against the closed-beta contribution distribution that exists at snapshot time.
-
-cPoints holders see the migration in their wallet as a one-time bINT mint; from that moment, the standard bINT → INT lifecycle (4.4) applies.
+Each verified contribution is recorded as an append-only event in the bINT accounting layer. Epoch settlement sums those events directly and converts the eligible total to INT at the flat 1:1 ratio (4.24); the standard bINT → INT lifecycle (4.4) applies. There is no separate migration event, snapshot, or intermediate conversion step.

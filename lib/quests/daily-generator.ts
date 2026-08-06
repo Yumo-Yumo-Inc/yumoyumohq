@@ -1,11 +1,13 @@
 /**
  * Daily quest generator V2: Tier-based rotation engine.
  *
- * 4 slots/day, each from a different tier:
+ * Slot count is account-level driven (getDailyQuestSlotCount): 3 base, +1 at L4,
+ * +1 at L22 (karar 2026-07-14). Tiers cycle DAILY_TIER_ORDER:
  *   Slot 1 — Tier 1 (Receipt)
  *   Slot 2 — Tier 2 (Discovery)
  *   Slot 3 — Tier 3 (Savings) → falls back to Tier 1 if the feature is unavailable
- *   Slot 4 — Tier 4 (Social)  → event quest when an event is active
+ *   Slot 4 — Tier 4 (Social)  → event quest when an event is active   [L4+]
+ *   Slot 5 — Tier 1 (Receipt, cycled)                                  [L22+]
  *
  * Anti-repeat: quests from the last 3 days are excluded from the pool.
  * Segment-adaptive: difficulty filter based on dormant/casual/power segment.
@@ -18,7 +20,9 @@ import {
   SEGMENT_DAILY_POOLS, DAILY_TIER_ORDER,
   DAILY_QUEST_TARGETS, FALLBACK_TITLES,
   isFeatureEnabled, TIER_FALLBACK,
+  getDailyQuestSlotCount,
 } from "@/lib/quests/quest-pools";
+import { getAccountLevelFromXp } from "@/config/account-level-config";
 import type { QuestTier, UserSegment as Segment, DailyQuestType } from "@/lib/quests/schema";
 
 function toRows(r: unknown): any[] {
@@ -106,11 +110,12 @@ export interface DailyQuestSlot {
 
 // ── Main generator ────────────────────────────────────────
 
-export async function generateDailyQuests(
+async function generateDailyQuests(
   username: string,
   dateStr: string,
   seasonNumber: number,
-  userState?: UserStateResult
+  userState?: UserStateResult,
+  slotCount: number = DAILY_TIER_ORDER.length
 ): Promise<DailyQuestSlot[]> {
   const state = userState ?? (await getUserState(username));
   const segment = await getUserSegment(username);
@@ -167,8 +172,9 @@ export async function generateDailyQuests(
 
   const slots: DailyQuestSlot[] = [];
 
-  for (let i = 0; i < DAILY_TIER_ORDER.length; i++) {
-    let tier = DAILY_TIER_ORDER[i];
+  for (let i = 0; i < slotCount; i++) {
+    // Slots beyond the base tier count cycle the tier order (5th slot → receipt).
+    let tier = DAILY_TIER_ORDER[i % DAILY_TIER_ORDER.length];
 
     // Tier availability check + fallback
     if (!isTierAvailable(tier)) {
@@ -233,6 +239,19 @@ export async function ensureDailyQuestsForUser(
     return { created: false, quests: [] };
   }
 
+  // Slot count grows with account level (3 base, +1 at L4, +1 at L22 — karar
+  // 2026-07-14). Fetched here so callers stay unchanged; falls back to base on any
+  // read failure so a DB hiccup never drops a user below the base quest count.
+  let slotCount = getDailyQuestSlotCount(1);
+  try {
+    const xpRow = toRows(
+      await sql`SELECT COALESCE(account_xp, 0) AS account_xp FROM user_profiles WHERE username = ${username} LIMIT 1`
+    )[0];
+    slotCount = getDailyQuestSlotCount(getAccountLevelFromXp(Number(xpRow?.account_xp ?? 0) || 0));
+  } catch (e) {
+    console.warn("[daily-generator] slot-count level fetch failed, using base:", e);
+  }
+
   // Check if today's quests already exist
   let existingRaw;
   try {
@@ -263,7 +282,7 @@ export async function ensureDailyQuestsForUser(
   const existing = toRows(existingRaw);
   console.log(`[daily-generator] existing quests for ${username} on ${dateStr}: ${existing.length}`, existing.map((r: any) => r.type));
 
-  if (existing.length >= 4) {
+  if (existing.length >= slotCount) {
     return {
       created: false,
       quests: existing.map((r: any) => ({
@@ -280,7 +299,7 @@ export async function ensureDailyQuestsForUser(
   }
 
   console.log(`[daily-generator] generating new daily quests for ${username}, season ${seasonNumber}`);
-  const slots = await generateDailyQuests(username, dateStr, seasonNumber);
+  const slots = await generateDailyQuests(username, dateStr, seasonNumber, undefined, slotCount);
   console.log(`[daily-generator] generated ${slots.length} slots:`, slots.map(s => `${s.type}(tier=${s.tier},target=${s.target})`));
 
   // Fetch template IDs

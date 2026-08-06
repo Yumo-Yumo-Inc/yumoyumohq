@@ -65,7 +65,7 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
   "¥": "JPY",
 };
 
-export const CURRENCY_CODES = [
+const CURRENCY_CODES = [
   "THB",
   "TWD",
   "TRY",
@@ -80,7 +80,7 @@ export const CURRENCY_CODES = [
   "VND",
 ];
 
-export const CURRENCY_HINTS: Array<{ re: RegExp; currency: string; country?: string }> = [
+const CURRENCY_HINTS: Array<{ re: RegExp; currency: string; country?: string }> = [
   { re: /฿/g, currency: "THB", country: "TH" },
   { re: /\bTHB\b/gi, currency: "THB", country: "TH" },
   { re: /\bNT\$\b/gi, currency: "TWD", country: "TW" },
@@ -95,7 +95,7 @@ export const CURRENCY_HINTS: Array<{ re: RegExp; currency: string; country?: str
 // Vendor / meta stopwords
 // ----------------------------
 
-export const VENDOR_STOPWORDS = new Set([
+const VENDOR_STOPWORDS = new Set([
   "welcome",
   "thank",
   "tax invoice",
@@ -127,7 +127,7 @@ export const VENDOR_STOPWORDS = new Set([
 // Hints: online invoice / card slip
 // ----------------------------
 
-export const ONLINE_HINTS = [
+const ONLINE_HINTS = [
   "e-tax",
   "e-receipt",
   "invoice",
@@ -143,7 +143,7 @@ export const ONLINE_HINTS = [
   "order id",
 ];
 
-export const CARD_SLIP_HINTS = [
+const CARD_SLIP_HINTS = [
   "visa",
   "mastercard",
   "amex",
@@ -160,7 +160,7 @@ export const CARD_SLIP_HINTS = [
 // Script / language helpers
 // ----------------------------
 
-export const THAI_SCRIPT_RE = /[ก-๙]/;
+const THAI_SCRIPT_RE = /[ก-๙]/;
 
 //
 // ----------------------------
@@ -175,28 +175,28 @@ export const THAI_SCRIPT_RE = /[ก-๙]/;
 //
 
 // Strong keys that should meaningfully indicate the payable total.
-export const TOTAL_STRONG_KEY_RE =
+const TOTAL_STRONG_KEY_RE =
   /(grand\s*total|total\s*amount|amount\s*due|total\s*due|balance\s*due|ยอดรวม|รวมทั้งสิ้น|ยอดสุทธิ|total\b|toplam|fiş\s*tutarı|gtoplam|tutar|ödenecek\s+tutar|ödenecek\s+toplam|ödenen\s+tutar|vergiler\s+dahil\s+toplam)/i;
 
 // Weak keys: useful as a scoring feature, NOT as a final decision by itself.
-export const TOTAL_WEAK_KEY_RE =
+const TOTAL_WEAK_KEY_RE =
   /\b(net|amount|baht|สุทธิ|รวม)\b/i;
 
 // Backwards compatible name used by older code paths
 export const TOTAL_KEY_RE = TOTAL_STRONG_KEY_RE;
 
-export const SUBTOTAL_KEY_RE = /(subtotal|sub\s*total|ยอดรวมก่อนภาษี|ara\s*toplam)/i;
+const SUBTOTAL_KEY_RE = /(subtotal|sub\s*total|ยอดรวมก่อนภาษี|ara\s*toplam)/i;
 export const TAX_KEY_RE = /\b(vat|vatable|tax|gst|kdv|ภาษี)\b/i;
 
-export const CASH_RE = /\b(cash|เงินสด)\b/i;
-export const CHANGE_RE = /\b(change|เงินทอน)\b/i;
+const CASH_RE = /\b(cash|เงินสด)\b/i;
+const CHANGE_RE = /\b(change|เงินทอน)\b/i;
 
-export const NUMERIC_DATE_RE = regexPatterns.numericDate;
-export const TEXTUAL_DATE_RE = regexPatterns.textualDate;
+const NUMERIC_DATE_RE = regexPatterns.numericDate;
+const TEXTUAL_DATE_RE = regexPatterns.textualDate;
 
 // Backwards compatible amount regex (older code imports AMOUNT_RE).
 // NOTE: still broad; use it only after you decide a line is an amount-candidate line.
-export const AMOUNT_RE = regexPatterns.amount;
+const AMOUNT_RE = regexPatterns.amount;
 
 //
 // ----------------------------
@@ -206,7 +206,7 @@ export const AMOUNT_RE = regexPatterns.amount;
 // but they allow you to quickly add a noise filter without inventing strings again.
 //
 
-export const NOISE_HINTS = [
+const NOISE_HINTS = [
   // wifi / password
   "wifi",
   "wi-fi",
@@ -255,7 +255,7 @@ export const NOISE_HINTS = [
   "receipt copy",
 ];
 
-export const NOISE_LINE_RE =
+const NOISE_LINE_RE =
   /\b(wifi|wi-fi|password|ssid|toilet|restroom|bathroom|survey|feedback|rate\s*us|review|follow\s*us|promo|promotion)\b/i;
 
 //
@@ -295,13 +295,13 @@ export const TOTAL_STRONG_KEYS = [
   "topam",
 ];
 
-export const TOTAL_WEAK_KEYS = ["net", "amount", "baht", "สุทธิ", "รวม"];
+const TOTAL_WEAK_KEYS = ["net", "amount", "baht", "สุทธิ", "รวม"];
 
-export const SUBTOTAL_KEYS = ["subtotal", "sub total", "ara toplam", "ยอดรวมก่อนภาษี"];
-export const TAX_KEYS = ["vat", "tax", "gst", "kdv", "ภาษี", "topkdv","TOPKDV","toplam kdv", "kdv toplamı","kdv tutarı",];
-export const DISCOUNT_KEYS = ["discount", "saved", "ส่วนลด", "คูปอง", "coupon"];
-export const SERVICE_KEYS = ["service", "svc", "service charge", "ค่าบริการ"];
-export const TIP_KEYS = ["tip", "gratuity"];
+const SUBTOTAL_KEYS = ["subtotal", "sub total", "ara toplam", "ยอดรวมก่อนภาษี"];
+const TAX_KEYS = ["vat", "tax", "gst", "kdv", "ภาษี", "topkdv","TOPKDV","toplam kdv", "kdv toplamı","kdv tutarı",];
+const DISCOUNT_KEYS = ["discount", "saved", "ส่วนลด", "คูปอง", "coupon"];
+const SERVICE_KEYS = ["service", "svc", "service charge", "ค่าบริการ"];
+const TIP_KEYS = ["tip", "gratuity"];
 
 //
 // End of file

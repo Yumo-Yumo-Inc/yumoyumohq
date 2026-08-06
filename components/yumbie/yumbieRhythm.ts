@@ -39,7 +39,7 @@ export function isoWeekKey(d: Date = new Date()): string {
   return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
-export function monthKey(d: Date = new Date()): string {
+function monthKey(d: Date = new Date()): string {
   return d.toISOString().slice(0, 7); // YYYY-MM
 }
 

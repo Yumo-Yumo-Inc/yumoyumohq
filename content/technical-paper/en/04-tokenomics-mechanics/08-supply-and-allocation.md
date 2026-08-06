@@ -42,5 +42,5 @@ The six rails account for one hundred percent of supply. There is no separate te
 - **Proof of Contribution** — periodic, rubric-scored distributions with vesting (4.13). Aligns team incentives with measurable work output.
 - **Staking Incentives** — released over a 5-year horizon. Tier-weighted accrual described in 4.6.
 - **Liquidity** — 1 billion INT seeds TGE through a liquidity bootstrapping pool (LP locked 12 months). 3.95 billion held in reserve for community-governed deployments.
-- **Airdrop** — distributed over multiple periods across years (not all at once) as participation-based marketing distributions. Each distribution is surprise-timed yet transparently provable: the recipient set is committed on-chain before tokens move. Distribution sizing is governed in the operations layer.
+- **Airdrop** — distributed over multiple periods as campaign distributions. For each distribution, the recipient set and calculation method are committed on-chain before tokens move. Distribution sizing is published in the relevant campaign record.
 - **Referral** — event-driven: a successful invite triggers a unit unlock to the referring user once the invited user crosses a meaningful contribution threshold. The threshold conditions are calibrated in production and not published.

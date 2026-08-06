@@ -4,38 +4,32 @@
 
 ### Client side
 
-The client resizes and applies lossy compression to the image — enough resolution for OCR while keeping upload sizes small on typical phones. Exact resolution and quality targets are managed in the internal operations layer. EXIF metadata is stripped before upload; geo-enrichment starts from explicit user opt-in.
-
-Perceptual hashing for deduplication is performed server-side once the image is received (2.3.3).
+The client submits the captured image or PDF directly to the application's upload endpoint as a multipart POST. Preprocessing is a server responsibility: keeping the client thin means every capture surface benefits from the same normalization without shipping image-processing code to each platform.
 
 ### Server side
 
-```json
-// UploadRequest
-{
-  "user_id": "uuid",
-  "content_type": "image/jpeg",
-  "size_bytes": 524288,
-  "captured_at": "2026-05-17T14:23:00Z"
-}
+The upload route validates the request before any storage work:
 
-// UploadResponse
-{
-  "receipt_id": "uuid",
-  "upload_url": "https://...",
-  "expires_at": "2026-05-17T14:24:00Z"
-}
-```
+- **Size limit** — the upload size is checked against a production-defined limit.
+- **Magic-byte sniffing** — the server inspects the leading bytes of the buffer to confirm the payload really is a raster image (`JPEG`, `PNG`, `WEBP`, `HEIC` and other supported formats) or a PDF, regardless of the client-supplied `Content-Type`. This blocks scripts or markup smuggled in under an `image/*` type.
 
-The server validates the upload size against a production-defined limit, allowlists the content type (`image/jpeg`, `image/png`, `application/pdf`), and issues a short-lived presigned URL. After the PUT succeeds, the client calls `POST /receipts/{id}/process` to enter Stage 1.
+Accepted uploads then pass through server-side preprocessing with `sharp`:
+
+- **Orientation** — EXIF-based auto-rotation so the receipt is upright before the reading stage.
+- **Compression** — the image is re-encoded to a size and quality profile tuned for the vision stage.
+- **Storage** — the processed image is written to Vercel Blob object storage, with a database fallback path when Blob storage is unavailable. Stored images are scheduled for deletion according to retention policy.
+
+The response returns a `receipt_id` and the stored image reference. The client then calls `POST /api/receipt/analyze` to enter Stage 1.
 
 ### Deduplication
 
-A multi-signal perceptual similarity check runs before any expensive work starts. Two cases are distinguished:
+An exact file-hash check runs before any expensive work starts: the SHA-256 of the uploaded bytes is compared against previously stored receipts. A perceptual-similarity check is deliberately deferred until after content extraction, where it can be cross-checked against a content hash; running visual comparison early would spend that work on uploads the exact check already resolves.
 
-1. **Same-user duplicate** — repeat uploads of the same receipt by the same user resolve to the existing record. This prevents accidental double-uploads.
-2. **Cross-user collision** — receipts that appear to be shared between accounts are flagged for trust review (Stage 6 downgrades them). This is part of the anti-farming defense.
+Both duplicate cases reject the upload with a duplicate error:
 
-A same-user duplicate is a **soft success** — the user sees their previous result. A cross-user signal still proceeds through the pipeline; the trust scorer decides. The exact similarity thresholds and signals are tuned in production and managed in the internal operations layer.
+1. **Same-user duplicate** — the user is told they already uploaded this receipt. This prevents accidental double-uploads and repeat-reward attempts.
+2. **Cross-user collision** — the user is told the receipt was uploaded by another account. This is part of the anti-farming defense.
+
+The exact similarity signals are tuned in production and managed in the internal operations layer.
 
 ---
