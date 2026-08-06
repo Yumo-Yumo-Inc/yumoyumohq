@@ -4,12 +4,18 @@
  * Eurostat publishes both COICOP-based HICP (consumer) and NACE Rev.2-based
  * producer price index (PPI) through a single SDMX/JSON-stat API. No key required.
  *
- *   CPI: dataset prc_hicp_midx, coicop=CP00/CP01.., unit=I15 (2015=100)
+ *   CPI (from 2026): dataset prc_hicp_minr (ECOICOP ver. 2), dimension
+ *     coicop18 + unit=I25 (2025=100). The old prc_hicp_midx / coicop / I15 table
+ *     is archived and frozen at 2025-12.
  *   PPI: dataset sts_inpp_m, nace_r2=C/D/C10.., indic_bt=PRC_PRR, unit=I21
  *
- * Source codes are converted to the canonical schema (CPI: COICOP CPxx → "GENEL"/"01".."12";
+ * Source codes are converted to the canonical schema (CPI: COICOP → "GENEL"/"01".."12";
  * PPI: Eurostat NACE → our ISIC codes "10","13","26","31","19","20_4","35","C","D","ARM").
  * Each series is normalized to a 2025-01 = 1.0 base and upserted into economic_indices.
+ *
+ * COICOP 2018 tail (same rule as DOSM): source CP12 = insurance/financial (no
+ * canonical counterpart → skipped); source CP13 = personal care & miscellaneous
+ * → canonical "12".
  */
 
 import {
@@ -23,14 +29,31 @@ import {
 
 const SOURCE = "EUROSTAT";
 const API = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data";
+/** ECOICOP ver. 2 monthly indices + rates (replaces archived prc_hicp_midx). */
+const CPI_DATASET = "prc_hicp_minr";
+/** Index, 2025=100 — aligns with our 2025-01 baseline month. */
+const CPI_UNIT = "I25";
 
 const EUROSTAT_COUNTRIES = new Set(["DE", "EE", "RO"]);
 
-// Canonical CPI series code → Eurostat COICOP code.
+/**
+ * Canonical CPI series code → Eurostat coicop18 code.
+ * TOTAL is the all-items aggregate (was CP00 under ECOICOP 1999).
+ */
 const CPI_MAP: Record<string, string> = {
-  GENEL: "CP00", "01": "CP01", "02": "CP02", "03": "CP03", "04": "CP04",
-  "05": "CP05", "06": "CP06", "07": "CP07", "08": "CP08", "09": "CP09",
-  "10": "CP10", "11": "CP11", "12": "CP12",
+  GENEL: "TOTAL",
+  "01": "CP01",
+  "02": "CP02",
+  "03": "CP03",
+  "04": "CP04",
+  "05": "CP05",
+  "06": "CP06",
+  "07": "CP07",
+  "08": "CP08",
+  "09": "CP09",
+  "10": "CP10",
+  "11": "CP11",
+  "12": "CP13", // personal care / misc (COICOP 2018) → canonical 12
 };
 
 // Canonical PPI series code → Eurostat NACE Rev.2 code.
@@ -90,10 +113,14 @@ export async function runEurostatEtl(opts: {
   const dryRun = opts.dryRun ?? false;
   const rows: EtlIndexRow[] = [];
 
-  // ── CPI (HICP) ───────────────────────────────────────────────────────────
-  for (const [ourCode, coicop] of Object.entries(CPI_MAP)) {
-    const js = await fetchEurostat("prc_hicp_midx", {
-      geo: country, coicop, unit: "I15", sinceTimePeriod: since,
+  // ── CPI (HICP, ECOICOP ver. 2) ───────────────────────────────────────────
+  for (const [ourCode, coicop18] of Object.entries(CPI_MAP)) {
+    const js = await fetchEurostat(CPI_DATASET, {
+      freq: "M",
+      geo: country,
+      coicop18,
+      unit: CPI_UNIT,
+      sinceTimePeriod: since,
     });
     if (!js) continue;
     const norm = normalizeToBaseline(parseJsonStat(js, since));
@@ -122,5 +149,3 @@ export async function runEurostatEtl(opts: {
   const written = dryRun ? 0 : await upsertIndices(rows);
   return summarizeRows(rows, written, dryRun);
 }
-
-;

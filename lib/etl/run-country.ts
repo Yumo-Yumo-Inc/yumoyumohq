@@ -115,6 +115,15 @@ export async function runCountryEtl(
   return outcomes;
 }
 
+/**
+ * Countries whose national adapters are time-sensitive (large payloads or
+ * category-level CPI). Run them first so a late timeout cannot skip TR YIUFE /
+ * Eurostat / DOSM after dozens of thin IMF calls.
+ */
+const ETL_PRIORITY_COUNTRIES = [
+  "TR", "DE", "EE", "RO", "MY", "BR", "AR", "PH", "PK", "US",
+];
+
 /** Runs all active countries (for the cron). */
 export async function runAllActiveCountries(
   opts: { since?: string; dryRun?: boolean } = {}
@@ -122,6 +131,13 @@ export async function runAllActiveCountries(
   const sql = getSql();
   if (!sql) throw new Error("DB bağlantısı kurulamadı");
   const rows = await sql`SELECT country FROM supported_countries WHERE status = 'active' ORDER BY country` as { country: string }[];
+  const priority = new Map(ETL_PRIORITY_COUNTRIES.map((c, i) => [c, i]));
+  rows.sort((a, b) => {
+    const pa = priority.get(a.country) ?? 1000;
+    const pb = priority.get(b.country) ?? 1000;
+    if (pa !== pb) return pa - pb;
+    return a.country.localeCompare(b.country);
+  });
   const all: CountryEtlOutcome[] = [];
   // Cross-country pacing: most countries hit the same DBnomics (imf_ifs) server;
   // consecutive requests trip the burst rate-limit (429 after 10+ requests). A

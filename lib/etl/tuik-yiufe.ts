@@ -122,6 +122,13 @@ function getObservationValue(
   return Number.isFinite(num) ? num : null;
 }
 
+/**
+ * Product codes we actually upsert. Narrowing the POST body cuts the full-table
+ * download from ~3–5 minutes / multi-MB to ~10s / ~0.5 MB — required so the
+ * monthly all-country cron can finish YIUFE inside maxDuration.
+ */
+const PRODUCT_FILTER_VALUES = SERIES_CONFIGS.map((c) => c.apiCode);
+
 async function fetchDataset(): Promise<JsonStatDataset> {
   const response = await fetch(
     `https://databrowser2.tuik.gov.tr/api/core/nodes/1/datasets/${DATASET_ID}/data`,
@@ -133,10 +140,23 @@ async function fetchDataset(): Promise<JsonStatDataset> {
         Referer: "https://databrowser2.tuik.gov.tr/",
         "User-Agent": "Mozilla/5.0 (compatible; YumoDataBot/1.0)",
       },
+      // Slice dimensions to index-level monthly observations for our series only.
+      // Unfiltered REF_AREA-only requests return the entire cube and routinely
+      // exceed the shared cron budget (see 2026-08-06 root-cause check).
       body: JSON.stringify([
         { id: "REF_AREA", filterValues: ["TR"], type: "CodeValues", period: 0 },
+        { id: "INDICATOR", filterValues: ["F_YIUFE"], type: "CodeValues", period: 0 },
+        { id: "DEGISIM", filterValues: ["1"], type: "CodeValues", period: 0 },
+        { id: "BASE_PER", filterValues: ["2003"], type: "CodeValues", period: 0 },
+        { id: "FREQ", filterValues: ["M"], type: "CodeValues", period: 0 },
+        {
+          id: "URUN_UFE_NACE_CPA",
+          filterValues: PRODUCT_FILTER_VALUES,
+          type: "CodeValues",
+          period: 0,
+        },
       ]),
-      signal: AbortSignal.timeout(300_000),
+      signal: AbortSignal.timeout(120_000),
     }
   );
 
@@ -216,14 +236,15 @@ async function upsertRows(
   for (const row of rows) {
     await sql`
       INSERT INTO economic_indices
-        (country, index_type, series, year_month, value, source, is_verified)
+        (country, index_type, series, year_month, value, source, is_verified, fetch_date)
       VALUES
         (${row.country}, ${row.indexType}, ${row.series}, ${row.yearMonth},
-         ${row.value}, ${row.source}, ${row.isVerified})
+         ${row.value}, ${row.source}, ${row.isVerified}, now())
       ON CONFLICT (country, index_type, series, year_month) DO UPDATE SET
         value = EXCLUDED.value,
         source = EXCLUDED.source,
         is_verified = EXCLUDED.is_verified,
+        fetch_date = EXCLUDED.fetch_date,
         updated_at = now()
     `;
   }
@@ -273,4 +294,3 @@ export async function runYiufeEtl(
   };
 }
 
-;
