@@ -8,6 +8,11 @@
 export interface ContributionCandidate {
   canonicalId: string | null;
   label: string;
+  /**
+   * Merchant and price this product was observed at in the external catalog, when there is
+   * one. A merchant name and numbers, so there is nothing in it to translate.
+   */
+  reference: string | null;
 }
 
 export interface ContributionTask {
@@ -28,7 +33,8 @@ export interface ContributionFeed {
   pointsRemaining: number;
 }
 
-export type AnswerKind = "pick" | "other" | "unknown";
+/** "none" says the options are all wrong, which is a different fact from not knowing. */
+export type AnswerKind = "pick" | "other" | "none" | "unknown";
 
 export interface AnswerInput {
   taskId: string;

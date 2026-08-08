@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
-import { HelpCircle, Pencil, Check } from "lucide-react";
+import { HelpCircle, Pencil, Check, Ban } from "lucide-react";
 import { Surface } from "@/components/ui/surface";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import type { AnswerKind, ContributionTask } from "@/lib/contribution/client";
@@ -155,11 +155,21 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
                 >
                   {isSel ? <Check size={14} strokeWidth={3} /> : String.fromCharCode(65 + i)}
                 </span>
-                <span
-                  className="text-[15px] font-medium leading-snug"
-                  style={{ color: "var(--app-text-primary)" }}
-                >
-                  {c.label}
+                <span className="min-w-0">
+                  <span
+                    className="block text-[15px] font-medium leading-snug"
+                    style={{ color: "var(--app-text-primary)" }}
+                  >
+                    {c.label}
+                  </span>
+                  {c.reference && (
+                    <span
+                      className="mt-0.5 block text-[12px] tabular-nums"
+                      style={{ color: "var(--app-text-muted)" }}
+                    >
+                      {c.reference}
+                    </span>
+                  )}
                 </span>
               </motion.button>
             );
@@ -225,8 +235,20 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
           </AnimatePresence>
         </div>
 
-        {/* Bilmiyorum — first-class, shame-free */}
-        <div className="mt-4 flex justify-center">
+        {/* Two ways out, both first-class and shame-free — and they are different answers:
+            "Hiçbiri" says the options are wrong and retires them, "Bilmiyorum" says nothing
+            about the options at all. Collapsing them would poison whichever one survived. */}
+        <div className="mt-4 flex items-center justify-center gap-5">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onAnswer({ kind: "none" })}
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium transition-opacity hover:opacity-100 disabled:opacity-40"
+            style={{ color: "var(--app-text-muted)", opacity: 0.8 }}
+          >
+            <Ban size={14} />
+            {t("contribute.card.none")}
+          </button>
           <button
             type="button"
             disabled={disabled}
