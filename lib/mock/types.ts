@@ -33,7 +33,7 @@ export interface HiddenCost {
    * MUST trigger a user-facing notice that the figure is an estimate, not computed
    * from the receipt's own line items (product decision, 2026-06-24).
    */
-  provenance?: "item_derived" | "retail_margin" | "category_derived" | "sector_average" | "inflation_premium";
+  provenance?: "item_derived" | "retail_margin" | "category_derived" | "sector_average" | "regional_proxy";
   /** Share (0-1) of paid amount priced from matched line items. */
   completeShare?: number;
 }

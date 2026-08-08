@@ -723,6 +723,7 @@
         "other": "Diğer — yazayım",
         "otherPlaceholder": "Ürün adını yaz…",
         "otherSubmit": "Gönder",
+        "none": "Hiçbiri",
         "dontKnow": "Bilmiyorum"
       },
       "flash": {
@@ -1210,6 +1211,7 @@
         "receiptCountryMismatch": "Bu fiş hesap ülkenizden farklı bir ülkeden görünüyor. Kayıtlı olduğunuz ülkeden fiş yükleyin ya da Ayarlar'dan ülkenizi güncelleyin.",
         "totalNotReliable": "Fişin değeri tespit edilemedi.",
         "merchantNotReadable": "İşletme adı okunamadı, lütfen tekrar deneyiniz.",
+        "receiptImageUnreadable": "Fiş fotoğrafı çok bulanık veya okunamıyor. Lütfen iyi ışıkta yeniden çekip deneyin.",
         "unknown": "Bir hata oluştu",
         "allFieldsRequired": "Tüm alanlar zorunludur",
         "invalidEmail": "Geçersiz e-posta adresi",

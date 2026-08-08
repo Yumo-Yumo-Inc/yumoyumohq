@@ -920,6 +920,7 @@
         "notValidReceipt": "Este documento no parece ser un recibo válido.",
         "totalNotReliable": "No se pudo extraer de manera confiable el monto total del recibo.",
         "merchantNotReadable": "No se pudo leer el nombre del comercio en el recibo. Vuelve a intentarlo.",
+        "receiptImageUnreadable": "La foto del recibo está demasiado borrosa o ilegible. Vuelve a tomarla con buena luz e inténtalo de nuevo.",
         "unknown": "Ocurrió un error",
         "allFieldsRequired": "Todos los campos son obligatorios",
         "invalidEmail": "Dirección de correo electrónico no válida",

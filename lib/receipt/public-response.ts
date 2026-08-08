@@ -12,6 +12,9 @@ export const VISION_PROVIDERS_BUSY_MESSAGE =
   "The service is busy right now. Please try again in a minute or two.";
 export const MERCHANT_NAME_NOT_READ_MESSAGE =
   "Merchant name could not be read from the receipt. Please try again.";
+/** Pre-extract quality gate: blur / unreadable photo — user should retake. */
+export const RECEIPT_IMAGE_UNREADABLE_MESSAGE =
+  "The receipt photo is too blurry or unreadable. Please retake it in good light and try again.";
 
 const SAFE_PUBLIC_MESSAGES = new Set<string>([
   "Unauthorized",
@@ -19,6 +22,7 @@ const SAFE_PUBLIC_MESSAGES = new Set<string>([
   "Please select your country first",
   "Total amount could not be reliably extracted",
   MERCHANT_NAME_NOT_READ_MESSAGE,
+  RECEIPT_IMAGE_UNREADABLE_MESSAGE,
   "Receipt country does not match your account country",
   PUBLIC_RECEIPT_REJECTION_MESSAGE,
   PUBLIC_ANALYZE_FAILURE_MESSAGE,
@@ -88,6 +92,10 @@ export function toPublicAnalyzeMessage(
 
   if (/merchant name could not be read from the receipt/i.test(trimmed)) {
     return MERCHANT_NAME_NOT_READ_MESSAGE;
+  }
+
+  if (/too blurry or unreadable/i.test(trimmed)) {
+    return RECEIPT_IMAGE_UNREADABLE_MESSAGE;
   }
 
   if (

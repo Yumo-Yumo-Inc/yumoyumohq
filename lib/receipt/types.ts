@@ -126,15 +126,16 @@ interface HiddenCostBreakdown {
  *  - category_derived: priced from the category cost-composition model (no items).
  *  - sector_average: generic items / LLM rate / fallback — a sector estimate that
  *    MUST be disclosed to the user (per the product decision, 2026-06-24).
- *  - inflation_premium: inflation_only countries — estimated from the general
- *    inflation (CPI) index; disclosed as an inflation-based estimate.
+ *  - regional_proxy: inflation_only countries — estimated from a comparable market's
+ *    verified commercial margin (regional proxy / cross-country median), low confidence;
+ *    disclosed as a regional-proxy estimate (yakın hesaplama modeli, 2026-08-06).
  */
 type HiddenCostProvenance =
   | "item_derived"
   | "retail_margin"
   | "category_derived"
   | "sector_average"
-  | "inflation_premium";
+  | "regional_proxy";
 
 export interface HiddenCost {
   referencePrice: number;

@@ -194,6 +194,7 @@ const API_ERROR_KEY_MAP: Record<string, string> = {
   'Receipt country does not match your account country': 'errors.api.receiptCountryMismatch',
   'Total amount could not be reliably extracted': 'errors.api.totalNotReliable',
   'Merchant name could not be read from the receipt. Please try again.': 'errors.api.merchantNotReadable',
+  'The receipt photo is too blurry or unreadable. Please retake it in good light and try again.': 'errors.api.receiptImageUnreadable',
   'All fields are required': 'errors.api.allFieldsRequired',
   'Invalid email address': 'errors.api.invalidEmail',
   'Invalid birth date': 'errors.api.invalidBirthDate',
@@ -266,6 +267,9 @@ export function translateApiError(
   if (trimmed.includes('Total amount could not be reliably extracted')) return t('errors.api.totalNotReliable');
   if (trimmed.includes('Merchant name could not be read from the receipt')) {
     return t('errors.api.merchantNotReadable');
+  }
+  if (trimmed.includes('too blurry or unreadable')) {
+    return t('errors.api.receiptImageUnreadable');
   }
   if (trimmed.startsWith('Please wait ') && trimmed.includes('before requesting another email')) {
     return t('errors.api.verificationCooldown');

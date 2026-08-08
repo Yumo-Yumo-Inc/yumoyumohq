@@ -258,8 +258,7 @@ export type HiddenCostProvenance =
   | "retail_margin"
   | "category_derived"
   | "sector_average"
-  | "category_inflation_premium"
-  | "inflation_premium";
+  | "regional_proxy";
 
 /**
  * Mandatory transparency notice for how the hidden-cost TOTAL was derived
@@ -271,28 +270,16 @@ export function getProvenanceNotice(
   provenance: HiddenCostProvenance | null | undefined,
   locale?: LocaleLike
 ): { label: string; detail: string; tone: "success" | "info" } {
-  if (provenance === "category_inflation_premium") {
-    // Each line was priced against its own COICOP division's inflation (food,
-    // transport, clothing …) rather than one headline number for the whole receipt.
+  if (provenance === "regional_proxy") {
+    // For countries without country-level producer data, the reference is the
+    // verified commercial margin of a comparable regional market (or the
+    // cross-country category median). No misleading precision is claimed.
     return {
-      label: pick(locale, "Kategori bazlı enflasyona dayalı", "Based on category inflation"),
+      label: pick(locale, "Bölgesel proxy marjına dayalı tahmin", "Based on a regional proxy margin"),
       detail: pick(
         locale,
-        "Her kalem kendi harcama grubunun resmî enflasyonuyla (gıda, ulaştırma, giyim gibi) karşılaştırıldı; tek bir genel enflasyon oranı kullanılmadı. Üretici maliyetinden hesaplanmadı.",
-        "Each line was compared against its own official spending-group inflation (food, transport, clothing and so on) rather than one headline rate. Not computed from producer cost."
-      ),
-      tone: "info",
-    };
-  }
-  if (provenance === "inflation_premium") {
-    // For countries without detailed producer-gap data, hidden cost is estimated from
-    // general inflation (CPI). No misleading precision (producer margin) is claimed.
-    return {
-      label: pick(locale, "Genel enflasyona dayalı tahmin", "Based on general inflation"),
-      detail: pick(
-        locale,
-        "Ülkeniz için ürün bazlı maliyet verisi henüz yok; bu rakam resmî genel enflasyon (TÜFE/CPI) endeksine dayalı tahminî bir paydır — kalem bazında üretici maliyetinden hesaplanmadı.",
-        "Product-level cost data is not available yet for your country, so this figure is an estimate based on the official general inflation (CPI) index — not computed from per-item producer cost."
+        "Ülkeniz için kalem bazında doğrulanmış veri henüz yok; bu rakam, benzer bir pazarın doğrulanmış perakende/dağıtım marjı katsayısından tahmin edildi — üretici maliyetinden hesaplanmadı ve düşük güvenlidir.",
+        "Country-level item data is not available yet, so this figure was estimated from a verified retail/distribution margin of a comparable market — not computed from producer cost, and low confidence."
       ),
       tone: "info",
     };

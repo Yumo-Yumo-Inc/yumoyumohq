@@ -147,6 +147,14 @@ async function getObservations(epochNumber: number): Promise<(PriceObservation &
  *
  * Only SEALED epochs are considered: a pending epoch's rows are still being built
  * and would be withdrawing themselves mid-flight.
+ *
+ * A leaf is withdrawn ONCE (G1, Uğur 2026-08-07). The scan re-evaluates every
+ * sealed observation on every build, and without a cross-epoch exclusion it
+ * re-emitted the same retraction in every epoch: #2..#22 each carried the
+ * identical 277 withdrawals (21 × 277 = 5.817 rows), and each future seal would
+ * have enshrined a byte-identical retraction block again. Only withdrawals from
+ * SEALED epochs count as already-made: a pending epoch's retraction is still being
+ * settled and may be rebuilt, so it must not suppress a legitimate new one.
  */
 async function getWithdrawals(epochNumber: number): Promise<Withdrawal[]> {
   const rows = (await sql`
@@ -157,6 +165,19 @@ async function getWithdrawals(epochNumber: number): Promise<Withdrawal[]> {
     LEFT JOIN price_ledger_clean c ON c.source_line_id = o.source_line_id
     WHERE o.epoch_number <> ${epochNumber}
   `) as any[];
+
+  // Retractions already sealed on-chain (memo_tx set). These are permanent; a
+  // reader who applied epochs in order already dropped the leaf, so re-emitting it
+  // here would only duplicate the permanent record.
+  const alreadyWithdrawn = new Set<string>();
+  for (const w of (await sql`
+    SELECT w.target_epoch, w.target_leaf
+    FROM price_epoch_withdrawals w
+    JOIN price_epochs e ON e.epoch_number = w.epoch_number AND e.memo_tx IS NOT NULL
+    WHERE w.epoch_number <> ${epochNumber}
+  `) as any[]) {
+    alreadyWithdrawn.add(`${String(w.target_epoch)}|${String(w.target_leaf)}`);
+  }
 
   // A leaf is withdrawn once. Epoch 1 published some leaves more than once —
   // identical product, merchant, date and price hash to the same leaf — and the
@@ -172,6 +193,7 @@ async function getWithdrawals(epochNumber: number): Promise<Withdrawal[]> {
 
   for (const r of rows) {
     const published = String(r.leaf_hash);
+    if (alreadyWithdrawn.has(`${String(r.epoch_number)}|${published}`)) continue;
     if (!r.disposition) {
       remember({ epochNumber: Number(r.epoch_number), targetLeaf: published, reason: "no_longer_in_ledger" });
       continue;

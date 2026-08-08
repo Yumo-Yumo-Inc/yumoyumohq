@@ -723,6 +723,7 @@
         "other": "Other — let me type it",
         "otherPlaceholder": "Type the product name…",
         "otherSubmit": "Send",
+        "none": "None of these",
         "dontKnow": "I don't know"
       },
       "flash": {
@@ -1210,6 +1211,7 @@
         "receiptCountryMismatch": "This receipt is from a different country than your account. Please upload receipts from your registered country, or update your country in Settings.",
         "totalNotReliable": "Total amount could not be reliably extracted from the receipt.",
         "merchantNotReadable": "Merchant name could not be read from the receipt. Please try again.",
+        "receiptImageUnreadable": "The receipt photo is too blurry or unreadable. Please retake it in good light and try again.",
         "unknown": "An error occurred",
         "allFieldsRequired": "All fields are required",
         "invalidEmail": "Invalid email address",

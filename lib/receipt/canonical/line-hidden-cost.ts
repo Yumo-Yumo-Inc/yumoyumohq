@@ -40,7 +40,7 @@ import { categorySeriesMap } from "@/lib/mining/categorySeriesMap";
 import { toHiddenCategory, computeLineComposition, commercialKatFor, isNonPurchaseLine } from "@/lib/mining/hiddenCostComposition";
 import type { HiddenCategory } from "@/lib/mining/hiddenCostComposition";
 import { countryHasExciseModel, getEffectiveExciseRate, getFuelExciseShare } from "@/lib/mining/exciseTax";
-import { commercialKatOverride } from "@/lib/mining/hiddenCostOverrides";
+import { commercialKatOverride, proximateKatFor } from "@/lib/mining/hiddenCostOverrides";
 
 // ─────────────────────────────────────────────
 // Types
@@ -70,10 +70,11 @@ export interface LineHiddenCostResult {
    *   weighted_index     — production_cost_weights, category-based PPI-weighted (producer_gap)
    *   market_benchmark_cpi — TÜİK CPI sub-series benchmark (market_benchmark)
    *   fallback_avg_index — avg(CPI GENEL + PPI C) (other/fallback, full tier)
-   *   sector_margin      — paid / verified retail-only commercial kat (inflation_only tier, when a
-   *                        verified commercial_margins row exists for the country+category)
-   *   inflation_premium  — amount paid / (annual CPI/GENEL multiplier) (inflation_only tier)
-   *   no_data            — inflation_only tier but no CPI data available → hidden cost is 0
+   *   sector_margin      — paid / verified commercial kat for the country+category
+   *   proxy_margin       — paid / regional-proxy or cross-country median kat (yakın
+   *                        hesaplama modeli, 2026-08-06) — confidence: low, şeffaf etiketli
+   *   no_data            — inflation_only tier but no data at all (regional proxy dahil) →
+   *                        hidden cost is 0 (uydurma yok, CPI primine düşülmez)
    *   profit_margin_factor — profit_margin_factor divisor only
    *   fallback_rate      — fixed rate (no data available)
    */
@@ -88,8 +89,7 @@ export interface LineHiddenCostResult {
     | "market_benchmark_cpi"
     | "fallback_avg_index"
     | "sector_margin"
-    | "category_inflation_premium"
-    | "inflation_premium"
+    | "proxy_margin"
     | "no_data"
     | "profit_margin_factor"
     | "fallback_rate";
@@ -186,64 +186,7 @@ export interface EconomicIndexMultipliers {
   cpi_08?: number;
   /** PPI-C: Manufacturing PPI — for the fallback average calculation */
   ppi_c?: number;
-  /**
-   * COICOP division multipliers ("01".."12"), present only for divisions the
-   * country actually publishes. Used by the inflation_only tier so a line is
-   * priced against ITS OWN division's inflation instead of headline CPI — a
-   * phone and a tomato no longer share one number. A division absent from this
-   * map falls back to `other` (CPI/GENEL).
-   */
-  cpi_divisions?: Partial<Record<CoicopDivision, number>>;
 }
-
-/** COICOP 2018 divisions, the canonical CPI series codes alongside "GENEL". */
-type CoicopDivision =
-  | "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12";
-
-/**
- * HiddenCategory → COICOP division. Drives the category-based inflation premium
- * in the inflation_only tier. Categories with no meaningful division stay unmapped
- * and keep using headline CPI.
- */
-const COICOP_BY_CATEGORY: Partial<Record<HiddenCategory, CoicopDivision>> = {
-  // 01 — food and non-alcoholic beverages
-  fresh_produce: "01", dairy: "01", meat_fish: "01", packaged_food: "01", bakery: "01",
-  bottled_water: "01", fruit_juice: "01", soft_drink_cola: "01", flavored_drink: "01",
-  // 02 — alcoholic beverages and tobacco
-  alcohol: "02", tobacco: "02",
-  // 03 — clothing and footwear
-  apparel: "03",
-  // 04 — housing, water, electricity, gas and other fuels
-  utilities_energy: "04", water_bill: "04",
-  // 05 — furnishings, household equipment and routine household maintenance
-  home_textile: "05", furniture: "05", glassware_decor: "05", white_goods: "05",
-  // 07 — transport
-  fuel: "07", vehicle: "07", bus_transport: "07", flight_domestic: "07",
-  // 08 — communication
-  mobile_phone: "08",
-  // 09 — recreation and culture (AV/computing equipment, sporting goods, streaming)
-  computer: "09", television: "09", small_electronics: "09", sporting_goods: "09",
-  digital_subscription: "09",
-  // 11 — restaurants and hotels
-  restaurant_dining: "11", food_delivery: "11", hotel_lodging: "11",
-  // 12 — miscellaneous goods and services (personal care)
-  cosmetics_perfume: "12",
-};
-
-/**
- * Annual inflation multiplier for a line's own COICOP division, or null when the
- * country does not publish that division (caller falls back to headline CPI).
- */
-function categoryInflationMultiplier(
-  category: HiddenCategory,
-  multipliers: EconomicIndexMultipliers | undefined
-): number | null {
-  const division = COICOP_BY_CATEGORY[category];
-  if (!division) return null;
-  const value = multipliers?.cpi_divisions?.[division];
-  return typeof value === "number" && value > 1 ? value : null;
-}
-
 // ─────────────────────────────────────────────
 // Helper: category mapping
 // ─────────────────────────────────────────────
@@ -289,7 +232,11 @@ function toInternalCategory(
     [["seyahat", "bilet", "ucak", "otobus", "travel", "ulasim", "ulastirma"], "travel_ticket"],
     [["konaklama", "otel", "hotel", "pansiyon"], "hospitality_lodging"],
     [["dijital", "digital", "yazilim", "abonelik", "uygulama", "oyun"], "services_digital"],
-    [["restoran", "restaurant", "yemek", "kafe", "cafe", "lokanta", "fast food", "food_service", "food service"], "food_delivery"],
+    // "food_delivery" is the internal label mapToInternalCategory emits for
+    // restaurant/cafe receipts at upload; without it here, receiptIsFoodService
+    // stays false and TH restaurant margins never apply (TatoOcha / yumbie_06).
+    [["restoran", "restaurant", "yemek", "kafe", "cafe", "lokanta", "fast food",
+      "food_service", "food service", "food_delivery"], "food_delivery"],
     [["mobilya", "ev & yasam", "ev &", "ev/yasam", "yasam", "home", "mutfak gereç", "zucaciye"], "home_living"],
     // groceries_fmcg: food + all market sub-categories + cleaning (fast-moving consumer goods)
     [["gida", "grocery", "groceries", "fmcg", "supermarket", "market",
@@ -466,62 +413,46 @@ export function computeLineHiddenCosts(input: ComputeLineHiddenCostInput): {
       }
     }
 
-    // ── inflation_only tier: no detailed data → general inflation premium ─────
-    // Detailed producer-gap data (taxonomy/wholesale market/TÜİK/commercial multiple) exists
-    // only for TR. In other countries, hidden cost = the share of the price coming from
-    // general inflation (CPI/GENEL YoY): reference = commercialBase / annual CPI multiplier,
-    // hidden = paid − reference. If no CPI data is available it is not computed (no_data) —
-    // it does NOT fall back to a fixed 35% rate (per the product decision, §3).
+    // ── inflation_only tier: yakın hesaplama modeli (3 kademe proxy) ──────────
+    // Detaylı üretici-makası verisi (taksonomi/taze pazar/TÜİK) TR'ye özgü; diğer
+    // ülkelerde gizli maliyet doğrulanmış commercial_margins üzerinden hesaplanır:
+    //   1. Birebir marj   — ülke+kategori doğrulanmış satır (sector_margin)
+    //   2. Bölgesel proxy — REGION_PROXY ülkesinin doğrulanmış marjı (proxy_margin)
+    //   3. Kategori ort.  — doğrulanmış ülkeler arası kategori ortancası (proxy_margin)
+    // Üçü de doğrulanmış veriden türetilir. Hiçbiri yoksa no_data (boş durum) — CPI
+    // primine DÜŞÜLMEZ (komik rakamlar üretiyordu; URUN-KARARLARI §3, karar 2026-08-06).
     // Short-circuits BEFORE the TR-specific special cases (wholesale market/fuel excise/category_kat/TÜİK).
     if (hiddenCostTier === "inflation_only") {
-      // ── sector_margin: verified retail-only commercial kat for this country+category.
       // "Üreticiden alsaydı" = producer selling price → reference = commercialBase / kat;
       // hidden = paid − reference = retail/distribution markup (+ embeddedTax already split
       // out above). Only is_verified=TRUE rows reach commercialKatOverride (drafts stay
-      // inert). No embedded TR constant fallback here — commercialKatOverride is country-
-      // scoped, so an absent row falls through to the CPI premium below, never TR's kat.
-      // On food-service receipts the restaurant kat overrides the item's own category
-      // (product decision 2026-07-10: restaurant reference = home-cooked ingredient cost).
+      // inert). No embedded TR constant fallback here. On food-service receipts the
+      // restaurant kat overrides the item's own category (product decision 2026-07-10).
       const marginCat: HiddenCategory =
         receiptIsFoodService || taxCat === "restaurant_dining" ? "restaurant_dining" : taxCat;
-      const katOverride = commercialKatOverride(marginCat);
-      if (katOverride && katOverride.kat > 1) {
-        reference = commercialBase / katOverride.kat;
+      const exactKat = commercialKatOverride(marginCat);
+      const kat = exactKat ?? proximateKatFor(country, marginCat);
+      if (kat && kat.kat > 1) {
+        reference = commercialBase / kat.kat;
         const hidden = Math.max(0, lineTotal - reference);
         results.push({
           observation: obs,
           reference_price: Math.round(reference * 100) / 100,
           hidden_cost_line: Math.round(hidden * 100) / 100,
-          calc_method: "sector_margin",
+          calc_method: exactKat ? "sector_margin" : "proxy_margin",
           model_type: "fallback",
         });
         continue;
       }
 
-      // Prefer the line's OWN COICOP division inflation over headline CPI: a phone
-      // and a tomato must not share one number. Falls back to CPI/GENEL when the
-      // country does not publish that division.
-      const categoryYoY = categoryInflationMultiplier(marginCat, economicMultipliers);
-      const cpiGenelYoY = categoryYoY ?? economicMultipliers?.other;
-      if (cpiGenelYoY && cpiGenelYoY > 1) {
-        reference = commercialBase / cpiGenelYoY;
-        const hidden = Math.max(0, lineTotal - reference);
-        results.push({
-          observation: obs,
-          reference_price: Math.round(reference * 100) / 100,
-          hidden_cost_line: Math.round(hidden * 100) / 100,
-          calc_method: categoryYoY ? "category_inflation_premium" : "inflation_premium",
-          model_type: "fallback",
-        });
-      } else {
-        results.push({
-          observation: obs,
-          reference_price: lineTotal,
-          hidden_cost_line: 0,
-          calc_method: "no_data",
-          model_type: "fallback",
-        });
-      }
+      // Hiçbir kademede veri yok → boş durum (uydurma/%35 yasak, CPI primi yok).
+      results.push({
+        observation: obs,
+        reference_price: lineTotal,
+        hidden_cost_line: 0,
+        calc_method: "no_data",
+        model_type: "fallback",
+      });
       continue;
     }
 
@@ -831,12 +762,16 @@ export async function computeReceiptHiddenFromLineItems(
     if (r.calc_method === "non_purchase") continue;
     const itemCat = toHiddenCategory(r.observation.canonical_name || r.observation.raw_name, r.observation.category_lvl1, { preferCategory: preferCategoryMap });
     const cat: HiddenCategory =
-      r.calc_method === "sector_margin" && (summaryFoodService || itemCat === "restaurant_dining")
+      (r.calc_method === "sector_margin" || r.calc_method === "proxy_margin") &&
+      (summaryFoodService || itemCat === "restaurant_dining")
         ? "restaurant_dining"
         : itemCat;
     let high = r.calc_method === "wholesale_gap" || r.calc_method === "fuel_otv" || cat === "tobacco" || cat === "alcohol";
     if (r.calc_method === "category_kat") high = commercialKatFor(cat)?.conf === "high";
     if (r.calc_method === "sector_margin") high = commercialKatOverride(cat)?.conf === "high";
+    // proxy_margin (bölgesel/kategori proxy) bu ülke için doğrulanmış değil →
+    // confidence düşük kabul edilir, incompletePaid'e gider.
+    if (r.calc_method === "proxy_margin") high = false;
     if (high) completePaid += lt; else incompletePaid += lt;
   }
   return { totalHidden: totalHiddenCanonical, completePaid, incompletePaid, methodCounts };
@@ -1021,10 +956,6 @@ export async function fetchEconomicIndexMultipliers(
       cpi_08:       pick("CPI",   "08"),
     };
 
-    // cpi_divisions is deliberately NOT populated here: this legacy reader applies
-    // `1 + value/100` to values that are stored as index ratios, which understates
-    // the multiplier. The category-based path is fed from fetchEconomicYoYMap via
-    // multipliersForCategory, which divides index levels 12 months apart.
     return multipliers;
   } catch (e) {
     console.warn(
@@ -1133,21 +1064,7 @@ function multipliersForCategory(
     cpi_11:       g("CPI/11"),
     cpi_07:       g("CPI/07"),
     cpi_08:       g("CPI/08"),
-    // COICOP divisions the country actually publishes. Absent divisions stay out of
-    // the map so the engine falls back to headline CPI rather than reading a neutral
-    // 1.0 as "zero inflation".
-    cpi_divisions: coicopDivisions(yoy),
   };
-}
-
-/** COICOP division → YoY multiplier, for the divisions present in the YoY map. */
-function coicopDivisions(yoy: Map<string, number>): Partial<Record<CoicopDivision, number>> {
-  const out: Partial<Record<CoicopDivision, number>> = {};
-  for (const division of ["01","02","03","04","05","06","07","08","09","10","11","12"] as CoicopDivision[]) {
-    const value = yoy.get(`CPI/${division}`);
-    if (typeof value === "number" && value > 0) out[division] = value;
-  }
-  return out;
 }
 
 // ─────────────────────────────────────────────
