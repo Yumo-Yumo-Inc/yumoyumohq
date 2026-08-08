@@ -220,6 +220,17 @@ export function normalizeUnit(r: RawLine): { price: number; unitType: string; to
   if (isFuel) unitType = "litre";
   else if (qty && qty > 0 && Math.abs(qty - Math.round(qty)) > 0.01 && (unitType === "adet" || unitType === "" || unitType === "piece"))
     unitType = "kg"; // fractional quantity of "pieces" → weighed
+  else if (
+    qty && qty >= 1 &&
+    (unitType === "ml" || unitType === "cl" || unitType === "g" || unitType === "l")
+  )
+    unitType = "adet"; // a per-item price labeled with the pack's unit (G7,
+    // Uğur 2026-08-07): "Muzlu Süt 180ml" cost 20 per bottle, not 20 per ml,
+    // and "Su 1,5L" 20 per bottle, not 20 per litre. The published price is
+    // already line_total/qty = per item; only the label was wrong, and
+    // "20 TRY/ml" is arithmetically absurd on a permanent record. l joins ml/g
+    // so two receipts of the same 1.5L bottle — one labelled adet, one l — hash
+    // to the same leaf instead of splitting the product across two units.
 
   /**
    * A pump prints what you paid, not what a litre costs. The per-litre price is

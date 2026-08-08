@@ -1,6 +1,7 @@
 "use client";
 
 import { buildOfflineInsightsRecord } from "@/lib/insights/offline-summary";
+import { resolveLedgerDate } from "@/lib/insights/ledger-date";
 import type { ConfidenceLevel, ReceiptSummary } from "@/lib/insights/types";
 import { localDb } from "@/lib/local-db";
 import { readCachedReceipts } from "@/lib/offline/cache";
@@ -22,12 +23,16 @@ export async function rebuildLocalInsightsFromReceipts(): Promise<void> {
       const retailHiddenCost = Math.max(0, hiddenTotal - hiddenCostCore);
       const totalPaid = Number(receipt.totalPaid ?? 0) || 0;
       const taxAmount = Number(receipt.vatAmount ?? 0) || 0;
+      const createdDay =
+        receipt.createdAt?.slice(0, 10) ?? new Date().toISOString().slice(0, 10);
+      const date =
+        resolveLedgerDate(receipt.extractionDate, createdDay) ?? createdDay;
       return {
         id: receipt.receiptId,
         merchantName: receipt.merchantName ?? "Unknown",
         country: receipt.merchantCountry ?? "",
         currency: receipt.currency || "TRY",
-        date: receipt.extractionDate ?? receipt.createdAt?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+        date,
         time: receipt.extractionTime ?? undefined,
         totalPaid,
         taxAmount,

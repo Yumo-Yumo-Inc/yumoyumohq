@@ -39,7 +39,7 @@ import {
   manifestHash,
   type ManifestHeader,
 } from "./leaf";
-import { isDateInRange } from "./clean-layer";
+import { isDateInRange, normalizeUnit, type RawLine } from "./clean-layer";
 
 type BuiltObservation = PriceObservation & {
   sourceLineId: number;
@@ -96,11 +96,17 @@ async function getObservations(epochNumber: number): Promise<(PriceObservation &
   // fresh price is correct and belongs in the median, it just waits its turn. The
   // ceiling moves with the build, so an observation held back today is picked up
   // by a later epoch once it ages past it — nothing is dropped.
+  //
+  // A source line whose receipt_line_items row is gone must not publish (G8,
+  // Uğur 2026-08-07: "Kaynağı olmayan veri olmayacak"). The clean layer is a
+  // derived table and can keep a row whose underlying line was deleted; JOINing
+  // the source guarantees nothing identity-free ever goes out without a receipt.
   const ceiling = publishCeiling(new Date().toISOString().slice(0, 10));
   const rows = (await sql`
     SELECT c.source_line_id, c.canonical_id, c.product, c.brand, c.pack_size, c.category,
            c.country, c.city, c.merchant, c.obs_date, c.normalized_price, c.currency, c.unit_type
     FROM price_ledger_clean c
+    JOIN receipt_line_items li ON li.id = c.source_line_id
     WHERE c.disposition = 'clean'
       AND c.obs_date <= ${ceiling}
   `) as any[];
@@ -112,25 +118,74 @@ async function getObservations(epochNumber: number): Promise<(PriceObservation &
   `) as any[]) {
     publishedPrice.set(Number(r.source_line_id), canonicalMoney(r.unit_price));
   }
-  return rows.map((r) => ({
-    sourceLineId: Number(r.source_line_id),
-    canonicalProductId: normalizeField(r.canonical_id),
-    productName: normalizeField(r.product),
-    brand: normalizeField(r.brand),
-    packSize: normalizeField(r.pack_size),
-    categoryPath: normalizeField(r.category),
-    country: normalizeField(r.country).toUpperCase(),
-    city: normalizeField(r.city),
-    merchant: normalizeField(r.merchant),
-    obsDate: canonicalDate(r.obs_date),
-    unitPrice: canonicalMoney(r.normalized_price),
-    currency: normalizeField(r.currency).toUpperCase(),
-    unitType: normalizeField(r.unit_type),
-    kind: deriveObservationKind(normalizeField(r.category)),
-    discounted: "0" as const, // extraction does not detect discounts yet; field reserved
-  })).filter((o) => {
+  // Every leaf already published in ANY earlier epoch, pending or sealed (G7,
+  // Uğur 2026-08-07). Two receipts of the same product at the same price and
+  // date hash to one leaf, so after the unit-label fix two source lines can
+  // publish the identical record in different epochs. The leaf is the permanent
+  // record: once it exists anywhere, later copies add nothing.
+  const publishedLeaves = new Set<string>();
+  for (const r of (await sql`
+    SELECT leaf_hash FROM price_epoch_observations
+    WHERE epoch_number < ${epochNumber}
+  `) as any[]) {
+    publishedLeaves.add(String(r.leaf_hash));
+  }
+  const mapped = rows.map((r) => {
+    // The clean layer stores the unit label as the extractor produced it; the
+    // per-item small-unit fix (G7, Uğur 2026-08-07) lives in normalizeUnit, so
+    // it is applied HERE, at publish time, from the same fields the extractor
+    // read. A 180ml bottle priced 20 TRY publishes as per-item (adet), not as
+    // 20 TRY/ml.
+    const nu = normalizeUnit({
+      id: Number(r.source_line_id),
+      canonicalId: normalizeField(r.canonical_id),
+      rawName: normalizeField(r.product),
+      merchant: normalizeField(r.merchant),
+      category: normalizeField(r.category),
+      unitPrice: Number(r.normalized_price),
+      quantity: 1,
+      lineTotal: Number(r.normalized_price),
+      unitType: normalizeField(r.unit_type),
+      currency: normalizeField(r.currency),
+      obsDate: canonicalDate(r.obs_date),
+    } as RawLine);
+    return {
+      sourceLineId: Number(r.source_line_id),
+      canonicalProductId: normalizeField(r.canonical_id),
+      productName: normalizeField(r.product),
+      brand: normalizeField(r.brand),
+      packSize: normalizeField(r.pack_size),
+      categoryPath: normalizeField(r.category),
+      country: normalizeField(r.country).toUpperCase(),
+      city: normalizeField(r.city),
+      merchant: normalizeField(r.merchant),
+      obsDate: canonicalDate(r.obs_date),
+      unitPrice: canonicalMoney(r.normalized_price),
+      currency: normalizeField(r.currency).toUpperCase(),
+      unitType: nu.unitType,
+      kind: deriveObservationKind(normalizeField(r.category)),
+      discounted: "0" as const, // extraction does not detect discounts yet; field reserved
+    };
+  }).filter((o) => {
     const was = publishedPrice.get(o.sourceLineId);
     return was === undefined || was !== o.unitPrice;
+  });
+
+  // A leaf is published once (G7, Uğur 2026-08-07). Two source lines that
+  // produce the identical preimage — same product, merchant, date and price,
+  // e.g. the same item bought twice — hash to the same leaf, and #14 published
+  // up to three copies of one leaf. The leaf IS the permanent record, so a copy
+  // adds nothing but manifest weight and a misleading observation_count. Keep
+  // the first, drop the rest, in row order — and drop a leaf that any earlier
+  // epoch already carries (publishedLeaves), so a unit-label fix that changes
+  // the hash does not republish an identical record in a later epoch.
+  const seen = new Set<string>();
+  return mapped.filter((o) => {
+    const h = observationLeaf(o, epochNumber);
+    if (publishedLeaves.has(h)) return false;
+    if (seen.has(h)) return false;
+    seen.add(h);
+    return true;
   });
 }
 
@@ -152,9 +207,15 @@ async function getObservations(epochNumber: number): Promise<(PriceObservation &
  * sealed observation on every build, and without a cross-epoch exclusion it
  * re-emitted the same retraction in every epoch: #2..#22 each carried the
  * identical 277 withdrawals (21 × 277 = 5.817 rows), and each future seal would
- * have enshrined a byte-identical retraction block again. Only withdrawals from
- * SEALED epochs count as already-made: a pending epoch's retraction is still being
- * settled and may be rebuilt, so it must not suppress a legitimate new one.
+ * have enshrined a byte-identical retraction block again.
+ *
+ * The exclusion covers EVERY earlier epoch, pending or sealed (G8, Uğur
+ * 2026-08-07): builds run strictly in ascending epoch order, so "already made"
+ * means "some earlier epoch carried it" — the first epoch that emits a
+ * retraction owns it, and a later pending epoch must not re-emit it. Without
+ * this, the 62 source-line-missing retractions G8 introduced would repeat in
+ * every pending epoch #3..#23 exactly like the 277 did. A retraction that was
+ * never emitted anywhere (no earlier row) is still produced here.
  */
 async function getWithdrawals(epochNumber: number): Promise<Withdrawal[]> {
   const rows = (await sql`
@@ -166,15 +227,14 @@ async function getWithdrawals(epochNumber: number): Promise<Withdrawal[]> {
     WHERE o.epoch_number <> ${epochNumber}
   `) as any[];
 
-  // Retractions already sealed on-chain (memo_tx set). These are permanent; a
-  // reader who applied epochs in order already dropped the leaf, so re-emitting it
-  // here would only duplicate the permanent record.
+  // Retractions any EARLIER epoch already emitted — sealed or pending. A reader
+  // applies epochs in order and drops a withdrawn leaf once; re-emitting it here
+  // would only duplicate the record in a later epoch.
   const alreadyWithdrawn = new Set<string>();
   for (const w of (await sql`
     SELECT w.target_epoch, w.target_leaf
     FROM price_epoch_withdrawals w
-    JOIN price_epochs e ON e.epoch_number = w.epoch_number AND e.memo_tx IS NOT NULL
-    WHERE w.epoch_number <> ${epochNumber}
+    WHERE w.epoch_number < ${epochNumber}
   `) as any[]) {
     alreadyWithdrawn.add(`${String(w.target_epoch)}|${String(w.target_leaf)}`);
   }

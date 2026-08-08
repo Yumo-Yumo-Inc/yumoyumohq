@@ -31,6 +31,7 @@ function invalidateOfflineBackedQueries(queryClient: QueryClient): Promise<unkno
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY }),
     queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+    queryClient.invalidateQueries({ queryKey: ["dashboard-monthly-insights"] }),
     queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
     queryClient.invalidateQueries({ queryKey: QUESTS_DAILY_QUERY_KEY }),
     queryClient.invalidateQueries({

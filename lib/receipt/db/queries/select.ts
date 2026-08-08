@@ -9,6 +9,7 @@ import { getAllReceipts as getAllReceiptsFile, getReceiptById as getReceiptByIdF
 import { isDatabaseAvailable, withRetry } from "../connection";
 import { dbRowToReceipt } from "../mappers/from-db";
 import type { ReceiptSummary } from "@/lib/insights/types";
+import { resolveLedgerDate } from "@/lib/insights/ledger-date";
 import {
   countCombinedUserReceipts,
   fetchCombinedUserReceiptsLite,
@@ -551,13 +552,19 @@ export async function getReceiptsForInsights(
           : row.flags_rejected || row.status === "rejected"
           ? "rejected"
           : "low";
-      const dateVal = row.extraction_date_value || (row.created_at ? new Date(row.created_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10));
+      const createdDay = row.created_at
+        ? new Date(row.created_at).toISOString().slice(0, 10)
+        : new Date().toISOString().slice(0, 10);
+      // Prefer a real calendar extraction date; garbage OCR values
+      // ("2019-05-2026", "2026-06-null") fall back to created_at.
+      const dateVal =
+        resolveLedgerDate(row.extraction_date_value, createdDay) ?? createdDay;
       return {
         id: row.receipt_id,
         merchantName: row.merchant_name || "Unknown",
         country: row.merchant_country || "US",
         currency: row.pricing_currency || "USD",
-        date: typeof dateVal === "string" ? dateVal.slice(0, 10) : dateVal,
+        date: dateVal,
         time: row.extraction_time_value ?? undefined,
         totalPaid: Number(row.pricing_total_paid) || 0,
         taxAmount: Number(row.pricing_vat_amount) || 0,

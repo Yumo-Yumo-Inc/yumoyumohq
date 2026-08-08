@@ -5,14 +5,7 @@ import type {
   MerchantInsightSummary,
   MonthlyInsightSummary,
 } from "@/lib/offline/types";
-
-function monthKeyFromDate(dateValue: string): string {
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) {
-    return new Date().toISOString().slice(0, 7);
-  }
-  return date.toISOString().slice(0, 7);
-}
+import { monthKeyFromLedgerDate } from "@/lib/insights/ledger-date";
 
 function lastSixMonthKeys(now = new Date()): string[] {
   const keys: string[] = [];
@@ -52,7 +45,7 @@ export function buildOfflineInsightsRecord(input: {
   let primaryCurrency = "USD";
 
   for (const receipt of input.receipts) {
-    const monthKey = monthKeyFromDate(receipt.date);
+    const monthKey = monthKeyFromLedgerDate(receipt.date);
     const category = receipt.category || "other";
     const merchantName = receipt.merchantName || "Unknown";
     const spend = Number(receipt.totalPaid) || 0;
@@ -67,6 +60,12 @@ export function buildOfflineInsightsRecord(input: {
     totalSpend += spend;
     totalHiddenCost += hidden;
     totalReceiptCount += 1;
+
+    // Skip monthly bucketing when the ledger date is unusable — never invent
+    // "this month" for OCR garbage like "2019-05-2026" / "2026-06-null".
+    if (!monthKey) {
+      continue;
+    }
 
     if (!monthlyAccumulator.has(monthKey)) {
       monthlyAccumulator.set(monthKey, {
