@@ -470,12 +470,24 @@ const LINE_ITEM_COLUMN_ALIASES: Record<string, LineItemColumn> = {
 };
 
 /**
- * Default column order used when NO recognizable header row is present. Matches
- * the live <YUMO_LINE_ITEMS> prompt header (7 columns, no BRAND/CATEGORY):
- *   LINE | NAME | QTY | UNIT | UNIT_PRICE | TOTAL | VAT_RATE
- * Header-driven mapping (below) overrides this whenever a header is found.
+ * Default column orders used when NO recognizable header row is present.
+ * The live prompt currently emits BRAND (8 columns). Older 7-column emissions
+ * (no BRAND) still appear; pick the order from the first data row's width so
+ * TOTAL does not shift into UNIT_PRICE (TH 7-Eleven header-less case).
+ *   8+: LINE | NAME | BRAND | QTY | UNIT | UNIT_PRICE | TOTAL | VAT_RATE
+ *   7:  LINE | NAME | QTY | UNIT | UNIT_PRICE | TOTAL | VAT_RATE
  */
-const DEFAULT_LINE_ITEM_ORDER: LineItemColumn[] = [
+const DEFAULT_LINE_ITEM_ORDER_WITH_BRAND: LineItemColumn[] = [
+  "LINE",
+  "NAME",
+  "BRAND",
+  "QTY",
+  "UNIT",
+  "UNIT_PRICE",
+  "TOTAL",
+  "VAT_RATE",
+];
+const DEFAULT_LINE_ITEM_ORDER_NO_BRAND: LineItemColumn[] = [
   "LINE",
   "NAME",
   "QTY",
@@ -484,6 +496,12 @@ const DEFAULT_LINE_ITEM_ORDER: LineItemColumn[] = [
   "TOTAL",
   "VAT_RATE",
 ];
+
+function defaultLineItemOrderForRow(row: string): LineItemColumn[] {
+  // split keeps empty cells between pipes; width decides BRAND presence.
+  const width = row.split("|").length;
+  return width >= 8 ? DEFAULT_LINE_ITEM_ORDER_WITH_BRAND : DEFAULT_LINE_ITEM_ORDER_NO_BRAND;
+}
 
 /** Normalize a raw header cell to a canonical column key, or null if unknown. */
 function canonicalizeHeaderCell(cell: string): LineItemColumn | null {
@@ -534,12 +552,16 @@ function parseLineItemsBlock(
     startIdx = 1;
   } else {
     columnMap = {};
-    DEFAULT_LINE_ITEM_ORDER.forEach((col, idx) => {
+    const order =
+      lines.length > 0
+        ? defaultLineItemOrderForRow(lines[0])
+        : DEFAULT_LINE_ITEM_ORDER_NO_BRAND;
+    order.forEach((col, idx) => {
       columnMap[col] = idx;
     });
     if (lines.length > 0) {
       warnings.push(
-        `line_items: header row not recognized, using default 7-column order — "${lines[0].slice(0, 80)}"`
+        `line_items: header row not recognized, using default ${order.length}-column order — "${lines[0].slice(0, 80)}"`
       );
     }
   }

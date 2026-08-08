@@ -1,14 +1,11 @@
 /**
  * Test: header-driven line-item column mapping.
  *
- * The live <YUMO_LINE_ITEMS> prompt emits 7 columns
- *   LINE | NAME | QTY | UNIT | UNIT_PRICE | TOTAL | VAT_RATE
- * while older fixtures use the full 10-column form (with BRAND/CATEGORY/...).
- * The parser now maps each value by its HEADER column name, so both forms — and
- * header-less rows — land in the correct fields. Previously a fixed positional
- * map assumed BRAND at index 2, shifting every field right by one on 7-col output
- * (e.g. "TUBORG 50CL | 2 | adet | 145 | 290 | 0.20" became unitPrice=290,
- * total=0.20).
+ * The live <YUMO_LINE_ITEMS> prompt emits 8 columns (with BRAND)
+ *   LINE | NAME | BRAND | QTY | UNIT | UNIT_PRICE | TOTAL | VAT_RATE
+ * while older fixtures use a 7-column form (no BRAND) or a full 10-column form.
+ * The parser maps by HEADER name when present; header-less rows pick 7- vs 8-col
+ * default from the first data row's width so TOTAL does not shift.
  *
  * Run: node --experimental-strip-types --no-warnings lib/receipt/parse/__tests__/machine-block.header-driven.test.ts
  */
@@ -82,6 +79,25 @@ assertEq("noheader name", nh.line_items[0]?.name, "SU CAM ŞİŞE");
 assertEq("noheader qty=3", nh.line_items[0]?.qty, 3);
 assertEq("noheader unit_price=130", nh.line_items[0]?.unit_price, 130);
 assertEq("noheader total=390", nh.line_items[0]?.total, 390);
+
+// --- Case 5: header-less 8-col with BRAND (live prompt shape) ---
+// Without width-aware default, TOTAL shifts into UNIT_PRICE and Σlines collapses
+// (TH 7-Eleven: total=103 vs Σ=9).
+const NO_HEADER_BRAND = `X
+<YUMO_LINE_ITEMS>
+1 | แซนวิชเคผักโขมชี | null | 1 | adet | null | 35.00 | null
+2 | กล้วยหอมทอง | null | 2 | adet | 9.00 | 18.00 | null
+3 | ASอเมริกาโน่ร้อน80 | null | 1 | adet | null | 50.00 | null
+</YUMO_LINE_ITEMS>`;
+const nhb = parseMachineOutput(NO_HEADER_BRAND);
+assertEq("noheader8 name1", nhb.line_items[0]?.name, "แซนวิชเคผักโขมชี");
+assertEq("noheader8 total1=35", nhb.line_items[0]?.total, 35);
+assertEq("noheader8 total2=18", nhb.line_items[1]?.total, 18);
+assertEq("noheader8 total3=50", nhb.line_items[2]?.total, 50);
+assertEq("noheader8 unit_price2=9", nhb.line_items[1]?.unit_price, 9);
+assertEq("noheader8 brand1 null", nhb.line_items[0]?.brand, null);
+const sum8 = (nhb.line_items ?? []).reduce((a, it) => a + (it.total ?? 0), 0);
+assertEq("noheader8 Σtotals=103", sum8, 103);
 
 if (failures > 0) {
   console.log(`\n${failures} TEST(S) FAILED`);
