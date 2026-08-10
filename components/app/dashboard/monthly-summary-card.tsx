@@ -36,12 +36,10 @@ function intlLocaleTag(locale: YumoLocale): string {
   }
 }
 
-/** Current calendar month key (UTC) — matches buildOfflineInsightsRecord. */
 function currentMonthKey(): string {
   return new Date().toISOString().slice(0, 7);
 }
 
-/** Previous calendar month key (UTC), for the month-over-month delta. */
 function previousMonthKey(): string {
   const d = new Date();
   d.setUTCDate(1);
@@ -49,10 +47,10 @@ function previousMonthKey(): string {
   return d.toISOString().slice(0, 7);
 }
 
-/** Area sparkline over the last months of spend — fills the hero column. */
+/** Sparkline that fills the hero's right column. */
 function HeroSparkline({ points }: { points: number[] }) {
-  const w = 220;
-  const h = 40;
+  const w = 280;
+  const h = 56;
   const valid = points.filter((p) => Number.isFinite(p));
   if (valid.length < 2) return null;
   const max = Math.max(...valid);
@@ -72,56 +70,19 @@ function HeroSparkline({ points }: { points: number[] }) {
     <svg
       viewBox={`0 0 ${w} ${h}`}
       preserveAspectRatio="none"
-      className="mt-4 block h-10 w-full"
+      className="block h-14 w-full"
       aria-hidden
     >
       <defs>
         <linearGradient id="hero-spark-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8b5cf6" stopOpacity="0.25" />
+          <stop offset="0" stopColor="#8b5cf6" stopOpacity="0.28" />
           <stop offset="1" stopColor="#8b5cf6" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={`${line} L${w} ${h} L0 ${h} Z`} fill="url(#hero-spark-fill)" />
-      <path d={line} fill="none" stroke="#8b5cf6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={line} fill="none" stroke="#8b5cf6" strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={lastX} cy={lastY} r={3.5} fill="#a78bfa" />
     </svg>
-  );
-}
-
-/** Borderless stat block — a colored left hairline + typography, no card box. */
-function StatBlock({
-  value,
-  label,
-  sub,
-  tone,
-}: {
-  value: string;
-  label: string;
-  sub?: string;
-  tone: "neutral" | "gold" | "hidden";
-}) {
-  const border =
-    tone === "hidden"
-      ? "border-l-[#ef6a43]/40"
-      : "border-l-[var(--app-gold-border)]";
-  const valueColor =
-    tone === "gold"
-      ? "text-[var(--app-gold-light)]"
-      : tone === "hidden"
-        ? "text-[#ef6a43]"
-        : "text-[var(--app-text-primary)]";
-  return (
-    <div className={`border-l-2 pl-3 ${border}`}>
-      <p className={`font-mono text-[17px] font-bold tabular-nums leading-tight ${valueColor}`}>
-        {value}
-      </p>
-      <p className="mt-0.5 text-[9px] font-extrabold uppercase tracking-[0.09em] text-[var(--app-text-muted)]">
-        {label}
-      </p>
-      {sub ? (
-        <p className="mt-0.5 text-[10px] font-semibold text-[var(--app-text-muted)]">{sub}</p>
-      ) : null}
-    </div>
   );
 }
 
@@ -139,7 +100,6 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
   const month = insights?.monthly?.[monthKey];
   const prevMonth = insights?.monthly?.[previousMonthKey()];
   const spent = month?.totalSpent ?? 0;
-  const hidden = month?.hiddenCostTotal ?? 0;
   const receiptCount = month?.receiptCount ?? 0;
   const currency = insights?.currency || "TRY";
   const trend = insights?.spendingTrend ?? [];
@@ -147,9 +107,6 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
   const prevSpent = prevMonth?.totalSpent ?? 0;
   const deltaPct =
     prevSpent > 0 ? Math.round(((spent - prevSpent) / prevSpent) * 100) : null;
-
-  // Hidden cost share of every 100 units paid (spent-based, honest framing).
-  const hiddenPer100 = spent > 0 ? Math.round((hidden / spent) * 100) : 0;
 
   const monthName = new Intl.DateTimeFormat(intlLocaleTag(locale), {
     month: "long",
@@ -165,20 +122,7 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
     `${monthName} · 本月支出`,
   );
   const vsLastMonth = byLocale(locale, "geçen aya göre", "vs last month", "к прошлому месяцу", "เทียบเดือนก่อน", "vs mes pasado", "对比上月");
-  const proofLabel = byLocale(locale, "Doğrulanmış Kanıt", "Verified Proofs", "Проверенные чеки", "หลักฐานที่ยืนยันแล้ว", "Pruebas verificadas", "已验证凭证");
-  const hiddenLabel = byLocale(locale, "Gizli Pay", "Hidden Cost", "Скрытая доля", "ต้นทุนแฝง", "Costo oculto", "隐藏成本");
-  const hiddenSub =
-    hiddenPer100 > 0
-      ? byLocale(
-          locale,
-          `her ₺100'de ₺${hiddenPer100}`,
-          `${hiddenPer100} in every 100`,
-          `${hiddenPer100} из каждых 100`,
-          `${hiddenPer100} ในทุก 100`,
-          `${hiddenPer100} de cada 100`,
-          `每 100 中有 ${hiddenPer100}`,
-        )
-      : undefined;
+  const receiptsLabel = byLocale(locale, "fiş", "receipts", "чеков", "ใบเสร็จ", "recibos", "收据");
 
   if (isLoading) {
     return (
@@ -190,13 +134,20 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
     );
   }
 
-  // No spend recorded this month → honest empty state, no fabricated numbers.
   if (spent <= 0) {
     return (
       <section className="pt-1">
-        <p className="text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
-          {spentEyebrow}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="min-w-0 truncate text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+            {spentEyebrow}
+          </p>
+          <p className="ml-auto shrink-0 font-mono text-[13px] font-black tabular-nums text-[var(--app-text-primary)]">
+            0
+            <span className="ml-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
+              {receiptsLabel}
+            </span>
+          </p>
+        </div>
         <p className="mt-2 text-sm font-semibold text-[var(--app-text-secondary)]">
           {displayName
             ? byLocale(
@@ -229,49 +180,56 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
     );
   }
 
+  const hasSpark = trend.filter((p) => Number.isFinite(p)).length >= 2;
+
   return (
-    <section
-      aria-label={spentEyebrow}
-      className="grid grid-cols-[1.5fr_1fr] items-start gap-4 pt-1"
-    >
-      {/* Left: the hero number, boxless on the page ground */}
-      <div className="min-w-0">
-        <p className="text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+    <section aria-label={spentEyebrow} className="pt-1">
+      {/* Eyebrow row — meta on the right fills the empty title line */}
+      <div className="flex items-center gap-3">
+        <p className="min-w-0 truncate text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
           {spentEyebrow}
         </p>
-        <p className="mt-1.5 font-mono text-[38px] font-bold leading-none tracking-tight tabular-nums text-[var(--app-text-primary)]">
-          {formatMoney(spent, currency, locale)}
-        </p>
-        {deltaPct != null && (
-          <p
-            className={`mt-2 text-[12.5px] font-bold ${
-              deltaPct <= 0 ? "text-emerald-500" : "text-amber-500"
-            }`}
-          >
-            {deltaPct <= 0 ? "▼" : "▲"} %{Math.abs(deltaPct)} {vsLastMonth}
-          </p>
-        )}
-        <HeroSparkline points={trend} />
+        <div className="ml-auto flex shrink-0 items-baseline gap-2">
+          {receiptCount > 0 ? (
+            <p className="font-mono text-[13px] font-black tabular-nums text-[var(--app-text-primary)]">
+              {receiptCount}
+              <span className="ml-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
+                {receiptsLabel}
+              </span>
+            </p>
+          ) : null}
+          {deltaPct != null ? (
+            <p
+              className={`font-mono text-[13px] font-black tabular-nums ${
+                deltaPct <= 0 ? "text-emerald-500" : "text-amber-500"
+              }`}
+            >
+              {deltaPct <= 0 ? "▼" : "▲"}
+              {Math.abs(deltaPct)}%
+            </p>
+          ) : null}
+        </div>
       </div>
 
-      {/* Right: Proof of Expense identity column — the dashboard's second
-          sentence: spending produces proof, proof produces earnings. */}
-      <aside className="flex flex-col gap-4 pt-1">
-        <p className="text-[9.5px] font-extrabold uppercase tracking-[0.16em] text-[var(--app-gold-light)]">
-          {byLocale(locale, "Harcama Kanıtı", "Proof of Expense", "Proof of Expense", "Proof of Expense", "Proof of Expense", "Proof of Expense")}
+      <div className="mt-2 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-end gap-3">
+        <p className="min-w-0 font-mono text-[40px] font-black leading-none tracking-tight tabular-nums text-[var(--app-text-primary)] sm:text-[44px]">
+          {formatMoney(spent, currency, locale)}
         </p>
-        {receiptCount > 0 && (
-          <StatBlock value={String(receiptCount)} label={proofLabel} tone="neutral" />
-        )}
-        {hidden > 0 && (
-          <StatBlock
-            value={formatMoney(hidden, currency, locale)}
-            label={hiddenLabel}
-            sub={hiddenSub}
-            tone="hidden"
-          />
-        )}
-      </aside>
+        {hasSpark ? (
+          <div className="min-w-0 pb-0.5">
+            <HeroSparkline points={trend} />
+            {deltaPct != null ? (
+              <p className="mt-1 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
+                {vsLastMonth}
+              </p>
+            ) : null}
+          </div>
+        ) : deltaPct != null ? (
+          <p className="pb-1 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
+            {vsLastMonth}
+          </p>
+        ) : null}
+      </div>
     </section>
   );
 }

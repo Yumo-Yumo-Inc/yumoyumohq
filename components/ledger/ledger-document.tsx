@@ -117,9 +117,12 @@ function EpochRow({ epoch, index, reduce }: { epoch: SealedPriceEpoch; index: nu
 export function LedgerDocument({
   epochs,
   loadError,
+  embedded = false,
 }: {
   epochs: SealedPriceEpoch[];
   loadError: boolean;
+  /** When true, drop full-page chrome so the document sits inside AppShell. */
+  embedded?: boolean;
 }) {
   const { t } = useAppLocale();
   const reduce = useReducedMotion();
@@ -131,10 +134,14 @@ export function LedgerDocument({
 
   return (
     <div
-      className="min-h-screen px-5 py-12 sm:px-8 sm:py-16"
-      style={{ background: "var(--app-bg-shell)", color: "var(--app-text-primary)" }}
+      className={
+        embedded
+          ? "px-0 py-2"
+          : "min-h-screen px-5 py-12 sm:px-8 sm:py-16"
+      }
+      style={{ background: embedded ? "transparent" : "var(--app-bg-shell)", color: "var(--app-text-primary)" }}
     >
-      <div className="mx-auto w-full max-w-[920px]">
+      <div className={embedded ? "mx-auto w-full" : "mx-auto w-full max-w-[920px]"}>
         {/* Document header */}
         <header className="flex items-start justify-between gap-4">
           <div>
@@ -148,7 +155,7 @@ export function LedgerDocument({
               {t("ledger.title")}
             </h1>
           </div>
-          <ThemeToggle className="shrink-0" />
+          {!embedded && <ThemeToggle className="shrink-0" />}
         </header>
 
         <p

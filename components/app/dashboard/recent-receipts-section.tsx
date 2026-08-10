@@ -246,14 +246,19 @@ export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
 
   return (
     <section aria-label={title}>
-      {/* Header — same typographic register as Spending Breakdown, no card frame */}
-      <div className="flex items-baseline gap-2.5">
-        <h2 className="text-sm font-extrabold tracking-tight text-[var(--app-text-primary)]">
+      {/* Header — title + count weight; action as compact pill */}
+      <div className="flex items-center gap-3">
+        <h2 className="min-w-0 text-[17px] font-black tracking-tight text-[var(--app-text-primary)]">
           {title}
         </h2>
+        {rows && rows.length > 0 ? (
+          <span className="shrink-0 font-mono text-[13px] font-black tabular-nums text-[var(--app-text-primary)]">
+            {rows.length}
+          </span>
+        ) : null}
         <Link
           href="/app/receipts"
-          className="ml-auto flex items-center gap-0.5 text-[11.5px] font-bold text-[var(--app-text-secondary)] transition hover:text-[var(--app-text-primary)]"
+          className="ml-auto inline-flex shrink-0 items-center gap-0.5 rounded-full border border-[var(--app-border)] bg-[var(--app-bg-elevated)] px-2.5 py-1 text-[11px] font-extrabold text-[var(--app-text-primary)] transition hover:brightness-110"
         >
           {viewAllLabel}
           <ChevronRight className="h-3 w-3" />
@@ -261,7 +266,7 @@ export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
       </div>
 
       {isLoading || rows === undefined ? (
-        <div className="-mx-3 mt-3 flex gap-3 overflow-hidden px-3 sm:-mx-4 sm:px-4 lg:mx-0 lg:px-0">
+        <div className="mt-3 flex gap-3 overflow-hidden">
           {[0, 1, 2, 3].map((i) => (
             <div key={i} className="h-[176px] w-[150px] shrink-0 animate-pulse">
               <div className="h-11 w-11 rounded-[14px] bg-[var(--app-text-muted)]/[0.10]" />
@@ -289,10 +294,9 @@ export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
           </p>
         </div>
       ) : (
-        // Horizontal, swipe-right rail of frameless merchant tickets.
-        <div className="relative -mx-3 mt-3 sm:-mx-4 lg:mx-0">
+        <div className="relative mt-3">
           <div
-            className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-1 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-4 lg:px-0"
+            className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{ overscrollBehaviorX: "contain" }}
           >
             {rows.map((row, index) => (
@@ -309,7 +313,6 @@ export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
             ))}
           </div>
 
-          {/* Right-edge fade — hints there is more to swipe */}
           {rows.length > 2 && (
             <span
               aria-hidden

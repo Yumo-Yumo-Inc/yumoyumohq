@@ -181,16 +181,16 @@ function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
   return (
     <section aria-label={spendingBreakdownLabel}>
       {/* Header: typography carries hierarchy, no card frame */}
-      <div className="flex items-baseline gap-2.5">
-        <h2 className="text-sm font-extrabold tracking-tight text-[var(--app-text-primary)]">
+      <div className="flex items-center gap-3">
+        <h2 className="min-w-0 text-[17px] font-black tracking-tight text-[var(--app-text-primary)]">
           {spendingBreakdownLabel}
         </h2>
-        <span className="text-[11px] font-semibold text-[var(--app-text-muted)]">
-          {lastWeekLabel.toLocaleLowerCase()}
+        <span className="shrink-0 rounded-full bg-[var(--app-bg-elevated)] px-2 py-0.5 font-mono text-[11px] font-black tabular-nums text-[var(--app-text-primary)]">
+          {lastWeekLabel}
         </span>
         <Link
           href="/app/insights"
-          className="ml-auto flex items-center gap-0.5 text-[11.5px] font-bold text-[var(--app-text-secondary)] transition hover:text-[var(--app-text-primary)]"
+          className="ml-auto inline-flex shrink-0 items-center gap-0.5 rounded-full border border-[var(--app-border)] bg-[var(--app-bg-elevated)] px-2.5 py-1 text-[11px] font-extrabold text-[var(--app-text-primary)] transition hover:brightness-110"
         >
           {detailsLabel}
           <ChevronRight className="h-3 w-3" />

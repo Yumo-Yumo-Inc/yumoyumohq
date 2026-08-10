@@ -22,8 +22,10 @@
 
 import type { ReactNode } from "react";
 import { Fragment, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   Activity,
+  ChevronRight,
   Clock3,
   Gauge,
   LineChart,
@@ -155,7 +157,7 @@ export default function AnalysisPage() {
           >
             <LineChart size={18} strokeWidth={2} />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <h1 className="m-0 text-[26px] font-bold leading-none tracking-[-0.02em] text-app-text-primary">
               {tr ? "Analiz" : "Analysis"}
             </h1>
@@ -165,6 +167,13 @@ export default function AnalysisPage() {
               </div>
             )}
           </div>
+          <Link
+            href="/app/ledger"
+            className="inline-flex shrink-0 items-center gap-0.5 rounded-full border border-[var(--app-border)] bg-[var(--app-bg-elevated)] px-3 py-1.5 text-[12px] font-bold text-[var(--app-text-primary)] transition hover:brightness-110"
+          >
+            {tr ? "Defter" : "Ledger"}
+            <ChevronRight className="h-3.5 w-3.5 text-[var(--app-text-muted)]" />
+          </Link>
         </header>
 
         {/* Tabs — segmented, gold active pill */}
