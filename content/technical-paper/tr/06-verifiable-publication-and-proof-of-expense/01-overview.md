@@ -95,7 +95,7 @@ Bu iki pratik koruma sağlar: uygulama ekranda görünen bINT bakiyesini değiş
 
 | Yüzey | Repodaki kanıt | Açıklanması gereken release durumu |
 |---|---|---|
-| Fiyat defteri | Yeniden kurulabilir manifest, Merkle tanımı, yayın betiği ve açık Memo doğrulama tarifi | Arweave ve Memo kimlikleri yayımlandığında üretim yayını bağımsız kontrol edilebilir |
+| Fiyat defteri | Yeniden kurulabilir manifest, Merkle tanımı, yayın betiği, açık Memo doğrulama tarifi ve açık kaynak doğrulayıcı | Solana mainnet’te canlı (Arweave artefact’larıyla); kamu dizini https://yumoyumo.com/ledger; bağımsız doğrulama https://github.com/Yumo-Yumo-Inc/price-ledger-verifier |
 | Jito dağıtım ağacı | Clean-room TypeScript ağaç oluşturucu; iki Jito CLI fixture ağacına karşı byte-exact test | Devnet’te prova edildi; her mainnet distributor kendi adresi, kökü, fonlama işlemi ve doğrulama kaydını gerektirir |
 | Hazine kontrolü | Root, treasury ve clawback için betikler ve görev ayrımı | Mainnet multisig adresleri, üyeler, eşik ve release onayları etkinleştirmeden önce yayımlanmalı |
 | INT mint | Açık mint-authority-close kapısı olan mainnet runbook | Mainnet mint adresi ve yetki durumu yayımlanmadan aktif denmemeli |
@@ -115,7 +115,7 @@ Gateway gecikmesi, RPC kesintisi, proof uyumsuzluğu, reddedilen claim, başarı
 
 ## 6.7 İnceleme yolu
 
-Teknik inceleyici fiyat-epoch Memo’sundaki Arweave işlem kimliğiyle başlayabilir; manifesti indirir, kökü yeniden hesaplar ve Solana ile karşılaştırır. Ödül inceleyicisi ise kaydedilmiş leaf seti, Jito ağaç biçimi, distributor hesabı, fonlama işlemi ve claim durumuyla dağıtım sınırını yeniden üretir. Uygulama biçimleri, program kimlikleri, release durumu gereklilikleri ve hata yönetimi [Protokol ayrıntıları ve operasyonel sınırlar](02-protocol-details.md) sayfasındadır.
+Teknik inceleyici kamu defter dizininden başlayabilir ([https://yumoyumo.com/ledger](https://yumoyumo.com/ledger)): mühürlü bir epoch’u açar, Solana Memo ve Arweave artefact bağlantılarını izler, ardından açık kaynak doğrulayıcıyla ([https://github.com/Yumo-Yumo-Inc/price-ledger-verifier](https://github.com/Yumo-Yumo-Inc/price-ledger-verifier)) `npx tsx src/verify.ts <epoch>` çalıştırarak kökü yeniden hesaplar. Yumo Yumo hesabı veya veritabanı gerekmez. Ödül inceleyicisi kaydedilmiş leaf seti, Jito ağaç biçimi, distributor hesabı, fonlama işlemi ve claim durumuyla dağıtım sınırını yeniden üretir. Uygulama biçimleri, program kimlikleri, release durumu gereklilikleri ve hata yönetimi [Protokol ayrıntıları ve operasyonel sınırlar](02-protocol-details.md) sayfasındadır.
 
 Web3 katmanının amacı fiş işlemeyi blockchaine taşımak değildir; yayımlanmış veriyi ve token settlement’ını, kalıcı veya ekonomik sonuç doğurduğu noktalarda bağımsız incelemeye açmaktır.
 

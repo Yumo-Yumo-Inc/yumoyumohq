@@ -79,7 +79,7 @@ bINT — учётный кредит вне цепи. Подходящие за�
 
 | Поверхность | Доказательство | Статус для раскрытия |
 |---|---|---|
-| Ценовой реестр | Пересобираемый manifest, спецификация, скрипт и рецепт Memo | Проверяем после публикации IDs Arweave и Memo |
+| Ценовой реестр | Пересобираемый manifest, спецификация, скрипт, рецепт Memo и открытый verifier | Живой Solana mainnet с артефактами Arweave; публичный индекс https://yumoyumo.com/ledger; независимая проверка https://github.com/Yumo-Yumo-Inc/price-ledger-verifier |
 | Дерево Jito | Clean-room TypeScript builder и byte-exact тесты с двумя CLI fixtures | Devnet-репетиция; каждый mainnet distributor требует своего адреса, корня, funding и проверки |
 | Казначейство и INT | Runbooks, разделение ролей и gate закрытия mint | Не заявлять активный mainnet до публикации адресов, порога и authority state |
 
@@ -89,6 +89,6 @@ bINT — учётный кредит вне цепи. Подходящие за�
 
 Reviewer может проверить hash/root manifest, включение отпечатка и согласованность proof, distributor и vault. OCR, matching, fraud и частная допустимость оцениваются по процессным доказательствам. Задержка gateway, RPC outage, несовпадение proof, отклонённый claim и clawback — наблюдаемые состояния; Web3 не заявляет, что предотвращает их.
 
-Проверка начинается с ID Arweave в ценовом Memo либо с leaves, Jito account, funding и claims распределения. Форматы и контроли описаны в [Детали протокола и операционные границы](02-protocol-details.md).
+Публичная проверка ценового реестра начинается с https://yumoyumo.com/ledger: открыть sealed epoch, перейти по Memo (Solana) и артефакту (Arweave), затем выполнить `npx tsx src/verify.ts <epoch>` из https://github.com/Yumo-Yumo-Inc/price-ledger-verifier. Проверка reward-пути использует leaves, Jito account, funding и claims. Форматы и контроли описаны в [Детали протокола и операционные границы](02-protocol-details.md).
 
 ---

@@ -64,10 +64,12 @@ bINT 是链下会计额度。合格记录经验证后转为不同于价格树的
 
 | 面向 | 证据 | 必须披露的状态 |
 |---|---|---|
-| 价格分类帐 | 可重建 manifest、规格、script 与 Memo 验证方法 | 发布 Arweave/Memo IDs 后可检查 |
+| 价格分类帐 | 可重建 manifest、规格、script、Memo 验证方法与开源 verifier | 已在 Solana mainnet 运行并搭配 Arweave artefact；公开索引 https://yumoyumo.com/ledger；独立验证 https://github.com/Yumo-Yumo-Inc/price-ledger-verifier |
 | Jito 树 | Clean-room builder 与两个 CLI fixture 的 byte-exact 测试 | 已 devnet 演练；每个 mainnet distributor 需其 address/root/funding/record |
 | Treasury/INT | 角色分离 runbook 与 mint-close gate | 在发布 addresses、threshold 和 authority 前不可称 mainnet active |
 
-审查者可验证 manifest hash/root、leaf 纳入以及 proof/distributor/vault 一致性；OCR、fraud、matching 与私人资格需从流程证据评估。Gateway 延迟、RPC 中断、proof 不符、claim 被拒和 clawback 都是可观测状态；Web3 不宣称防止它们。详情见[协议细节与营运边界](02-protocol-details.md)。
+审查者可验证 manifest hash/root、leaf 纳入以及 proof/distributor/vault 一致性；OCR、fraud、matching 与私人资格需从流程证据评估。Gateway 延迟、RPC 中断、proof 不符、claim 被拒和 clawback 都是可观测状态；Web3 不宣称防止它们。
+
+价格分类帐的公开入口：https://yumoyumo.com/ledger；开源 verifier：https://github.com/Yumo-Yumo-Inc/price-ledger-verifier（`npx tsx src/verify.ts <epoch>`）。详情见[协议细节与营运边界](02-protocol-details.md)。
 
 ---

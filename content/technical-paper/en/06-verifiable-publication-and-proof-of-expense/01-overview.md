@@ -96,7 +96,7 @@ This provides two practical protections: the application cannot create an INT cl
 
 | Surface | Evidence available in the repository | Release status to disclose |
 |---|---|---|
-| Price ledger | Rebuildable manifest, Merkle specification, publishing script, and public Memo verification recipe | Production publication is independently checkable after its Arweave and Memo IDs are released |
+| Price ledger | Rebuildable manifest, Merkle specification, publishing script, public Memo verification recipe, and open-source verifier | Live on Solana mainnet with Arweave artefacts; public index at https://yumoyumo.com/ledger; independent verify via https://github.com/Yumo-Yumo-Inc/price-ledger-verifier |
 | Jito distribution tree | Clean-room TypeScript tree builder; byte-exact tests against two Jito CLI fixture trees | Devnet-rehearsed; each mainnet distributor needs its own address, root, funding transaction, and verification record |
 | Treasury control | Scripts and role separation for root, treasury, and clawback | Mainnet multisig addresses, members, threshold, and release approvals must be published before activation |
 | INT mint | Mainnet runbook with explicit mint-authority-close gate | Do not state that a mainnet mint is active until its address and authority state are published |
@@ -116,7 +116,7 @@ Gateway delay, RPC outage, proof mismatch, rejected claim, failed verifier run, 
 
 ## 6.7 Review path
 
-A technical reviewer can begin with the Arweave transaction ID in a price-epoch Memo, download the manifest, recompute the root, and compare it with Solana. A reward reviewer can use the recorded leaf set, Jito tree format, distributor account, funding transaction, and claim status to reproduce the distribution boundary. The implementation-level formats, program IDs, release-state requirements, and failure handling are in [Protocol details and operational boundaries](02-protocol-details.md).
+A technical reviewer can begin at the public ledger index ([https://yumoyumo.com/ledger](https://yumoyumo.com/ledger)), open a sealed epoch, follow its Solana Memo and Arweave artefact links, then recompute the root with the open-source verifier ([https://github.com/Yumo-Yumo-Inc/price-ledger-verifier](https://github.com/Yumo-Yumo-Inc/price-ledger-verifier)) using `npx tsx src/verify.ts <epoch>`. No Yumo Yumo account or database is required. A reward reviewer can use the recorded leaf set, Jito tree format, distributor account, funding transaction, and claim status to reproduce the distribution boundary. The implementation-level formats, program IDs, release-state requirements, and failure handling are in [Protocol details and operational boundaries](02-protocol-details.md).
 
 This is the purpose of the Web3 layer: not to move receipt processing onto a blockchain, but to make published data and token settlement independently inspectable at the points where they become durable or economically consequential.
 

@@ -79,7 +79,7 @@ La aplicación no crea claims cambiando un saldo visible y el usuario no firma p
 
 | Superficie | Evidencia | Estado que debe declararse |
 |---|---|---|
-| Libro de precios | Manifest reconstruible, especificación, script y receta Memo | Verificable cuando se publiquen IDs Arweave y Memo |
+| Libro de precios | Manifest reconstruible, especificación, script, receta Memo y verificador de código abierto | En vivo en Solana mainnet con artefactos Arweave; índice público https://yumoyumo.com/ledger; verificación independiente https://github.com/Yumo-Yumo-Inc/price-ledger-verifier |
 | Árbol Jito | Builder TypeScript clean-room y pruebas byte-exact contra dos fixtures CLI | Ensayado en devnet; cada distributor mainnet requiere dirección, raíz, funding y verificación propios |
 | Tesorería e INT | Runbooks, separación de roles y gate de cierre de mint | No declarar mainnet activo antes de publicar direcciones, umbral y estado de autoridad |
 
@@ -89,6 +89,6 @@ Un flujo ensayado es evidencia de implementación, no evidencia de que la instan
 
 Un revisor puede comprobar hash/root del manifest, inclusión de una huella y coherencia entre proof, distributor y vault. Debe evaluar por evidencia de proceso OCR, matching, fraude y elegibilidad privada. Retrasos de gateway, RPC caído, proof no coincidente, claim rechazado y clawback son estados observables; Web3 no afirma prevenirlos.
 
-La revisión comienza con el ID de Arweave en un Memo de precios o con leaves, cuenta Jito, funding y claims de una distribución. Los formatos y controles están en [Detalles del protocolo y límites operativos](02-protocol-details.md).
+La revisión pública del libro de precios comienza en https://yumoyumo.com/ledger: abrir un epoch sellado, seguir Memo (Solana) y artefacto (Arweave), luego ejecutar `npx tsx src/verify.ts <epoch>` desde https://github.com/Yumo-Yumo-Inc/price-ledger-verifier. Una revisión de recompensas usa leaves, cuenta Jito, funding y claims. Los formatos y controles están en [Detalles del protocolo y límites operativos](02-protocol-details.md).
 
 ---

@@ -64,10 +64,12 @@ bINT เป็นเครดิตบัญชีนอกเชน ราย�
 
 | พื้นผิว | หลักฐาน | สถานะที่ต้องเปิดเผย |
 |---|---|---|
-| ราคา | manifest ที่สร้างใหม่ได้ สเปก script และสูตร Memo | ตรวจได้เมื่อเผยแพร่ IDs Arweave/Memo |
+| ราคา | manifest ที่สร้างใหม่ได้ สเปก script สูตร Memo และ open-source verifier | ใช้งานจริงบน Solana mainnet พร้อม artefact บน Arweave; ดัชนีสาธารณะ https://yumoyumo.com/ledger; ตรวจสอบอิสระ https://github.com/Yumo-Yumo-Inc/price-ledger-verifier |
 | ต้นไม้ Jito | builder แบบ clean-room และ byte-exact tests กับ CLI fixtures สองชุด | ซ้อม devnet; mainnet distributor แต่ละตัวต้องมี address/root/funding/record ของตน |
 | Treasury/INT | runbook การแยกบทบาทและ gate ปิด mint | ห้ามบอกว่า mainnet active ก่อนเผยแพร่ addresses, threshold และ authority |
 
-ผู้ตรวจตรวจ hash/root ของ manifest การรวม leaf และความสอดคล้องของ proof/distributor/vault ได้ แต่ OCR, fraud, matching และสิทธิ์ส่วนตัวต้องประเมินจากหลักฐานกระบวนการ Gateway delay, RPC outage, proof mismatch, claim ถูกปฏิเสธ และ clawback เป็นสถานะที่สังเกตได้ Web3 ไม่ได้อ้างว่าป้องกันสิ่งเหล่านี้ รายละเอียดอยู่ที่ [รายละเอียดโปรโตคอลและขอบเขตการปฏิบัติงาน](02-protocol-details.md)
+ผู้ตรวจตรวจ hash/root ของ manifest การรวม leaf และความสอดคล้องของ proof/distributor/vault ได้ แต่ OCR, fraud, matching และสิทธิ์ส่วนตัวต้องประเมินจากหลักฐานกระบวนการ Gateway delay, RPC outage, proof mismatch, claim ถูกปฏิเสธ และ clawback เป็นสถานะที่สังเกตได้ Web3 ไม่ได้อ้างว่าป้องกันสิ่งเหล่านี้
+
+ทางเข้าสาธารณะของ price ledger: https://yumoyumo.com/ledger และ verifier ที่ https://github.com/Yumo-Yumo-Inc/price-ledger-verifier (`npx tsx src/verify.ts <epoch>`) รายละเอียดอยู่ที่ [รายละเอียดโปรโตคอลและขอบเขตการปฏิบัติงาน](02-protocol-details.md)
 
 ---
