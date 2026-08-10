@@ -250,6 +250,40 @@ interface CandidateEntry {
  * does not become five competing options — which would split the vote and guarantee
  * nothing ever clears the margin.
  */
+async function appendPackCandidate(
+  taskId: string | number,
+  packSize: string,
+  username: string
+): Promise<void> {
+  try {
+    const { rows } = await db.query<{ candidates: CandidateEntry[] | null }>(
+      `SELECT candidates FROM contribution_tasks WHERE id = $1`,
+      [taskId]
+    );
+    const current: CandidateEntry[] = Array.isArray(rows[0]?.candidates)
+      ? (rows[0]?.candidates as CandidateEntry[])
+      : [];
+    const norm = (s: string) => s.toLowerCase().trim().replace(/\s+/g, " ");
+    if (current.some((c) => norm(c.label) === norm(packSize))) return;
+    const entry: CandidateEntry = {
+      canonical_id: null,
+      label: packSize,
+      score: 0,
+      via: "other",
+      added_by: username,
+    };
+    await db.query(
+      `UPDATE contribution_tasks SET candidates = $2::jsonb WHERE id = $1`,
+      [taskId, JSON.stringify([...current, entry])]
+    );
+  } catch (error) {
+    console.warn(
+      "[contribution/answer] pack candidate append failed:",
+      (error as Error).message
+    );
+  }
+}
+
 async function appendFreeTextCandidate(
   taskId: string | number,
   text: string,
