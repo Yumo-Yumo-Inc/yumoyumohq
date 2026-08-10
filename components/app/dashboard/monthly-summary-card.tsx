@@ -211,12 +211,12 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
         </div>
       </div>
 
-      <div className="mt-2 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-end gap-3">
-        <p className="min-w-0 font-mono text-[40px] font-black leading-none tracking-tight tabular-nums text-[var(--app-text-primary)] sm:text-[44px]">
+      <div className="mt-1 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start gap-3">
+        <p className="min-w-0 -translate-y-0.5 font-mono text-[40px] font-black leading-[0.9] tracking-tight tabular-nums text-[var(--app-text-primary)] sm:text-[44px]">
           {formatMoney(spent, currency, locale)}
         </p>
         {hasSpark ? (
-          <div className="min-w-0 pb-0.5">
+          <div className="min-w-0 pt-1">
             <HeroSparkline points={trend} />
             {deltaPct != null ? (
               <p className="mt-1 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
@@ -225,7 +225,7 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
             ) : null}
           </div>
         ) : deltaPct != null ? (
-          <p className="pb-1 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
+          <p className="pt-1 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--app-text-muted)]">
             {vsLastMonth}
           </p>
         ) : null}

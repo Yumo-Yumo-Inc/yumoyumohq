@@ -13,7 +13,8 @@
     "visionPaper": "Vision Paper",
     "visionPaperDesc": "产品论述与经济叙事。",
     "technicalPaper": "Technical Paper",
-    "technicalPaperDesc": "Pipeline、架构、公式与风险处理。"
+    "technicalPaperDesc": "Pipeline、架构、公式与风险处理。",
+    "ledger": "Ledger"
   },
   "hero": {
     "title": "解码你的收据。",

@@ -26,6 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       ledger?.metaDescription ??
       "Yumo Yumo price ledger — sealed, verifiable price observations anchored to Solana and Arweave.",
+    alternates: { canonical: "https://yumoyumo.com/ledger" },
   };
 }
 

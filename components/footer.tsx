@@ -15,6 +15,7 @@ export function Footer() {
       resources: 'Resources',
       whitepaper: 'Whitepaper',
       roadmap: 'Roadmap',
+      ledger: 'Price ledger',
       community: 'Community',
       terms: 'Terms & Conditions',
       privacy: 'Privacy Policy',
@@ -31,6 +32,7 @@ export function Footer() {
       resources: 'Ресурсы',
       whitepaper: 'Whitepaper',
       roadmap: 'Дорожная карта',
+      ledger: 'Price ledger',
       community: 'Сообщество',
       terms: 'Условия использования',
       privacy: 'Политика конфиденциальности',
@@ -47,6 +49,7 @@ export function Footer() {
       resources: 'Kaynaklar',
       whitepaper: 'Whitepaper',
       roadmap: 'Yol Haritası',
+      ledger: 'Fiyat defteri',
       community: 'Topluluk',
       terms: 'Kullanım Koşulları',
       privacy: 'Gizlilik Politikası',
@@ -63,6 +66,7 @@ export function Footer() {
       resources: 'ทรัพยากร',
       whitepaper: 'Whitepaper',
       roadmap: 'แผนงาน',
+      ledger: 'Price ledger',
       community: 'ชุมชน',
       terms: 'ข้อกำหนดและเงื่อนไข',
       privacy: 'นโยบายความเป็นส่วนตัว',
@@ -79,6 +83,7 @@ export function Footer() {
       resources: '资源',
       whitepaper: 'Whitepaper',
       roadmap: '路线图',
+      ledger: 'Price ledger',
       community: '社区',
       terms: '条款和条件',
       privacy: '隐私政策',
@@ -95,6 +100,7 @@ export function Footer() {
       resources: 'Recursos',
       whitepaper: 'Whitepaper',
       roadmap: 'Hoja de Ruta',
+      ledger: 'Price ledger',
       community: 'Comunidad',
       terms: 'Términos y Condiciones',
       privacy: 'Política de Privacidad',
@@ -138,6 +144,11 @@ export function Footer() {
                 <a href="#roadmap" className="text-gray-400 hover:text-primary transition-colors">
                   {t.roadmap}
                 </a>
+              </li>
+              <li>
+                <Link href="/ledger" className="text-gray-400 hover:text-primary transition-colors">
+                  {t.ledger}
+                </Link>
               </li>
             </ul>
           </div>

@@ -13,7 +13,8 @@
     "visionPaper": "Vision Paper",
     "visionPaperDesc": "วิสัยทัศน์ผลิตภัณฑ์และเรื่องเล่าเชิงเศรษฐกิจ",
     "technicalPaper": "Technical Paper",
-    "technicalPaperDesc": "Pipeline, schema, สูตร และการจัดการความเสี่ยง"
+    "technicalPaperDesc": "Pipeline, schema, สูตร และการจัดการความเสี่ยง",
+    "ledger": "Ledger"
   },
   "hero": {
     "title": "ถอดรหัสใบเสร็จของคุณ",

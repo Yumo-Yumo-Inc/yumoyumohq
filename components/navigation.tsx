@@ -132,8 +132,14 @@ export function Navigation() {
           </a>
           <LanguageSelector />
           <Button
+            asChild
+            className="ml-4 border border-[#C9A84C]/55 bg-[#C9A84C]/12 text-[#E8D5A3] hover:bg-[#C9A84C]/22 hover:text-[#F5E6C0]"
+          >
+            <Link href="/ledger">{t("ledger")}</Link>
+          </Button>
+          <Button
             onClick={() => window.location.href = '/app/login'}
-            className="ml-4 bg-primary hover:bg-primary/90 text-white"
+            className="ml-2 bg-primary hover:bg-primary/90 text-white"
           >
             {t("goApp")}
           </Button>
@@ -204,6 +210,14 @@ export function Navigation() {
               >
                 {t("faq")}
               </a>
+              <Button
+                asChild
+                className="mt-2 border border-[#C9A84C]/55 bg-[#C9A84C]/12 text-[#E8D5A3] hover:bg-[#C9A84C]/22 hover:text-[#F5E6C0]"
+              >
+                <Link href="/ledger" onClick={() => setIsMenuOpen(false)}>
+                  {t("ledger")}
+                </Link>
+              </Button>
               <Button
                 onClick={() => {
                   setIsMenuOpen(false);

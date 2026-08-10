@@ -13,7 +13,8 @@
     "visionPaper": "Vision Paper",
     "visionPaperDesc": "Product thesis, economic narrative.",
     "technicalPaper": "Technical Paper",
-    "technicalPaperDesc": "Pipeline, schemas, formulas, risk treatment."
+    "technicalPaperDesc": "Pipeline, schemas, formulas, risk treatment.",
+    "ledger": "Ledger"
   },
   "hero": {
     "title": "The financial OS for everyday life.",

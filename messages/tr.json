@@ -13,7 +13,8 @@
     "visionPaper": "Vision Paper",
     "visionPaperDesc": "Ürün tezi ve ekonomik anlatı.",
     "technicalPaper": "Technical Paper",
-    "technicalPaperDesc": "Pipeline, şemalar, formüller, risk yaklaşımı."
+    "technicalPaperDesc": "Pipeline, şemalar, formüller, risk yaklaşımı.",
+    "ledger": "Defter"
   },
   "hero": {
     "title": "Harcamanı anlayan finansal OS.",

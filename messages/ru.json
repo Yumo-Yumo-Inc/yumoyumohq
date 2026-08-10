@@ -13,7 +13,8 @@
     "visionPaper": "Vision Paper",
     "visionPaperDesc": "Продуктовый тезис и экономический нарратив.",
     "technicalPaper": "Technical Paper",
-    "technicalPaperDesc": "Pipeline, схемы, формулы, работа с рисками."
+    "technicalPaperDesc": "Pipeline, схемы, формулы, работа с рисками.",
+    "ledger": "Ledger"
   },
   "hero": {
     "title": "Расшифруй свои чеки.",

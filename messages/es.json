@@ -13,7 +13,8 @@
     "visionPaper": "Vision Paper",
     "visionPaperDesc": "Tesis de producto y narrativa económica.",
     "technicalPaper": "Technical Paper",
-    "technicalPaperDesc": "Pipeline, esquemas, fórmulas y tratamiento de riesgos."
+    "technicalPaperDesc": "Pipeline, esquemas, fórmulas y tratamiento de riesgos.",
+    "ledger": "Ledger"
   },
   "hero": {
     "title": "Decodifica tus recibos.",
