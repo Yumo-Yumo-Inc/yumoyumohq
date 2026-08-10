@@ -8,6 +8,8 @@
 export interface ContributionCandidate {
   canonicalId: string | null;
   label: string;
+  /** Normalised pack token for product_pack_size tasks (e.g. 100g, 15adet). */
+  packSize?: string | null;
   /**
    * Merchant and price this product was observed at in the external catalog, when there is
    * one. A merchant name and numbers, so there is nothing in it to translate.
@@ -17,6 +19,7 @@ export interface ContributionCandidate {
 
 export interface ContributionTask {
   id: string;
+  taskType: string;
   rawText: string;
   merchantLabel: string | null;
   priceMedian: number | null;

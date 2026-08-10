@@ -724,7 +724,10 @@
         "otherPlaceholder": "Type the product name…",
         "otherSubmit": "Send",
         "none": "None of these",
-        "dontKnow": "I don't know"
+        "dontKnow": "I don't know",
+        "questionPack": "What is the pack size of this product?",
+        "otherPack": "Other size — let me type it",
+        "otherPlaceholderPack": "e.g. 100g, 15 pack, 1.5L…"
       },
       "flash": {
         "thanks": "Thanks — recorded",

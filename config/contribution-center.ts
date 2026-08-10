@@ -20,6 +20,12 @@
  */
 export const TASK_POINTS_IDENTIFY = 10;
 
+/** Same payout as identify — one tap for a pack / gramaj fact. */
+export const TASK_POINTS_PACK_SIZE = TASK_POINTS_IDENTIFY;
+
+export const TASK_TYPE_IDENTIFY = "product_identify";
+export const TASK_TYPE_PACK_SIZE = "product_pack_size";
+
 /**
  * Bonus for the user whose free-text "Diğer" answer went on to win the task.
  *

@@ -48,7 +48,7 @@ export interface MasterMerchant {
 export const MASTER_MERCHANTS: MasterMerchant[] = [
   { brandKey: "migros", displayName: "Migros", domain: "migros.com.tr", category: "grocery", aliases: ["migros ticaret", "migros jet", "mmm migros", "5m migros", "migros m"] },
   { brandKey: "bim", displayName: "BİM", domain: "bim.com.tr", category: "grocery", aliases: ["bim", "bim birlesik magazalar"] },
-  { brandKey: "sok", displayName: "ŞOK", domain: "sokmarket.com.tr", category: "grocery", aliases: ["sok", "sok marketler", "sok market"] },
+  { brandKey: "sok", displayName: "ŞOK", domain: "sokmarket.com.tr", category: "grocery", aliases: ["sok", "sok marketler", "sok market", "şük marketler", "suk marketler"] },
   { brandKey: "a101", displayName: "A101", domain: "a101.com.tr", category: "grocery", aliases: ["a101", "a 101"] },
   { brandKey: "carrefoursa", displayName: "CarrefourSA", domain: "carrefoursa.com", category: "grocery", aliases: ["carrefoursa", "carrefour", "carrefour sa"] },
   { brandKey: "macrocenter", displayName: "Macrocenter", domain: "macrocenter.com.tr", category: "grocery", aliases: ["macro center", "macrocenter"] },

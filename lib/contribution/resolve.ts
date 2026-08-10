@@ -35,7 +35,13 @@ import {
 
 export type ResolveOutcome =
   | { status: "open"; reason: string }
-  | { status: "resolved"; canonicalId: string; rowsFixed: number }
+  | {
+      status: "resolved";
+      /** Empty for pack-size resolutions (see packSize). */
+      canonicalId: string;
+      rowsFixed: number;
+      packSize?: string;
+    }
   | { status: "unresolvable" }
   | { status: "capped" };
 
@@ -56,6 +62,15 @@ interface TaskRow {
  * known; they exist to measure the answerer.
  */
 export async function evaluateTask(taskId: string | number): Promise<ResolveOutcome> {
+  const { rows: typeRows } = await db.query<{ task_type: string }>(
+    `SELECT task_type FROM contribution_tasks WHERE id = $1`,
+    [taskId]
+  );
+  if (typeRows[0]?.task_type === "product_pack_size") {
+    const { evaluatePackTask } = await import("./resolve-pack");
+    return evaluatePackTask(taskId);
+  }
+
   const { rows: taskRows } = await db.query<TaskRow>(
     `SELECT id, raw_text_norm, merchant_id, sample_raw_text, answers_count, status, is_gold
        FROM contribution_tasks WHERE id = $1`,

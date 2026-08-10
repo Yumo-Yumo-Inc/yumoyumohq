@@ -25,6 +25,7 @@
 import { OBS_DATE_FLOOR } from "@/config/price-ledger";
 import {
   isUnsizedEggCarton,
+  needsCrowdPackHint,
   pricePerPiece,
   resolvePiecePackCount,
 } from "@/lib/receipt/pack-size";
@@ -334,6 +335,19 @@ export function classifyLine(
   if (isUnusableMerchant(r.merchant)) return base("excluded", "PLACEHOLDER_MERCHANT", "none", null);
   if (r.unitPrice <= 0.05) return base("excluded", "GARBAGE_PRICE", "none", null);
   if (totalNotUnit) return base("excluded", "FUEL_TOTAL_NOT_UNIT", "none", null);
+
+  // Packaged goods with no pack/size cannot be a comparable unit price — hold until
+  // Contribution Center (or a name that already encodes size) supplies the pack.
+  if (
+    needsCrowdPackHint({
+      name: r.rawName,
+      packSize: r.packSize ?? null,
+      unitType,
+      quantity: r.quantity,
+    })
+  ) {
+    return base("hold", "MISSING_PACK", "none", null);
+  }
 
   // 2/3) validate
   if (n >= 2 && median && median > 0) {

@@ -724,7 +724,10 @@
         "otherPlaceholder": "Ürün adını yaz…",
         "otherSubmit": "Gönder",
         "none": "Hiçbiri",
-        "dontKnow": "Bilmiyorum"
+        "dontKnow": "Bilmiyorum",
+        "questionPack": "Bu ürünün gramajı / paket boyutu nedir?",
+        "otherPack": "Diğer boyut — yazayım",
+        "otherPlaceholderPack": "örn. 100g, 15'li, 1.5L…"
       },
       "flash": {
         "thanks": "Teşekkürler — kaydedildi",

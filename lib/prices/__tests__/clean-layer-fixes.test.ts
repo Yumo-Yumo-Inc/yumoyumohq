@@ -77,7 +77,7 @@ console.log("\n── SECTION_RE: fiş bölüm başlığı ürün sayılmamalı"
 const sect: [string, string][] = [
   ["TEMEL GIDA", "excluded"], ["Temel Gıda", "excluded"], ["ARA TOPLAM", "excluded"],
   ["İNDİRİM", "excluded"], ["Yemek Bedeli", "excluded"],
-  ["Temel Gıda Paketi", "clean"], // gerçek ürün — başlık gibi başlıyor ama değil
+  ["Temel Gıda Paketi", "hold"], // gerçek ürün ama gramaj yok → MISSING_PACK
 ];
 for (const [name, want] of sect) {
   const v = classifyLine(mk({ rawName: name, unitPrice: 100, lineTotal: 100 }), 100, 5, null, today);
@@ -143,6 +143,33 @@ console.log("\n── multipack / egg carton (pack ÷ N)");
   console.log(`  ${ok ? "✓" : "✗ BOZUK"}  çıplak Yumurta 200 → ${v.disposition} (${v.reason})`);
 }
 
+
+console.log("\n── MISSING_PACK: gramajsız paketli ürün hold");
+{
+  const v = classifyLine(
+    mk({ rawName: "ETI BURCAK", unitPrice: 45, lineTotal: 45, unitType: "adet" }),
+    45,
+    5,
+    null,
+    today,
+  );
+  const ok = v.disposition === "hold" && v.reason === "MISSING_PACK";
+  if (ok) pass++;
+  console.log(`  ${ok ? "✓" : "✗ BOZUK"}  ETI BURCAK → ${v.disposition} (${v.reason})`);
+}
+{
+  const v = classifyLine(
+    mk({ rawName: "ETI BURCAK 200g", unitPrice: 45, lineTotal: 45, unitType: "adet" }),
+    45,
+    5,
+    null,
+    today,
+  );
+  const ok = v.disposition === "clean";
+  if (ok) pass++;
+  console.log(`  ${ok ? "✓" : "✗ BOZUK"}  ETI BURCAK 200g → ${v.disposition} (size in name)`);
+}
+
 console.log("\n── normalizeCity: bir şehir, tek yazım");
 const cityCases: [string[], string][] = [
   [["IZMIR", "Izmir", "İZMİR", "İzmir", "izmir"], "IZMIR"],
@@ -159,6 +186,6 @@ for (const [variants, want] of cityCases) {
   console.log(`  ${ok ? "✓" : "✗"}  ${variants.filter(Boolean).join(" / ") || "(boş)"} → "${want}"${ok ? "" : `  çıkan: ${JSON.stringify(got)}`}`);
 }
 
-const total = cases.length + sect.length + 5 + 6 + 2 + cityCases.length + 2 + 3;
+const total = cases.length + sect.length + 5 + 6 + 2 + cityCases.length + 2 + 3 + 2;
 console.log(`\n${pass}/${total} ${pass === total ? "GEÇTİ ✓" : "KALDI ✗"}`);
 if (pass !== total) process.exitCode = 1;

@@ -104,7 +104,11 @@ export async function submitAnswerWithExternal(input: {
       ...input,
       kind: input.kind,
     });
-    if (result.ok && result.outcome.status === "resolved") {
+    if (
+      result.ok
+      && result.outcome.status === "resolved"
+      && result.outcome.canonicalId
+    ) {
       const actor = await confirmationActor(
         input.taskId,
         result.outcome.canonicalId,
@@ -124,6 +128,12 @@ export async function submitAnswerWithExternal(input: {
       } else {
         await markExternalCandidatesNeedsReviewForTask({ taskId: input.taskId });
       }
+    } else if (
+      result.ok
+      && result.outcome.status === "resolved"
+      && result.outcome.packSize
+    ) {
+      // Pack-size tasks do not touch external product confirmation.
     } else if (result.ok && result.outcome.status === "unresolvable") {
       await markExternalCandidatesNeedsReviewForTask({ taskId: input.taskId });
     } else if (result.ok && result.outcome.status === "capped") {
@@ -141,7 +151,7 @@ export async function submitAnswerWithExternal(input: {
      SELECT $1, $2, 'none', FALSE, $3, $4, $5
       WHERE EXISTS (
         SELECT 1 FROM contribution_tasks
-         WHERE id = $1 AND status = 'open' AND task_type = 'product_identify'
+         WHERE id = $1 AND status = 'open' AND task_type IN ('product_identify', 'product_pack_size')
       )
      ON CONFLICT (task_id, username) DO NOTHING
      RETURNING id`,

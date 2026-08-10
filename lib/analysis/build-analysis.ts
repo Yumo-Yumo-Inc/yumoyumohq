@@ -359,7 +359,7 @@ async function loadLineItemsFromTable(username: string, start: Date): Promise<It
       COALESCE(NULLIF(i.canonical_name, ''), i.raw_name) AS name,
       COALESCE(NULLIF(i.display_name_tr, ''), NULLIF(cp.display_name_tr, '')) AS display_name,
       NULLIF(i.brand, '') AS brand,
-      i.pack_size,
+      COALESCE(NULLIF(i.pack_size, ''), NULLIF(h.pack_size, '')) AS pack_size,
       NULLIF(i.unit_type, '') AS unit_type,
       i.quantity,
       COALESCE(i.unit_price_gross, i.unit_price) AS unit_price_gross,
@@ -371,6 +371,7 @@ async function loadLineItemsFromTable(username: string, start: Date): Promise<It
     JOIN receipts r ON r.receipt_id = i.receipt_id
     LEFT JOIN merchants m ON m.id = r.merchant_id
     LEFT JOIN canonical_products cp ON cp.id::text = i.canonical_id
+    LEFT JOIN product_pack_hints h ON h.raw_text_norm = upper(btrim(i.raw_name))
     WHERE r.username = ${username}
       AND COALESCE(r.expense_type, 'personal') = 'personal'
       AND COALESCE(NULLIF(r.extraction_date_value, ''), to_char(r.created_at, 'YYYY-MM-DD')) >= ${startStr}

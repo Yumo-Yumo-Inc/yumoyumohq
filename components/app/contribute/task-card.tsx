@@ -57,12 +57,21 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
     if (otherOpen) inputRef.current?.focus();
   }, [otherOpen]);
 
-  const pickable = task.candidates.filter((c) => c.canonicalId);
+  const isPackTask = (task.taskType ?? "product_identify") === "product_pack_size";
+  const pickable = isPackTask
+    ? task.candidates.filter((c) => c.label)
+    : task.candidates.filter((c) => c.canonicalId);
 
   const choose = (canonicalId: string) => {
     if (disabled) return;
     setSelected(canonicalId);
     onAnswer({ kind: "pick", canonicalId });
+  };
+
+  const choosePack = (packToken: string) => {
+    if (disabled) return;
+    setSelected(packToken);
+    onAnswer({ kind: "other", freeText: packToken });
   };
 
   const submitOther = () => {
@@ -121,19 +130,26 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
           className="mt-5 text-[15px] font-medium"
           style={{ color: "var(--app-text-secondary)" }}
         >
-          {t("contribute.card.question")}
+          {t(isPackTask ? "contribute.card.questionPack" : "contribute.card.question")}
         </p>
 
         {/* Options */}
         <div className="mt-3 flex flex-col gap-2.5">
           {pickable.map((c, i) => {
-            const isSel = selected === c.canonicalId;
+            const optionKey = isPackTask
+              ? (c.packSize || c.label)
+              : (c.canonicalId as string);
+            const isSel = selected === optionKey;
             return (
               <motion.button
-                key={c.canonicalId}
+                key={optionKey}
                 type="button"
                 disabled={disabled}
-                onClick={() => choose(c.canonicalId as string)}
+                onClick={() =>
+                  isPackTask
+                    ? choosePack(c.packSize || c.label)
+                    : choose(c.canonicalId as string)
+                }
                 whileTap={reduce ? undefined : { scale: 0.985 }}
                 transition={{ type: "spring", stiffness: 420, damping: 30 }}
                 className="group relative flex items-center gap-3 rounded-[var(--app-radius-lg)] px-4 py-3.5 text-left disabled:opacity-60"
@@ -195,7 +211,11 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
                     value={otherText}
                     onChange={(e) => setOtherText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && submitOther()}
-                    placeholder={t("contribute.card.otherPlaceholder")}
+                    placeholder={t(
+                      isPackTask
+                        ? "contribute.card.otherPlaceholderPack"
+                        : "contribute.card.otherPlaceholder"
+                    )}
                     maxLength={80}
                     disabled={disabled}
                     className="min-w-0 flex-1 bg-transparent text-[15px] outline-none"
@@ -228,7 +248,7 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
                   <Pencil size={13} />
                 </span>
                 <span className="text-[15px] font-medium" style={{ color: "var(--app-text-secondary)" }}>
-                  {t("contribute.card.other")}
+                  {t(isPackTask ? "contribute.card.otherPack" : "contribute.card.other")}
                 </span>
               </button>
             )}
@@ -239,6 +259,7 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
             "Hiçbiri" says the options are wrong and retires them, "Bilmiyorum" says nothing
             about the options at all. Collapsing them would poison whichever one survived. */}
         <div className="mt-4 flex items-center justify-center gap-5">
+          {!isPackTask && (
           <button
             type="button"
             disabled={disabled}
@@ -249,6 +270,7 @@ export function TaskCard({ task, onAnswer, disabled = false }: TaskCardProps) {
             <Ban size={14} />
             {t("contribute.card.none")}
           </button>
+          )}
           <button
             type="button"
             disabled={disabled}

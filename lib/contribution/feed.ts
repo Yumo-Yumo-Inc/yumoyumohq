@@ -37,10 +37,12 @@ import { getDailyBudget } from "./reliability";
 interface FeedCandidate {
   canonicalId: string | null;
   label: string;
+  packSize?: string | null;
 }
 
 interface FeedTask {
   id: string;
+  taskType: string;
   rawText: string;
   merchantLabel: string | null;
   priceMedian: number | null;
@@ -53,13 +55,14 @@ interface FeedTask {
 
 interface TaskRow {
   id: string;
+  task_type: string;
   sample_raw_text: string | null;
   raw_text_norm: string;
   merchant_label: string | null;
   price_median: string | number | null;
   currency: string | null;
   row_count: number;
-  candidates: Array<{ canonical_id: string | null; label: string }> | null;
+  candidates: Array<{ canonical_id: string | null; label: string; pack_size?: string }> | null;
   is_witness: boolean;
 }
 
@@ -68,12 +71,18 @@ const SPREAD_POOL = 40;
 
 function toFeedTask(row: TaskRow, seed: number): FeedTask {
   const raw = row.sample_raw_text ?? row.raw_text_norm;
+  const isPack = row.task_type === "product_pack_size";
   const candidates: FeedCandidate[] = (row.candidates ?? [])
-    .filter((c) => c && c.canonical_id)
-    .map((c) => ({ canonicalId: c.canonical_id, label: c.label }));
+    .filter((c) => c && (isPack ? Boolean(c.label) : Boolean(c.canonical_id)))
+    .map((c) => ({
+      canonicalId: c.canonical_id,
+      label: c.label,
+      packSize: c.pack_size ?? (isPack ? c.label : null),
+    }));
 
   return {
     id: row.id,
+    taskType: row.task_type,
     rawText: raw,
     merchantLabel: row.merchant_label,
     priceMedian: row.price_median == null ? null : Number(row.price_median),
@@ -131,6 +140,7 @@ export async function getContributionFeed(
     )
     SELECT
       t.id,
+      t.task_type,
       t.sample_raw_text,
       t.raw_text_norm,
       t.merchant_label,
@@ -195,12 +205,13 @@ async function injectGoldTasks(
 
   const { rows } = await db.query<TaskRow>(
     `SELECT
-       t.id, t.sample_raw_text, t.raw_text_norm, t.merchant_label,
+       t.id, t.task_type, t.sample_raw_text, t.raw_text_norm, t.merchant_label,
        t.price_median, t.currency, t.row_count, t.candidates,
        FALSE AS is_witness
      FROM contribution_tasks t
      WHERE t.status = 'open'
        AND t.is_gold = TRUE
+       AND t.task_type = 'product_identify'
        AND NOT EXISTS (
          SELECT 1 FROM contribution_answers a
           WHERE a.task_id = t.id AND a.username = $1

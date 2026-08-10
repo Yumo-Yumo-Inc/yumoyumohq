@@ -28,6 +28,7 @@ import {
   stripMerchantGreetingPrefix,
   normalizeMerchantForDbLookup,
 } from "@/lib/receipt/merchant-validation";
+import { correctKnownChainOcrTypos } from "@/lib/receipt/chain-ocr-corrections";
 import { normalizeMerchantDisplayName } from "@/lib/receipt/name-normalization";
 import { loadVknMerchantMap, getMerchantIdByVkn } from "@/lib/receipt/vkn-map";
 import { validateTurkishTaxId } from "@/lib/receipt/tax-id-validation";
@@ -1126,7 +1127,8 @@ export async function matchMerchant(
   // layer and the trust gate see the merchant name — the write path already did this,
   // but the read path compared the greeting-laden raw name and rejected good matches.
   const cleanedInputName = stripMerchantGreetingPrefix(input.merchantName ?? "");
-  input = { ...input, merchantName: cleanedInputName };
+  const correctedInputName = correctKnownChainOcrTypos(cleanedInputName);
+  input = { ...input, merchantName: correctedInputName };
 
   const countryCode = input.country?.trim().toUpperCase().slice(0, 2) || null;
   const layer1 = await layer1Vkn(input.taxId, countryCode);

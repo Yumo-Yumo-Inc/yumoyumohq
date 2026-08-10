@@ -24,10 +24,13 @@ import { db } from "@/lib/db/client";
 import {
   DAILY_TASK_POINT_CAP,
   TASK_POINTS_IDENTIFY,
+  TASK_POINTS_PACK_SIZE,
   TASK_POINTS_UNKNOWN,
+  TASK_TYPE_PACK_SIZE,
   taskSourceType,
 } from "@/config/contribution-center";
 import { getCurrentSeasonNumber } from "@/lib/oracle/account-season-level";
+import { parseUserPackAnswer } from "@/lib/receipt/pack-size";
 import { getReliability, recordGoldOutcome, getDailyBudget } from "./reliability";
 import { evaluateTask, type ResolveOutcome } from "./resolve";
 
@@ -59,6 +62,7 @@ interface TaskRow {
   gold_canonical_id: string | null;
   raw_text_norm: string;
   candidates: unknown;
+  task_type: string;
 }
 
 /**
@@ -96,12 +100,19 @@ export async function submitAnswer(
   if (kind === "other" && !input.freeText?.trim()) return { ok: false, code: "invalid" };
 
   const { rows: taskRows } = await db.query<TaskRow>(
-    `SELECT id, status, is_gold, gold_canonical_id, raw_text_norm, candidates
+    `SELECT id, status, is_gold, gold_canonical_id, raw_text_norm, candidates, task_type
        FROM contribution_tasks WHERE id = $1`,
     [taskId]
   );
   const task = taskRows[0];
   if (!task || task.status !== "open") return { ok: false, code: "task_not_open" };
+
+  const isPackTask = task.task_type === TASK_TYPE_PACK_SIZE;
+  // Pack tasks vote via free_text (chips + typed). A pick with a product UUID is invalid.
+  if (isPackTask && kind === "pick") return { ok: false, code: "invalid" };
+  if (isPackTask && kind === "other") {
+    if (!parseUserPackAnswer(input.freeText)) return { ok: false, code: "invalid" };
+  }
 
   const budget = await getDailyBudget(username);
   if (budget.remainingTasks <= 0) return { ok: false, code: "quota_exhausted" };
@@ -113,8 +124,19 @@ export async function submitAnswer(
   // it even if the quota is somehow out of step. contribution_point_events has no daily
   // limit of its own — every existing cap sits on receipt_rewards — so this is the only
   // thing standing between a new source_type and an uncapped tap.
-  const basePoints = kind === "unknown" ? TASK_POINTS_UNKNOWN : TASK_POINTS_IDENTIFY;
+  const basePoints =
+    kind === "unknown"
+      ? TASK_POINTS_UNKNOWN
+      : isPackTask
+        ? TASK_POINTS_PACK_SIZE
+        : TASK_POINTS_IDENTIFY;
   const points = Math.max(0, Math.min(basePoints, budget.pointsRemaining));
+
+  let freeText: string | null = kind === "other" ? input.freeText?.trim() ?? null : null;
+  if (isPackTask && freeText) {
+    const parsed = parseUserPackAnswer(freeText);
+    freeText = parsed?.packSize ?? freeText;
+  }
 
   const { rows: inserted } = await db.query<{ id: string }>(
     `INSERT INTO contribution_answers
@@ -127,7 +149,7 @@ export async function submitAnswer(
       username,
       kind,
       kind === "pick" ? input.canonicalId : null,
-      kind === "other" ? input.freeText?.trim() : null,
+      freeText,
       witness,
       state.reliability,
       points,
@@ -144,7 +166,7 @@ export async function submitAnswer(
   );
 
   if (points > 0) {
-    await payPoints(username, taskId, points);
+    await payPoints(username, taskId, points, task.task_type);
   }
 
   // A gold task's answer is already known, so it teaches us nothing about the product —
@@ -164,8 +186,12 @@ export async function submitAnswer(
   // scale: the first person does the hard half (typing a name the machine never had),
   // everyone after only has to agree with it — and it is the only path by which a
   // correct answer that was missing from the candidates can ever win.
-  if (kind === "other" && input.freeText?.trim()) {
-    await appendFreeTextCandidate(taskId, input.freeText.trim(), username);
+  if (kind === "other" && freeText) {
+    if (isPackTask) {
+      await appendPackCandidate(taskId, freeText, username);
+    } else {
+      await appendFreeTextCandidate(taskId, freeText, username);
+    }
   }
 
   const outcome = task.is_gold
@@ -183,7 +209,8 @@ export async function submitAnswer(
 async function payPoints(
   username: string,
   taskId: string | number,
-  points: number
+  points: number,
+  taskType: string
 ): Promise<void> {
   try {
     // reference_id = task id, and the ledger's UNIQUE(username, source_type, reference_id)
@@ -196,7 +223,7 @@ async function payPoints(
       [
         username,
         points,
-        taskSourceType("product_identify"),
+        taskSourceType(taskType),
         String(taskId),
         getCurrentSeasonNumber(),
         JSON.stringify({ cap: DAILY_TASK_POINT_CAP }),
