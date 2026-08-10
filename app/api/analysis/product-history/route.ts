@@ -247,7 +247,10 @@ export async function GET(request: NextRequest) {
       productKey: keyParam,
       name: displayName,
       brand: first.brand ?? null,
-      packSize: first.pack_size ?? null,
+      packSize: resolvePiecePackCount({
+        name: displayName,
+        packSize: first.pack_size,
+      }),
       unitType: first.unit_type ?? null,
       stats,
       history,
