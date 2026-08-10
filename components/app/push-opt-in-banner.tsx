@@ -24,19 +24,24 @@ export function PushOptInBanner({ open, onDismiss, onSubscribed }: PushOptInBann
 
   useEffect(() => {
     if (!open) return;
+    setHidden(false);
     void isPushSubscribed().then(setSubscribed);
   }, [open]);
 
-  if (!open || hidden || !pushSupported()) return null;
-  const perm = pushPermission();
-  if (perm === "denied" || subscribed) return null;
+  if (!open || hidden) return null;
+  if (subscribed) return null;
 
-  const title = t("app.pushOptIn.title");
-  const body = t("app.pushOptIn.body");
-  const enableLabel = t("app.pushOptIn.enable");
-  const dismissLabel = t("app.pushOptIn.dismiss");
+  const supported = pushSupported();
+  const perm = pushPermission();
+  if (perm === "denied") return null;
+
+  const title = t("pushOptIn.title");
+  const body = supported ? t("pushOptIn.body") : t("pushOptIn.unsupportedBody");
+  const enableLabel = t("pushOptIn.enable");
+  const dismissLabel = t("pushOptIn.dismiss");
 
   const handleEnable = async () => {
+    if (!supported) return;
     setLoading(true);
     try {
       const result = await subscribeToPush();
@@ -57,7 +62,7 @@ export function PushOptInBanner({ open, onDismiss, onSubscribed }: PushOptInBann
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      className="fixed inset-x-0 bottom-0 z-[80] flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
       role="region"
       aria-label={title}
     >
@@ -77,14 +82,16 @@ export function PushOptInBanner({ open, onDismiss, onSubscribed }: PushOptInBann
           <p className="text-[13px] font-semibold text-[var(--app-text-primary)]">{title}</p>
           <p className="mt-0.5 text-[12px] leading-snug text-[var(--app-text-muted)]">{body}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => void handleEnable()}
-              disabled={loading}
-              className="rounded-full bg-[#FAC775] px-3.5 py-1.5 text-[12px] font-semibold text-[#1a1206] disabled:opacity-50"
-            >
-              {enableLabel}
-            </button>
+            {supported && (
+              <button
+                type="button"
+                onClick={() => void handleEnable()}
+                disabled={loading}
+                className="rounded-full bg-[#FAC775] px-3.5 py-1.5 text-[12px] font-semibold text-[#1a1206] disabled:opacity-50"
+              >
+                {enableLabel}
+              </button>
+            )}
             <button
               type="button"
               onClick={handleDismiss}

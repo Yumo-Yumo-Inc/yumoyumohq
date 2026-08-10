@@ -766,6 +766,7 @@
     "pushOptIn": {
       "title": "Bill reminders",
       "body": "Want a heads-up before due dates? Turn on notifications.",
+      "unsupportedBody": "To get bill reminders on this phone, add Yumo Yumo to your Home Screen, then turn on notifications.",
       "enable": "Turn on",
       "dismiss": "Not now"
     },
@@ -2836,6 +2837,12 @@
     "morning": "morning",
     "reminderHintOff": "No reminders set",
     "reminderHintOn": "{n} reminder(s) active",
+    "pushEnableTitle": "Phone notifications",
+    "pushEnableBody": "Reminders reach your phone only if notifications are on.",
+    "pushEnableCta": "Allow notifications",
+    "pushEnabled": "Notifications on — reminders can reach this phone.",
+    "pushDenied": "Notifications are blocked in browser settings. Turn them on to get reminders.",
+    "pushUnsupported": "This browser cannot send phone alerts. Add Yumo Yumo to your Home Screen, then allow notifications.",
     "optional": "optional",
     "clear": "Clear",
     "undoPaidShort": "Undo",

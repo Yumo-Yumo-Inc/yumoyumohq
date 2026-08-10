@@ -34,6 +34,12 @@ import { useAppProfile } from "@/lib/app/profile-context";
 import { currencyForCountry, formatMoney } from "@/lib/format/money";
 import { AppShell } from "@/components/app/app-shell";
 import { PushOptInBanner } from "@/components/app/push-opt-in-banner";
+import {
+  isPushSubscribed,
+  pushPermission,
+  pushSupported,
+  subscribeToPush,
+} from "@/lib/app/push-subscribe";
 
 /* ─────────────────────────────────────────────── */
 /*  Categories — bill vs subscription split        */
@@ -1857,9 +1863,33 @@ function AddProviderSheet({
   const [expectedAmount, setExpectedAmount] = useState<string>("");
   const [sampleDocument, setSampleDocument] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushState, setPushState] = useState<
+    "loading" | "ready" | "subscribed" | "denied" | "unsupported"
+  >("loading");
   const sampleInputRef = useRef<HTMLInputElement | null>(null);
 
   const availableCategories = categoriesForTab(defaultTab);
+
+  const refreshPushState = useCallback(async () => {
+    if (!pushSupported()) {
+      setPushState("unsupported");
+      return;
+    }
+    if (pushPermission() === "denied") {
+      setPushState("denied");
+      return;
+    }
+    if (await isPushSubscribed()) {
+      setPushState("subscribed");
+      return;
+    }
+    setPushState("ready");
+  }, []);
+
+  useEffect(() => {
+    void refreshPushState();
+  }, [refreshPushState]);
 
   // Lock body scroll while sheet is open. Without this, mobile Safari lets the
   // underlying page scroll and the sheet's 100dvh container ends up clipped
@@ -1904,6 +1934,16 @@ function AddProviderSheet({
 
   const canSubmit = category !== null && name.trim().length >= 1;
 
+  const handleEnablePush = async () => {
+    setPushBusy(true);
+    try {
+      await subscribeToPush();
+      await refreshPushState();
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
   const handleSubmit = () => {
     if (!canSubmit || !category) return;
     setError(null);
@@ -1911,7 +1951,7 @@ function AddProviderSheet({
     if (reminderT3) reminders.push(3);
     if (reminderT1) reminders.push(1);
     const expected = expectedAmount.trim() === "" ? null : Number(expectedAmount);
-    mutation.mutate({
+    const payload = {
       category,
       name: name.trim(),
       paymentDay,
@@ -1919,7 +1959,27 @@ function AddProviderSheet({
       reminderSameDay,
       reminderHour,
       expectedAmount: Number.isFinite(expected!) ? expected : null,
-    });
+    };
+    const reminderCountNow = reminders.length + (reminderSameDay ? 1 : 0);
+
+    // Ask for OS notification permission on the same tap as Save when
+    // reminders are on and the browser has not decided yet.
+    if (
+      reminderCountNow > 0 &&
+      pushSupported() &&
+      pushPermission() === "default"
+    ) {
+      setPushBusy(true);
+      void subscribeToPush()
+        .then(() => refreshPushState())
+        .finally(() => {
+          setPushBusy(false);
+          mutation.mutate(payload);
+        });
+      return;
+    }
+
+    mutation.mutate(payload);
   };
 
   const surfacePreview = category ? CARD_SURFACE[category] : null;
@@ -2230,6 +2290,72 @@ function AddProviderSheet({
                 secondary={tx("bills.morning", "sabah")}
               />
             </div>
+
+            {reminderCount > 0 && pushState !== "loading" && (
+              <div
+                className="mt-2.5 rounded-[14px] px-3.5 py-3"
+                style={{
+                  background:
+                    pushState === "subscribed"
+                      ? "linear-gradient(180deg, rgba(134,239,172,0.10) 0%, rgba(134,239,172,0.02) 100%)"
+                      : "linear-gradient(180deg, rgba(250,199,117,0.10) 0%, rgba(250,199,117,0.02) 100%)",
+                  border:
+                    pushState === "subscribed"
+                      ? "1px solid rgba(134,239,172,0.28)"
+                      : "1px solid rgba(250,199,117,0.30)",
+                }}
+              >
+                <div className="flex items-start gap-2.5">
+                  <div
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px]"
+                    style={{
+                      background: "rgba(250,199,117,0.14)",
+                      border: "1px solid rgba(250,199,117,0.28)",
+                    }}
+                  >
+                    <Bell size={14} className="text-[#FAC775]" strokeWidth={2.2} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12.5px] font-semibold text-[var(--app-text-primary)]">
+                      {tx("bills.pushEnableTitle", "Telefon bildirimi")}
+                    </p>
+                    <p className="mt-0.5 text-[11.5px] leading-snug text-[var(--app-text-muted)]">
+                      {pushState === "subscribed"
+                        ? tx(
+                            "bills.pushEnabled",
+                            "Bildirimler açık — hatırlatmalar bu telefona gelebilir.",
+                          )
+                        : pushState === "denied"
+                          ? tx(
+                              "bills.pushDenied",
+                              "Bildirimler tarayıcı ayarlarında engelli. Hatırlatma için açman gerekir.",
+                            )
+                          : pushState === "unsupported"
+                            ? tx(
+                                "bills.pushUnsupported",
+                                "Bu tarayıcı telefona bildirim gönderemiyor. Yumo Yumo’yu Ana Ekran’a ekle, sonra bildirimlere izin ver.",
+                              )
+                            : tx(
+                                "bills.pushEnableBody",
+                                "Hatırlatmalar telefona yalnızca bildirim izni açıksa gelir.",
+                              )}
+                    </p>
+                    {pushState === "ready" && (
+                      <button
+                        type="button"
+                        onClick={() => void handleEnablePush()}
+                        disabled={pushBusy}
+                        className="mt-2.5 rounded-full bg-[#FAC775] px-3.5 py-1.5 text-[12px] font-semibold text-[#1a1206] disabled:opacity-50"
+                      >
+                        {pushBusy
+                          ? tx("bills.loading", "Yükleniyor…")
+                          : tx("bills.pushEnableCta", "Bildirimlere izin ver")}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </StepBlock>
 
           {/* ───────── Step 6 — Sample doc (optional) ───────── */}
@@ -2329,15 +2455,15 @@ function AddProviderSheet({
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!canSubmit || mutation.isPending}
+              disabled={!canSubmit || mutation.isPending || pushBusy}
               className={cn(
                 "flex flex-1 items-center justify-center gap-2 rounded-[14px] py-3.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
-                canSubmit && !mutation.isPending
+                canSubmit && !mutation.isPending && !pushBusy
                   ? "text-white"
                   : "cursor-not-allowed bg-white/[0.04] text-[var(--app-text-muted)]"
               )}
               style={
-                canSubmit && !mutation.isPending
+                canSubmit && !mutation.isPending && !pushBusy
                   ? {
                       background:
                         "linear-gradient(135deg, #E85A3C 0%, #FF6B47 60%, #FAC775 200%)",
@@ -2347,7 +2473,7 @@ function AddProviderSheet({
                   : undefined
               }
             >
-              {mutation.isPending ? (
+              {mutation.isPending || pushBusy ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   {sampleDocument

@@ -766,6 +766,7 @@
     "pushOptIn": {
       "title": "Fatura hatırlatmaları",
       "body": "Son ödeme günü yaklaşınca haber vermemi ister misin? Bildirimleri aç.",
+      "unsupportedBody": "Bu telefonda fatura hatırlatması için Yumo Yumo’yu Ana Ekran’a ekle, sonra bildirimleri aç.",
       "enable": "Bildirimleri aç",
       "dismiss": "Şimdilik değil"
     },
@@ -2836,6 +2837,12 @@
     "morning": "sabah",
     "reminderHintOff": "Hatırlatıcı seçilmedi",
     "reminderHintOn": "{n} hatırlatıcı aktif",
+    "pushEnableTitle": "Telefon bildirimi",
+    "pushEnableBody": "Hatırlatmalar telefona yalnızca bildirim izni açıksa gelir.",
+    "pushEnableCta": "Bildirimlere izin ver",
+    "pushEnabled": "Bildirimler açık — hatırlatmalar bu telefona gelebilir.",
+    "pushDenied": "Bildirimler tarayıcı ayarlarında engelli. Hatırlatma için açman gerekir.",
+    "pushUnsupported": "Bu tarayıcı telefona bildirim gönderemiyor. Yumo Yumo’yu Ana Ekran’a ekle, sonra bildirimlere izin ver.",
     "optional": "opsiyonel",
     "clear": "Temizle",
     "undoPaidShort": "Geri al",

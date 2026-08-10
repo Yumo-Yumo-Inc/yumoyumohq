@@ -2,20 +2,13 @@
  * Achievement metrics — the real, grounded value behind each track.
  *
  * Every query is scoped to one user and reads existing tables only (no new
- * counters, no fabrication). A "verified" receipt is proof_status='matched'
- * (lib/receipt/proof-matching, migration 082). Each metric is defensive: any
- * failure returns 0 so the caller (achievement evaluation) never breaks the
- * receipt pipeline.
+ * counters, no fabrication). Each metric is defensive: any failure returns 0 so
+ * the caller (achievement evaluation) never breaks the receipt pipeline.
  *
- * Column grounding (verified against migrations + live DEV data):
- *  - receipts.username, receipts.merchant_name, receipts.proof_status (082)
- *    NOTE: receipts.merchant_id is NOT populated by the pipeline (0/9 matched rows
- *    in DEV) — merchant identity lives in merchant_name, so diversity counts that.
- *  - receipt_line_items.receipt_id, .category_path                    (050)
- *  - receipt_canonical.receipt_id, .total_hidden_canonical            (023)
- *  - user_streaks.username, .longest_streak                           (044)
- *  - user_profiles.username, .account_level                           (015)
- *  - referral_relationships.referrer_username, .active, .referee_phone_verified_at (015)
+ * "Verified receipt" for achievements (Ugur 2026-08-10) means a receipt that
+ * paid a reward — contribution ledger receipt_verified, reward_final > 0, or
+ * receipt_rewards with points/amount. It is NOT proof_status = matched
+ * (that flag is only the dual-proof POS-itemized link).
  */
 
 import { sql } from "@/lib/db/client";
@@ -29,29 +22,59 @@ async function scalar(rows: unknown): Promise<number> {
   return Number.isFinite(n) ? n : 0;
 }
 
-/** Distinct merchants on verified receipts (by normalized name — merchant_id is unset). */
+/** Distinct merchants on rewarded receipts (by normalized name). */
 async function distinctMerchants(username: string): Promise<number> {
   const rows = await sql`
-    SELECT COUNT(DISTINCT lower(btrim(merchant_name)))::int AS n
-    FROM receipts
-    WHERE username = ${username} AND proof_status = 'matched'
-      AND merchant_name IS NOT NULL AND btrim(merchant_name) <> ''
+    SELECT COUNT(DISTINCT lower(btrim(r.merchant_name)))::int AS n
+    FROM receipts r
+    WHERE r.username = ${username}
+      AND r.merchant_name IS NOT NULL AND btrim(r.merchant_name) <> ''
+      AND (
+        COALESCE(r.reward_final, 0) > 0
+        OR EXISTS (
+          SELECT 1 FROM contribution_point_events e
+          WHERE e.username = r.username
+            AND e.source_type = 'receipt_verified'
+            AND e.reference_id = r.receipt_id::text
+            AND e.points_delta > 0
+        )
+        OR EXISTS (
+          SELECT 1 FROM receipt_rewards rr
+          WHERE rr.receipt_id = r.receipt_id
+            AND (COALESCE(rr.contribution_points, 0) > 0 OR COALESCE(rr.bint_amount, 0) > 0)
+        )
+      )
   `;
   return scalar(rows);
 }
 
-/** Distinct v3-taxonomy category paths across the user's verified receipts. */
+/** Distinct v3-taxonomy category paths across the user's rewarded receipts. */
 async function distinctCategories(username: string): Promise<number> {
   const rows = await sql`
     SELECT COUNT(DISTINCT li.category_path)::int AS n
     FROM receipt_line_items li
     JOIN receipts r ON r.receipt_id = li.receipt_id
-    WHERE r.username = ${username} AND r.proof_status = 'matched' AND li.category_path IS NOT NULL
+    WHERE r.username = ${username}
+      AND li.category_path IS NOT NULL
+      AND (
+        COALESCE(r.reward_final, 0) > 0
+        OR EXISTS (
+          SELECT 1 FROM contribution_point_events e
+          WHERE e.username = r.username
+            AND e.source_type = 'receipt_verified'
+            AND e.reference_id = r.receipt_id::text
+            AND e.points_delta > 0
+        )
+        OR EXISTS (
+          SELECT 1 FROM receipt_rewards rr
+          WHERE rr.receipt_id = r.receipt_id
+            AND (COALESCE(rr.contribution_points, 0) > 0 OR COALESCE(rr.bint_amount, 0) > 0)
+        )
+      )
   `;
   return scalar(rows);
 }
 
-/** Best (longest) active-day streak the user has reached, across streak types. */
 async function bestStreak(username: string): Promise<number> {
   const rows = await sql`
     SELECT COALESCE(MAX(longest_streak), 0)::int AS n
@@ -61,7 +84,6 @@ async function bestStreak(username: string): Promise<number> {
   return scalar(rows);
 }
 
-/** Account level (lifetime). */
 async function accountLevel(username: string): Promise<number> {
   const rows = await sql`
     SELECT COALESCE(account_level, 1)::int AS n
@@ -72,28 +94,56 @@ async function accountLevel(username: string): Promise<number> {
   return scalar(rows);
 }
 
-/** Count of verified receipts. */
+/** Count of rewarded receipts (achievement "verified" = paid out). */
 async function verifiedReceipts(username: string): Promise<number> {
   const rows = await sql`
-    SELECT COUNT(*)::int AS n
-    FROM receipts
-    WHERE username = ${username} AND proof_status = 'matched'
+    SELECT COUNT(DISTINCT r.receipt_id)::int AS n
+    FROM receipts r
+    WHERE r.username = ${username}
+      AND (
+        COALESCE(r.reward_final, 0) > 0
+        OR EXISTS (
+          SELECT 1 FROM contribution_point_events e
+          WHERE e.username = r.username
+            AND e.source_type = 'receipt_verified'
+            AND e.reference_id = r.receipt_id::text
+            AND e.points_delta > 0
+        )
+        OR EXISTS (
+          SELECT 1 FROM receipt_rewards rr
+          WHERE rr.receipt_id = r.receipt_id
+            AND (COALESCE(rr.contribution_points, 0) > 0 OR COALESCE(rr.bint_amount, 0) > 0)
+        )
+      )
   `;
   return scalar(rows);
 }
 
-/** Cumulative hidden cost surfaced across verified receipts (₺). */
 async function hiddenCostSurfaced(username: string): Promise<number> {
   const rows = await sql`
     SELECT COALESCE(SUM(rc.total_hidden_canonical), 0)::numeric AS n
     FROM receipt_canonical rc
     JOIN receipts r ON r.receipt_id = rc.receipt_id
-    WHERE r.username = ${username} AND r.proof_status = 'matched'
+    WHERE r.username = ${username}
+      AND (
+        COALESCE(r.reward_final, 0) > 0
+        OR EXISTS (
+          SELECT 1 FROM contribution_point_events e
+          WHERE e.username = r.username
+            AND e.source_type = 'receipt_verified'
+            AND e.reference_id = r.receipt_id::text
+            AND e.points_delta > 0
+        )
+        OR EXISTS (
+          SELECT 1 FROM receipt_rewards rr
+          WHERE rr.receipt_id = r.receipt_id
+            AND (COALESCE(rr.contribution_points, 0) > 0 OR COALESCE(rr.bint_amount, 0) > 0)
+        )
+      )
   `;
   return scalar(rows);
 }
 
-/** Successful referrals: active relationships whose referee verified their phone. */
 async function successfulReferrals(username: string): Promise<number> {
   const rows = await sql`
     SELECT COUNT(*)::int AS n
@@ -115,11 +165,6 @@ const METRIC_FNS: Record<AchievementMetric, (username: string) => Promise<number
   successful_referrals: successfulReferrals,
 };
 
-/**
- * Compute every achievement metric for a user. Defensive: a failing metric
- * resolves to 0 and never throws, so achievement evaluation cannot break the
- * receipt pipeline.
- */
 export async function computeAchievementMetrics(
   username: string,
 ): Promise<Record<AchievementMetric, number>> {
