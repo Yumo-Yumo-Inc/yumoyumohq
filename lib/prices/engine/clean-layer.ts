@@ -23,6 +23,11 @@
  */
 
 import { OBS_DATE_FLOOR } from "@/config/price-ledger";
+import {
+  isUnsizedEggCarton,
+  pricePerPiece,
+  resolvePiecePackCount,
+} from "@/lib/receipt/pack-size";
 
 // Tax / fee / non-product lines mis-labeled as products.
 export const TAX_RE =
@@ -169,6 +174,8 @@ export type RawLine = {
   currency: string;
   /** YYYY-MM-DD — gated against the ledger's covered period. */
   obsDate: string;
+  /** Optional pack_size from receipt_line_items ("30adet", "15", …). */
+  packSize?: string | number | null;
 };
 
 /** Descriptive fields the published leaf needs; carried through unchanged (K1). */
@@ -185,7 +192,12 @@ function isPlaceholderMerchant(m: string): boolean {
 }
 
 /** Comparable per-unit price + normalised unit label. */
-export function normalizeUnit(r: RawLine): { price: number; unitType: string; totalNotUnit?: boolean } {
+export function normalizeUnit(r: RawLine): {
+  price: number;
+  unitType: string;
+  totalNotUnit?: boolean;
+  unsizedCarton?: boolean;
+} {
   const up = r.unitPrice;
   const qty = num(r.quantity);
   let lt = num(r.lineTotal);
@@ -213,7 +225,7 @@ export function normalizeUnit(r: RawLine): { price: number; unitType: string; to
   // line_total / quantity is the most reliable per-unit price (fixes fuel pump
   // totals, weighed items, quantity swaps — a receipt that prints 64,490 for
   // diesel still yields 64.47 through the total). Fall back to unit_price.
-  const price = qty && qty > 0 && lt && lt > 0 ? lt / qty : up;
+  let price = qty && qty > 0 && lt && lt > 0 ? lt / qty : up;
 
   let unitType = (r.unitType || "").trim().toLowerCase();
   const isFuel = FUEL_RE.test(upper(r.rawName)) || FUEL_RE.test(upper(r.category));
@@ -231,6 +243,25 @@ export function normalizeUnit(r: RawLine): { price: number; unitType: string; to
     // "20 TRY/ml" is arithmetically absurd on a permanent record. l joins ml/g
     // so two receipts of the same 1.5L bottle — one labelled adet, one l — hash
     // to the same leaf instead of splitting the product across two units.
+
+  const qEff = qty && qty > 0 ? qty : 1;
+  const pack = resolvePiecePackCount({ name: r.rawName, packSize: r.packSize ?? null });
+  if (
+    !isFuel &&
+    isUnsizedEggCarton({
+      name: r.rawName,
+      pack,
+      qty: qEff,
+      perPack: price,
+      unitType,
+    })
+  ) {
+    return { price: 0, unitType, unsizedCarton: true };
+  }
+  if (!isFuel && pack != null && pack > 1 && Number.isFinite(price) && price > 0) {
+    const perPiece = pricePerPiece(price, qEff, pack);
+    if (perPiece != null) price = perPiece;
+  }
 
   /**
    * A pump prints what you paid, not what a litre costs. The per-litre price is
@@ -289,7 +320,7 @@ export function classifyLine(
   ext: ExternalRef | null,
   today: string
 ): CleanVerdict {
-  const { price, unitType, totalNotUnit } = normalizeUnit(r);
+  const { price, unitType, totalNotUnit, unsizedCarton } = normalizeUnit(r);
   const base = (d: CleanVerdict["disposition"], reason: string, vb: CleanVerdict["validationBasis"], ref: number | null): CleanVerdict => {
     const fark = ref && ref > 0 ? Math.round((price / ref - 1) * 100) : null;
     return { disposition: d, reason, validationBasis: vb, refPrice: ref, farkPct: fark, normalizedPrice: price, unitType };
@@ -297,6 +328,7 @@ export function classifyLine(
 
   // 1) removal — vetoes everything.
   if (!isDateInRange(r.obsDate, today)) return base("excluded", "DATE_OUT_OF_RANGE", "none", null);
+  if (unsizedCarton) return base("excluded", "PACK_CARTON_UNSIZED", "none", null);
   if (TAX_RE.test(upper(r.rawName))) return base("excluded", "TAX_LINE", "none", null);
   if (SECTION_RE.test(upper(r.rawName))) return base("excluded", "SECTION_LINE", "none", null);
   if (isUnusableMerchant(r.merchant)) return base("excluded", "PLACEHOLDER_MERCHANT", "none", null);

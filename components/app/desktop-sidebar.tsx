@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, ScanLine, TrendingUp, Award, Flame, Settings } from "lucide-react";
+import { Home, ScanLine, LineChart, Award, Flame, Settings } from "lucide-react";
 import { AvatarImage } from "@/components/app/avatar-image";
 import { AvatarFrame } from "@/components/app/avatar-frame";
 import { AvatarSticker } from "@/components/app/avatar-sticker";
@@ -28,7 +28,7 @@ const NAV_ITEMS: readonly { href: string; label: UserFacingText; icon: React.Ele
   { href: "/app/dashboard", label: { tr: "Bugün", en: "Today", ru: "Сегодня", th: "วันนี้", es: "Hoy", zh: "今天" }, icon: Home },
   { href: "/app/mine", label: { tr: "Tara", en: "Scan", ru: "Скан", th: "สแกน", es: "Escanear", zh: "扫描" }, icon: ScanLine },
   { href: "/app/season", label: { tr: "Sezon", en: "Season", ru: "Сезон", th: "ซีซัน", es: "Temporada", zh: "赛季" }, icon: Flame },
-  { href: "/app/patterns", label: { tr: "Yaşam", en: "Life", ru: "Жизнь", th: "ชีวิต", es: "Vida", zh: "生活" }, icon: TrendingUp },
+  { href: "/app/analysis", label: { tr: "Analiz", en: "Analysis", ru: "Анализ", th: "วิเคราะห์", es: "Análisis", zh: "分析" }, icon: LineChart },
   { href: "/app/achievements", label: { tr: "Başarımlar", en: "Achievements", ru: "Достижения", th: "ความสำเร็จ", es: "Logros", zh: "成就" }, icon: Award },
 ];
 

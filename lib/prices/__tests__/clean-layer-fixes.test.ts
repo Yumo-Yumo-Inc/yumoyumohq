@@ -104,6 +104,45 @@ for (const [inp, want] of [
   console.log(`  ${ok ? "✓" : "✗"}  "${inp}" → "${got}"${ok ? "" : `  (beklenen "${want}")`}`);
 }
 
+console.log("\n── multipack / egg carton (pack ÷ N)");
+{
+  const got = normalizeUnit(mk({
+    rawName: "Yumurta 15'li",
+    unitPrice: 99,
+    quantity: 1,
+    lineTotal: 99,
+    unitType: "adet",
+    packSize: "15adet",
+  }));
+  const ok = Math.abs(got.price - 6.6) < 0.01;
+  if (ok) pass++;
+  console.log(`  ${ok ? "✓" : "✗ BOZUK"}  Yumurta 15'li 99 → ${got.price} (want 6.6)`);
+}
+{
+  const got = normalizeUnit(mk({
+    rawName: "Maden Suyu 6x200ml",
+    unitPrice: 90,
+    quantity: 1,
+    lineTotal: 90,
+    unitType: "adet",
+  }));
+  const ok = Math.abs(got.price - 15) < 0.01;
+  if (ok) pass++;
+  console.log(`  ${ok ? "✓" : "✗ BOZUK"}  Maden Suyu 6x200ml 90 → ${got.price} (want 15)`);
+}
+{
+  const v = classifyLine(
+    mk({ rawName: "Yumurta", unitPrice: 200, lineTotal: 200, unitType: "adet" }),
+    6,
+    5,
+    null,
+    today,
+  );
+  const ok = v.disposition === "excluded" && v.reason === "PACK_CARTON_UNSIZED";
+  if (ok) pass++;
+  console.log(`  ${ok ? "✓" : "✗ BOZUK"}  çıplak Yumurta 200 → ${v.disposition} (${v.reason})`);
+}
+
 console.log("\n── normalizeCity: bir şehir, tek yazım");
 const cityCases: [string[], string][] = [
   [["IZMIR", "Izmir", "İZMİR", "İzmir", "izmir"], "IZMIR"],
@@ -120,6 +159,6 @@ for (const [variants, want] of cityCases) {
   console.log(`  ${ok ? "✓" : "✗"}  ${variants.filter(Boolean).join(" / ") || "(boş)"} → "${want}"${ok ? "" : `  çıkan: ${JSON.stringify(got)}`}`);
 }
 
-const total = cases.length + sect.length + 5 + 6 + 2 + cityCases.length + 2;
+const total = cases.length + sect.length + 5 + 6 + 2 + cityCases.length + 2 + 3;
 console.log(`\n${pass}/${total} ${pass === total ? "GEÇTİ ✓" : "KALDI ✗"}`);
 if (pass !== total) process.exitCode = 1;

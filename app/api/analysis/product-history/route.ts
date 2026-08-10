@@ -6,12 +6,17 @@
  * instance with merchant, date, quantity, unit price and line total, plus
  * summary statistics (min, max, avg, latest unit price).
  *
- * Insufficient data yields an empty history array — no fabricated values.
+ * Unit prices prefer line_total/quantity (same comparable path as Analysis
+ * tracks). Min/max/avg use the outlier gate so a single OCR misread cannot
+ * stretch the range (e.g. bread 15 → 2587). Insufficient data yields an empty
+ * history array — no fabricated values.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUsername } from "@/lib/auth/session";
 import { sql } from "@/lib/db/client";
+import { comparableUnitPrice, resolvePiecePackCount } from "@/lib/analysis/comparable-unit-price";
+import { filterOutlierValues } from "@/lib/analysis/price-sanity";
 import type { ProductHistoryResponse, ProductHistoryItem, ProductHistoryStats } from "@/lib/analysis/types";
 
 function normaliseText(input: string): string {
@@ -30,7 +35,7 @@ interface RawRow {
   canonical_name: string | null;
   display_name_tr: string | null;
   brand: string | null;
-  pack_size: number | null;
+  pack_size: string | number | null;
   unit_type: string | null;
   quantity: number;
   unit_price_gross: number | null;
@@ -63,25 +68,39 @@ function matchesProductKey(row: RawRow, key: ReturnType<typeof parseProductKey>)
   const name = (row.canonical_name || row.raw_name || "").trim();
   if (!name) return false;
   if (normaliseText(name) !== key.normalisedName) return false;
-  if (key.packSize !== null && row.pack_size !== key.packSize) return false;
+  const rowPack =
+    resolvePiecePackCount({
+      name: row.display_name_tr || row.canonical_name || row.raw_name,
+      packSize: row.pack_size,
+    });
+  if (key.packSize !== null && rowPack !== key.packSize) return false;
   if (key.unitType !== null && row.unit_type !== key.unitType) return false;
   return true;
 }
 
 function computeStats(items: ProductHistoryItem[]): ProductHistoryStats {
-  const prices = items
-    .map((i) => i.unitPrice)
-    .filter((p): p is number => p !== null && Number.isFinite(p) && p > 0);
+  const cleanPrices = items
+    .filter((i) => !i.outlier && i.unitPrice != null && i.unitPrice > 0)
+    .map((i) => i.unitPrice as number);
 
-  if (prices.length === 0) {
+  if (cleanPrices.length === 0) {
     return { min: null, max: null, avg: null, latest: null, count: items.length, spanDays: 0 };
   }
 
-  const sorted = [...prices].sort((a, b) => a - b);
+  const sorted = [...cleanPrices].sort((a, b) => a - b);
   const min = sorted[0];
   const max = sorted[sorted.length - 1];
   const avg = sorted.reduce((s, v) => s + v, 0) / sorted.length;
-  const latest = prices[prices.length - 1];
+
+  let latest: number | null = null;
+  for (let i = items.length - 1; i >= 0; i--) {
+    const row = items[i];
+    if (!row.outlier && row.unitPrice != null && row.unitPrice > 0) {
+      latest = row.unitPrice;
+      break;
+    }
+  }
+  if (latest == null) latest = sorted[sorted.length - 1];
 
   let spanDays = 0;
   if (items.length >= 2) {
@@ -175,14 +194,51 @@ export async function GET(request: NextRequest) {
     const first = matched[0];
     const displayName = first.display_name_tr || first.canonical_name || first.raw_name || "";
 
-    const history: ProductHistoryItem[] = matched.map((row) => ({
-      receiptId: row.receipt_id,
-      date: typeof row.dt === "string" ? row.dt.slice(0, 10) : "",
-      merchantName: row.merchant ?? null,
-      quantity: Number(row.quantity) || 1,
-      unitPrice: row.unit_price_gross != null ? Number(row.unit_price_gross) : null,
-      lineTotal: row.line_total_gross != null ? Number(row.line_total_gross) : null,
-      unitType: row.unit_type ?? null,
+    const historyDraft: ProductHistoryItem[] = matched.map((row) => {
+      const quantity = Number(row.quantity) || 1;
+      const lineTotal = row.line_total_gross != null ? Number(row.line_total_gross) : null;
+      const rawUnit = row.unit_price_gross != null ? Number(row.unit_price_gross) : null;
+      const displayName = row.display_name_tr || row.canonical_name || row.raw_name || "";
+      const packSize = resolvePiecePackCount({
+        name: displayName,
+        packSize: row.pack_size,
+      });
+      return {
+        receiptId: row.receipt_id,
+        date: typeof row.dt === "string" ? row.dt.slice(0, 10) : "",
+        merchantName: row.merchant ?? null,
+        quantity,
+        unitPrice: comparableUnitPrice({
+          name: displayName,
+          quantity,
+          unitPrice: rawUnit,
+          lineTotal,
+          packSize,
+          unitType: row.unit_type,
+        }),
+        lineTotal,
+        unitType: row.unit_type ?? null,
+      };
+    });
+
+    // Index-stable outlier mark: same rounded price on two rows must not
+    // collapse both into "kept" via a Set.
+    const pricedIdx = historyDraft
+      .map((item, idx) => ({ idx, p: item.unitPrice }))
+      .filter((x): x is { idx: number; p: number } => x.p != null && x.p > 0);
+    const remaining = [...filterOutlierValues(pricedIdx.map((x) => x.p))];
+    const keptIdx = new Set<number>();
+    for (const row of pricedIdx) {
+      const at = remaining.indexOf(row.p);
+      if (at >= 0) {
+        keptIdx.add(row.idx);
+        remaining.splice(at, 1);
+      }
+    }
+
+    const history: ProductHistoryItem[] = historyDraft.map((item, idx) => ({
+      ...item,
+      outlier: item.unitPrice != null && item.unitPrice > 0 ? !keptIdx.has(idx) : false,
     }));
 
     const stats = computeStats(history);

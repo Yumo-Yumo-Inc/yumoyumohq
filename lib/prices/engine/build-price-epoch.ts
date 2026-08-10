@@ -148,6 +148,8 @@ async function getObservations(epochNumber: number): Promise<(PriceObservation &
       unitType: normalizeField(r.unit_type),
       currency: normalizeField(r.currency),
       obsDate: canonicalDate(r.obs_date),
+      // Pack is intentionally omitted: normalized_price is already clean-layer
+      // output; re-applying pack÷N here would double-divide.
     } as RawLine);
     return {
       sourceLineId: Number(r.source_line_id),

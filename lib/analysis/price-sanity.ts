@@ -34,13 +34,20 @@ function median(values: number[]): number {
 /**
  * Returns the values that survive the median+MAD outlier gate.
  * Order is preserved. Non-positive values never survive.
+ *
+ * The median-multiple gate always runs when there are 2+ values — a pair like
+ * 12 and 240 must not both survive just because MAD needs three points.
+ * MAD robust-z only runs when there are enough points for MAD to mean something.
  */
 export function filterOutlierValues(values: number[]): number[] {
   const positive = values.filter((v) => Number.isFinite(v) && v > 0);
-  if (positive.length < 3) return positive;
+  if (positive.length <= 1) return positive;
   const med = median(positive);
   if (med <= 0) return positive;
-  const mad = median(positive.map((v) => Math.abs(v - med)));
+  const mad =
+    positive.length >= 3
+      ? median(positive.map((v) => Math.abs(v - med)))
+      : 0;
   return positive.filter((v) => {
     if (v > med * OUTLIER_MEDIAN_MULTIPLE || v < med / OUTLIER_MEDIAN_MULTIPLE) return false;
     if (mad > 0) {

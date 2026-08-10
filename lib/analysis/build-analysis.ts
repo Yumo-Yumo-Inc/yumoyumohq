@@ -35,6 +35,8 @@ import {
   sanitizeObservations,
   isPlausibleDeltaRatio,
 } from "./price-sanity";
+import { comparableUnitPrice } from "./comparable-unit-price";
+import { isUmbrellaProductSlug, parsePackCount, resolvePiecePackCount } from "@/lib/receipt/pack-size";
 import type {
   AnalysisPayload,
   AnalysisOverview,
@@ -138,6 +140,11 @@ function toNum(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** pack_size column may be "30adet" — extract the piece count. */
+function toPackCount(v: unknown): number | null {
+  return parsePackCount(v as string | number | null);
+}
+
 function toStr(v: unknown): string | null {
   return typeof v === "string" && v.trim() !== "" ? v.trim() : null;
 }
@@ -180,20 +187,14 @@ function weekKey(date: Date): string {
  * own-price-track logic without depending on the offline cache types.
  */
 function normalisedUnitPrice(item: ItemRow): number | null {
-  const qty = item.quantity || 1;
-  if (item.lineTotalGross && item.packSize && item.packSize > 0) {
-    const perUnit = item.lineTotalGross / qty / item.packSize;
-    if (Number.isFinite(perUnit) && perUnit > 0) return perUnit;
-  }
-  if (item.unitPriceGross && item.unitPriceGross > 0) {
-    return item.packSize && item.packSize > 0
-      ? item.unitPriceGross / item.packSize
-      : item.unitPriceGross;
-  }
-  if (item.lineTotalGross && item.lineTotalGross > 0 && qty > 0) {
-    return item.lineTotalGross / qty;
-  }
-  return null;
+  return comparableUnitPrice({
+    name: item.displayName || item.name,
+    quantity: item.quantity,
+    unitPrice: item.unitPriceGross,
+    lineTotal: item.lineTotalGross,
+    packSize: item.packSize,
+    unitType: item.unitType,
+  });
 }
 
 /**
@@ -294,8 +295,14 @@ function merchantGroupKey(cleanedName: string): string {
 function productKey(item: ItemRow): string | null {
   const name = item.name?.trim();
   if (!name) return null;
-  const parts = [normaliseText(name)];
-  if (item.packSize != null) parts.push(`p${item.packSize}`);
+  const slug = normaliseText(name);
+  if (isUmbrellaProductSlug(slug)) return null;
+  const parts = [slug];
+  const pack =
+    item.packSize != null && item.packSize > 0
+      ? item.packSize
+      : resolvePiecePackCount({ name: item.displayName || item.name, packSize: null });
+  if (pack != null) parts.push(`p${pack}`);
   if (item.unitType) parts.push(item.unitType.slice(0, 4));
   return parts.join(":");
 }
@@ -418,7 +425,7 @@ function mapItemRows(rows: Record<string, unknown>[]): ItemRow[] {
         currency: toStr(row.currency),
         name,
         brand: toStr(row.brand),
-        packSize: toNum(row.pack_size),
+        packSize: toPackCount(row.pack_size),
         unitType: toStr(row.unit_type),
         quantity: toNum(row.quantity) ?? 1,
         unitPriceGross: toNum(row.unit_price_gross),

@@ -13,6 +13,7 @@ import type { CanonicalObservation } from "../canonical-types";
 import type { TaxonomyRow } from "./line-hidden-cost";
 import { normalizeReceiptLinesWithLLM } from "./normalize-product-llm";
 import { detectGuardedProductCategory } from "./product-category-guards";
+import { inferPiecePackCountFromName, parsePackCount } from "@/lib/receipt/pack-size";
 
 const FUZZY_THRESHOLD = 0.85;
 /** Default FMCG-style cost split for LLM-created taxonomy rows (sums to 100). */
@@ -182,10 +183,27 @@ function mapUnitTypeToObservation(u: string | null | undefined): string {
   return t;
 }
 
+/**
+ * Persist pack as "<count><unit>" for leaf display (e.g. "30adet").
+ * Readers parse the leading count via parsePackCount — do not invent sizes.
+ */
 function packSizeFromLlm(size: string | null, type: string | null): string | null {
-  if (size && type) return `${size}${type}`;
-  if (size) return size;
-  return null;
+  if (!size && !type) return null;
+  const raw = (size ?? "").trim();
+  if (!raw && type) return null;
+  // Already "30adet" / "15pcs"
+  if (parsePackCount(raw) != null && /[a-zA-ZçğıöşüÇĞİÖŞÜ]/.test(raw)) return raw;
+  const n = parsePackCount(raw) ?? (Number.isFinite(Number(raw.replace(",", "."))) ? Number(raw.replace(",", ".")) : null);
+  const t = mapUnitTypeToObservation(type) ?? (type ? type.trim().toLowerCase() : null);
+  if (n != null && n >= 2 && t) return `${n}${t}`;
+  if (n != null && n >= 2) return `${n}adet`;
+  if (raw && t) return `${raw}${t}`;
+  return raw || null;
+}
+
+function packSizeFromNameFallback(name: string | null | undefined): string | null {
+  const n = inferPiecePackCountFromName(name ?? null);
+  return n != null ? `${n}adet` : null;
 }
 
 async function fuzzyMatchTaxonomyBulk(
@@ -413,7 +431,9 @@ export async function resolveCanonicalObservations(
       obs.canonical_name = llm.canonical_name;
       if (llm.brand) obs.brand = llm.brand;
       obs.brand_verdict = llm.brand_verdict;
-      obs.pack_size = packSizeFromLlm(llm.unit_size, llm.unit_type);
+      obs.pack_size =
+        packSizeFromLlm(llm.unit_size, llm.unit_type) ??
+        packSizeFromNameFallback(obs.raw_name || obs.canonical_name || llm.raw_name);
       obs.category_lvl1 = cat1;
       obs.category_lvl2 = cat2;
       // Carry the v3 path so brand-status classification works on the v1 path too.

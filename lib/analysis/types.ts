@@ -150,6 +150,8 @@ export interface ProductHistoryItem {
   unitPrice: number | null;
   lineTotal: number | null;
   unitType: string | null;
+  /** True when this price was dropped from min/max/avg (OCR / unit noise). */
+  outlier?: boolean;
 }
 
 export interface ProductHistoryStats {

@@ -164,9 +164,13 @@ export function ProductPriceDetail({
   const packLabel =
     data?.packSize && unitLabel ? ` ${data.packSize}${unitLabel}` : "";
 
-  // Compute price trend for the sparkline
+  // Sparkline uses only non-outlier comparable prices (same set as min/max).
   const pricePoints = useMemo(
-    () => data?.history.map((h) => h.unitPrice).filter((p): p is number => p !== null && p > 0) ?? [],
+    () =>
+      data?.history
+        .filter((h) => !h.outlier)
+        .map((h) => h.unitPrice)
+        .filter((p): p is number => p !== null && p > 0) ?? [],
     [data],
   );
   const rising =
@@ -350,11 +354,17 @@ export function ProductPriceDetail({
                       className="flex items-center justify-between px-4 py-2.5"
                       style={{
                         borderTop: i > 0 ? "1px solid var(--app-border)" : undefined,
+                        opacity: item.outlier ? 0.45 : 1,
                       }}
                     >
                       <div className="min-w-0 flex-1">
                         <div className="text-[12.5px] font-medium text-app-text-primary">
                           {item.date}
+                          {item.outlier ? (
+                            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wide text-app-text-muted">
+                              {tr ? "şüpheli" : "suspect"}
+                            </span>
+                          ) : null}
                         </div>
                         {item.merchantName && (
                           <div className="truncate text-[11px] text-app-text-muted">
