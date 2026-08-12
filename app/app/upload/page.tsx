@@ -133,18 +133,42 @@ export default function UploadPage() {
         if (res.ok) {
           const data = (await res.json()) as {
             bint?: number | null;
+            contributionPoints?: number | null;
             xp?: number | null;
             rewardBreakdown?: RewardBreakdown | null;
             hiddenCost?: number | null;
+            hiddenCostStatus?: "computed" | "unavailable" | "pending";
             finished?: boolean;
           };
-          if (!cancelled && data.bint != null) setReceiptBint(Number(data.bint) || 0);
+          // Prefer contribution ledger once post-process writes it (karar 2026-06-28).
+          const points =
+            data.contributionPoints != null
+              ? Number(data.contributionPoints) || 0
+              : data.bint != null
+                ? Number(data.bint) || 0
+                : null;
+          if (!cancelled && points != null) setReceiptBint(points);
           if (!cancelled && data.rewardBreakdown != null) setReceiptBreakdown(data.rewardBreakdown);
           // Hidden cost may be revised once post-process re-prices the lines with
           // resolved categories. Adopt the server's figure so the screen stops
           // showing the coarser upload-time estimate. Points are untouched by
           // that correction, so nothing else on the card has to move.
-          if (!cancelled && data.hiddenCost != null) {
+          // unavailable → mark provenance; never treat null/0 as a computed zero.
+          if (!cancelled && data.hiddenCostStatus === "unavailable") {
+            setAnalysis((prev) => {
+              if (!prev?.hiddenCost) return prev;
+              if (prev.hiddenCost.provenance === "unavailable") return prev;
+              return {
+                ...prev,
+                hiddenCost: {
+                  ...prev.hiddenCost,
+                  hiddenCostCore: 0,
+                  totalHidden: 0,
+                  provenance: "unavailable",
+                },
+              };
+            });
+          } else if (!cancelled && data.hiddenCost != null) {
             const next = Number(data.hiddenCost);
             if (Number.isFinite(next)) {
               setAnalysis((prev) => {
@@ -943,6 +967,7 @@ export default function UploadPage() {
                   <BreakdownCard
                     pricing={analysis.pricing}
                     hiddenCost={analysis.hiddenCost}
+                    documentType={analysis.flags?.docType ?? null}
                     showEstimate={getCategoryRates(analysis.merchant.category).isEstimate}
                   />
                 </ThemeCard>

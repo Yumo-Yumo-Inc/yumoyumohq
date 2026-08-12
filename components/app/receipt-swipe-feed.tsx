@@ -22,7 +22,7 @@ import { useAppLocale } from "@/lib/i18n/app-context";
 import { getCategorySchemaLabel } from "@/lib/receipt/cost-layer-display";
 import { formatUnitType } from "@/lib/format/unit-type";
 import { StatusBadge } from "@/components/app/status-badge";
-import { displayHiddenCost, displayHiddenPercent } from "@/lib/receipt/display-hidden-cost";
+import { displayHiddenCost, displayHiddenPercent, isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
 import { readCachedReceiptById } from "@/lib/offline/cache";
 import { convertCachedReceiptToReceipt } from "@/lib/offline/receipt-cache";
 import type { Receipt, ReceiptLineItem } from "@/lib/mock/types";
@@ -380,8 +380,9 @@ function ReceiptFullCard(props: CardProps) {
   const { t, locale } = useAppLocale();
   const shownHidden = displayHiddenCost(r);
   const hiddenPct = displayHiddenPercent(r);
-  const hasHidden = shownHidden > 0;
-  const paidVisible = Math.max(0, r.total - shownHidden);
+  const hiddenUnavailable = isHiddenCostUnavailable(r);
+  const hasHidden = !hiddenUnavailable && shownHidden > 0;
+  const paidVisible = Math.max(0, r.total - (hiddenUnavailable ? 0 : shownHidden));
 
   // Real 3-layer hidden breakdown (productValue is the real value, not hidden).
   const layers = [
@@ -472,12 +473,16 @@ function ReceiptFullCard(props: CardProps) {
               {merchantLabel}
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px]" style={{ color: "var(--app-text-muted)" }}>
-              {r.category && r.category !== "other" && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {getCategorySchemaLabel(r.category, locale, r.merchantChannel)}
-                </span>
-              )}
+              {(() => {
+                const schema = getCategorySchemaLabel(r.category, locale, r.merchantChannel);
+                if (!schema) return null;
+                return (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {schema}
+                  </span>
+                );
+              })()}
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 {r.date}
@@ -527,8 +532,12 @@ function ReceiptFullCard(props: CardProps) {
               className="mt-1.5 text-[32px] font-extrabold leading-none tracking-tight"
               style={{ color: hasHidden ? "var(--app-danger)" : "var(--app-success)" }}
             >
-              {shownHidden.toFixed(2)}
-              <span className="ml-1 text-sm font-normal opacity-70">{r.currency}</span>
+              {hiddenUnavailable
+                ? byLocale("Hesaplanamadı", "N/A", "Н/Д", "N/A", "N/D", "不可用")
+                : shownHidden.toFixed(2)}
+              {!hiddenUnavailable && (
+                <span className="ml-1 text-sm font-normal opacity-70">{r.currency}</span>
+              )}
             </div>
             <div className="mt-1.5 font-mono text-[11px]" style={{ color: "var(--app-text-muted)" }}>
               {hasHidden

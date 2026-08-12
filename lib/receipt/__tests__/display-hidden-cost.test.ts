@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   displayHiddenCost,
   displayHiddenPercent,
+  isHiddenCostUnavailable,
   resolveRawHiddenCost,
 } from "@/lib/receipt/display-hidden-cost";
 
@@ -38,8 +39,35 @@ describe("display-hidden-cost", () => {
     expect(
       displayHiddenCost({
         totalPaid: 500,
-        hiddenCost: { totalHidden: 280 },
+        hiddenCost: { totalHidden: 120, hiddenCostCore: 120 },
       })
-    ).toBe(280);
+    ).toBe(120);
+  });
+
+  it("marks provenance unavailable as could-not-compute", () => {
+    expect(
+      isHiddenCostUnavailable({
+        documentType: "payment_receipt",
+        hiddenCost: { hiddenCostCore: 0, provenance: "unavailable" },
+      })
+    ).toBe(true);
+  });
+
+  it("does not treat money_transfer zero as unavailable purchase HC", () => {
+    expect(
+      isHiddenCostUnavailable({
+        documentType: "money_transfer",
+        hiddenCost: { hiddenCostCore: 0 },
+      })
+    ).toBe(false);
+  });
+
+  it("treats legacy zero with no breakdown as unavailable", () => {
+    expect(
+      isHiddenCostUnavailable({
+        documentType: "receipt",
+        hiddenCost: { hiddenCostCore: 0, breakdownItems: [] },
+      })
+    ).toBe(true);
   });
 });

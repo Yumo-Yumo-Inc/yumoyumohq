@@ -1,4 +1,5 @@
 import type { ReceiptStatus } from "@/lib/mock/types";
+import { normalizeReceiptCategory } from "@/lib/receipt/categories";
 
 export type CostLayerBucket = "store" | "supply" | "retail" | "government" | "excise" | "other";
 
@@ -30,71 +31,100 @@ export type ReceiptCategoryKind =
   | "alcohol"
   | "tobacco"
   | "retail"
-  | "general";
+  | "services"
+  | "beauty";
 
+/**
+ * Maps merchant_category (+ optional channel) to a UI schema kind.
+ * Returns null for unknown/other — callers must not show a "General" badge.
+ */
 export function getReceiptCategoryKind(
   category?: string | null,
   merchantChannel?: string | null
-): ReceiptCategoryKind {
-  const cat = normalize(category);
+): ReceiptCategoryKind | null {
   const channel = normalize(merchantChannel);
+  if (channel === "supermarket_grocery") return "market";
 
-  if (
-    channel === "supermarket_grocery" ||
-    ["grocery", "groceries", "groceries_fmcg", "supermarket", "market", "convenience"].some((key) =>
-      cat.includes(key)
-    )
-  ) {
+  const canonical = normalizeReceiptCategory(category);
+  if (canonical === "other") return null;
+  if (canonical) {
+    switch (canonical) {
+      case "grocery":
+      case "kiosk":
+        return "market";
+      case "restaurant":
+      case "cafe":
+        return "food";
+      case "apparel":
+      case "fashion":
+        return "fashion";
+      case "fuel":
+        return "fuel";
+      case "utilities":
+        return "utility";
+      case "travel":
+        return "travel";
+      case "hospitality_lodging":
+        return "hospitality";
+      case "electronics":
+        return "electronics";
+      case "pharmacy":
+        return "pharmacy";
+      case "healthcare":
+        return "healthcare";
+      case "alcohol":
+        return "alcohol";
+      case "tobacco":
+        return "tobacco";
+      case "specialty_retail":
+      case "sports":
+        return "retail";
+      case "beauty":
+      case "personal_care":
+        return "beauty";
+      case "services":
+        return "services";
+      default:
+        break;
+    }
+  }
+
+  // Legacy / unnormalized strings that never hit the canonical enum.
+  const cat = normalize(category);
+  if (!cat) return null;
+  if (["grocery", "groceries", "supermarket", "market", "convenience", "kiosk", "bakery", "butcher"].some((k) => cat.includes(k))) {
     return "market";
   }
-  if (["restaurant", "cafe", "food", "dining", "bakery", "food_delivery"].some((key) => cat.includes(key))) {
-    return "food";
-  }
-  if (["fashion", "apparel", "clothing", "shoe", "jewelry"].some((key) => cat.includes(key))) {
-    return "fashion";
-  }
-  if (["fuel", "gas_station", "petrol", "akaryakit"].some((key) => cat.includes(key))) {
-    return "fuel";
-  }
-  if (["utility", "utilities", "electric", "water", "gas bill"].some((key) => cat.includes(key))) {
-    return "utility";
-  }
-  if (["travel", "flight", "ticket", "train", "bus", "ferry"].some((key) => cat.includes(key))) {
-    return "travel";
-  }
-  if (["hospitality", "lodging", "hotel", "hostel", "booking", "agoda"].some((key) => cat.includes(key))) {
+  if (["restaurant", "cafe", "food", "dining", "food_delivery"].some((k) => cat.includes(k))) return "food";
+  if (["fashion", "apparel", "clothing", "shoe", "jewelry"].some((k) => cat.includes(k))) return "fashion";
+  if (["fuel", "gas_station", "petrol", "akaryakit"].some((k) => cat.includes(k))) return "fuel";
+  if (["utility", "utilities", "electric", "water", "gas bill"].some((k) => cat.includes(k))) return "utility";
+  if (["travel", "flight", "ticket", "train", "bus", "ferry"].some((k) => cat.includes(k))) return "travel";
+  if (["hospitality", "lodging", "hotel", "hostel", "booking", "agoda", "accommodation"].some((k) => cat.includes(k))) {
     return "hospitality";
   }
-  if (["alcohol", "liquor", "wine", "beer", "rakı", "raki", "tekel"].some((key) => cat.includes(key))) {
-    return "alcohol";
-  }
-  if (["tobacco", "cigarette", "sigara", "tütün", "tutun"].some((key) => cat.includes(key))) {
-    return "tobacco";
-  }
-  if (["electronic", "electronics", "teknosa", "computer"].some((key) => cat.includes(key))) {
-    return "electronics";
-  }
-  if (["pharmacy", "drug", "eczane"].some((key) => cat.includes(key))) {
-    return "pharmacy";
-  }
+  if (["alcohol", "liquor", "wine", "beer", "rakı", "raki", "tekel"].some((k) => cat.includes(k))) return "alcohol";
+  if (["tobacco", "cigarette", "sigara", "tütün", "tutun"].some((k) => cat.includes(k))) return "tobacco";
+  if (["electronic", "electronics", "teknosa", "computer"].some((k) => cat.includes(k))) return "electronics";
+  if (["pharmacy", "drug", "eczane"].some((k) => cat.includes(k))) return "pharmacy";
   if (
     ["healthcare", "sağlı", "saglik", "hospital", "hastane", "clinic", "klinik", "poliklinik", "medical",
-     "tıp merkez", "tip merkez", "muayene", "dental", "dentist", "diş", "dis hekim", "doctor", "doktor",
-     "laboratory", "laboratuvar"].some((key) =>
-      cat.includes(key)
-    )
+      "tıp merkez", "tip merkez", "muayene", "dental", "dentist", "diş", "dis hekim", "doctor", "doktor",
+      "laboratory", "laboratuvar"].some((k) => cat.includes(k))
   ) {
     return "healthcare";
   }
+  if (["beauty", "cosmetic", "kozmetik", "personal_care", "kişisel", "kisisel"].some((k) => cat.includes(k))) {
+    return "beauty";
+  }
+  if (["service", "subscription", "digital", "tax_office"].some((k) => cat.includes(k))) return "services";
   if (
     ["specialty_retail", "stationery", "kırtasiye", "kirtasiye", "bookstore", "kitabevi",
-     "nalbur", "hardware", "hırdavat", "hirdavat", "florist", "çiçek", "cicek"].some((key) =>
-      cat.includes(key)
-    )
+      "nalbur", "hardware", "hırdavat", "hirdavat", "florist", "çiçek", "cicek", "sport"].some((k) => cat.includes(k))
   ) {
     return "retail";
   }
-  return "general";
+  return null;
 }
 
 export function getCategorySchemaLabel(
@@ -103,12 +133,13 @@ export function getCategorySchemaLabel(
   merchantChannel?: string | null
 ): string {
   const kind = getReceiptCategoryKind(category, merchantChannel);
+  if (!kind) return "";
   const labels: Record<ReceiptCategoryKind, string> = {
     market: pick(locale, "Market", "Market"),
     food: pick(locale, "Restoran / kafe", "Restaurant / cafe"),
     fashion: pick(locale, "Moda / perakende", "Fashion / retail"),
     fuel: pick(locale, "Akaryakıt", "Fuel"),
-    utility: pick(locale, "Fatura / hizmet", "Utility / service"),
+    utility: pick(locale, "Fatura", "Utility"),
     travel: pick(locale, "Seyahat", "Travel"),
     hospitality: pick(locale, "Konaklama", "Hospitality"),
     electronics: pick(locale, "Elektronik", "Electronics"),
@@ -117,7 +148,8 @@ export function getCategorySchemaLabel(
     alcohol: pick(locale, "Alkol", "Alcohol"),
     tobacco: pick(locale, "Tütün", "Tobacco"),
     retail: pick(locale, "Perakende", "Retail"),
-    general: pick(locale, "Genel", "General"),
+    services: pick(locale, "Hizmetler", "Services"),
+    beauty: pick(locale, "Güzellik / bakım", "Beauty / care"),
   };
   return labels[kind];
 }
@@ -128,7 +160,7 @@ export function getCostLayerCopy(args: {
   bucket?: string | null;
   locale?: LocaleLike;
 }): { label: string; description: string } {
-  const kind = getReceiptCategoryKind(args.category, args.merchantChannel);
+  const kind = getReceiptCategoryKind(args.category, args.merchantChannel) ?? "retail";
   const bucket = (args.bucket || "other") as CostLayerBucket;
   const locale = args.locale;
 
@@ -238,10 +270,17 @@ export function getCostLayerCopy(args: {
       government: { tr: ["Vergi", "Fişte görünen vergi kalemi"], en: ["Tax", "Tax line shown on the receipt"] },
       other: { tr: ["Diğer katman", "Kategoriye göre ayrıştırılamayan tahmini pay"], en: ["Other layer", "Estimated share not mapped to a category layer"] },
     },
-    general: {
-      store: { tr: ["İşletme operasyonu", "Mekan, ekip ve operasyon giderleri"], en: ["Business operations", "Location, team, and operations"] },
-      supply: { tr: ["Tedarik ve yolculuk", "Lojistik, dağıtım ve altyapı"], en: ["Supply and journey", "Logistics, distribution, and infrastructure"] },
-      retail: { tr: ["Marka / marj", "Marka, pazarlama ve ticari marj"], en: ["Brand / margin", "Brand, marketing, and commercial margin"] },
+    services: {
+      store: { tr: ["Hizmet operasyonu", "Personel, mekan ve idari giderler"], en: ["Service operations", "Staff, premises, and administration"] },
+      supply: { tr: ["Girdi ve araçlar", "Sarf malzeme, yazılım ve altyapı"], en: ["Inputs and tools", "Consumables, software, and infrastructure"] },
+      retail: { tr: ["Hizmet marjı", "İşletme payı ve fiyatlandırma"], en: ["Service margin", "Operator share and pricing"] },
+      government: { tr: ["Vergi", "Fişte görünen vergi kalemi"], en: ["Tax", "Tax line shown on the receipt"] },
+      other: { tr: ["Diğer katman", "Kategoriye göre ayrıştırılamayan tahmini pay"], en: ["Other layer", "Estimated share not mapped to a category layer"] },
+    },
+    beauty: {
+      store: { tr: ["Mağaza / salon operasyonu", "Kira, ekip ve hizmet alanı"], en: ["Store / salon operations", "Rent, staff, and service floor"] },
+      supply: { tr: ["Ürün tedariki", "Kozmetik / bakım ürünleri ve lojistik"], en: ["Product sourcing", "Beauty / care products and logistics"] },
+      retail: { tr: ["Perakende ve marka", "Mağaza marjı ve marka primi"], en: ["Retail and brand", "Store margin and brand premium"] },
       government: { tr: ["Vergi", "Fişte görünen vergi kalemi"], en: ["Tax", "Tax line shown on the receipt"] },
       other: { tr: ["Diğer katman", "Kategoriye göre ayrıştırılamayan tahmini pay"], en: ["Other layer", "Estimated share not mapped to a category layer"] },
     },
@@ -258,7 +297,8 @@ export type HiddenCostProvenance =
   | "retail_margin"
   | "category_derived"
   | "sector_average"
-  | "regional_proxy";
+  | "regional_proxy"
+  | "unavailable";
 
 /**
  * Mandatory transparency notice for how the hidden-cost TOTAL was derived
@@ -269,7 +309,18 @@ export type HiddenCostProvenance =
 export function getProvenanceNotice(
   provenance: HiddenCostProvenance | null | undefined,
   locale?: LocaleLike
-): { label: string; detail: string; tone: "success" | "info" } {
+): { label: string; detail: string; tone: "success" | "info" | "muted" } {
+  if (provenance === "unavailable") {
+    return {
+      label: pick(locale, "Gizli maliyet hesaplanamadı", "Hidden cost could not be calculated"),
+      detail: pick(
+        locale,
+        "Bu belge için doğrulanmış marj veya proxy verisi yok. Sıfır göstermek yanıltıcı olur; rakam uydurulmaz.",
+        "No verified margin or proxy data exists for this document. Showing zero would be misleading; no figure is fabricated."
+      ),
+      tone: "muted",
+    };
+  }
   if (provenance === "regional_proxy") {
     // For countries without country-level producer data, the reference is the
     // verified commercial margin of a comparable regional market (or the
@@ -341,9 +392,10 @@ function isReceiptVerified(status?: ReceiptStatus | string | null): boolean {
 }
 
 export function getCategoryStoryIntro(
-  kind: ReceiptCategoryKind,
+  kind: ReceiptCategoryKind | null,
   locale?: LocaleLike
 ): string {
+  if (!kind) return "";
   const intros: Record<ReceiptCategoryKind, { tr: string; en: string }> = {
     market: {
       tr: "Market alışverişinde ödediğin tutar; mağaza operasyonu, tedarik zinciri ve perakende marjı katmanlarına dağılır. Kalemler satır doğrulaması tamamlandıkça güncellenir.",
@@ -397,12 +449,16 @@ export function getCategoryStoryIntro(
       tr: "Kırtasiye ve benzeri perakendede tutar; mağaza operasyonu, tedarik ve perakende marjına dağılır.",
       en: "Stationery and similar retail receipts split across store operations, supply, and retail margin.",
     },
-    general: {
-      tr: "Bu kategoride ödediğin tutar; işletme, tedarik ve marka marjı katmanlarına dağılır.",
-      en: "In this category, what you pay splits across business operations, supply, and brand margin.",
+    services: {
+      tr: "Hizmet fişlerinde tutar; hizmet operasyonu, girdi-araçlar ve hizmet marjı katmanlarına dağılır.",
+      en: "Service receipts split across service operations, inputs/tools, and service margin.",
+    },
+    beauty: {
+      tr: "Güzellik ve kişisel bakımda tutar; mağaza/salon operasyonu, ürün tedariki ve perakende-marka katmanlarına dağılır.",
+      en: "Beauty and personal care receipts split across store/salon operations, product sourcing, and retail-brand layers.",
     },
   };
-  const entry = intros[kind] || intros.general;
+  const entry = intros[kind];
   return isTurkish(locale) ? entry.tr : entry.en;
 }
 

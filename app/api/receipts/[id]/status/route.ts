@@ -42,8 +42,12 @@ export async function GET(
       username: string;
       hidden_cost_core: string | number | null;
       pricing_total_paid: string | number | null;
+      hc_provenance: string | null;
+      document_type: string | null;
     }>(
-      `SELECT status, expense_type, username, hidden_cost_core, pricing_total_paid
+      `SELECT status, expense_type, username, hidden_cost_core, pricing_total_paid,
+              receipt_data->'hiddenCost'->>'provenance' AS hc_provenance,
+              COALESCE(document_type, receipt_data->'flags'->>'docType') AS document_type
          FROM receipts
         WHERE receipt_id = $1
         LIMIT 1`,
@@ -55,9 +59,26 @@ export async function GET(
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
       const status = String(primaryRow.status || "scanned");
-      // Points (bINT) earned for this receipt — the user-visible token amount,
-      // after all multipliers and caps. Written at upload (reward_final), so it
-      // is usually ready on the first poll.
+      // User-visible points = contribution ledger (karar 2026-06-28).
+      // bINT from receipt_rewards remains internal / fallback while post-process
+      // finishes writing contribution_point_events.
+      let contributionPoints: number | null = null;
+      try {
+        const cp = await db.query<{ points: string | number | null }>(
+          `SELECT points_delta AS points
+             FROM contribution_point_events
+            WHERE reference_id = $1
+              AND source_type = 'receipt_verified'
+            LIMIT 1`,
+          [trimmed]
+        );
+        if (cp.rows?.[0]?.points != null) {
+          contributionPoints = Number(cp.rows[0].points) || 0;
+        }
+      } catch {
+        contributionPoints = null;
+      }
+
       let bint: number | null = null;
       let rewardBreakdown: unknown = null;
       try {
@@ -74,6 +95,12 @@ export async function GET(
         bint = null;
         rewardBreakdown = null;
       }
+
+      // Prefer contribution points once written; otherwise keep bINT estimate.
+      const points =
+        contributionPoints != null
+          ? contributionPoints
+          : bint;
 
       // XP earned for this receipt. Granted by trust-update in the background, so
       // it may lag the first poll. When no XP row exists yet, distinguish
@@ -113,12 +140,22 @@ export async function GET(
       // analyzing screen polls this so the number it shows follows that
       // correction instead of freezing on the upload estimate. Clamped to the
       // amount paid, mirroring displayHiddenCost.
+      // When provenance is unavailable, return null (not 0) — 0 means
+      // “no hidden cost”, unavailable means “could not compute”.
       let hiddenCost: number | null = null;
-      if (primaryRow.hidden_cost_core != null) {
+      let hiddenCostStatus: "computed" | "unavailable" | "pending" = "pending";
+      const provenance = primaryRow.hc_provenance;
+      if (provenance === "unavailable") {
+        hiddenCost = null;
+        hiddenCostStatus = "unavailable";
+      } else if (primaryRow.hidden_cost_core != null) {
         const raw = Number(primaryRow.hidden_cost_core);
         const paid = Number(primaryRow.pricing_total_paid) || 0;
         if (Number.isFinite(raw) && raw >= 0) {
           hiddenCost = paid > 0 ? Math.min(raw, paid) : raw;
+          hiddenCostStatus =
+            raw <= 0 && !provenance ? "unavailable" : "computed";
+          if (hiddenCostStatus === "unavailable") hiddenCost = null;
         }
       }
 
@@ -127,10 +164,14 @@ export async function GET(
         expenseType: primaryRow.expense_type ?? "personal",
         visible: true,
         finished: isTerminal(status),
-        bint,
+        // User-facing points (contribution ledger preferred).
+        bint: points,
+        contributionPoints,
         rewardBreakdown,
         xp,
         hiddenCost,
+        hiddenCostStatus,
+        documentType: primaryRow.document_type,
       });
     }
 

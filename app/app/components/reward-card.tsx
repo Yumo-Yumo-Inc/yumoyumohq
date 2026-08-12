@@ -89,16 +89,17 @@ function buildBreakdownRows(
 export function RewardCard({ reward, bint, xp, breakdown, receiptDate, qualityHonor, onRequestItemizedUpload }: RewardCardProps) {
   const { t } = useAppLocale();
   const [showBreakdown, setShowBreakdown] = useState(false);
-  const noRewardMessage = resolveNoRewardMessage(reward, t, { receiptDate });
   const pendingItemized = reward?.pendingItemizedReceipt === true;
   const fullEstimate = reward?.fullRewardEstimate ?? null;
-  // Points shown = user-visible unit (reward.ryumo; reward.final is the base
-  // unit of the SAME amount, never added on top). The poll refines from the
-  // ledger, and only upward: a higher settled value replaces the estimate,
-  // a lower one leaves the screen alone (kurgu: the ledger stays authoritative,
-  // the result screen never walks a shown reward back).
+  // Points shown = contribution ledger when polled; otherwise upload estimate.
+  // Contribution points are independent of hidden-cost amount (karar 2026-06-28 /
+  // 2026-08-08): HC unavailable must not hide a granted contribution reward.
   const estimate = reward?.ryumo ?? reward?.final ?? 0;
   const points = bint != null ? Math.max(bint, estimate) : estimate;
+  const hasPoints = points > 0;
+  const noRewardMessage = hasPoints
+    ? null
+    : resolveNoRewardMessage(reward, t, { receiptDate });
   // XP is granted by background trust-update, so it may lag the first render.
   const isCalculatingXp = xp == null && !noRewardMessage;
 

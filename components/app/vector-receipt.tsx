@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { useTier } from "@/lib/theme/theme-context";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import type { Receipt } from "@/lib/mock/types";
-import { displayHiddenCost } from "@/lib/receipt/display-hidden-cost";
+import { displayHiddenCost, isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
+import { getCategorySchemaLabel } from "@/lib/receipt/cost-layer-display";
 
 interface VectorReceiptProps {
   receipt: Receipt;
@@ -63,8 +64,9 @@ export function VectorReceipt({
     return timeStr.match(/^\d{2}:\d{2}$/) ? timeStr : timeStr;
   };
 
-  const category = receipt.category || "General";
+  const category = getCategorySchemaLabel(receipt.category, undefined, receipt.merchantChannel) || "";
   const totalPaid = receipt.totalPaid || receipt.total;
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
   const hiddenCost = displayHiddenCost(receipt);
   const date = formatDate(receipt.date);
   const time = formatTime(receipt.time);
@@ -314,7 +316,7 @@ export function VectorReceipt({
           textAnchor="middle"
           fill="#a1a1aa"
         >
-          {escapeXml(category.toUpperCase())}
+          {category ? escapeXml(category.toUpperCase()) : ""}
         </text>
 
         {/* Date & time block */}
@@ -490,7 +492,7 @@ export function VectorReceipt({
           textAnchor="middle"
           fill={acc2}
         >
-          {hiddenCost.toFixed(2)}
+          {hiddenUnavailable ? "—" : hiddenCost.toFixed(2)}
         </text>
         <text
           x="200"
@@ -503,7 +505,7 @@ export function VectorReceipt({
           textAnchor="middle"
           fill="#a1a1aa"
         >
-          {escapeXml(receipt.currency)}
+          {hiddenUnavailable ? "N/A" : escapeXml(receipt.currency)}
         </text>
 
         {/* Bottom dashed line */}

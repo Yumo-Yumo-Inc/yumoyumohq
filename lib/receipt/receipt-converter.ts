@@ -176,6 +176,7 @@ export function convertReceiptAnalysisToReceipt(analysis: ReceiptAnalysis, image
     username: analysis.username, // Add username for admin viewing
     displayName: (analysis as any).displayName, // Display name (user_profiles.display_name)
     merchantChannel: analysis.merchant?.channel || "other", // Add merchant channel (fallback to "other")
+    documentType: analysis.flags?.docType ?? null,
     // Fraud detection information (for admin display)
     fraudInfo: analysis.fraud ? {
       fraudScore: analysis.fraud.fraudScore,

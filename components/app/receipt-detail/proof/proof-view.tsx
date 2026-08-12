@@ -157,7 +157,9 @@ export function ProofView(props: ProofViewProps) {
           {/* Category + status */}
           <Reveal>
             <div className="flex items-center justify-between gap-2">
-              <span className="rounded-lg border px-2.5 py-1 text-[10.5px] uppercase tracking-[0.12em]" style={{ color: "var(--pf-soft)", borderColor: "var(--pf-line-strong)", fontFamily: MONO }}>{schemaLabel}</span>
+              {schemaLabel ? (
+                <span className="rounded-lg border px-2.5 py-1 text-[10.5px] uppercase tracking-[0.12em]" style={{ color: "var(--pf-soft)", borderColor: "var(--pf-line-strong)", fontFamily: MONO }}>{schemaLabel}</span>
+              ) : null}
               <div className="flex items-center gap-2">
                 {proofSeal && (
                   <span title={isTr ? proofSeal.label.tr : proofSeal.label.en} aria-label={isTr ? proofSeal.label.tr : proofSeal.label.en}>
@@ -227,7 +229,9 @@ export function ProofView(props: ProofViewProps) {
             <div className="rounded-2xl p-4" style={{ background: "var(--pf-inset)", border: "1px solid var(--pf-line)" }}>
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="text-[15px] font-semibold" style={{ color: "var(--pf-text)" }}>{t("pipeline.breakdownTitle")}</span>
-                <span className="rounded-md px-2 py-0.5 text-[10px] font-semibold" style={{ background: FLAME, color: "#1c1638" }}>{schemaLabel}</span>
+                {schemaLabel ? (
+                  <span className="rounded-md px-2 py-0.5 text-[10px] font-semibold" style={{ background: FLAME, color: "#1c1638" }}>{schemaLabel}</span>
+                ) : null}
               </div>
               <p className="mb-3 text-[11.5px] leading-relaxed" style={{ color: "var(--pf-soft)" }}>{breakdownDisplay.storyIntro}</p>
               {stackGroups.length > 0 && (

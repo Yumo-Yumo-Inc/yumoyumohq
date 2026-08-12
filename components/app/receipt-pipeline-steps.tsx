@@ -11,7 +11,11 @@ import { useAppLocale } from "@/lib/i18n/app-context";
 import { useCountUp } from "@/lib/hooks/use-count-up";
 import { ThemeCard } from "@/components/app/theme-card";
 import type { Receipt } from "@/lib/mock/types";
-import { displayHiddenCost, displayHiddenPercent } from "@/lib/receipt/display-hidden-cost";
+import {
+  displayHiddenCost,
+  displayHiddenPercent,
+  isHiddenCostUnavailable,
+} from "@/lib/receipt/display-hidden-cost";
 import { useSound } from "@/lib/audio/sound-context";
 import {
   ChevronRight,
@@ -62,11 +66,13 @@ const LAYER_PALETTE = ["#9B8FF0", "#3FD9A0", "#FFC65A", "#F2A03C", "#7CA0FF", "#
 
 function noRewardOptionsForReceipt(
   receipt: Receipt,
-  hiddenCostCore: number
+  hiddenCostCore: number | null
 ): ResolveNoRewardOptions {
   return {
     receiptDate: receipt.date,
-    hiddenCostCore,
+    // Pass null when HC is unavailable so UI does not invent
+    // "reward_pending_verification" from a literal zero.
+    hiddenCostCore: hiddenCostCore ?? undefined,
     isDuplicate: receipt.duplicateCheck?.isDuplicate === true,
     duplicateUsername: receipt.duplicateCheck?.duplicateUsername ?? null,
     currentUsername: receipt.username ?? null,
@@ -582,11 +588,19 @@ interface ResultStepProps {
 function ReceiptResultStep({ receipt, onContinue, onCancel, accountLevel = 1 }: ResultStepProps) {
   const tier = useTier(accountLevel);
   const { t } = useAppLocale();
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
   const hiddenCost = displayHiddenCost(receipt);
   const totalPaid = receipt.total;
   const productValue = Math.max(0, receipt.hiddenCost.productValue ?? totalPaid - hiddenCost);
   const hiddenPercent = displayHiddenPercent(receipt);
-  const labels = { title: t("pipeline.hiddenCostFound"), hidden: t("mine.hiddenCost"), paid: t("pipeline.paid"), realValue: t("pipeline.realValue"), viewDetails: t("pipeline.viewDetails"), cancel: t("common.cancel") };
+  const labels = {
+    title: hiddenUnavailable ? t("pipeline.hiddenCostUnavailable") : t("pipeline.hiddenCostFound"),
+    hidden: t("mine.hiddenCost"),
+    paid: t("pipeline.paid"),
+    realValue: t("pipeline.realValue"),
+    viewDetails: t("pipeline.viewDetails"),
+    cancel: t("common.cancel"),
+  };
 
   return (
     <ThemeCard accountLevel={accountLevel} className="p-5">
@@ -594,19 +608,29 @@ function ReceiptResultStep({ receipt, onContinue, onCancel, accountLevel = 1 }: 
       <div className="rounded-xl p-4 mb-4" style={{ background: "var(--app-bg-elevated)" }}>
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm" style={{ color: "var(--app-text-muted)" }}>{labels.hidden}</span>
-          <span className="font-semibold tabular-nums" style={{ color: tier.accent }}>{hiddenCost.toFixed(2)} {receipt.currency}</span>
+          <span className="font-semibold tabular-nums" style={{ color: tier.accent }}>
+            {hiddenUnavailable ? t("pipeline.hiddenCostUnavailableShort") : `${hiddenCost.toFixed(2)} ${receipt.currency}`}
+          </span>
         </div>
         <div className="flex justify-between items-center text-sm mb-2">
           <span style={{ color: "var(--app-text-muted)" }}>{labels.paid}</span>
           <span style={{ color: "var(--app-text-primary)" }}>{totalPaid.toFixed(2)} {receipt.currency}</span>
         </div>
-        <div className="flex justify-between items-center text-sm">
-          <span style={{ color: "var(--app-text-muted)" }}>{labels.realValue}</span>
-          <span style={{ color: "var(--app-text-primary)" }}>{productValue.toFixed(2)} {receipt.currency}</span>
-        </div>
-        <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--app-border)" }}>
-          <div className="h-full rounded-full" style={{ width: `${hiddenPercent}%`, background: tier.accent }} />
-        </div>
+        {!hiddenUnavailable && (
+          <div className="flex justify-between items-center text-sm">
+            <span style={{ color: "var(--app-text-muted)" }}>{labels.realValue}</span>
+            <span style={{ color: "var(--app-text-primary)" }}>{productValue.toFixed(2)} {receipt.currency}</span>
+          </div>
+        )}
+        {hiddenUnavailable ? (
+          <p className="mt-3 text-[12px] leading-snug" style={{ color: "var(--app-text-muted)" }}>
+            {t("pipeline.hiddenCostUnavailableDetail")}
+          </p>
+        ) : (
+          <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--app-border)" }}>
+            <div className="h-full rounded-full" style={{ width: `${hiddenPercent}%`, background: tier.accent }} />
+          </div>
+        )}
       </div>
       <div className="flex gap-3">
         {onCancel && (
@@ -658,6 +682,7 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
   const activeLocale = localeProp || locale;
   const copy = getMvpCopy(activeLocale);
   const breakdownDisplay = buildReceiptBreakdownDisplay(receipt, activeLocale);
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
   const hiddenCost = breakdownDisplay.hiddenCost;
   const totalPaid = receipt.total;
   const taxAmount = receipt.vat || receipt.hiddenCost.state || 0;
@@ -665,13 +690,13 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
   const noRewardMessage = resolveNoRewardMessage(
     receipt.reward,
     t,
-    noRewardOptionsForReceipt(receipt, hiddenCost)
+    noRewardOptionsForReceipt(receipt, hiddenUnavailable ? null : hiddenCost)
   );
   const showPartialReward = shouldShowPartialRewardNotice(receipt.reward);
   const hiddenPercent = totalPaid > 0 ? Math.min(100, (hiddenCost / totalPaid) * 100) : 0;
   const schemaLabel = getCategorySchemaLabel(receipt.category, activeLocale, receipt.merchantChannel);
   const productValue = Math.max(0, receipt.hiddenCost.productValue ?? totalPaid - hiddenCost);
-  const animatedHidden = useCountUp(hiddenCost);
+  const animatedHidden = useCountUp(hiddenUnavailable ? 0 : hiddenCost);
 
   // Behavioural read (deterministic, no LLM). Shown as an "estimated read".
   const xray = computeReceiptXRay(receipt);
@@ -730,9 +755,11 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
       <div className="relative z-[1] flex-1 overflow-y-auto px-4 pt-5 pb-4">
         {/* Header: category pill + "a field wrong?" */}
         <div className="scanui-rise flex items-center justify-between gap-2" style={{ animationDelay: "0.02s" }}>
-          <span className="rounded-lg border px-2.5 py-1 text-[10.5px] uppercase tracking-[0.12em] text-white/60" style={{ borderColor: "var(--scanui-card-border)" }}>
-            {schemaLabel}
-          </span>
+          {schemaLabel ? (
+            <span className="rounded-lg border px-2.5 py-1 text-[10.5px] uppercase tracking-[0.12em] text-white/60" style={{ borderColor: "var(--scanui-card-border)" }}>
+              {schemaLabel}
+            </span>
+          ) : null}
           {editableReceiptId && (
             <button type="button" onClick={() => setCorrectionOpen(true)} className="flex items-center gap-1.5 text-[12px]" style={{ color: SCANUI_GOLD }}>
               <Pencil className="h-3.5 w-3.5" />
@@ -744,24 +771,41 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
         {/* Hero — hidden cost */}
         <div className="scanui-rise mt-4" style={{ animationDelay: "0.06s" }}>
           <p className="text-[10.5px] uppercase tracking-[0.16em] text-white/45">{copy.hiddenEstimate}</p>
-          <p className="scanui-hero-num mt-1.5 text-[50px]">
-            {animatedHidden.toFixed(2)} <span className="text-[18px] font-semibold" style={{ color: SCANUI_GOLD }}>{receipt.currency}</span>
-          </p>
-          <p className="mt-2 text-[12.5px] text-white/60">
-            {receipt.merchantName || "—"}{pendingBadge("merchant_name")} · {receipt.date || "—"}{pendingBadge("date")}
-            {(receipt as { time?: string }).time ? <> · {(receipt as { time?: string }).time}</> : null}{pendingBadge("time")}
-          </p>
-          <div className="mt-3.5 h-2 overflow-hidden rounded-full" style={{ background: "var(--scanui-track)" }}>
-            <div className="scanui-ratiofill h-full rounded-full transition-[width] duration-700" style={{ width: `${hiddenPercent}%` }} />
-          </div>
-          <p className="mt-1.5 text-[11.5px] text-white/60">
-            {t("resultHero.ratioCap", { paid: `${totalPaid.toFixed(0)} ${receipt.currency}`, pct: Math.round(hiddenPercent) })}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {[copy.totalConfidence, taxAmount > 0 ? copy.taxConfidence : copy.noTaxConfidence, copy.distributionConfidence].map((chip) => (
-              <span key={chip} className="rounded-md px-2 py-1 text-[10px] text-white/60" style={{ background: "var(--scanui-soft-bg)", border: "1px solid var(--scanui-card-border)" }}>{chip}</span>
-            ))}
-          </div>
+          {hiddenUnavailable ? (
+            <>
+              <p className="scanui-hero-num mt-1.5 text-[28px] leading-tight text-white/85">
+                {t("pipeline.hiddenCostUnavailable")}
+              </p>
+              <p className="mt-2 text-[12.5px] text-white/60">
+                {receipt.merchantName || "—"}{pendingBadge("merchant_name")} · {receipt.date || "—"}{pendingBadge("date")}
+                {(receipt as { time?: string }).time ? <> · {(receipt as { time?: string }).time}</> : null}{pendingBadge("time")}
+              </p>
+              <p className="mt-3 text-[12.5px] leading-snug text-white/55">
+                {t("pipeline.hiddenCostUnavailableDetail")}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="scanui-hero-num mt-1.5 text-[50px]">
+                {animatedHidden.toFixed(2)} <span className="text-[18px] font-semibold" style={{ color: SCANUI_GOLD }}>{receipt.currency}</span>
+              </p>
+              <p className="mt-2 text-[12.5px] text-white/60">
+                {receipt.merchantName || "—"}{pendingBadge("merchant_name")} · {receipt.date || "—"}{pendingBadge("date")}
+                {(receipt as { time?: string }).time ? <> · {(receipt as { time?: string }).time}</> : null}{pendingBadge("time")}
+              </p>
+              <div className="mt-3.5 h-2 overflow-hidden rounded-full" style={{ background: "var(--scanui-track)" }}>
+                <div className="scanui-ratiofill h-full rounded-full transition-[width] duration-700" style={{ width: `${hiddenPercent}%` }} />
+              </div>
+              <p className="mt-1.5 text-[11.5px] text-white/60">
+                {t("resultHero.ratioCap", { paid: `${totalPaid.toFixed(0)} ${receipt.currency}`, pct: Math.round(hiddenPercent) })}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {[copy.totalConfidence, taxAmount > 0 ? copy.taxConfidence : copy.noTaxConfidence, copy.distributionConfidence].map((chip) => (
+                  <span key={chip} className="rounded-md px-2 py-1 text-[10px] text-white/60" style={{ background: "var(--scanui-soft-bg)", border: "1px solid var(--scanui-card-border)" }}>{chip}</span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Stats: paid / VAT / product value */}
@@ -812,7 +856,9 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
         <div className="scanui-rise scanui-card mt-4 p-4" style={{ animationDelay: "0.14s" }}>
           <div className="mb-3 flex items-center justify-between gap-2">
             <span className="text-[15px] font-semibold text-white">{labels.breakdownTitle}</span>
-            <span className="rounded-md px-2 py-0.5 text-[10px] font-semibold" style={{ background: "linear-gradient(140deg,#FFD37A,#FFB23E)", color: "#1c1638" }}>{schemaLabel}</span>
+            {schemaLabel ? (
+              <span className="rounded-md px-2 py-0.5 text-[10px] font-semibold" style={{ background: "linear-gradient(140deg,#FFD37A,#FFB23E)", color: "#1c1638" }}>{schemaLabel}</span>
+            ) : null}
           </div>
           <p className="mb-3 text-[11.5px] leading-relaxed text-white/55">{breakdownDisplay.storyIntro}</p>
 
@@ -840,9 +886,22 @@ export function ReceiptResultWithBreakdownStep({ receipt, onContinue, onCancel, 
 
           {breakdownDisplay.groups.length === 0 && taxAmount <= 0 && (
             <p className="text-[12px] leading-snug text-white/55">
-              {String(activeLocale || "").toLowerCase().startsWith("tr") ? "Bu belgede gizli masraf hesaplanamadı veya bulunmamaktadır." : "No hidden cost could be calculated for this document."}
+              {t("pipeline.hiddenCostUnavailableDetail")}
             </p>
           )}
+
+          {hiddenUnavailable && (() => {
+            const notice = getProvenanceNotice("unavailable", activeLocale);
+            return (
+              <div className="mb-3 flex items-start gap-2 rounded-xl p-3" style={{ background: "rgba(148,163,184,0.12)", border: "1px solid rgba(148,163,184,0.28)" }}>
+                <span className="mt-0.5 text-sm leading-none">ℹ️</span>
+                <div className="min-w-0">
+                  <p className="text-[12px] font-semibold text-white/80">{notice.label}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-white/55">{notice.detail}</p>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="space-y-3">
             {breakdownDisplay.groups.map(({ bucket, items, total: bucketTotal }) => {
@@ -1086,12 +1145,13 @@ export function ReceiptVectorReceiptStep({ receipt, onBack, onSave, isSaving = f
   const copy = getMvpCopy(activeLocale);
   const schemaLabel = getCategorySchemaLabel(receipt.category, activeLocale, receipt.merchantChannel);
   const taxAmount = receipt.vat || receipt.hiddenCost.state || 0;
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
   const hiddenCost = displayHiddenCost(receipt);
   const totalReward = getTotalRewardAmount(receipt.reward);
   const noRewardMessage = resolveNoRewardMessage(
     receipt.reward,
     t,
-    noRewardOptionsForReceipt(receipt, hiddenCost)
+    noRewardOptionsForReceipt(receipt, hiddenUnavailable ? null : hiddenCost)
   );
   const showPartialReward = shouldShowPartialRewardNotice(receipt.reward);
   const totalPaid = receipt.totalPaid || receipt.total;
@@ -1101,9 +1161,11 @@ export function ReceiptVectorReceiptStep({ receipt, onBack, onSave, isSaving = f
     <ThemeCard accountLevel={accountLevel} className="p-4 space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] uppercase" style={{ color: tier.accent }}>
-            {schemaLabel}
-          </p>
+          {schemaLabel ? (
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase" style={{ color: tier.accent }}>
+              {schemaLabel}
+            </p>
+          ) : null}
           <h2 className="text-lg font-semibold mt-1" style={{ color: "var(--app-text-primary)" }}>
             {isTr ? "Fişi kaydetmeden kontrol et" : "Review before saving"}
           </h2>
@@ -1265,11 +1327,12 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts, saveSt
   const schemaLabel = getCategorySchemaLabel(receipt.category, locale, receipt.merchantChannel);
   const isTr = String(locale || "").toLowerCase().startsWith("tr");
   const hiddenCost = displayHiddenCost(receipt);
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
   const totalReward = getTotalRewardAmount(receipt.reward);
   const noRewardMessage = resolveNoRewardMessage(
     receipt.reward,
     t,
-    noRewardOptionsForReceipt(receipt, hiddenCost)
+    noRewardOptionsForReceipt(receipt, hiddenUnavailable ? null : hiddenCost)
   );
   const taxAmount = receipt.vat || receipt.hiddenCost.state || 0;
   const totalPaid = receipt.totalPaid || receipt.total;
@@ -1346,7 +1409,9 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts, saveSt
         <div className="scanui-rise scanui-card mt-5 p-4" style={{ animationDelay: "0.12s" }}>
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.13em] text-white/40">{schemaLabel}</p>
+              {schemaLabel ? (
+                <p className="text-[10px] uppercase tracking-[0.13em] text-white/40">{schemaLabel}</p>
+              ) : null}
               <p className="mt-1 text-[16px] font-semibold text-white">{summaryLabel}</p>
             </div>
             <span className="shrink-0 rounded-md px-2 py-1 text-[9.5px] font-semibold" style={{ background: "linear-gradient(140deg,#FFD37A,#FFB23E)", color: "#1c1638" }}>

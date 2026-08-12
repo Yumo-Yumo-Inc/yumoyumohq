@@ -129,13 +129,16 @@ interface HiddenCostBreakdown {
  *  - regional_proxy: inflation_only countries — estimated from a comparable market's
  *    verified commercial margin (regional proxy / cross-country median), low confidence;
  *    disclosed as a regional-proxy estimate (yakın hesaplama modeli, 2026-08-06).
+ *  - unavailable: purchase document but no verified margin/proxy — must NOT display as 0
+ *    (0 means “no hidden cost”; unavailable means “could not compute”).
  */
 type HiddenCostProvenance =
   | "item_derived"
   | "retail_margin"
   | "category_derived"
   | "sector_average"
-  | "regional_proxy";
+  | "regional_proxy"
+  | "unavailable";
 
 export interface HiddenCost {
   referencePrice: number;

@@ -33,7 +33,13 @@ export interface HiddenCost {
    * MUST trigger a user-facing notice that the figure is an estimate, not computed
    * from the receipt's own line items (product decision, 2026-06-24).
    */
-  provenance?: "item_derived" | "retail_margin" | "category_derived" | "sector_average" | "regional_proxy";
+  provenance?:
+    | "item_derived"
+    | "retail_margin"
+    | "category_derived"
+    | "sector_average"
+    | "regional_proxy"
+    | "unavailable";
   /** Share (0-1) of paid amount priced from matched line items. */
   completeShare?: number;
 }
@@ -144,6 +150,8 @@ export interface Receipt {
   username?: string; // Username who uploaded this receipt (for admin viewing)
   displayName?: string; // Display name (user_profiles.display_name)
   merchantChannel?: string; // Merchant channel classification (marketplace, supermarket_grocery, etc.)
+  /** Vision document_type — used to decide whether hidden cost applies. */
+  documentType?: string | null;
   fraudInfo?: FraudInfo; // Fraud detection information (for admin display)
   riskScore?: number | null; // Fraud/risk score (0-100)
   marginViolation?: {

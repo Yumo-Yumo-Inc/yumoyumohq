@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ReceiptAnalysis } from "@/lib/receipt/types";
+import { getCategorySchemaLabel } from "@/lib/receipt/cost-layer-display";
 
 interface StyledReceiptProps {
   analysis: ReceiptAnalysis;
@@ -67,7 +68,7 @@ export function StyledReceipt({
   };
 
   const merchantName = analysis.merchant?.name || "Unknown";
-  const category = analysis.merchant?.category || "General";
+  const category = getCategorySchemaLabel(analysis.merchant?.category) || "";
   const totalPaid = analysis.pricing?.totalPaid || analysis.extraction?.total?.value || 0;
   const hiddenCost = analysis.hiddenCost?.hiddenCostCore || (analysis.hiddenCost as any)?.totalHidden || 0;
   const currency = analysis.pricing?.currency || "TRY";
@@ -181,7 +182,7 @@ export function StyledReceipt({
         <rect x="30" y="78" width="340" height="80" fill="#242424" stroke="#2f2f2f" strokeWidth="1.5" rx="8" filter={`url(#${uniqueId}-shadow)`} opacity="0.95"/>
         <text x="200" y="98" style={{ fontFamily: "Arial, sans-serif", fontSize: "8px", fontWeight: "600", letterSpacing: "1.5px" }} textAnchor="middle" fill="#94a3b8">{t.merchant}</text>
         <text x="200" y="118" style={{ fontFamily: "Georgia, serif", fontSize: "15px", fontWeight: "bold" }} textAnchor="middle" fill="#f1f5f9">{escapeXml(truncatedMerchant)}</text>
-        <text x="200" y="136" style={{ fontFamily: "Arial, sans-serif", fontSize: "9px", fontWeight: "500" }} textAnchor="middle" fill="#cbd5e1">{escapeXml(category.toUpperCase())}</text>
+        <text x="200" y="136" style={{ fontFamily: "Arial, sans-serif", fontSize: "9px", fontWeight: "500" }} textAnchor="middle" fill="#cbd5e1">{category ? escapeXml(category.toUpperCase()) : ""}</text>
         
         {/* Date & Time Section */}
         <rect x="30" y="170" width="340" height="60" fill="#242424" stroke="#2f2f2f" strokeWidth="1.5" rx="8" filter={`url(#${uniqueId}-shadow)`} opacity="0.95"/>
