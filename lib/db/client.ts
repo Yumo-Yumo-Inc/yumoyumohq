@@ -113,8 +113,9 @@ export const sql = getSql() as SqlTaggedTemplate;
 
 /**
  * Detect transient Neon connection failures that are safe to retry.
- * Covers cold-start resets, TLS handshake drops, and write timeouts seen in
- * production logs ("fetch failed" + ECONNRESET / ETIMEDOUT).
+ * Covers cold-start resets, TLS handshake drops, write timeouts, and Neon
+ * proxy permit exhaustion ("Failed to acquire permit to connect…") seen on
+ * cron jobs that collide with top-of-hour traffic.
  */
 function isTransientConnectionError(error: any): boolean {
   const cause = error?.cause;
@@ -129,6 +130,8 @@ function isTransientConnectionError(error: any): boolean {
     message.includes("econnreset") ||
     message.includes("etimedout") ||
     message.includes("socket disconnected") ||
+    message.includes("acquire permit") ||
+    message.includes("too many database connection") ||
     message.includes("connection") ||
     message.includes("timeout")
   );
