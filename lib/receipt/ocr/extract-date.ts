@@ -75,7 +75,22 @@ function isValidReceiptDate(date: Date, now: Date): boolean {
 }
 
 function buildValidatedIsoDate(year: number, month: number, day: number, now: Date): string | null {
+  // Gemini sometimes emits YYYY-DD-MM ("2026-14-08"). Month 14 is not a calendar
+  // month — swap before Date() which would overflow into the next year.
+  if (month > 12 && month <= 31 && day >= 1 && day <= 12) {
+    const swapped = month;
+    month = day;
+    day = swapped;
+  }
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
   const candidate = new Date(year, month - 1, day);
+  if (
+    candidate.getFullYear() !== year ||
+    candidate.getMonth() !== month - 1 ||
+    candidate.getDate() !== day
+  ) {
+    return null;
+  }
   if (!isValidReceiptDate(candidate, now)) return null;
   return formatIsoDateParts(year, month, day);
 }

@@ -1,7 +1,7 @@
 import type { PipelineContext, ReceiptContext } from "@/app/api/receipt/analyze/types";
 import type { ExtractionValidationResult, HiddenCostBreakdownItem } from "@/lib/receipt/types";
 import { normalizeReceiptCategory } from "@/lib/receipt/categories";
-import { resolveNoRewardReasonForContext, resolveDuplicateNoRewardCode } from "@/lib/receipt/vision-post-rules";
+import { resolveNoRewardReasonForContext, resolveDuplicateNoRewardCode, shouldComputeHiddenCost } from "@/lib/receipt/vision-post-rules";
 import { buildUploadRewardBreakdown } from "@/lib/receipt/reward-breakdown";
 import type { RewardCapResult } from "@/lib/receipt/reward-caps";
 
@@ -169,7 +169,12 @@ export function buildAnalyzeResponse({
       totalHidden: hiddenCostCore,
       hiddenRate,
       // Computation provenance — drives the mandatory "sector average" notice.
-      provenance: ctx.hiddenCostProvenance ?? undefined,
+      provenance:
+        (ctx.hiddenCostProvenance as string | undefined) ??
+        (hiddenCostCore <= 0 &&
+        shouldComputeHiddenCost(String(ctx.documentType ?? "receipt"))
+          ? "unavailable"
+          : undefined),
       completeShare: ctx.hiddenCostCompleteShare ?? undefined,
       layers: context.hiddenCostBreakdown ? {
         platformEcosystem: context.hiddenCostBreakdown.layers.platformEcosystem,

@@ -1196,22 +1196,28 @@ export function ReceiptVectorReceiptStep({ receipt, onBack, onSave, isSaving = f
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold" style={{ color: "var(--app-text-primary)" }}>{copy.hiddenEstimate}</span>
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b" }}>
-                {copy.estimated}
-              </span>
+              {!hiddenUnavailable && (
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(245,158,11,0.12)", color: "#f59e0b" }}>
+                  {copy.estimated}
+                </span>
+              )}
             </div>
-            <p className="text-xs mt-1" style={{ color: "var(--app-text-muted)" }}>{copy.updateableReward}</p>
+            <p className="text-xs mt-1" style={{ color: "var(--app-text-muted)" }}>
+              {hiddenUnavailable ? t("pipeline.hiddenCostUnavailableDetail") : copy.updateableReward}
+            </p>
           </div>
           <div className="text-right">
             <p className="text-xl font-bold tabular-nums" style={{ color: tier.accent2 }}>
-              {hiddenCost.toFixed(2)}
+              {hiddenUnavailable ? t("pipeline.hiddenCostUnavailableShort") : hiddenCost.toFixed(2)}
             </p>
-            <p className="text-[10px] uppercase" style={{ color: "var(--app-text-muted)" }}>{receipt.currency}</p>
+            <p className="text-[10px] uppercase" style={{ color: "var(--app-text-muted)" }}>{hiddenUnavailable ? "" : receipt.currency}</p>
           </div>
         </div>
+        {!hiddenUnavailable && (
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--app-border)" }}>
           <div className="h-full rounded-full" style={{ width: `${hiddenPercent}%`, background: tier.accent }} />
         </div>
+        )}
         <div className="grid grid-cols-3 gap-2">
           {[
             { label: t("receiptDetail.total"), value: totalPaid.toFixed(2), badge: copy.receiptRead, tone: "success" },
@@ -1371,7 +1377,7 @@ export function ReceiptDoneStep({ receipt, onMineAnother, onViewReceipts, saveSt
 
   const cells: { label: string; value: string; badge: string; tone: "success" | "warning" | "muted"; gold?: boolean }[] = [
     { label: t("receiptDetail.total"), value: `${totalPaid.toFixed(2)} ${receipt.currency}`, badge: copy.receiptRead, tone: "success" },
-    { label: copy.hiddenEstimate, value: `${hiddenCost.toFixed(2)} ${receipt.currency}`, badge: copy.estimated, tone: "warning" },
+    { label: copy.hiddenEstimate, value: hiddenUnavailable ? t("pipeline.hiddenCostUnavailableShort") : `${hiddenCost.toFixed(2)} ${receipt.currency}`, badge: hiddenUnavailable ? t("pipeline.hiddenCostUnavailableShort") : copy.estimated, tone: hiddenUnavailable ? "muted" : "warning" },
     { label: copy.rewardEstimate, value: `${totalReward.toFixed(2)} ${t("rewardCard.pointsUnit")}`, badge: copy.verifying, tone: "warning", gold: true },
     { label: copy.taxRead, value: `${taxAmount.toFixed(2)} ${receipt.currency}`, badge: taxAmount > 0 ? copy.receiptRead : copy.noTaxConfidence, tone: taxAmount > 0 ? "success" : "muted" },
   ];

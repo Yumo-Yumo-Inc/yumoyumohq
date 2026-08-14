@@ -37,9 +37,12 @@ import {
 } from "./price-sanity";
 import { comparableUnitPrice } from "./comparable-unit-price";
 import { isUmbrellaProductSlug, parsePackCount, resolvePiecePackCount } from "@/lib/receipt/pack-size";
+import { repairIsoDate } from "@/lib/receipt/ocr/repair-iso-date";
+import { resolveLedgerDate } from "@/lib/insights/ledger-date";
 import type {
   AnalysisPayload,
   AnalysisOverview,
+  MerchantSpendRow,
   PriceTrack,
   MerchantComparison,
   MerchantPriceRow,
@@ -170,8 +173,9 @@ function normaliseText(input: string): string {
 }
 
 function parseDateStr(dateStr: string): Date | null {
-  if (!/^\d{4}-\d{2}-\d{2}/.test(dateStr)) return null;
-  const d = new Date(`${dateStr.slice(0, 10)}T00:00:00Z`);
+  const repaired = repairIsoDate(dateStr);
+  if (!repaired) return null;
+  const d = new Date(`${repaired}T00:00:00Z`);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
@@ -314,7 +318,8 @@ async function loadReceipts(username: string, start: Date): Promise<ReceiptRow[]
   const rows = (await sql`
     SELECT
       r.receipt_id,
-      COALESCE(NULLIF(r.extraction_date_value, ''), to_char(r.created_at, 'YYYY-MM-DD')) AS dt,
+      NULLIF(r.extraction_date_value, '') AS extraction_dt,
+      to_char(r.created_at, 'YYYY-MM-DD') AS created_dt,
       NULLIF(r.extraction_time_value, '') AS tm,
       COALESCE(r.pricing_total_paid, r.extraction_total_value) AS total,
       r.hidden_cost_core AS hidden_cost,
@@ -323,13 +328,19 @@ async function loadReceipts(username: string, start: Date): Promise<ReceiptRow[]
     FROM receipts r
     WHERE r.username = ${username}
       AND COALESCE(r.expense_type, 'personal') = 'personal'
-      AND COALESCE(NULLIF(r.extraction_date_value, ''), to_char(r.created_at, 'YYYY-MM-DD')) >= ${startStr}
+      AND (
+        r.created_at >= ${start.toISOString()}
+        OR COALESCE(NULLIF(r.extraction_date_value, ''), to_char(r.created_at, 'YYYY-MM-DD')) >= ${startStr}
+      )
   `) as Record<string, unknown>[];
 
   const out: ReceiptRow[] = [];
   for (const row of Array.isArray(rows) ? rows : []) {
-    const date = typeof row.dt === "string" ? row.dt.slice(0, 10) : null;
-    if (!date || !parseDateStr(date)) continue;
+    const date = resolveLedgerDate(
+      typeof row.extraction_dt === "string" ? row.extraction_dt : null,
+      typeof row.created_dt === "string" ? row.created_dt : null
+    );
+    if (!date || date < startStr || !parseDateStr(date)) continue;
     out.push({
       receiptId: String(row.receipt_id ?? ""),
       date,
@@ -417,7 +428,8 @@ function mapItemRows(rows: Record<string, unknown>[]): ItemRow[] {
   for (const row of Array.isArray(rows) ? rows : []) {
     try {
       const name = toStr(row.name);
-      const date = typeof row.dt === "string" ? row.dt.slice(0, 10) : null;
+      const rawDate = typeof row.dt === "string" ? row.dt.slice(0, 10) : null;
+      const date = rawDate ? repairIsoDate(rawDate) : null;
       if (!name || !date || !parseDateStr(date)) continue;
       out.push({
         receiptId: String(row.receipt_id ?? ""),
@@ -642,7 +654,7 @@ function buildOverview(receipts: ReceiptRow[], receiptCount: number, now: Date):
     const ym = r.date.slice(0, 7);
     if (ym === curMonth) {
       if (r.total != null) monthTotal += r.total;
-      if (r.hiddenCost != null) {
+      if (r.hiddenCost != null && r.hiddenCost > 0) {
         hiddenCostMonth += r.hiddenCost;
         hiddenCostSeen = true;
       }
@@ -687,9 +699,9 @@ function buildPriceTracks(seriesByKey: Map<string, ProductSeries>): PriceTrack[]
     .slice(0, PRICE_TRACK_LIMIT);
 }
 
-/** Bill-style documents record payments, not shoppable products. */
+/** Bill-style documents record payments, not shoppable products.
+ *  e_invoice is a purchase (Grab, restaurant, grocery) — keep those lines. */
 const BILL_DOCUMENT_TYPES = new Set([
-  "e_invoice",
   "payment_receipt",
   "bank_statement",
   "order_list",
@@ -989,6 +1001,30 @@ function buildUnitTraps(items: ItemRow[]): UnitTrap[] {
     });
   }
   return traps.sort((a, b) => b.savingsRatio - a.savingsRatio).slice(0, UNIT_TRAP_LIMIT);
+}
+
+const MERCHANT_SPEND_LIMIT = 8;
+
+function buildMerchantSpend(receipts: ReceiptRow[], now: Date): MerchantSpendRow[] {
+  const curMonth = now.toISOString().slice(0, 7);
+  const by = new Map<string, { spend: number; receiptCount: number }>();
+  for (const r of receipts) {
+    if (r.date.slice(0, 7) !== curMonth) continue;
+    if (r.total == null || r.total <= 0) continue;
+    const name = (r.merchant && r.merchant.trim()) || "—";
+    const cur = by.get(name) ?? { spend: 0, receiptCount: 0 };
+    cur.spend += r.total;
+    cur.receiptCount += 1;
+    by.set(name, cur);
+  }
+  return [...by.entries()]
+    .map(([merchant, v]) => ({
+      merchant,
+      spend: round(v.spend, 2),
+      receiptCount: v.receiptCount,
+    }))
+    .sort((a, b) => b.spend - a.spend)
+    .slice(0, MERCHANT_SPEND_LIMIT);
 }
 
 function buildTimeHeatmap(receipts: ReceiptRow[]): TimeHeatmap | null {
@@ -1412,6 +1448,7 @@ export async function buildAnalysis(username: string): Promise<AnalysisPayload> 
     currency,
     generatedAt: now.toISOString(),
     overview: buildOverview(receipts, receiptCount, now),
+    merchantSpend: buildMerchantSpend(receipts, now),
     priceTracks: buildPriceTracks(seriesByKey),
     merchantComparison: buildMerchantComparison(items),
     unitTraps: buildUnitTraps(items),

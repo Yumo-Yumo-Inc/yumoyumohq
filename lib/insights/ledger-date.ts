@@ -3,7 +3,10 @@
  *
  * Invalid OCR/LLM dates (e.g. "2019-05-2026", "2026-06-null") must NEVER fall
  * through to "today's month" — that silently inflates the current month total.
+ * Gemini YYYY-DD-MM ("2026-14-08") is repaired to a real calendar day first.
  */
+
+import { repairIsoDate } from "@/lib/receipt/ocr/repair-iso-date";
 
 /** Exact YYYY-MM-DD, or ISO datetime starting with a real calendar day. */
 const LEDGER_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/;
@@ -18,11 +21,11 @@ export function isValidLedgerDate(value: string | null | undefined): boolean {
  * Returns null when the value is missing, malformed, or not a real calendar day.
  * Does not substitute "today".
  *
- * Important: do not slice(0,10) before validating — "2019-05-2026".slice(0,10)
- * is the fake-valid day "2019-05-20".
+ * Gemini YYYY-DD-MM ("2026-14-08") is repaired to a real day before bucketing.
  */
 export function monthKeyFromLedgerDate(value: string | null | undefined): string | null {
-  const raw = String(value ?? "").trim();
+  const repaired = repairIsoDate(value);
+  const raw = repaired ?? String(value ?? "").trim();
   const m = LEDGER_DATE_RE.exec(raw);
   if (!m) return null;
   const y = Number(m[1]);
@@ -51,8 +54,7 @@ export function resolveLedgerDate(
 ): string | null {
   const extracted = String(extractionDate ?? "").trim();
   if (monthKeyFromLedgerDate(extracted)) {
-    const m = LEDGER_DATE_RE.exec(extracted);
-    return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
+    return repairIsoDate(extracted) ?? extracted.slice(0, 10);
   }
   const created = String(createdAt ?? "").trim();
   if (monthKeyFromLedgerDate(created)) {

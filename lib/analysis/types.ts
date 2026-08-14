@@ -173,10 +173,18 @@ export interface ProductHistoryResponse {
   history: ProductHistoryItem[];
 }
 
+export interface MerchantSpendRow {
+  merchant: string;
+  spend: number;
+  receiptCount: number;
+}
+
 export interface AnalysisPayload {
   currency: string;
   generatedAt: string;
   overview: AnalysisOverview;
+  /** Current-month spend by merchant (receipt totals). Empty when none. */
+  merchantSpend: MerchantSpendRow[];
   priceTracks: PriceTrack[];
   merchantComparison: MerchantComparison | null;
   unitTraps: UnitTrap[];

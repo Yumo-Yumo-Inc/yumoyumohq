@@ -70,4 +70,26 @@ describe("display-hidden-cost", () => {
       })
     ).toBe(true);
   });
+
+  it("treats nested breakdown items as priced when present", () => {
+    expect(
+      isHiddenCostUnavailable({
+        documentType: "receipt",
+        hiddenCost: {
+          hiddenCostCore: 0,
+          breakdownItems: [],
+        },
+      })
+    ).toBe(true);
+    expect(
+      isHiddenCostUnavailable({
+        documentType: "receipt",
+        hiddenCost: {
+          hiddenCostCore: 4.95,
+          totalHidden: 4.95,
+          breakdown: { items: [{ amount: 4.95 }] },
+        } as { hiddenCostCore: number; totalHidden: number; breakdown: { items: Array<{ amount: number }> } },
+      })
+    ).toBe(false);
+  });
 });

@@ -53,6 +53,7 @@ import type {
   AnalysisPayload,
   CategoryInflationRow,
   LoyaltyItem,
+  MerchantSpendRow,
   PriceTrack,
   ShrinkflationHit,
   UnitTrap,
@@ -382,6 +383,7 @@ function MetricBar({
 
 function EssentialsPanel({ data, loading, money, tr, locale }: PanelProps) {
   const ov = data?.overview ?? null;
+  const merchantSpend = data?.merchantSpend ?? [];
   const tracks = data?.priceTracks ?? [];
   const mc = data?.merchantComparison ?? null;
   const traps = data?.unitTraps ?? [];
@@ -425,6 +427,13 @@ function EssentialsPanel({ data, loading, money, tr, locale }: PanelProps) {
   return (
     <div className="mt-6">
       <OverviewHero ov={ov} money={money} tr={tr} locale={locale} loading={loading} />
+
+      {merchantSpend.length > 0 && (
+        <>
+          <Hairline />
+          <MerchantSpendSection rows={merchantSpend} money={money} tr={tr} />
+        </>
+      )}
 
       {tracks.length > 0 && (
         <>
@@ -554,6 +563,36 @@ function OverviewHero({
         )}
       </div>
     </section>
+  );
+}
+
+function MerchantSpendSection({
+  rows,
+  money,
+  tr,
+}: {
+  rows: MerchantSpendRow[];
+  money: (n: number, digits?: number) => string;
+  tr: boolean;
+}) {
+  const max = rows.length > 0 ? Math.max(...rows.map((r) => r.spend)) : 0;
+  return (
+    <Band
+      icon={Store}
+      eyebrow={tr ? "Bu ay" : "This month"}
+      title={tr ? "Harcama nereye gitti?" : "Where the money went"}
+      subtitle={tr ? "Fiş toplamları, satıcıya göre" : "Receipt totals, by merchant"}
+    >
+      {rows.map((row) => (
+        <MetricBar
+          key={row.merchant}
+          label={row.merchant}
+          valueText={money(row.spend, 0)}
+          ratio={max > 0 ? row.spend / max : 0}
+          bold
+        />
+      ))}
+    </Band>
   );
 }
 

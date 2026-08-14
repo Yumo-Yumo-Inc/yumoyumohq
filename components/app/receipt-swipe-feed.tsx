@@ -525,12 +525,12 @@ function ReceiptFullCard(props: CardProps) {
             <div className="h-full w-px" style={{ background: "var(--app-border-strong)" }} />
           </div>
           <div className="text-right">
-            <div className="font-mono text-[10px] uppercase tracking-wider" style={{ color: hasHidden ? "var(--app-danger)" : "var(--app-success)" }}>
+            <div className="font-mono text-[10px] uppercase tracking-wider" style={{ color: hasHidden ? "var(--app-danger)" : hiddenUnavailable ? "var(--app-text-muted)" : "var(--app-success)" }}>
               {byLocale("Gizli Maliyet", "Hidden Cost", "Скрытая цена", "ต้นทุนแฝง", "Costo oculto", "隐藏成本")}
             </div>
             <div
               className="mt-1.5 text-[32px] font-extrabold leading-none tracking-tight"
-              style={{ color: hasHidden ? "var(--app-danger)" : "var(--app-success)" }}
+              style={{ color: hasHidden ? "var(--app-danger)" : hiddenUnavailable ? "var(--app-text-muted)" : "var(--app-success)" }}
             >
               {hiddenUnavailable
                 ? byLocale("Hesaplanamadı", "N/A", "Н/Д", "N/A", "N/D", "不可用")
@@ -540,7 +540,9 @@ function ReceiptFullCard(props: CardProps) {
               )}
             </div>
             <div className="mt-1.5 font-mono text-[11px]" style={{ color: "var(--app-text-muted)" }}>
-              {hasHidden
+              {hiddenUnavailable
+                ? byLocale("Gizli maliyet hesaplanamadı", "Hidden cost unavailable", "Скрытая цена недоступна", "คำนวณต้นทุนแฝงไม่ได้", "Costo oculto no disponible", "隐藏成本无法计算")
+                : hasHidden
                 ? `%${hiddenPct.toFixed(0)} ${byLocale("toplam", "of total", "от суммы", "ของยอด", "del total", "占比")}`
                 : byLocale("gizli maliyet yok", "no hidden cost", "нет скрытой цены", "ไม่มีต้นทุนแฝง", "sin costo oculto", "无隐藏成本")}
             </div>

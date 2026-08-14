@@ -7,6 +7,7 @@ import { FaFacebookF, FaTelegram, FaWhatsapp, FaXTwitter } from "react-icons/fa6
 import type { ComponentType, CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { Receipt } from "@/lib/mock/types";
+import { isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
 
 const PUBLIC_SHARE_URL = "https://yumoyumo.com";
 
@@ -95,8 +96,13 @@ export function ReceiptShareDialog({ open, onOpenChange, receipt, locale }: Prop
   const [building, setBuilding] = useState(false);
   const [error, setError] = useState(false);
 
-  const hiddenPct = receipt.total > 0 ? Math.round((receipt.hiddenCost.totalHidden / receipt.total) * 100) : 0;
-  const shareText = isTr
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
+  const hiddenPct = !hiddenUnavailable && receipt.total > 0 ? Math.round((receipt.hiddenCost.totalHidden / receipt.total) * 100) : 0;
+  const shareText = hiddenUnavailable
+    ? (isTr
+      ? `${receipt.merchantName} fişimi Yumo Yumo ile taradım. Harcamanın dökümünü gör 👇`
+      : `I scanned my ${receipt.merchantName} receipt with Yumo Yumo. See the spend breakdown 👇`)
+    : isTr
     ? `${receipt.merchantName} alışverişimde ödediğimin %${hiddenPct}'i gizli maliyetmiş. Harcamanın gerçek dökümünü Yumo Yumo ile gör 👇`
     : `${hiddenPct}% of what I paid at ${receipt.merchantName} was hidden cost. See the real breakdown of your spending with Yumo Yumo 👇`;
 

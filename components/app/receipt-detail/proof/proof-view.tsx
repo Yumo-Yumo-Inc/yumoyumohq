@@ -11,7 +11,7 @@ import {
   getCategorySchemaLabel,
 } from "@/lib/receipt/cost-layer-display";
 import { buildReceiptBreakdownDisplay } from "@/lib/receipt/build-breakdown-display";
-import { displayHiddenCost } from "@/lib/receipt/display-hidden-cost";
+import { displayHiddenCost, isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
 import { computeReceiptXRay } from "@/lib/receipt/xray/compute-xray";
 import type { Receipt } from "@/lib/mock/types";
 import { proofVars, FLAME, MONO } from "./theme";
@@ -59,6 +59,7 @@ export function ProofView(props: ProofViewProps) {
   // Card-list breakdown (same data-honest helpers the in-flow result step uses).
   const breakdownDisplay = buildReceiptBreakdownDisplay(receipt, locale);
   const hidden = displayHiddenCost(receipt);
+  const hiddenUnavailable = isHiddenCostUnavailable(receipt);
   const productValue = Math.max(0, hc.productValue ?? total - hidden);
   const hiddenPctPaid = total > 0 ? Math.min(100, (hidden / total) * 100) : 0;
   const schemaLabel = getCategorySchemaLabel(receipt.category, locale, receipt.merchantChannel);
@@ -175,12 +176,24 @@ export function ProofView(props: ProofViewProps) {
           <Reveal>
             <div>
               <p className="text-[10.5px] uppercase tracking-[0.16em]" style={{ color: "var(--pf-mute)", fontFamily: MONO }}>{mvp.hiddenEstimate}</p>
-              <p className="mt-1 text-[50px] font-bold leading-none tracking-tight" style={{ background: FLAME, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent", filter: "drop-shadow(0 5px 26px rgba(255,180,60,0.45))" }}>
-                {hidden.toFixed(2)} <span className="text-[18px] font-semibold" style={{ color: "var(--pf-gold)", WebkitTextFillColor: "var(--pf-gold)" }}>{currency}</span>
-              </p>
-              <p className="mt-2 text-[11.5px] uppercase tracking-wide" style={{ color: "var(--pf-mute)", fontFamily: MONO }}>{metaLine}</p>
-              <div className="mt-3.5 h-2 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.1)" }}><div className="h-full rounded-full" style={{ width: `${hiddenPctPaid}%`, background: FLAME }} /></div>
-              <p className="mt-1.5 text-[11.5px]" style={{ color: "var(--pf-soft)" }}>{t("resultHero.ratioCap", { paid: `${total.toFixed(0)} ${currency}`, pct: Math.round(hiddenPctPaid) })}</p>
+              {hiddenUnavailable ? (
+                <>
+                  <p className="mt-1 text-[28px] font-bold leading-tight tracking-tight" style={{ color: "var(--pf-soft)" }}>
+                    {t("pipeline.hiddenCostUnavailable")}
+                  </p>
+                  <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: "var(--pf-soft)" }}>{t("pipeline.hiddenCostUnavailableDetail")}</p>
+                  <p className="mt-2 text-[11.5px] uppercase tracking-wide" style={{ color: "var(--pf-mute)", fontFamily: MONO }}>{metaLine}</p>
+                </>
+              ) : (
+                <>
+                  <p className="mt-1 text-[50px] font-bold leading-none tracking-tight" style={{ background: FLAME, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent", filter: "drop-shadow(0 5px 26px rgba(255,180,60,0.45))" }}>
+                    {hidden.toFixed(2)} <span className="text-[18px] font-semibold" style={{ color: "var(--pf-gold)", WebkitTextFillColor: "var(--pf-gold)" }}>{currency}</span>
+                  </p>
+                  <p className="mt-2 text-[11.5px] uppercase tracking-wide" style={{ color: "var(--pf-mute)", fontFamily: MONO }}>{metaLine}</p>
+                  <div className="mt-3.5 h-2 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.1)" }}><div className="h-full rounded-full" style={{ width: `${hiddenPctPaid}%`, background: FLAME }} /></div>
+                  <p className="mt-1.5 text-[11.5px]" style={{ color: "var(--pf-soft)" }}>{t("resultHero.ratioCap", { paid: `${total.toFixed(0)} ${currency}`, pct: Math.round(hiddenPctPaid) })}</p>
+                </>
+              )}
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {[mvp.totalConfidence, vat > 0 ? mvp.taxConfidence : mvp.noTaxConfidence, mvp.distributionConfidence].map((chip) => (
                   <span key={chip} className="rounded-md px-2 py-1 text-[10px]" style={{ color: "var(--pf-mute)", background: "var(--pf-inset)", border: "1px solid var(--pf-line)" }}>{chip}</span>
@@ -206,7 +219,7 @@ export function ProofView(props: ProofViewProps) {
           </Reveal>
 
           {/* Deep Price Compare — season capability (unlocked at pass L22) */}
-          {deepPrice && (
+          {deepPrice && !hiddenUnavailable && (
             <Reveal>
               <div className="rounded-2xl p-3.5" style={{ background: "var(--pf-inset)", border: "1px solid rgba(167,139,250,0.35)" }}>
                 <span className="text-[10.5px] font-semibold uppercase tracking-wide" style={{ color: "#A78BFA" }}>
@@ -292,7 +305,7 @@ export function ProofView(props: ProofViewProps) {
           </Reveal>
 
           {/* Sector comparison — only with a sourced, verified benchmark */}
-          {sectorAvg != null && (
+          {sectorAvg != null && !hiddenUnavailable && (
             <Reveal>
               <div className="rounded-2xl p-4" style={{ background: "var(--pf-inset)", border: "1px solid var(--pf-line)" }}>
                 <p className="mb-3 text-[15px] font-semibold" style={{ color: "var(--pf-text)" }}>{t("sectorCompare.title")}</p>

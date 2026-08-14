@@ -6,7 +6,8 @@
 import type { ReceiptAnalysis } from "./types";
 import type { Receipt, HiddenCost, Reward, OCRLine, TotalCandidate } from "@/lib/mock/types";
 import type { FraudDetectionResult } from "@/lib/fraud/fraud-detection";
-import { displayHiddenCost } from "@/lib/receipt/display-hidden-cost";
+import { displayHiddenCost, isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
+import { repairIsoDate } from "@/lib/receipt/ocr/repair-iso-date";
 
 function resolveReceiptBintAmount(analysis: ReceiptAnalysis): number {
   if (analysis.reward?.final != null) {
@@ -81,16 +82,38 @@ export function convertReceiptAnalysisToReceipt(analysis: ReceiptAnalysis, image
   const productValue = originalProductValue < 0 ? 0 : originalProductValue;
   const systemSubsidy = originalProductValue < 0 ? Math.abs(originalProductValue) : undefined;
   
+  const documentType = analysis.flags?.docType ?? analysis.documentType ?? null;
   const totalPaid = analysis.pricing?.totalPaid || 0;
   const rawTotalHidden = isFlight
     ? ((analysis.hiddenCost as { hiddenTotal?: number })?.hiddenTotal ||
         analysis.hiddenCost?.hiddenCostCore ||
         0)
     : (analysis.hiddenCost?.hiddenCostCore || 0);
-  const totalHidden = displayHiddenCost({
-    totalPaid,
-    hiddenCost: { totalHidden: rawTotalHidden },
+  const hiddenUnavailable = isHiddenCostUnavailable({
+    documentType,
+    hiddenCost: {
+      hiddenCostCore: analysis.hiddenCost?.hiddenCostCore,
+      totalHidden: (analysis.hiddenCost as { totalHidden?: number } | undefined)?.totalHidden,
+      provenance: analysis.hiddenCost?.provenance,
+      breakdownItems,
+    },
+    hiddenCostCore: analysis.hiddenCost?.hiddenCostCore,
+    hiddenTotal: rawTotalHidden,
   });
+  const totalHidden = hiddenUnavailable
+    ? 0
+    : displayHiddenCost({
+        documentType,
+        totalPaid,
+        hiddenCost: {
+          totalHidden: rawTotalHidden,
+          provenance: analysis.hiddenCost?.provenance,
+          breakdownItems,
+        },
+      });
+  const provenance = hiddenUnavailable
+    ? "unavailable"
+    : analysis.hiddenCost?.provenance;
 
   // Embedded excise (ÖTV) on tobacco / alcohol / fuel — surfaced as its own layer.
   const exciseTax = isFlight ? 0 : (analysis.hiddenCost?.breakdown?.exciseTaxCost || 0);
@@ -106,7 +129,7 @@ export function convertReceiptAnalysisToReceipt(analysis: ReceiptAnalysis, image
     ...(systemSubsidy !== undefined && systemSubsidy > 0 ? { systemSubsidy } : {}), // Only include if > 0
     totalHidden,
     breakdownItems,
-    ...(analysis.hiddenCost?.provenance ? { provenance: analysis.hiddenCost.provenance } : {}),
+    ...(provenance ? { provenance } : {}),
     ...(analysis.hiddenCost?.completeShare !== undefined ? { completeShare: analysis.hiddenCost.completeShare } : {}),
   };
 
@@ -147,7 +170,7 @@ export function convertReceiptAnalysisToReceipt(analysis: ReceiptAnalysis, image
     merchantPlaceId: analysis.merchant?.placeId,
     country: analysis.merchant?.country || "",
     currency: analysis.pricing?.currency || "",
-    date: analysis.extraction?.date?.value || "",
+    date: repairIsoDate(analysis.extraction?.date?.value) || analysis.extraction?.date?.value || "",
     total: totalPaid,
     totalPaid, // Alias for compatibility
     vat: analysis.pricing?.vatAmount || 0,
@@ -176,7 +199,7 @@ export function convertReceiptAnalysisToReceipt(analysis: ReceiptAnalysis, image
     username: analysis.username, // Add username for admin viewing
     displayName: (analysis as any).displayName, // Display name (user_profiles.display_name)
     merchantChannel: analysis.merchant?.channel || "other", // Add merchant channel (fallback to "other")
-    documentType: analysis.flags?.docType ?? null,
+    documentType,
     // Fraud detection information (for admin display)
     fraudInfo: analysis.fraud ? {
       fraudScore: analysis.fraud.fraudScore,

@@ -68,7 +68,13 @@ export function isHiddenCostUnavailable(receipt: {
     return false;
   }
 
-  const items = receipt.hiddenCost?.breakdownItems ?? [];
+  const nestedItems =
+    (receipt.hiddenCost as { breakdown?: { items?: Array<{ amount?: number | null }> } } | undefined)
+      ?.breakdown?.items ?? [];
+  const items = [
+    ...(receipt.hiddenCost?.breakdownItems ?? []),
+    ...nestedItems,
+  ];
   const hasPriced = items.some((item) => (Number(item?.amount) || 0) > 0);
   return !hasPriced;
 }

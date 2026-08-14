@@ -13,6 +13,7 @@
 import type { Receipt } from "@/lib/mock/types";
 import { normalizeReceiptCategory } from "@/lib/receipt/categories";
 import { currencySymbol } from "@/components/app/receipt-detail/proof/theme";
+import { isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
 
 const W = 1080;
 const H = 1350;
@@ -182,8 +183,9 @@ export async function generateReceiptShareCard(receipt: Receipt, locale: string)
   const total = receipt.total || 0;
   const symbol = currencySymbol(receipt.currency);
   const cur = receipt.currency;
-  const hidden = hc?.totalHidden || 0;
-  const hiddenPct = total > 0 ? Math.round((hidden / total) * 100) : 0;
+  const unavailable = isHiddenCostUnavailable(receipt);
+  const hidden = unavailable ? 0 : hc?.totalHidden || 0;
+  const hiddenPct = !unavailable && total > 0 ? Math.round((hidden / total) * 100) : 0;
   const money = (v: number) => shortMoney(v, symbol, cur);
 
   // ===== background: deep slate, warm gold spotlight, cool depth =====
@@ -246,7 +248,9 @@ export async function generateReceiptShareCard(receipt: Receipt, locale: string)
   ctx.fillText(isTr ? "GİZLİ MALİYET" : "HIDDEN COST", M, y);
   setLS(0);
 
-  const heroText = money(hidden);
+  const heroText = unavailable
+    ? (isTr ? "HESAPLANAMADI" : "UNAVAILABLE")
+    : money(hidden);
   const heroSize = fitSize(heroText, (s) => COND(s, 800), 300, CW, 120);
   ctx.font = COND(heroSize, 800);
   const heroTop = y + 40;
@@ -266,7 +270,9 @@ export async function generateReceiptShareCard(receipt: Receipt, locale: string)
   const paidStr = money(total);
   ctx.fillText(isTr ? `${paidStr} ödedim` : `out of ${paidStr} I paid`, M, y);
   ctx.font = SANS(24, 800);
-  const chip = isTr ? `harcamamın %${hiddenPct}'i` : `${hiddenPct}% of my spend`;
+  const chip = unavailable
+    ? (isTr ? "gizli maliyet hesaplanamadı" : "hidden cost unavailable")
+    : isTr ? `harcamamın %${hiddenPct}'i` : `${hiddenPct}% of my spend`;
   const chipW = ctx.measureText(chip).width + 36;
   const chipH = 44;
   const chipY = y + 22;

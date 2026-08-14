@@ -462,21 +462,27 @@ export async function getReceiptsByDateRange(
   try {
     const rows = await withRetry(async () => {
       return await dbSql`
-        SELECT receipt_data, username
+        SELECT receipt_data, username, extraction_date_value, receipts.created_at
         FROM receipts
         WHERE username = ${username}
           AND COALESCE(expense_type, 'personal') = 'personal'
           AND (
+            receipts.created_at >= ${start.toISOString()} AND receipts.created_at <= ${end.toISOString()}
+            OR
             (extraction_date_value IS NOT NULL AND extraction_date_value != ''
               AND extraction_date_value >= ${startStr} AND extraction_date_value <= ${endStr})
-            OR
-            ((extraction_date_value IS NULL OR extraction_date_value = '')
-              AND receipts.created_at >= ${start.toISOString()} AND receipts.created_at <= ${end.toISOString()})
           )
         ORDER BY receipts.created_at DESC
       `;
     });
-    return rows.map((row: any) => dbRowToReceipt(row));
+    return rows.flatMap((row: any) => {
+      const createdDay = row.created_at
+        ? new Date(row.created_at).toISOString().slice(0, 10)
+        : null;
+      const day = resolveLedgerDate(row.extraction_date_value, createdDay);
+      if (!day || day < startStr || day > endStr) return [];
+      return [dbRowToReceipt(row)];
+    });
   } catch (error: any) {
     console.error("[storage-db] getReceiptsByDateRange failed:", error);
     const allReceipts = await getAllReceiptsFile();
@@ -717,30 +723,33 @@ export async function getReceiptsByDateRangeForInsights(
         WHERE username = ${username}
           AND COALESCE(expense_type, 'personal') = 'personal'
           AND (
+            receipts.created_at >= ${start.toISOString()} AND receipts.created_at <= ${end.toISOString()}
+            OR
             (extraction_date_value IS NOT NULL AND extraction_date_value != ''
               AND extraction_date_value >= ${startStr} AND extraction_date_value <= ${endStr})
-            OR
-            ((extraction_date_value IS NULL OR extraction_date_value = '')
-              AND receipts.created_at >= ${start.toISOString()} AND receipts.created_at <= ${end.toISOString()})
           )
         ORDER BY receipts.created_at DESC
       `;
     });
 
-    return (Array.isArray(rows) ? rows : []).map((row: any) => {
+    return (Array.isArray(rows) ? rows : []).flatMap((row: any) => {
       const confidence: "verified" | "low" | "rejected" =
         row.status === "verified" || row.status === "saved"
           ? "verified"
           : row.flags_rejected || row.status === "rejected"
           ? "rejected"
           : "low";
-      const dateVal = row.extraction_date_value || (row.created_at ? new Date(row.created_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10));
-      return {
+      const createdDay = row.created_at
+        ? new Date(row.created_at).toISOString().slice(0, 10)
+        : new Date().toISOString().slice(0, 10);
+      const dateVal = resolveLedgerDate(row.extraction_date_value, createdDay) ?? createdDay;
+      if (dateVal < startStr || dateVal > endStr) return [];
+      return [{
         id: row.receipt_id,
         merchantName: row.merchant_name || "Unknown",
         country: row.merchant_country || "US",
         currency: row.pricing_currency || "USD",
-        date: typeof dateVal === "string" ? dateVal.slice(0, 10) : dateVal,
+        date: dateVal,
         time: row.extraction_time_value ?? undefined,
         totalPaid: Number(row.pricing_total_paid) || 0,
         taxAmount: Number(row.pricing_vat_amount) || 0,
@@ -752,7 +761,7 @@ export async function getReceiptsByDateRangeForInsights(
         confidence,
         category: row.merchant_category || "other",
         merchantId: row.merchant_place_id ?? undefined,
-      } as ReceiptSummary;
+      } as ReceiptSummary];
     });
   } catch (error: any) {
     console.error("[storage-db] getReceiptsByDateRangeForInsights failed:", error);

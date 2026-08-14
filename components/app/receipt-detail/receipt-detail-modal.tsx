@@ -15,6 +15,7 @@ import { CategoryPickerModal } from "@/components/app/category-picker-modal";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import { useReceiptDetail } from "@/lib/receipt/use-receipt-detail";
 import type { Receipt } from "@/lib/mock/types";
+import { isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
 import { localDb } from "@/lib/local-db";
 import { deleteLocalReceiptImage } from "@/lib/local-db/receipt-images";
 import { syncMobileData } from "@/lib/sync";
@@ -98,7 +99,13 @@ export function ReceiptDetailModal({ receiptId, onClose, onDeleted, mode = "deta
   const PUBLIC_SHARE_URL = "https://yumoyumo.com";
 
   const shareTextFor = (r: Receipt) => {
-    const hiddenPct = r.total > 0 ? Math.round((r.hiddenCost.totalHidden / r.total) * 100) : 0;
+    const hiddenUnavailable = isHiddenCostUnavailable(r);
+    const hiddenPct = !hiddenUnavailable && r.total > 0 ? Math.round((r.hiddenCost.totalHidden / r.total) * 100) : 0;
+    if (hiddenUnavailable) {
+      return isTr
+        ? `${r.merchantName} fişimi Yumo Yumo ile taradım. Harcamanın dökümünü gör 👇`
+        : `I scanned my ${r.merchantName} receipt with Yumo Yumo. See the spend breakdown 👇`;
+    }
     return isTr
       ? `${r.merchantName} alışverişimde ödediğimin %${hiddenPct}'i gizli maliyetmiş. Harcamanın gerçek dökümünü Yumo Yumo ile gör 👇`
       : `${hiddenPct}% of what I paid at ${r.merchantName} was hidden cost. See the real breakdown of your spending with Yumo Yumo 👇`;

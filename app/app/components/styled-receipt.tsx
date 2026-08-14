@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ReceiptAnalysis } from "@/lib/receipt/types";
 import { getCategorySchemaLabel } from "@/lib/receipt/cost-layer-display";
+import { isHiddenCostUnavailable } from "@/lib/receipt/display-hidden-cost";
 
 interface StyledReceiptProps {
   analysis: ReceiptAnalysis;
@@ -70,7 +71,15 @@ export function StyledReceipt({
   const merchantName = analysis.merchant?.name || "Unknown";
   const category = getCategorySchemaLabel(analysis.merchant?.category) || "";
   const totalPaid = analysis.pricing?.totalPaid || analysis.extraction?.total?.value || 0;
-  const hiddenCost = analysis.hiddenCost?.hiddenCostCore || (analysis.hiddenCost as any)?.totalHidden || 0;
+  const hiddenUnavailable = isHiddenCostUnavailable({
+    documentType: analysis.flags?.docType ?? analysis.documentType,
+    hiddenCost: analysis.hiddenCost,
+    hiddenCostCore: analysis.hiddenCost?.hiddenCostCore,
+    hiddenTotal: (analysis.hiddenCost as { totalHidden?: number } | undefined)?.totalHidden,
+  });
+  const hiddenCost = hiddenUnavailable
+    ? null
+    : analysis.hiddenCost?.hiddenCostCore || (analysis.hiddenCost as { totalHidden?: number } | undefined)?.totalHidden || null;
   const currency = analysis.pricing?.currency || "TRY";
   const symbol = analysis.pricing?.symbol || "₺";
   const date = formatDate(analysis.extraction?.date?.value || new Date().toISOString());
@@ -103,6 +112,7 @@ export function StyledReceipt({
       timeNA: "Saat bilgisi yok",
       totalPaid: "ÖDENEN TOPLAM",
       hiddenCost: "GİZLİ MALİYET TESPİT EDİLDİ",
+      hiddenCostUnavailable: "GİZLİ MALİYET HESAPLANAMADI",
       thanks: "YumoYumo'yu tercih ettiğiniz için teşekkür ederiz",
       seeAgain: "Yine bekleriz",
       receiptCode: "FİŞ KODU",
@@ -114,6 +124,7 @@ export function StyledReceipt({
       timeNA: "Time not available",
       totalPaid: "TOTAL AMOUNT PAID",
       hiddenCost: "HIDDEN COST DETECTED",
+      hiddenCostUnavailable: "HIDDEN COST UNAVAILABLE",
       thanks: "Thank you for choosing YumoYumo",
       seeAgain: "We look forward to seeing you again",
       receiptCode: "RECEIPT CODE",
@@ -205,9 +216,9 @@ export function StyledReceipt({
         
         {/* Hidden Cost Section */}
         <rect x="30" y="360" width="340" height="75" fill="#1a1a1a" stroke="#ef4444" strokeWidth="2" rx="8" filter={`url(#${uniqueId}-shadow)`} opacity="0.98"/>
-        <text x="200" y="382" style={{ fontFamily: "Arial, sans-serif", fontSize: "8px", fontWeight: "600", letterSpacing: "1.5px" }} textAnchor="middle" fill="#fca5a5">{t.hiddenCost}</text>
-        <text x="200" y="408" style={{ fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: "bold" }} textAnchor="middle" fill="#ef4444">{hiddenCost.toFixed(2)}</text>
-        <text x="200" y="425" style={{ fontFamily: "Arial, sans-serif", fontSize: "10px", fontWeight: "600", letterSpacing: "1px" }} textAnchor="middle" fill="#fca5a5">{escapeXml(currency)}</text>
+        <text x="200" y="382" style={{ fontFamily: "Arial, sans-serif", fontSize: "8px", fontWeight: "600", letterSpacing: "1.5px" }} textAnchor="middle" fill="#fca5a5">{hiddenUnavailable ? t.hiddenCostUnavailable : t.hiddenCost}</text>
+        <text x="200" y="408" style={{ fontFamily: "Georgia, serif", fontSize: hiddenUnavailable ? "16px" : "22px", fontWeight: "bold" }} textAnchor="middle" fill="#ef4444">{hiddenUnavailable ? "—" : (hiddenCost ?? 0).toFixed(2)}</text>
+        <text x="200" y="425" style={{ fontFamily: "Arial, sans-serif", fontSize: "10px", fontWeight: "600", letterSpacing: "1px" }} textAnchor="middle" fill="#fca5a5">{hiddenUnavailable ? "" : escapeXml(currency)}</text>
         
         {/* Footer */}
         <text x="200" y="475" style={{ fontFamily: "Arial, sans-serif", fontSize: "9px", fontWeight: "600", letterSpacing: "0.5px" }} textAnchor="middle" fill="#cbd5e1">
