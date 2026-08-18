@@ -774,6 +774,63 @@
       "enable": "Bildirimleri aç",
       "dismiss": "Şimdilik değil"
     },
+    "demoPreview": {
+      "chapterOf": "Bölüm {current} / {total}",
+      "back": "Önceki adıma dön",
+      "exit": "Rehberi kapat",
+      "confirmed": "Tamam — sonuç oluşuyor",
+      "exiting": "Hesabın açılıyor…",
+      "targetErrorTitle": "Bu an hazır değil",
+      "targetErrorBody": "Ekrandaki öğe yüklenemedi. Aynı adımı yeniden bulmayı deneyebilirsin.",
+      "retry": "Yeniden dene",
+      "steps": {
+        "welcome": {
+          "title": "Bir fişin yolculuğu",
+          "body": "45 saniyede bir fişin harcama hafızasına, gerçek fiyat içgörüsüne ve ilerlemeye nasıl dönüştüğünü gör.",
+          "action": "Göster"
+        },
+        "receipts": {
+          "title": "Her şey fişle başlar",
+          "body": "Işığın gösterdiği son fişe dokun. İşletme, tutar ve puan tek kayıtta birleşir.",
+          "action": "Parlayan fişe dokun"
+        },
+        "month": {
+          "title": "Fiş, hafızaya dönüşür",
+          "body": "Her doğrulanmış fiş ay toplamını ve kategori dağılımını kendiliğinden günceller.",
+          "action": "Aylık görünüm oluşuyor"
+        },
+        "nav-analysis": {
+          "title": "Şimdi asıl içgörüyü aç",
+          "body": "Aynı ürün tekrarlandıkça fişler kişisel bir fiyat geçmişine dönüşür.",
+          "action": "Analiz'e dokun"
+        },
+        "analysis-price": {
+          "title": "Fiyatın izini gör",
+          "body": "Işığın gösterdiği noktaya dokun; aynı ürün için zaman içinde ödediğin fiyatı gör.",
+          "action": "Parlayan noktaya dokun"
+        },
+        "analysis-inflation": {
+          "title": "Bu oran yalnızca sana ait",
+          "body": "Genel bir tahmin değil; tekrar aldığın ürünlerin gerçek fiyat değişiminden hesaplanır.",
+          "action": "Kişisel oran hesaplandı"
+        },
+        "nav-season": {
+          "title": "Katkının karşılığını gör",
+          "body": "Doğrulanan fişlerinin ilerlemeyi nasıl büyüttüğünü görmek için Sezon'a git.",
+          "action": "Sezon'a dokun"
+        },
+        "season": {
+          "title": "Her fiş ilerleme bırakır",
+          "body": "Sezon çizgin büyür; yeni seviyeler ve ödüller yol boyunca açılır.",
+          "action": "İlerleme eklendi"
+        },
+        "nav-scan": {
+          "title": "Şimdi sıra sende",
+          "body": "Tek yapman gereken fişi taramak. Geri kalan hafızayı Yumo Yumo senin için kurar.",
+          "action": "İlk fişimi tara"
+        }
+      }
+    },
     "resultHero": {
       "ratioCap": "{paid} tutarın %{pct}'i fişte yazmayan katmanlarda."
     },

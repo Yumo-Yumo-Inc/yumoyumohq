@@ -64,6 +64,7 @@ export function BottomNav({ className }: BottomNavProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                data-tour="nav-scan"
                 aria-current={isActive ? "page" : undefined}
                 className="group flex min-w-0 flex-col items-center gap-1 rounded-[18px] px-1 py-0.5 text-center outline-none focus-visible:ring-2 focus-visible:ring-[#a8c59d]"
               >
@@ -88,6 +89,15 @@ export function BottomNav({ className }: BottomNavProps) {
             <Link
               key={item.href}
               href={item.href}
+              data-tour={
+                item.href === "/app/analysis"
+                  ? "nav-analysis"
+                  : item.href === "/app/season"
+                    ? "nav-season"
+                    : item.href === "/app/achievements"
+                      ? "nav-achievements"
+                      : undefined
+              }
               aria-current={isActive ? "page" : undefined}
               className="flex min-w-0 flex-col items-center gap-1 rounded-[18px] px-0.5 py-1.5 text-center outline-none transition focus-visible:ring-2 focus-visible:ring-[#a8c59d]"
               style={{ background: isActive ? "color-mix(in srgb, var(--app-text-primary) 9%, transparent)" : "transparent" }}

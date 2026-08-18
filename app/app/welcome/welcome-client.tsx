@@ -15,6 +15,7 @@ import {
   type Lang,
 } from "./i18n";
 import { subscribeToPush, wantsOsPushNotifications } from "@/lib/app/push-subscribe";
+import { beginDemoTour } from "@/lib/demo/tour-context";
 
 const WHY_REASONS = [
   { key: "fin_track", lens: "FINANCIAL" as const },
@@ -259,6 +260,12 @@ export default function WelcomePageClient({ initialLang }: WelcomePageClientProp
 
   const goToDashboard = () => {
     document.cookie = "onboarding_pending=; Max-Age=0; path=/; SameSite=Lax";
+    try {
+      sessionStorage.setItem("yumo:bootstrap-fresh", "1");
+    } catch {
+      // sessionStorage may be blocked
+    }
+    beginDemoTour();
     window.location.assign("/app/dashboard");
   };
 

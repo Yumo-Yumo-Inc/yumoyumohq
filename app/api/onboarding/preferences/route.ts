@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { getSessionUsername } from "@/lib/auth/session";
+import { getRealSessionUsername } from "@/lib/auth/session";
+import { applyDemoPreviewCookie } from "@/lib/auth/demo-preview";
 import { saveOnboardingPreferences } from "@/lib/onboarding/preferences";
 
 export async function POST(req: Request) {
-  const username = await getSessionUsername();
+  const username = await getRealSessionUsername();
   if (!username) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
   });
 
   const response = NextResponse.json({ success: true });
+  applyDemoPreviewCookie(response, true);
   response.cookies.set("onboarding_pending", "", {
     maxAge: 0,
     path: "/",

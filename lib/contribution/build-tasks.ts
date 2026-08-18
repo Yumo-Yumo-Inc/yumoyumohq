@@ -222,6 +222,8 @@ async function loadSubjects(limit: number): Promise<SubjectRow[]> {
         AND (li.line_kind = 'product' OR li.line_kind IS NULL)
         AND li.raw_name IS NOT NULL
         AND length(btrim(li.raw_name)) > 0
+        AND COALESCE(li.source, '') <> 'demo_seed'
+        AND r.username <> 'yumo_demo'
         -- Coarse gate: only receipts from merchants that sell shelf products carry
         -- cryptic product strings. A bank/telecom/restaurant/fuel receipt has
         -- transactions, fees and menu items, not abbreviated products to name.

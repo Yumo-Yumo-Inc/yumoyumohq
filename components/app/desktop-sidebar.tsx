@@ -168,6 +168,17 @@ export function DesktopSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              data-tour={
+                item.href === "/app/analysis"
+                  ? "nav-analysis"
+                  : item.href === "/app/season"
+                    ? "nav-season"
+                    : item.href === "/app/achievements"
+                      ? "nav-achievements"
+                      : item.href === "/app/mine"
+                        ? "nav-scan"
+                        : undefined
+              }
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-[18px] px-3 py-3 text-sm font-black transition",

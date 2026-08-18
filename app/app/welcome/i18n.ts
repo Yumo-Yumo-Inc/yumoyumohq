@@ -98,9 +98,9 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     back: "Geri",
     skip: "Geç",
     finish: "Tamamla",
-    doneTitle: "Hazırsın!",
-    doneSubtitle: "Profilin hazır. İlk fişini ekleyerek başlayabilirsin.",
-    goToApp: "Dashboard'a Git",
+    doneTitle: "Hazırsın",
+    doneSubtitle: "Profilin kaydedildi. Şimdi dolu bir hesabın nasıl göründüğüne bak — kendi belgelerini yükleyince senin analizin dolar.",
+    goToApp: "Örnek hesabı aç",
 
     personalInfoTitle: "Kendini Tanıt",
     personalInfoSubtitle: "Sana nasıl hitap edeceğimizi ve seni daha iyi tanımamızı sağlayacak birkaç bilgi.",
@@ -165,8 +165,8 @@ export const TRANSLATIONS: Record<Lang, TranslationShape> = {
     skip: "Skip",
     finish: "Finish",
     doneTitle: "You're ready",
-    doneSubtitle: "Your profile is saved. Start by adding your first receipt.",
-    goToApp: "Go to Dashboard",
+    doneSubtitle: "Your profile is saved. Next, look at a fully used account — your own numbers appear when you upload receipts.",
+    goToApp: "Open the sample account",
 
     personalInfoTitle: "Introduce Yourself",
     personalInfoSubtitle: "A few details so we know how to address you and understand you better.",

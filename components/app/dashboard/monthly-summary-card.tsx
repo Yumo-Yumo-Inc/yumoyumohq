@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { formatMoney } from "@/lib/format/money";
 import { readCachedInsights } from "@/lib/offline/cache";
 import { useAppProfile } from "@/lib/app/profile-context";
+import { useDemoTour } from "@/lib/demo/tour-context";
 import type { YumoLocale } from "@/lib/product-architecture/dashboard-contract";
 
 function byLocale(
@@ -88,13 +89,17 @@ function HeroSparkline({ points }: { points: number[] }) {
 
 export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
   const { profile } = useAppProfile();
+  const tour = useDemoTour();
   const displayName = profile?.displayName || profile?.username || "";
 
-  const { data: insights, isLoading } = useQuery({
+  const { data: liveInsights, isLoading: liveLoading } = useQuery({
     queryKey: ["dashboard-monthly-insights"],
     queryFn: () => readCachedInsights(),
     staleTime: 5 * 60_000,
+    enabled: !tour.active,
   });
+  const insights = tour.active ? tour.snapshot.insights : liveInsights;
+  const isLoading = tour.active ? false : liveLoading;
 
   const monthKey = currentMonthKey();
   const month = insights?.monthly?.[monthKey];
@@ -136,7 +141,7 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
 
   if (spent <= 0) {
     return (
-      <section className="pt-1">
+      <section className="pt-1" data-tour="month">
         <div className="flex items-center gap-3">
           <p className="min-w-0 truncate text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
             {spentEyebrow}
@@ -183,7 +188,7 @@ export function MonthlySummaryCard({ locale }: { locale: YumoLocale }) {
   const hasSpark = trend.filter((p) => Number.isFinite(p)).length >= 2;
 
   return (
-    <section aria-label={spentEyebrow} className="pt-1">
+    <section aria-label={spentEyebrow} className="pt-1" data-tour="month">
       {/* Eyebrow row — meta on the right fills the empty title line */}
       <div className="flex items-center gap-3">
         <p className="min-w-0 truncate text-[10.5px] font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">

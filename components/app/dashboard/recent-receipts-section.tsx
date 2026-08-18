@@ -13,6 +13,7 @@ import { categoryLabel } from "@/lib/i18n/taxonomy";
 import type { ReceiptAnalysis } from "@/lib/receipt/types";
 import type { Receipt } from "@/lib/mock/types";
 import type { YumoLocale } from "@/lib/product-architecture/dashboard-contract";
+import { useDemoTour } from "@/lib/demo/tour-context";
 
 /** Recent receipts on the dashboard; the header links to the full list. */
 const RECENT_LIMIT = 10;
@@ -175,7 +176,10 @@ function ReceiptTicket({
     >
       <div className="min-w-0">
         {/* Receipt icon + status */}
-        <div className="flex items-start justify-between gap-1.5">
+        <div
+          data-tour={index === 0 ? "receipt-open" : undefined}
+          className="flex items-start justify-between gap-1.5"
+        >
           <span
             className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-[-4deg]"
             style={{
@@ -232,12 +236,16 @@ function ReceiptTicket({
 
 export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
   const reducedMotion = useReducedMotion();
+  const tour = useDemoTour();
   const [detailId, setDetailId] = useState<string | null>(null);
-  const { data: rows, isLoading } = useQuery({
+  const { data: liveRows, isLoading: liveLoading } = useQuery({
     queryKey: ["dashboard-recent-receipts", RECENT_LIMIT],
     queryFn: fetchRecentReceipts,
     staleTime: 60_000,
+    enabled: !tour.active,
   });
+  const rows = tour.active ? tour.snapshot.receipts : liveRows;
+  const isLoading = tour.active ? false : liveLoading;
 
   const numLocale = intlLocaleTag(locale);
   const title = byLocale(locale, "Son Fişler", "Recent Receipts", "Последние чеки", "ใบเสร็จล่าสุด", "Recibos recientes", "最近的收据");
@@ -245,7 +253,7 @@ export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
   const hiddenChipLabel = byLocale(locale, "gizli", "hidden", "скрыто", "แฝง", "oculto", "隐藏");
 
   return (
-    <section aria-label={title}>
+    <section aria-label={title} data-tour="receipts">
       {/* Header — title + count weight; action as compact pill */}
       <div className="flex items-center gap-3">
         <h2 className="min-w-0 text-[17px] font-black tracking-tight text-[var(--app-text-primary)]">
@@ -308,7 +316,9 @@ export function RecentReceiptsSection({ locale }: { locale: YumoLocale }) {
                 numLocale={numLocale}
                 reducedMotion={reducedMotion}
                 hiddenChipLabel={hiddenChipLabel}
-                onOpen={() => setDetailId(row.id)}
+                onOpen={() => {
+                  if (!tour.active) setDetailId(row.id);
+                }}
               />
             ))}
           </div>

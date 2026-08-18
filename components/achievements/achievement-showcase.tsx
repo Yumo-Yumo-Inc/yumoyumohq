@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { AchievementBadge } from "@/components/achievements/achievement-badge";
 import { pickAchName, type AchName } from "@/config/achievements";
 import { useAppLocale } from "@/lib/i18n/app-context";
+import { useDemoTour } from "@/lib/demo/tour-context";
 
 type Tier = {
   index: number;
@@ -34,11 +35,16 @@ type Track = {
 
 export function AchievementShowcase() {
   const { locale } = useAppLocale();
+  const tour = useDemoTour();
   const loc = locale as string;
-  const [tracks, setTracks] = useState<Track[] | null>(null);
+  const [tracks, setTracks] = useState<Track[] | null>(tour.active ? (tour.snapshot.achievements as Track[]) : null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (tour.active) {
+      setTracks(tour.snapshot.achievements as Track[]);
+      return;
+    }
     let alive = true;
     fetch("/api/user/achievements", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -47,7 +53,7 @@ export function AchievementShowcase() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [tour.active, tour.snapshot.achievements]);
 
   const tr = (tk: string, en: string) => (loc === "tr" ? tk : en);
 
@@ -68,7 +74,7 @@ export function AchievementShowcase() {
 
   return (
     <div className="space-y-8">
-      {tracks.map((track) => {
+      {tracks.map((track, trackIndex) => {
         const earnedCount = track.tiers.filter((t) => t.earned).length;
         const next = track.nextTier;
         const pct = next ? Math.min(100, Math.round((track.value / next.threshold) * 100)) : 100;
@@ -103,8 +109,12 @@ export function AchievementShowcase() {
 
             {/* tier grid */}
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
-              {track.tiers.map((tier) => (
-                <div key={tier.key} className="flex flex-col items-center gap-1.5 text-center">
+              {track.tiers.map((tier, tierIndex) => (
+                <div
+                  key={tier.key}
+                  data-tour={trackIndex === 0 && tierIndex === 0 ? "achievement-open" : undefined}
+                  className="flex flex-col items-center gap-1.5 text-center"
+                >
                   <AchievementBadge
                     badgeKey={tier.key}
                     tierIndex={tier.index}

@@ -95,6 +95,11 @@ export async function getSessionState(): Promise<AppSessionState | null> {
   return resolution.session;
 }
 
+export async function getRealSessionUsername(): Promise<string | null> {
+  const session = await getSessionState();
+  return session?.username ?? null;
+}
+
 export async function getSessionUsername(): Promise<string | null> {
   const session = await getSessionState();
   return session?.username ?? null;

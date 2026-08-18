@@ -23,6 +23,7 @@ import { useAppProfile } from "@/lib/app/profile-context";
 import { cn } from "@/lib/utils";
 import { useAppLocale } from "@/lib/i18n/app-context";
 import { fetchCategorySpending, fetchWeeklySpend } from "@/lib/insights/category-spending";
+import { useDemoTour } from "@/lib/demo/tour-context";
 import {
   pickText,
   type UserFacingText,
@@ -93,16 +94,21 @@ function formatCurrency(amount: number, currency: string, locale: YumoLocale): s
 
 function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
   const [expanded, setExpanded] = useState(false);
-  const { data: buckets = [], isLoading } = useQuery({
+  const tour = useDemoTour();
+  const { data: liveBuckets = [], isLoading: liveLoading } = useQuery({
     queryKey: ["dashboard-category-spending"],
     queryFn: () => fetchCategorySpending(),
     staleTime: 5 * 60_000,
+    enabled: !tour.active,
   });
   const { data: weekly } = useQuery({
     queryKey: ["dashboard-weekly-spend"],
     queryFn: () => fetchWeeklySpend(),
     staleTime: 5 * 60_000,
+    enabled: !tour.active,
   });
+  const buckets = tour.active ? tour.snapshot.categories : liveBuckets;
+  const isLoading = tour.active ? false : liveLoading;
 
   const totalSpend = buckets.reduce((s, b) => s + b.total, 0);
   const currency = buckets[0]?.currency ?? weekly?.currency ?? "TRY";
@@ -151,7 +157,7 @@ function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
             <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
-        <div className="mt-4 rounded-[18px] border border-dashed border-[var(--app-border-strong)] p-4 text-center">
+        <div data-tour="spend" className="mt-4 rounded-[18px] border border-dashed border-[var(--app-border-strong)] p-4 text-center">
           <p className="text-sm font-bold text-[var(--app-text-secondary)]">
             {byLocale(
               locale,
@@ -179,7 +185,7 @@ function SpendingCategoryCard({ locale }: { locale: YumoLocale }) {
   const hiddenCount = buckets.length - 2;
 
   return (
-    <section aria-label={spendingBreakdownLabel}>
+    <section aria-label={spendingBreakdownLabel} data-tour="spend">
       {/* Header: typography carries hierarchy, no card frame */}
       <div className="flex items-center gap-3">
         <h2 className="min-w-0 text-[17px] font-black tracking-tight text-[var(--app-text-primary)]">

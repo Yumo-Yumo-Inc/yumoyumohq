@@ -59,16 +59,19 @@ import type {
   UnitTrap,
 } from "@/lib/analysis/types";
 import { TXT_MINI_CAPS, TXT_SECTION_LABEL, NUM_FEAT } from "@/components/insights/typography";
+import { useDemoTour } from "@/lib/demo/tour-context";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Data hook
 // ────────────────────────────────────────────────────────────────────────────
 
 function useAnalysis(): { data: AnalysisPayload | null; loading: boolean } {
+  const tour = useDemoTour();
   const [data, setData] = useState<AnalysisPayload | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!tour.active);
 
   useEffect(() => {
+    if (tour.active) return;
     let alive = true;
     (async () => {
       try {
@@ -88,8 +91,9 @@ function useAnalysis(): { data: AnalysisPayload | null; loading: boolean } {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [tour.active]);
 
+  if (tour.active) return { data: tour.snapshot.analysis, loading: false };
   return { data, loading };
 }
 
@@ -132,8 +136,13 @@ export default function AnalysisPage() {
   const { locale } = useAppLocale();
   const { data, loading } = useAnalysis();
   const reduced = useReducedMotion();
-  const [tab, setTab] = useState<TabKey>("spending");
+  const tour = useDemoTour();
+  const [tab, setTab] = useState<TabKey>(tour.active ? "deep" : "spending");
   const tr = locale === "tr";
+
+  useEffect(() => {
+    if (tour.active) setTab("deep");
+  }, [tour.active]);
 
   const currency = data?.currency ?? "TRY";
   const money = (n: number, digits = 0) => fmtCurrency(n, currency, locale, digits);
@@ -146,6 +155,7 @@ export default function AnalysisPage() {
   return (
     <AppShell>
       <div className="pb-24 lg:pb-8">
+        <div>
         {/* Header */}
         <header className="flex items-center gap-3 px-1 pt-2">
           <div
@@ -214,6 +224,7 @@ export default function AnalysisPage() {
             );
           })}
         </div>
+        </div>
 
         <AnimatePresence mode="wait">
           <motion.div
@@ -230,8 +241,8 @@ export default function AnalysisPage() {
             )}
             {tab === "deep" && (
               <>
-                <DeepInsightsPanel />
-                <Hairline />
+                {tour.active ? null : <DeepInsightsPanel />}
+                {tour.active ? null : <Hairline />}
                 <EssentialsPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />
                 <Hairline />
                 <DeepPanel data={data} loading={loading} money={money} tr={tr} locale={locale} />
@@ -277,17 +288,20 @@ function Band({
   title,
   subtitle,
   children,
+  tourId,
 }: {
   icon: LucideIcon;
   eyebrow: string;
   title: string;
   subtitle?: ReactNode;
   children: ReactNode;
+  tourId?: string;
 }) {
   const reduced = useReducedMotion();
   return (
     <motion.section
       className="px-1"
+      data-tour={tourId}
       initial={reduced ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
@@ -518,7 +532,7 @@ function OverviewHero({
   const noReceiptsThisMonth = !!ov && ov.monthTotal === 0;
 
   return (
-    <section className="px-1">
+    <section className="px-1" data-tour="analysis">
       <div className={TXT_MINI_CAPS}>{tr ? "Bu ay" : "This month"}</div>
       <motion.div
         initial={reduced ? false : { opacity: 0, y: 8 }}
@@ -654,7 +668,7 @@ function PriceTrackSection({
             {fmtPct(top.deltaRatio, locale)} {tr ? "birim fiyat" : "unit price"}
           </span>
         </div>
-        <Sparkline points={top.series.map((p) => p.unitPrice)} rising={top.deltaRatio > 0} />
+        <Sparkline points={top.series.map((p) => p.unitPrice)} rising={top.deltaRatio > 0} tourId="analysis-price" />
       </div>
 
       {rest.length > 0 && (
@@ -692,7 +706,7 @@ function trackLabel(t: PriceTrack, locale: string): string {
   return `${t.name}${pack}`;
 }
 
-function Sparkline({ points, rising }: { points: number[]; rising: boolean }) {
+function Sparkline({ points, rising, tourId }: { points: number[]; rising: boolean; tourId?: string }) {
   const reduced = useReducedMotion();
   const path = useMemo(() => {
     if (points.length < 2) return null;
@@ -738,6 +752,7 @@ function Sparkline({ points, rising }: { points: number[]; rising: boolean }) {
         transition={{ duration: 0.8, ease: "easeOut" }}
       />
       <circle cx={last[0]} cy={last[1]} r={4} fill={rising ? "var(--app-gold-light)" : "#34D399"} />
+      {tourId ? <circle data-tour={tourId} cx={last[0]} cy={last[1]} r={18} fill="transparent" /> : null}
     </svg>
   );
 }
@@ -1056,6 +1071,7 @@ function InflationGauge({ pi, tr, locale }: { pi: NonNullable<AnalysisPayload["p
         transition={{ duration: 0.4 }}
       >
         <span
+          data-tour="analysis-inflation"
           className="font-mono text-[44px] font-bold leading-none tracking-[-0.03em]"
           style={{
             ...NUM_FEAT,

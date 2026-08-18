@@ -8,6 +8,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { useDemoTour } from "@/lib/demo/tour-context";
 
 type SeasonTierRef = { index: number; key: string; cpointsReward: number };
 type SeasonNextTier = SeasonTierRef & { minSeasonXp: number };
@@ -52,11 +53,13 @@ const EMPTY_SEASON: SeasonStatus = {
 };
 
 export function useSeasonStatus() {
+  const tour = useDemoTour();
   const [data, setData] = useState<SeasonStatus | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!tour.active);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (tour.active) return;
     let alive = true;
     fetch("/api/season/status", { cache: "no-store", credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -69,8 +72,9 @@ export function useSeasonStatus() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [tour.active]);
 
+  if (tour.active) return { data: tour.snapshot.season, loading: false, error: false };
   return { data, loading, error };
 }
 

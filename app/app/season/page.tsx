@@ -134,7 +134,7 @@ export default function SeasonHubPage() {
             </div>
 
             {/* xp bar */}
-            <div className="mt-4 h-2 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+            <div data-tour="season-progress" className="mt-4 h-2 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
               <motion.div
                 className="h-full rounded-full"
                 initial={reduced ? false : { width: 0 }}

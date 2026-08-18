@@ -22,6 +22,7 @@ import { getUnlocksBetween, type AccountUnlock } from "@/config/account-unlocks"
 import { setThemeAccentKey } from "@/lib/theme/accent-store";
 import type { MobileLevelEvent } from "@/lib/mobile/action-result-types";
 import { fetchAccountCountryWithRetry } from "@/lib/auth/account-country";
+import { useDemoTour } from "@/lib/demo/tour-context";
 
 interface AppProfile {
   username?: string;
@@ -141,6 +142,7 @@ export function useAppProfile() {
 }
 
 export function AppProfileProvider({ children }: { children: ReactNode }) {
+  const tour = useDemoTour();
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const isPublicAuthPath =
@@ -176,7 +178,7 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
     queryKey: PROFILE_QUERY_KEY,
     queryFn: fetchProfileData,
     refetchInterval: 60_000,
-    enabled: !isPublicAuthPath,
+    enabled: !isPublicAuthPath && !tour.active,
   });
 
   // Mirror the chosen theme accent into the external store so useTier (mounted
@@ -289,7 +291,13 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
 
   return (
     <ProfileContext.Provider
-      value={{ profile: profile ?? null, loading, error: isError, refresh, announceLevelUp }}
+      value={{
+        profile: tour.active ? (tour.snapshot.profile as AppProfile) : profile ?? null,
+        loading: tour.active ? false : loading,
+        error: tour.active ? false : isError,
+        refresh,
+        announceLevelUp,
+      }}
     >
       {children}
       {levelUpEvent ? (
@@ -302,7 +310,7 @@ export function AppProfileProvider({ children }: { children: ReactNode }) {
           onDismiss={() => setActiveUnlockReveal(null)}
         />
       ) : null}
-      {!isPublicAuthPath && !levelUpEvent && !activeUnlockReveal ? (
+      {!isPublicAuthPath && !tour.active && !levelUpEvent && !activeUnlockReveal ? (
         <SeasonCompleteGate />
       ) : null}
     </ProfileContext.Provider>

@@ -145,6 +145,15 @@ function toNum(v: unknown): number | null {
 
 /** pack_size column may be "30adet" — extract the piece count. */
 function toPackCount(v: unknown): number | null {
+  if (typeof v === "number" && Number.isFinite(v) && v > 0) return v;
+  if (typeof v === "string") {
+    const s = v.trim().replace(",", ".");
+    const m = s.match(/^(\d+(?:\.\d+)?)\s*(kg|g|gr|l|lt|ml|cl)?$/i);
+    if (m) {
+      const n = Number(m[1]);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+  }
   return parsePackCount(v as string | number | null);
 }
 
@@ -1325,6 +1334,7 @@ async function buildCommunity(
         AND r.pricing_currency = ${currency}
         AND COALESCE(NULLIF(r.extraction_date_value, ''), to_char(r.created_at, 'YYYY-MM-DD')) >= ${startStr}
         AND COALESCE(r.pricing_total_paid, r.extraction_total_value) IS NOT NULL
+        AND r.username <> 'yumo_demo'
       GROUP BY lower(p.city)
       HAVING count(DISTINCT r.username) >= ${COMMUNITY_MIN_CONTRIBUTORS}
       ORDER BY count(*) DESC

@@ -774,6 +774,63 @@
       "enable": "Turn on",
       "dismiss": "Not now"
     },
+    "demoPreview": {
+      "chapterOf": "Chapter {current} / {total}",
+      "back": "Go to the previous step",
+      "exit": "Close the guide",
+      "confirmed": "Done — building the result",
+      "exiting": "Opening your account…",
+      "targetErrorTitle": "This moment isn't ready",
+      "targetErrorBody": "The screen element did not load. Try finding the same step again.",
+      "retry": "Try again",
+      "steps": {
+        "welcome": {
+          "title": "The journey of one receipt",
+          "body": "In 45 seconds, see a receipt become spending memory, a real price insight, and progress.",
+          "action": "Show me"
+        },
+        "receipts": {
+          "title": "It starts with a receipt",
+          "body": "Tap the recent receipt in the spotlight. Merchant, total, and points come together in one record.",
+          "action": "Tap the glowing receipt"
+        },
+        "month": {
+          "title": "A receipt becomes memory",
+          "body": "Every verified receipt updates your monthly total and category split automatically.",
+          "action": "Monthly view is taking shape"
+        },
+        "nav-analysis": {
+          "title": "Now open the real insight",
+          "body": "As products repeat, receipts become your personal price history.",
+          "action": "Tap Analysis"
+        },
+        "analysis-price": {
+          "title": "See the price trail",
+          "body": "Tap the point in the spotlight to see what you paid for the same product over time.",
+          "action": "Tap the glowing point"
+        },
+        "analysis-inflation": {
+          "title": "This rate is uniquely yours",
+          "body": "Not a generic estimate—it's calculated from the real price changes in products you buy again.",
+          "action": "Personal rate calculated"
+        },
+        "nav-season": {
+          "title": "See what your contribution earns",
+          "body": "Open Season to see how verified receipts build your progress.",
+          "action": "Tap Season"
+        },
+        "season": {
+          "title": "Every receipt leaves progress",
+          "body": "Your season line grows, unlocking new levels and rewards along the way.",
+          "action": "Progress added"
+        },
+        "nav-scan": {
+          "title": "Now it's your turn",
+          "body": "Just scan a receipt. Yumo Yumo builds the memory from there.",
+          "action": "Scan my first receipt"
+        }
+      }
+    },
     "resultHero": {
       "ratioCap": "{pct}% of {paid} sits in layers not printed on the receipt."
     },

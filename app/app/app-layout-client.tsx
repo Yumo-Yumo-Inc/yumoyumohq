@@ -3,6 +3,8 @@
 import { SolanaWalletProvider } from "@/components/providers/solana-wallet-provider";
 import { AppI18nProvider, type AppLocale } from "@/lib/i18n/app-context";
 import { AppProfileProvider } from "@/lib/app/profile-context";
+import { DemoTourProvider } from "@/lib/demo/tour-context";
+import { OnboardingTour } from "@/components/app/cinematic-onboarding-tour";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { AppQueryProvider } from "@/lib/app/app-query-client";
 import { SessionHeartbeat } from "@/components/app/session-heartbeat";
@@ -21,12 +23,15 @@ export function AppLayoutClient({
       <AppQueryProvider>
         <ThemeProvider>
           <SolanaWalletProvider>
-            <AppProfileProvider>
-              <OfflineBootstrapManager />
-              <SessionHeartbeat />
-              <AccountRestrictionNotice />
-              {children}
-            </AppProfileProvider>
+            <DemoTourProvider>
+              <AppProfileProvider>
+                <OfflineBootstrapManager />
+                <SessionHeartbeat />
+                <AccountRestrictionNotice />
+                {children}
+                <OnboardingTour />
+              </AppProfileProvider>
+            </DemoTourProvider>
           </SolanaWalletProvider>
         </ThemeProvider>
       </AppQueryProvider>

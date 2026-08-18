@@ -7,8 +7,10 @@ import {
   shouldShowGenesisPatchNotes,
 } from "@/lib/dashboard/genesis-patch-notes";
 import { GenesisPatchNotesModal } from "@/components/app/dashboard/genesis-patch-notes-modal";
+import { useDemoTour } from "@/lib/demo/tour-context";
 
 export function GenesisPatchNotesGate() {
+  const { active: tourActive } = useDemoTour();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -24,7 +26,7 @@ export function GenesisPatchNotesGate() {
     setOpen(false);
   };
 
-  if (!open) return null;
+  if (tourActive || !open) return null;
 
   return <GenesisPatchNotesModal open={open} onDismiss={handleDismiss} />;
 }

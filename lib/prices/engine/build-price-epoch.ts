@@ -306,6 +306,7 @@ async function getReceiptAnchors(
     WHERE COALESCE(r.flags_rejected, false) = false
       AND r.duplicate_of IS NULL
       AND COALESCE(r.status, '') <> 'rejected'
+      AND r.username <> 'yumo_demo'
       AND NOT EXISTS (
         SELECT 1 FROM price_epoch_receipt_leaves l
         WHERE l.receipt_id = r.receipt_id AND l.epoch_number <> ${epochNumber}
