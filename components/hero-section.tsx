@@ -26,6 +26,17 @@ function SolanaMark({ className }: { className?: string }) {
   )
 }
 
+// Frozen traction cut — single source for all locales
+// (memory/decisions/2026-08-10-temiz-traction-metrikleri.md):
+// 9 countries, 10,070 receipts, 24 monthly active users. Refresh these
+// numbers once here; every locale updates together. The MAU footnote is
+// mandatory — an unlabeled MAU figure counts as inflation.
+const TRACTION = {
+  countries: 9,
+  receipts: 10070,
+  mau: 24,
+} as const
+
 // Editorial Minimal hero: zero framer-motion, zero JS animations, zero scroll handlers.
 // Only animation in this entire section is a single CSS-driven cursor blink (opacity only,
 // runs on the compositor thread). All visual richness comes from static gradients and
@@ -39,73 +50,109 @@ export function HeroSection({ onSignUp }: HeroSectionProps) {
     subtitle: string
     description: string
     pills?: string[]
-    buttonGoApp: string
+    buttonSignIn: string
     buttonWaitlist: string
-    stats: { countries: string; receipts: string; hidden: string }
+    stats: {
+      countries: string
+      receipts: string
+      mau: string
+      footnote: string
+    }
   }> = {
     en: {
-      badge: "First on Solana",
+      badge: "Open Beta",
       title: "The financial OS for everyday life.",
       subtitle: "Receipt-powered financial intelligence.",
       description: "",
       pills: ["Spending analysis", "Habit visibility", "Price memory"],
-      buttonGoApp: "Go App",
+      buttonSignIn: "Sign in",
       buttonWaitlist: "Create Account",
-      stats: { countries: "Countries", receipts: "Receipts Analyzed", hidden: "Hidden Cost Revealed" },
+      stats: {
+        countries: "Countries",
+        receipts: "Receipts processed",
+        mau: "Monthly active users",
+        footnote: "Monthly active users: unique users who uploaded at least one receipt in the trailing 30 days, as of Aug 10, 2026.",
+      },
     },
     tr: {
-      badge: "Solana'da bir ilk",
+      badge: "Açık Beta",
       title: "Harcamanı anlayan finansal OS.",
       subtitle: "Fiş destekli finansal zeka.",
       description: "",
       pills: ["Harcama analizi", "Alışkanlık görünürlüğü", "Fiyat hafızası"],
-      buttonGoApp: "Uygulamaya Git",
+      buttonSignIn: "Giriş Yap",
       buttonWaitlist: "Hesap Oluştur",
-      stats: { countries: "Ülke", receipts: "Fiş Analiz Edildi", hidden: "Gizli Maliyet Ortaya Çıktı" },
+      stats: {
+        countries: "Ülke",
+        receipts: "İşlenen fiş",
+        mau: "Aylık aktif kullanıcı",
+        footnote: "Aylık aktif kullanıcı: son 30 gün içinde en az bir fiş yükleyen tekil kullanıcı sayısı (10 Ağustos 2026 itibarıyla).",
+      },
     },
     ru: {
-      badge: "Первый на Solana",
+      badge: "Открытая бета",
       title: "Финансовая ОС, которая понимает ваши траты.",
       subtitle: "Финансовый интеллект на основе чеков.",
       description: "",
       pills: ["Анализ трат", "Видимость привычек", "Память цен"],
-      buttonGoApp: "В приложение",
+      buttonSignIn: "Войти",
       buttonWaitlist: "Создать аккаунт",
-      stats: { countries: "Страны", receipts: "Чеков проанализировано", hidden: "Скрытых затрат выявлено" },
+      stats: {
+        countries: "Страны",
+        receipts: "Обработано чеков",
+        mau: "Активных пользователей в месяц",
+        footnote: "Активные пользователи в месяц — уникальные пользователи, загрузившие хотя бы один чек за последние 30 дней (по состоянию на 10 августа 2026 года).",
+      },
     },
     th: {
-      badge: "Solana รายแรก",
+      badge: "เปิดระยะเบต้า",
       title: "ระบบปฏิบัติการการเงินที่เข้าใจการใช้จ่ายของคุณ",
       subtitle: "ปัญญาทางการเงินจากใบเสร็จ",
       description: "",
       pills: ["วิเคราะห์การใช้จ่าย", "มองเห็นนิสัย", "ความจำราคา"],
-      buttonGoApp: "ไปที่แอป",
+      buttonSignIn: "เข้าสู่ระบบ",
       buttonWaitlist: "สร้างบัญชี",
-      stats: { countries: "ประเทศ", receipts: "ใบเสร็จที่วิเคราะห์แล้ว", hidden: "ต้นทุนที่ซ่อนอยู่ถูกเปิดเผย" },
+      stats: {
+        countries: "ประเทศ",
+        receipts: "ใบเสร็จที่ประมวลผลแล้ว",
+        mau: "ผู้ใช้งานต่อเดือน",
+        footnote: "ผู้ใช้งานต่อเดือน: ผู้ใช้รายที่อัปโหลดใบเสร็จอย่างน้อยหนึ่งใบในช่วง 30 วันที่ผ่านมา (ข้อมูล ณ วันที่ 10 สิงหาคม 2026)",
+      },
     },
     zh: {
-      badge: "Solana 首创",
+      badge: "公测",
       title: "懂你的支出的金融 OS。",
       subtitle: "收据驱动的金融智能。",
       description: "",
       pills: ["支出分析", "习惯可见性", "价格记忆"],
-      buttonGoApp: "进入应用",
+      buttonSignIn: "登录",
       buttonWaitlist: "创建账户",
-      stats: { countries: "国家", receipts: "已分析收据", hidden: "隐藏成本已揭示" },
+      stats: {
+        countries: "国家",
+        receipts: "已处理收据",
+        mau: "月活跃用户",
+        footnote: "月活跃用户：截至2026年8月10日，过去30天内上传过至少一张收据的独立用户。",
+      },
     },
     es: {
-      badge: "Primero en Solana",
+      badge: "Beta Abierta",
       title: "El OS financiero que entiende tu gasto.",
       subtitle: "Inteligencia financiera basada en recibos.",
       description: "",
       pills: ["Análisis de gasto", "Visibilidad de hábitos", "Memoria de precios"],
-      buttonGoApp: "Ir a la App",
+      buttonSignIn: "Iniciar sesión",
       buttonWaitlist: "Crear Cuenta",
-      stats: { countries: "Países", receipts: "Recibos Analizados", hidden: "Costos Ocultos Revelados" },
+      stats: {
+        countries: "Países",
+        receipts: "Recibos procesados",
+        mau: "Usuarios activos mensuales",
+        footnote: "Usuarios activos mensuales: usuarios únicos que subieron al menos un recibo en los últimos 30 días (al 10 de agosto de 2026).",
+      },
     },
   }
 
   const content = heroContent[locale] || heroContent.en
+  const numbers = new Intl.NumberFormat(locale)
 
   const handleButtonClick = () => {
     if (onSignUp) {
@@ -122,11 +169,11 @@ export function HeroSection({ onSignUp }: HeroSectionProps) {
       className="relative flex items-center justify-center overflow-hidden min-h-[calc(100svh-4rem)] py-4 md:py-0"
       style={{ background: 'radial-gradient(120% 110% at 50% 28%, #262838 0%, #121420 60%, #0d0e16 100%)' }}
     >
-      {/* Isometric Yumbie command room â€” single rAF loop, paused offscreen/hidden,
+      {/* Isometric Yumbie command room — single rAF loop, paused offscreen/hidden,
           static frame under prefers-reduced-motion. */}
       <HeroIsoRoom />
 
-      {/* Ambient light over the room â€” lifts the dark scene (screen blend) */}
+      {/* Ambient light over the room — lifts the dark scene (screen blend) */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -237,8 +284,45 @@ export function HeroSection({ onSignUp }: HeroSectionProps) {
                 if (typeof window !== 'undefined') window.location.href = '/app/login'
               }}
             >
-              {content.buttonGoApp}
+              {content.buttonSignIn}
             </Button>
+          </div>
+
+          {/* Traction stats — frozen 2026-08-10 clean cut (see decision note),
+              values from the shared TRACTION constant. MAU ships with its
+              definition; an unlabeled MAU is inflated by default. Opaque bg,
+              no backdrop blur: the iso-room canvas repaints every frame and
+              backdrop-filter would force per-frame GPU recompositing. */}
+          <div className="mt-8 md:mt-12 mx-auto max-w-2xl rounded-2xl border border-white/10 bg-black/70 px-4 py-5 md:px-8 md:py-6">
+            <div className="grid grid-cols-3 divide-x divide-white/10">
+              <div className="px-2 md:px-4 text-center">
+                <div className="text-2xl md:text-4xl font-extrabold text-white tabular-nums tracking-tight">
+                  {numbers.format(TRACTION.countries)}
+                </div>
+                <div className="mt-1.5 text-[10px] md:text-xs font-semibold uppercase tracking-[0.12em] text-white/60">
+                  {content.stats.countries}
+                </div>
+              </div>
+              <div className="px-2 md:px-4 text-center">
+                <div className="text-2xl md:text-4xl font-extrabold text-white tabular-nums tracking-tight">
+                  {numbers.format(TRACTION.receipts)}
+                </div>
+                <div className="mt-1.5 text-[10px] md:text-xs font-semibold uppercase tracking-[0.12em] text-white/60">
+                  {content.stats.receipts}
+                </div>
+              </div>
+              <div className="px-2 md:px-4 text-center">
+                <div className="text-2xl md:text-4xl font-extrabold text-white tabular-nums tracking-tight">
+                  {numbers.format(TRACTION.mau)}
+                </div>
+                <div className="mt-1.5 text-[10px] md:text-xs font-semibold uppercase tracking-[0.12em] text-white/60">
+                  {content.stats.mau}
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-center text-[10px] md:text-[11px] leading-relaxed text-white/40 max-w-xl mx-auto">
+              {content.stats.footnote}
+            </p>
           </div>
         </div>
       </div>

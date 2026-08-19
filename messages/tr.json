@@ -125,7 +125,8 @@
         "description": "Davet ettiklerin doğrulama eşiğini geçtiğinde (ör. başarılı PoE yüklemesi) açılan etkinlik bazlı ödüller."
       }
     ],
-    "detailedLink": "Detaylı tokenomik için tıkla"
+    "detailedLink": "Detaylı tokenomik için tıkla",
+    "rewardNote": "Bugün uygulama içi ödüller cPoints (katkı puanı) olarak kazanılıyor. INT token üretimi TGE’de planlanıyor."
   },
   "papers": {
     "title": "Belgelerimizi Oku",
@@ -302,9 +303,18 @@
         "year": "P1",
         "title": "Faz 1 — Erken Veri Sağlayıcıları\nFarkındalık Başlıyor",
         "items": [
-          "Adil Lansman: Topluluk odaklı likidite ve fiyat keşfi",
-          "PoE Katkısı: Fişleri uygulama içi katkı kayıtlarına dönüştür",
-          "Dijital Kimlik: Foundation NFT'ni al, seviyeni yükselt"
+          {
+            "text": "Adil Lansman: Topluluk odaklı likidite ve fiyat keşfi",
+            "status": "launching"
+          },
+          {
+            "text": "PoE Katkısı: Fişleri uygulama içi katkı kayıtlarına dönüştür",
+            "status": "live"
+          },
+          {
+            "text": "Dijital Kimlik: Foundation NFT'ni al, seviyeni yükselt",
+            "status": "launching"
+          }
         ]
       },
       {
@@ -312,9 +322,15 @@
         "year": "P2",
         "title": "Faz 2 — Genişleme\nVeriden Güce",
         "items": [
-          "Akıllı Ajanlar: NFT'ler AI destekli yol arkadaşlarına dönüşür",
-          "Staking Açılışı: Erken katılanlar için yüksek APR",
-          "Merchant Matrix: Kategori bazlı ödül çarpanları"
+          {
+            "text": "Akıllı Ajanlar: NFT'ler AI destekli yol arkadaşlarına dönüşür"
+          },
+          {
+            "text": "Staking Açılışı: Katılımcılar için uzun vadeli staking teşvikleri"
+          },
+          {
+            "text": "Merchant Matrix: Kategori bazlı ödül çarpanları"
+          }
         ]
       },
       {
@@ -322,12 +338,20 @@
         "year": "P3",
         "title": "Faz 3 — Zeka\nSistem Öğreniyor",
         "items": [
-          "Gelişmiş İçgörüler: AI destekli finansal raporlar",
-          "HCI Endeksi: Global hidden cost panosu",
-          "Olgun Protokol: Tamamen veri destekli ekonomi"
+          {
+            "text": "Gelişmiş İçgörüler: AI destekli finansal raporlar"
+          },
+          {
+            "text": "HCI Endeksi: Global hidden cost panosu"
+          },
+          {
+            "text": "Olgun Protokol: Tamamen veri destekli ekonomi"
+          }
         ]
       }
-    ]
+    ],
+    "statusLive": "Canlı",
+    "statusLaunching": "24 Ağustos’ta başlıyor"
   },
   "waitlist": {
     "title": "Bekleme Listesine Katılın",
@@ -3206,5 +3230,13 @@
       "baby": "Bebek & Çocuk",
       "other": "Diğer"
     }
+  },
+  "founder": {
+    "label": "Kurucu",
+    "name": "Uğur Alacakapı",
+    "role": "Yumo Yumo Kurucusu",
+    "bio": "Yumo Yumo, uluslararası ekonomi mezunu ve sekiz yıllık blockchain protokol araştırması deneyimine sahip Uğur Alacakapı tarafından kurulmuştur.",
+    "company": "Yumo Yumo Inc., Delaware, Amerika Birleşik Devletleri",
+    "cta": "Yumo Yumo Hakkında"
   }
 }

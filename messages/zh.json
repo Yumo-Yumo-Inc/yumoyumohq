@@ -125,7 +125,8 @@
         "description": "當受邀使用者達成驗證里程碑時解鎖。"
       }
     ],
-    "detailedLink": "[ 點擊此處查看詳細代幣經濟學白皮書]"
+    "detailedLink": "[ 點擊此處查看詳細代幣經濟學白皮書]",
+    "rewardNote": "目前应用内奖励以 cPoints（贡献积分）形式发放。INT 代币生成计划在 TGE 进行。"
   },
   "papers": {
     "title": "閱讀我們的文檔",
@@ -160,9 +161,18 @@
         "year": "P1",
         "title": "阶段一 — 起源\n觉醒开始",
         "items": [
-          "公平启动：社区驱动的流动性与价格发现",
-          "PoE 挖掘：收据转化为 points 奖励",
-          "数字身份：领取 Foundation NFT，开启成长"
+          {
+            "text": "公平启动：社区驱动的流动性与价格发现",
+            "status": "launching"
+          },
+          {
+            "text": "PoE 挖掘：收据转化为 points 奖励",
+            "status": "live"
+          },
+          {
+            "text": "数字身份：领取 Foundation NFT，开启成长",
+            "status": "launching"
+          }
         ]
       },
       {
@@ -170,9 +180,15 @@
         "year": "P2",
         "title": "阶段二 — 扩展\n从数据到力量",
         "items": [
-          "智能代理：NFT 进化为 AI 经济伙伴",
-          "质押开启：早期参与者享受高 APR",
-          "商户矩阵：按类别计算奖励倍数"
+          {
+            "text": "智能代理：NFT 进化为 AI 经济伙伴"
+          },
+          {
+            "text": "质押开启：面向参与者的长期激励"
+          },
+          {
+            "text": "商户矩阵：按类别计算奖励倍数"
+          }
         ]
       },
       {
@@ -180,12 +196,20 @@
         "year": "P3",
         "title": "阶段三 — 智能\n系统开始思考",
         "items": [
-          "高级洞察：AI 驱动的财务分析",
-          "HCI 指数：全球隐藏成本仪表盘",
-          "协议成熟：完全由数据支撑的经济体系"
+          {
+            "text": "高级洞察：AI 驱动的财务分析"
+          },
+          {
+            "text": "HCI 指数：全球隐藏成本仪表盘"
+          },
+          {
+            "text": "协议成熟：完全由数据支撑的经济体系"
+          }
         ]
       }
-    ]
+    ],
+    "statusLive": "已上线",
+    "statusLaunching": "8月24日上线"
   },
   "waitlist": {
     "title": "加入候补名单",
@@ -2402,5 +2426,13 @@
     "confidence": "置信度：{pct}%",
     "rate": "税率：{pct}%",
     "sourceLine": "从第 {line} 行提取"
+  },
+  "founder": {
+    "label": "创始人",
+    "name": "Uğur Alacakapı",
+    "role": "Yumo Yumo 创始人",
+    "bio": "Yumo Yumo 由 Uğur Alacakapı 创立。他毕业于国际经济学专业，拥有八年区块链协议研究经验。",
+    "company": "Yumo Yumo Inc.，美国特拉华州",
+    "cta": "关于 Yumo Yumo"
   }
 }

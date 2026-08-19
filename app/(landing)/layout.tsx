@@ -5,6 +5,33 @@ import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { I18nProvider } from "@/lib/i18n/context";
 import NextAuthProvider from "@/components/session-provider";
 
+// JSON-LD (plan item 17): Organization + WebSite. `sameAs` lists only
+// verified public profiles — X today; Telegram is added when its URL exists.
+const LANDING_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yumoyumo.com/#organization",
+      name: "Yumo Yumo",
+      url: "https://yumoyumo.com",
+      logo: "https://yumoyumo.com/pwa/icon-512.png",
+      founder: {
+        "@type": "Person",
+        name: "Uğur Alacakapı",
+      },
+      sameAs: ["https://twitter.com/yumohq"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yumoyumo.com/#website",
+      name: "Yumo Yumo",
+      url: "https://yumoyumo.com",
+      publisher: { "@id": "https://yumoyumo.com/#organization" },
+    },
+  ],
+};
+
 export default function LandingLayout({
   children,
 }: {
@@ -25,6 +52,10 @@ export default function LandingLayout({
             fontFamily: "Inter, system-ui, sans-serif",
           }}
         >
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(LANDING_JSON_LD) }}
+          />
           <Navigation />
           <main style={{ flex: 1 }}>
             {children}

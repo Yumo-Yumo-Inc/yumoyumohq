@@ -17,7 +17,7 @@ export function PapersSection() {
   const seriousPaperTags = Array.isArray(seriousPaperTagsRaw) ? seriousPaperTagsRaw : []
 
   const getVisionPaperUrl = () => `/vision/${locale || "en"}`
-  const getTechnicalPaperUrl = () => `/technical-paper/${locale || "tr"}`
+  const getTechnicalPaperUrl = () => `/technical-paper/${locale || "en"}`
 
   return (
     <section className="py-20 px-4">

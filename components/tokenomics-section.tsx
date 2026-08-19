@@ -314,7 +314,7 @@ export function TokenomicsSection() {
 
   // Get tokenomics URL based on current locale
   const getTokenomicsUrl = () => {
-    return `/technical-paper/${locale || "tr"}/04-tokenomics-mechanics/08-supply-and-allocation`
+    return `/technical-paper/${locale || "en"}/04-tokenomics-mechanics/08-supply-and-allocation`
   }
 
   const distribution =
@@ -357,6 +357,11 @@ export function TokenomicsSection() {
           </p>
           <p className="text-sm text-gray-400 max-w-2xl mx-auto px-2">
             {t('tokenomics.totalSupply')}
+          </p>
+          {/* Reward-unit framing: today's unit is cPoints; INT generation is
+              planned for the TGE (mint not yet on-chain — plan item 9). */}
+          <p className="text-sm text-gray-300 max-w-2xl mx-auto px-2 mt-2">
+            {t('tokenomics.rewardNote')}
           </p>
         </motion.div>
 

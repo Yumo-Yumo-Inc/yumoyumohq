@@ -25,7 +25,7 @@ const CONTENT: Record<string, Locale> = {
     label: 'What is Yumo Yumo?',
     parts: [
       { t: 'Yumo Yumo', hl: 'brand' },
-      { t: ' is the first blockchain project that records all spending and generates value from ' },
+      { t: ' records everyday spending and generates value from ' },
       { t: 'real economic data', hl: 'accent' },
       { t: '. Every purchase you make turns into data — and that data turns into ' },
       { t: 'rewards for you', hl: 'accent' },
@@ -37,9 +37,9 @@ const CONTENT: Record<string, Locale> = {
     label: 'Yumo Yumo nedir?',
     parts: [
       { t: 'Yumo Yumo', hl: 'brand' },
-      { t: ', tüm harcamaları kayıt altına alan ve ' },
+      { t: ', günlük harcamaları kayıt altına alır ve ' },
       { t: 'gerçek ekonomik verilerden', hl: 'accent' },
-      { t: ' değer üreten ilk blockchain projesidir. Harcadığın her kuruş artık veriye, o veri de ' },
+      { t: ' değer üretir. Harcadığın her kuruş artık veriye, o veri de ' },
       { t: 'sana ödüle', hl: 'accent' },
       { t: ' dönüşüyor.' },
     ],
@@ -49,7 +49,7 @@ const CONTENT: Record<string, Locale> = {
     label: 'Что такое Yumo Yumo?',
     parts: [
       { t: 'Yumo Yumo', hl: 'brand' },
-      { t: ' — первый блокчейн-проект, который фиксирует все расходы и создаёт ценность из ' },
+      { t: ' фиксирует повседневные расходы и создаёт ценность из ' },
       { t: 'реальных экономических данных', hl: 'accent' },
       { t: '. Каждая твоя покупка превращается в данные, а эти данные — в ' },
       { t: 'награды для тебя', hl: 'accent' },
@@ -61,7 +61,7 @@ const CONTENT: Record<string, Locale> = {
     label: 'Yumo Yumo คืออะไร?',
     parts: [
       { t: 'Yumo Yumo', hl: 'brand' },
-      { t: ' คือโครงการบล็อกเชนแรกที่บันทึกค่าใช้จ่ายทั้งหมดและสร้างมูลค่าจาก' },
+      { t: ' บันทึกการใช้จ่ายประจำวันและสร้างมูลค่าจาก' },
       { t: 'ข้อมูลเศรษฐกิจจริง', hl: 'accent' },
       { t: ' ทุกการใช้จ่ายของคุณกลายเป็นข้อมูล และข้อมูลนั้นก็กลายเป็น' },
       { t: 'รางวัลของคุณ', hl: 'accent' },
@@ -72,9 +72,9 @@ const CONTENT: Record<string, Locale> = {
     label: '什么是 Yumo Yumo？',
     parts: [
       { t: 'Yumo Yumo', hl: 'brand' },
-      { t: ' 是首个记录所有支出并从' },
+      { t: ' 记录日常支出，并从' },
       { t: '真实经济数据', hl: 'accent' },
-      { t: '中创造价值的区块链项目。你的每一笔消费都化作数据，而这些数据又化作' },
+      { t: '中创造价值。你的每一笔消费都化作数据，而这些数据又化作' },
       { t: '属于你的奖励', hl: 'accent' },
       { t: '。' },
     ],
@@ -84,7 +84,7 @@ const CONTENT: Record<string, Locale> = {
     label: '¿Qué es Yumo Yumo?',
     parts: [
       { t: 'Yumo Yumo', hl: 'brand' },
-      { t: ' es el primer proyecto blockchain que registra todos los gastos y genera valor a partir de ' },
+      { t: ' registra los gastos cotidianos y genera valor a partir de ' },
       { t: 'datos económicos reales', hl: 'accent' },
       { t: '. Cada compra que haces se convierte en datos, y esos datos se convierten en ' },
       { t: 'recompensas para ti', hl: 'accent' },

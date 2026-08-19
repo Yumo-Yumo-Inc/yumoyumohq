@@ -13,7 +13,12 @@ const PhaseBadge = ({ phase, gradient }: { phase: string; gradient: string }) =>
 
 export function RoadmapSection() {
   const { t } = useTranslations()
-  const roadmapData = t('roadmap.items') as Array<{ quarter: string; year: string; title: string; items: string[] }>
+  const roadmapData = t('roadmap.items') as Array<{
+    quarter: string
+    year: string
+    title: string
+    items: Array<{ text: string; status?: 'live' | 'launching' }>
+  }>
 
   const phases = [
     { gradient: "from-primary to-orange-500", emoji: "🚀" },
@@ -67,12 +72,28 @@ export function RoadmapSection() {
                       <h3 className="text-2xl font-bold text-white leading-tight">{item.title}</h3>
                     </div>
 
-                    {/* Items */}
+                    {/* Items — status badges only on verified items (plan item 8:
+                        Live = cPoints ledger / PoE data contribution; Launching
+                        = TGE public announcement (Aug 24); others carry no marker). */}
                     <div className="space-y-3">
-                      {Array.isArray(item.items) && item.items.map((itemText, subIdx) => (
+                      {Array.isArray(item.items) && item.items.map((subItem, subIdx) => (
                         <div key={subIdx} className="flex items-start gap-3 group/item">
                           <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${phase.gradient} mt-1.5 flex-shrink-0`} />
-                          <span className="text-gray-300 text-sm leading-relaxed group-hover/item:text-white transition-colors">{itemText}</span>
+                          <span className="text-gray-300 text-sm leading-relaxed group-hover/item:text-white transition-colors">
+                            {subItem.text}
+                            {subItem.status === 'live' && (
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300 align-middle">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                                {t('roadmap.statusLive')}
+                              </span>
+                            )}
+                            {subItem.status === 'launching' && (
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 align-middle">
+                                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden="true" />
+                                {t('roadmap.statusLaunching')}
+                              </span>
+                            )}
+                          </span>
                         </div>
                       ))}
                     </div>

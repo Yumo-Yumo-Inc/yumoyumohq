@@ -125,7 +125,8 @@
         "description": "Desbloqueos por eventos cuando los invitados completan hitos de verificación (por ejemplo una carga PoE exitosa)."
       }
     ],
-    "detailedLink": "[ Haz clic aquí para ver el Whitepaper detallado]"
+    "detailedLink": "[ Haz clic aquí para ver el Whitepaper detallado]",
+    "rewardNote": "Hoy las recompensas dentro de la aplicación se obtienen en cPoints (puntos de contribución). La generación del token INT está planificada para el TGE."
   },
   "papers": {
     "title": "Explora Nuestra Documentación",
@@ -160,9 +161,18 @@
         "year": "P1",
         "title": "Fase 1: Génesis — El Despertar de la Conciencia\nEl viaje comienza",
         "items": [
-          "Lanzamiento Justo (Fair Launch): Descubrimiento de precio y liquidez impulsados 100% por la comunidad.",
-          "Contribución de Datos PoE: Empieza a transformar tus recibos en recompensas de datos points.",
-          "Identidad Digital: Reclama tu Foundation NFT y asegura tu lugar en el origen del ecosistema."
+          {
+            "text": "Lanzamiento Justo (Fair Launch): Descubrimiento de precio y liquidez impulsados 100% por la comunidad.",
+            "status": "launching"
+          },
+          {
+            "text": "Contribución de Datos PoE: Empieza a transformar tus recibos en recompensas de datos points.",
+            "status": "live"
+          },
+          {
+            "text": "Identidad Digital: Reclama tu Foundation NFT y asegura tu lugar en el origen del ecosistema.",
+            "status": "launching"
+          }
         ]
       },
       {
@@ -170,9 +180,15 @@
         "year": "P2",
         "title": "Fase 2: Expansión — Del Dato al Poder\nAumentando el impacto",
         "items": [
-          "Agentes Inteligentes: Los NFTs evolucionan para convertirse en tus compañeros personales con IA.",
-          "Staking Activo: Apertura de pools con alto APR exclusivos para los primeros creyentes del protocolo.",
-          "Merchant Matrix: Desbloquea multiplicadores de recompensa en las categorías de gasto más importantes."
+          {
+            "text": "Agentes Inteligentes: Los NFTs evolucionan para convertirse en tus compañeros personales con IA."
+          },
+          {
+            "text": "Staking: Incentivos de participación a largo plazo para los participantes"
+          },
+          {
+            "text": "Merchant Matrix: Desbloquea multiplicadores de recompensa en las categorías de gasto más importantes."
+          }
         ]
       },
       {
@@ -180,12 +196,20 @@
         "year": "P3",
         "title": "Fase 3: Inteligencia — El Sistema Cobra Vida\nIA y Visión Global",
         "items": [
-          "Insights Avanzados: Reportes financieros personalizados y optimizados por Inteligencia Artificial.",
-          "Panel HCI: Lanzamiento del Índice de Costos Ocultos, el primer monitor económico global descentralizado.",
-          "Madurez del Protocolo: Consolidación de una economía real impulsada por datos transparentes."
+          {
+            "text": "Insights Avanzados: Reportes financieros personalizados y optimizados por Inteligencia Artificial."
+          },
+          {
+            "text": "Panel HCI: Lanzamiento del Índice de Costos Ocultos, un monitor económico global descentralizado."
+          },
+          {
+            "text": "Madurez del Protocolo: Consolidación de una economía real impulsada por datos transparentes."
+          }
         ]
       }
-    ]
+    ],
+    "statusLive": "Activo",
+    "statusLaunching": "Lanzamiento: 24 de agosto"
   },
   "waitlist": {
     "title": "Únete a la Lista de Espera",
@@ -2363,5 +2387,13 @@
     "confidence": "Confianza: {pct}%",
     "rate": "Tasa: {pct}%",
     "sourceLine": "Extraído de la línea {line}"
+  },
+  "founder": {
+    "label": "Fundador",
+    "name": "Uğur Alacakapı",
+    "role": "Fundador de Yumo Yumo",
+    "bio": "Yumo Yumo fue fundado por Uğur Alacakapı, graduado en economía internacional con ocho años de experiencia en investigación de protocolos blockchain.",
+    "company": "Yumo Yumo Inc., Delaware, Estados Unidos",
+    "cta": "Sobre Yumo Yumo"
   }
 }

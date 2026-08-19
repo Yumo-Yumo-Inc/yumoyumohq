@@ -125,7 +125,8 @@
         "description": "Event-based unlocks when invitees complete verification milestones (e.g. a successful PoE upload)."
       }
     ],
-    "detailedLink": "Click here for detailed tokenomics"
+    "detailedLink": "Click here for detailed tokenomics",
+    "rewardNote": "In-app rewards are earned as cPoints (contribution points) today. INT token generation is planned for the TGE."
   },
   "papers": {
     "title": "Read Our Papers",
@@ -160,9 +161,18 @@
         "year": "P1",
         "title": "Phase 1 — Early Data Contributors\nAwareness Begins",
         "items": [
-          "Fair Launch: Community-led liquidity & price discovery",
-          "PoE Data Contribution: Turn receipts into in-app contribution records",
-          "Digital Identity: Claim your Foundation NFT & start leveling"
+          {
+            "text": "Fair Launch: Community-led liquidity & price discovery",
+            "status": "launching"
+          },
+          {
+            "text": "PoE Data Contribution: Turn receipts into in-app contribution records",
+            "status": "live"
+          },
+          {
+            "text": "Digital Identity: Claim your Foundation NFT & start leveling",
+            "status": "launching"
+          }
         ]
       },
       {
@@ -170,9 +180,15 @@
         "year": "P2",
         "title": "Phase 2 — Expansion\nFrom Data to Power",
         "items": [
-          "Smart Agents: NFTs evolve into AI-powered companions",
-          "Staking Unlocks: High-APR pools for early believers",
-          "Merchant Matrix: Category-based reward multipliers"
+          {
+            "text": "Smart Agents: NFTs evolve into AI-powered companions"
+          },
+          {
+            "text": "Staking Unlocks: Long-term staking incentives for participants"
+          },
+          {
+            "text": "Merchant Matrix: Category-based reward multipliers"
+          }
         ]
       },
       {
@@ -180,12 +196,20 @@
         "year": "P3",
         "title": "Phase 3 — Intelligence\nThe System Thinks",
         "items": [
-          "Advanced Insights: AI-driven financial reports",
-          "HCI Index: Global hidden cost dashboard",
-          "Protocol Maturity: Fully data-backed economy"
+          {
+            "text": "Advanced Insights: AI-driven financial reports"
+          },
+          {
+            "text": "HCI Index: Global hidden cost dashboard"
+          },
+          {
+            "text": "Protocol Maturity: Fully data-backed economy"
+          }
         ]
       }
-    ]
+    ],
+    "statusLive": "Live",
+    "statusLaunching": "Launching Aug 24"
   },
   "waitlist": {
     "title": "Join the Waitlist",
@@ -3206,5 +3230,13 @@
       "baby": "Baby & Kids",
       "other": "Other"
     }
+  },
+  "founder": {
+    "label": "Founder",
+    "name": "Uğur Alacakapı",
+    "role": "Founder, Yumo Yumo",
+    "bio": "Yumo Yumo was founded by Uğur Alacakapı, an international economics graduate with eight years of blockchain-protocol research experience.",
+    "company": "Yumo Yumo Inc., Delaware, United States",
+    "cta": "About Yumo Yumo"
   }
 }
